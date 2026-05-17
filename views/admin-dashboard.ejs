@@ -12,44 +12,85 @@
 </div>
 
 <div class="grid-3" style="align-items: start;">
-    <!-- Panel Berita -->
-    <div class="glass" style="padding: 25px; grid-column: span 2;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;">
-            <h3 style="display:flex; align-items:center; gap:10px; margin:0;"><i data-lucide="file-text" class="text-primary"></i> Kelola Berita</h3>
-            <button class="btn btn-primary" style="padding:8px 15px; font-size:0.85rem;">+ Tambah</button>
-        </div>
+    <!-- Bagian Kiri (Berisi Berita dan Kepengurusan) -->
+    <div style="grid-column: span 2; display:flex; flex-direction:column; gap:30px;">
         
-        <div style="overflow-x:auto;">
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Judul</th>
-                        <th>Kategori</th>
-                        <th style="text-align:right;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% news.forEach(item => { %>
-                    <tr>
-                        <td style="font-weight:600;"><%= item.title %></td>
-                        <td><span style="background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px; font-size:0.8rem;"><%= item.category %></span></td>
-                        <td style="text-align:right;">
-                            <button class="action-btn edit"><i data-lucide="edit" style="width:18px;"></i></button>
-                            <button class="action-btn delete"><i data-lucide="trash-2" style="width:18px;"></i></button>
-                        </td>
-                    </tr>
-                    <% }) %>
-                </tbody>
-            </table>
+        <!-- Panel Berita -->
+        <div class="glass" style="padding: 25px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;">
+                <h3 style="display:flex; align-items:center; gap:10px; margin:0;"><i data-lucide="file-text" class="text-primary"></i> Kelola Berita</h3>
+                <button class="btn btn-primary" onclick="openModal('modalBerita')" style="padding:8px 15px; font-size:0.85rem;">+ Tambah Berita</button>
+            </div>
+            
+            <div style="overflow-x:auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Judul Berita</th>
+                            <th>Kategori</th>
+                            <th style="text-align:right;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% news.forEach(item => { %>
+                        <tr>
+                            <td style="font-weight:600;"><%= item.title %></td>
+                            <td><span style="background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px; font-size:0.8rem;"><%= item.category %></span></td>
+                            <td style="text-align:right;">
+                                <button class="action-btn edit"><i data-lucide="edit" style="width:18px;"></i></button>
+                                <button class="action-btn delete"><i data-lucide="trash-2" style="width:18px;"></i></button>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
         </div>
+
+        <!-- Panel Kelola Pengurus Baru -->
+        <div class="glass" style="padding: 25px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;">
+                <h3 style="display:flex; align-items:center; gap:10px; margin:0;"><i data-lucide="users" class="text-primary"></i> Kelola Galeri Pengurus</h3>
+                <div>
+                    <button class="btn btn-primary" onclick="openModal('modalPengurus')" style="padding:8px 15px; font-size:0.85rem; margin-right:5px;">+ Pengurus</button>
+                    <button class="btn" onclick="openModal('modalBidang')" style="padding:8px 15px; font-size:0.85rem; background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2);">+ Bidang</button>
+                </div>
+            </div>
+            
+            <div style="overflow-x:auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Nama Pengurus</th>
+                            <th>Jabatan</th>
+                            <th style="text-align:right;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% pengurus.forEach(person => { %>
+                        <tr>
+                            <td style="font-weight:600;"><%= person.name %></td>
+                            <td style="color:#4ade80; font-size:0.85rem;"><%= person.role %></td>
+                            <td style="text-align:right;">
+                                <button class="action-btn edit"><i data-lucide="edit" style="width:18px;"></i></button>
+                                <button class="action-btn delete"><i data-lucide="trash-2" style="width:18px;"></i></button>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Sidebar Tools -->
+    <!-- Sidebar Kanan Tools -->
     <div style="display:flex; flex-direction:column; gap:30px;">
-        <!-- Panel Galeri -->
+        
+        <!-- Panel Galeri Kegiatan -->
         <div class="glass" style="padding: 25px;">
-            <h3 style="display:flex; align-items:center; gap:10px; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="image" class="text-primary"></i> Kelola Galeri</h3>
-            <button class="btn" style="width:100%; background:rgba(255,255,255,0.1); color:#fff; margin-bottom:20px; border:1px solid rgba(255,255,255,0.2);">Buat Album Baru</button>
+            <h3 style="display:flex; align-items:center; gap:10px; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="image" class="text-primary"></i> Kelola Galeri Kegiatan</h3>
+            <button class="btn" onclick="openModal('modalAlbum')" style="width:100%; background:rgba(255,255,255,0.1); color:#fff; margin-bottom:20px; border:1px solid rgba(255,255,255,0.2);">+ Tambah Galeri Foto</button>
             <ul style="display:flex; flex-direction:column; gap:10px;">
                 <% albums.forEach(album => { %>
                 <li style="background:rgba(0,0,0,0.3); padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
@@ -74,5 +115,114 @@
         </div>
     </div>
 </div>
+
+<!-- ================= MODALS AREA ================= -->
+
+<!-- Modal Tambah Berita -->
+<div class="modal-overlay" id="modalBerita">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Tambah Berita Baru</h3>
+            <button class="close-modal" onclick="closeModal('modalBerita')"><i data-lucide="x"></i></button>
+        </div>
+        <form action="/admin/tambah-berita" method="POST">
+            <div class="form-group">
+                <label>Judul Berita</label>
+                <input type="text" name="title" class="input-control" required placeholder="Contoh: Kegiatan HMI KomKGUMI">
+            </div>
+            <div class="form-group">
+                <label>Kategori</label>
+                <select name="category" class="input-control" required style="background:#1f2937;">
+                    <option value="Terbaru">Terbaru</option>
+                    <option value="Populer">Populer</option>
+                    <option value="Pin">Pin (Disematkan)</option>
+                    <option value="Lama">Lama (Old)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Isi Berita</label>
+                <textarea name="content" class="input-control" rows="4" required placeholder="Tulis deskripsi berita di sini..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>URL Foto Berita</label>
+                <input type="url" name="image" class="input-control" required placeholder="[https://link-gambar.com/foto.jpg](https://link-gambar.com/foto.jpg)">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Simpan Berita</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Tambah Galeri / Album -->
+<div class="modal-overlay" id="modalAlbum">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Tambah Galeri Kegiatan</h3>
+            <button class="close-modal" onclick="closeModal('modalAlbum')"><i data-lucide="x"></i></button>
+        </div>
+        <form action="/admin/tambah-album" method="POST">
+            <div class="form-group">
+                <label>Judul Kegiatan</label>
+                <input type="text" name="title" class="input-control" required placeholder="Contoh: Basic Training I">
+            </div>
+            <div class="form-group">
+                <label>URL Foto Utama (Cover)</label>
+                <input type="url" name="cover" class="input-control" required placeholder="[https://link-gambar.com/cover.jpg](https://link-gambar.com/cover.jpg)">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Simpan Galeri</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Tambah Pengurus -->
+<div class="modal-overlay" id="modalPengurus">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Tambah Galeri Pengurus</h3>
+            <button class="close-modal" onclick="closeModal('modalPengurus')"><i data-lucide="x"></i></button>
+        </div>
+        <form action="/admin/tambah-pengurus" method="POST">
+            <div class="form-group">
+                <label>Nama Lengkap</label>
+                <input type="text" name="name" class="input-control" required placeholder="Nama lengkap pengurus">
+            </div>
+            <div class="form-group">
+                <label>Jabatan</label>
+                <input type="text" name="role" class="input-control" required placeholder="Contoh: Ketua Umum / Sekretaris">
+            </div>
+            <div class="form-group">
+                <label>URL Foto Pengurus</label>
+                <input type="url" name="image" class="input-control" required placeholder="[https://link-gambar.com/pengurus.jpg](https://link-gambar.com/pengurus.jpg)">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Simpan Pengurus</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Tambah Bidang -->
+<div class="modal-overlay" id="modalBidang">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Tambah Bidang Baru</h3>
+            <button class="close-modal" onclick="closeModal('modalBidang')"><i data-lucide="x"></i></button>
+        </div>
+        <form action="/admin/tambah-bidang" method="POST">
+            <div class="form-group">
+                <label>Nama Bidang</label>
+                <input type="text" name="bidang_name" class="input-control" required placeholder="Contoh: Bidang Humas">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Tambah Bidang</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Logic Untuk Modal Popups Admin
+    function openModal(modalId) {
+        document.getElementById(modalId).classList.add('active');
+    }
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+    }
+</script>
 
 <%- include('partials/footer') %>
