@@ -42,14 +42,18 @@
             
             <div class="footer-bottom">
                 <span>© 2026 HMI Komisariat Kedokteran Gigi UMI. All rights reserved.</span>
-                <span>Node.js + Upstash Redis KV</span>
+                <span>💻 Axa Xyz</span>
             </div>
         </div>
     </footer>
 
-    <!-- Inisialisasi Icon Lucide -->
+    <!-- Inisialisasi Icon Lucide (Diperbaiki agar merender sempurna setelah HTML dimuat) -->
     <script>
-        lucide.createIcons();
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
     </script>
 </body>
 </html>
