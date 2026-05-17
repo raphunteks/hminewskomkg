@@ -1,5 +1,5 @@
 const express = require('express');
-const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 const multer = require('multer');
 const { createClient } = require('@vercel/kv');
@@ -8,10 +8,10 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Konfigurasi Multer untuk Vercel (Upload File ke Memory, diubah jadi Base64)
+// Konfigurasi Multer
 const upload = multer({ 
     storage: multer.memoryStorage(),
-    limits: { fileSize: 5 * 1024 * 1024 } // Batas maksimal file 5MB agar Redis tidak penuh
+    limits: { fileSize: 50 * 1024 * 1024 } // Limit diatur ke 50MB (Walau Vercel akan otomatis handle di client-side)
 });
 
 // Inisialisasi Koneksi ke Upstash Redis KV
@@ -25,21 +25,10 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Middleware untuk form data & sesi
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(express.json({ limit: '10mb' }));
-
-// FIX SESI LOGIN: Agar tidak mudah logout (bertahan 7 hari)
-app.set('trust proxy', 1);
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { 
-        secure: process.env.NODE_ENV === 'production', 
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 Hari
-    }
-}));
+// Middleware untuk form data (Limit dinaikkan agar tidak 413)
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(cookieParser()); // Menggunakan Cookie Parser untuk sesi Vercel
 
 // Fungsi Helper untuk Inisialisasi Default Data
 async function initDefaultData() {
@@ -92,16 +81,17 @@ app.get('/galeri', async (req, res) => {
 
 app.get('/data-anggota', (req, res) => res.render('data-anggota', { page: 'data-anggota' }));
 
-// --- ROUTES ADMIN ---
+// --- ROUTES ADMIN (FIXED LOGIN PERSISTENT) ---
 app.get('/admin', (req, res) => {
-    if(req.session.loggedIn) return res.redirect('/admin/dashboard');
+    if(req.cookies.admin_auth === 'true') return res.redirect('/admin/dashboard');
     res.render('admin-login', { page: 'admin', error: null });
 });
 
 app.post('/admin/login', (req, res) => {
     const { username, password } = req.body;
     if(username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
-        req.session.loggedIn = true;
+        // Set Cookie tahan 7 Hari, Solusi ampuh untuk Vercel
+        res.cookie('admin_auth', 'true', { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true });
         res.redirect('/admin/dashboard');
     } else {
         res.render('admin-login', { page: 'admin', error: 'Username atau Password salah!' });
@@ -109,7 +99,7 @@ app.post('/admin/login', (req, res) => {
 });
 
 const requireAdmin = (req, res, next) => {
-    if (!req.session.loggedIn) return res.redirect('/admin');
+    if (req.cookies.admin_auth !== 'true') return res.redirect('/admin');
     next();
 };
 
@@ -122,17 +112,16 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
 });
 
 app.get('/admin/logout', (req, res) => {
-    req.session.destroy();
+    res.clearCookie('admin_auth');
     res.redirect('/admin');
 });
 
-// --- FITUR UPLOAD & TAMBAH DATA ---
+// --- FITUR UPLOAD & TAMBAH DATA (MENDUKUNG COMPRESS DARI CLIENT) ---
 app.post('/admin/tambah-berita', requireAdmin, upload.single('image'), async (req, res) => {
-    const { title, category, content } = req.body;
-    let imageStr = '';
-    if (req.file) {
-        const b64 = Buffer.from(req.file.buffer).toString('base64');
-        imageStr = `data:${req.file.mimetype};base64,${b64}`;
+    const { title, category, content, image_b64 } = req.body;
+    let imageStr = image_b64 || '';
+    if (!imageStr && req.file) {
+        imageStr = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
     }
     let news = await kv.get('newsList') || [];
     news.unshift({ id: Date.now(), title, category, date: new Date().toLocaleDateString('id-ID'), content, image: imageStr });
@@ -141,11 +130,10 @@ app.post('/admin/tambah-berita', requireAdmin, upload.single('image'), async (re
 });
 
 app.post('/admin/tambah-album', requireAdmin, upload.single('cover'), async (req, res) => {
-    const { title } = req.body;
-    let coverStr = '';
-    if (req.file) {
-        const b64 = Buffer.from(req.file.buffer).toString('base64');
-        coverStr = `data:${req.file.mimetype};base64,${b64}`;
+    const { title, cover_b64 } = req.body;
+    let coverStr = cover_b64 || '';
+    if (!coverStr && req.file) {
+        coverStr = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
     }
     let albums = await kv.get('albumsList') || [];
     albums.unshift({ id: Date.now(), title, date: new Date().toLocaleDateString('id-ID'), cover: coverStr });
@@ -155,11 +143,10 @@ app.post('/admin/tambah-album', requireAdmin, upload.single('cover'), async (req
 
 // --- FITUR PENGURUS UTAMA ---
 app.post('/admin/tambah-pengurus', requireAdmin, upload.single('image'), async (req, res) => {
-    const { name, role } = req.body;
-    let imageStr = '';
-    if (req.file) {
-        const b64 = Buffer.from(req.file.buffer).toString('base64');
-        imageStr = `data:${req.file.mimetype};base64,${b64}`;
+    const { name, role, image_b64 } = req.body;
+    let imageStr = image_b64 || '';
+    if (!imageStr && req.file) {
+        imageStr = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
     }
     let pengurus = await kv.get('pengurusList') || [];
     pengurus.push({ id: Date.now(), name, role, image: imageStr });
@@ -169,16 +156,19 @@ app.post('/admin/tambah-pengurus', requireAdmin, upload.single('image'), async (
 
 // EDIT PENGURUS
 app.post('/admin/edit-pengurus/:id', requireAdmin, upload.single('image'), async (req, res) => {
-    const { name, role } = req.body;
+    const { name, role, image_b64 } = req.body;
     let pengurus = await kv.get('pengurusList') || [];
     let index = pengurus.findIndex(p => p.id === parseInt(req.params.id));
     if (index !== -1) {
         pengurus[index].name = name;
         pengurus[index].role = role;
-        if (req.file) {
-            const b64 = Buffer.from(req.file.buffer).toString('base64');
-            pengurus[index].image = `data:${req.file.mimetype};base64,${b64}`;
+        
+        let imageStr = image_b64 || '';
+        if (!imageStr && req.file) {
+            imageStr = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
         }
+        if (imageStr) pengurus[index].image = imageStr; // Hanya update jika ada file baru
+        
         await kv.set('pengurusList', pengurus);
     }
     res.redirect('/admin/dashboard');
@@ -195,11 +185,10 @@ app.post('/admin/tambah-bidang', requireAdmin, async (req, res) => {
 });
 
 app.post('/admin/tambah-anggota-bidang/:bidangId', requireAdmin, upload.single('image'), async (req, res) => {
-    const { name } = req.body;
-    let imageStr = '';
-    if (req.file) {
-        const b64 = Buffer.from(req.file.buffer).toString('base64');
-        imageStr = `data:${req.file.mimetype};base64,${b64}`;
+    const { name, image_b64 } = req.body;
+    let imageStr = image_b64 || '';
+    if (!imageStr && req.file) {
+        imageStr = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
     }
     let bidang = await kv.get('bidangList') || [];
     let bIndex = bidang.findIndex(b => b.id === parseInt(req.params.bidangId));
