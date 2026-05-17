@@ -35,8 +35,8 @@ async function initDefaultData() {
     const hasNews = await kv.get('newsList');
     if (!hasNews) {
         await kv.set('newsList', [
-            { id: 1, title: 'Silaturahmi, Penghargaan dan Launching Kaos', category: 'Terbaru', date: '10 May 2025', content: 'Kegiatan silaturahmi kader...', image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=800&q=80' },
-            { id: 2, title: 'Semarak Hari Santri! HMI Gelar Pengajian', category: 'Populer', date: '22 Oct 2024', content: 'Peringatan hari santri nasional...', image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80' }
+            { id: 1, title: 'Silaturahmi, Penghargaan dan Launching Kaos', category: 'Terbaru', date: '10 May 2025', content: 'Kegiatan silaturahmi kader...', image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=800&q=80', photos: [] },
+            { id: 2, title: 'Semarak Hari Santri! HMI Gelar Pengajian', category: 'Populer', date: '22 Oct 2024', content: 'Peringatan hari santri nasional...', image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80', photos: [] }
         ]);
         await kv.set('albumsList', [
             { id: 1, title: 'Basic Training (LK I) LXIII', date: '12 Maret 2025', cover: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80', photos: [] }
@@ -51,7 +51,7 @@ async function initDefaultData() {
     }
 }
 
-// Auto-Migrasi
+// Auto-Migrasi: Menambahkan properti array 'photos' untuk Berita dan struktur lain jika belum ada
 async function upgradeDataFormat() {
     let bidang = await kv.get('bidangList');
     if (bidang && bidang.length > 0 && typeof bidang[0] === 'string') {
@@ -59,14 +59,18 @@ async function upgradeDataFormat() {
         await kv.set('bidangList', upgraded);
     }
     
-    // Migrasi Album untuk memastikan properti 'photos' (array) ada
     let albums = await kv.get('albumsList');
     if (albums) {
         let updated = false;
-        albums.forEach(a => {
-            if (!a.photos) { a.photos = []; updated = true; }
-        });
+        albums.forEach(a => { if (!a.photos) { a.photos = []; updated = true; } });
         if (updated) await kv.set('albumsList', albums);
+    }
+
+    let news = await kv.get('newsList');
+    if (news) {
+        let updated = false;
+        news.forEach(n => { if (!n.photos) { n.photos = []; updated = true; } });
+        if (updated) await kv.set('newsList', news);
     }
 }
 
@@ -84,10 +88,29 @@ async function upgradeDataFormat() {
 // --- ROUTES HALAMAN UTAMA ---
 app.get('/', async (req, res) => {
     try {
-        const news = await kv.get('newsList') || [];
-        res.render('index', { page: 'beranda', news });
+        let news = await kv.get('newsList') || [];
+        const filter = req.query.filter; // Menangkap query URL ?filter=Kategori
+        
+        // Logika Filter Berita
+        if (filter && filter !== 'Semua') {
+            news = news.filter(n => n.category.toLowerCase() === filter.toLowerCase());
+        }
+        
+        res.render('index', { page: 'beranda', news, currentFilter: filter || 'Semua' });
     } catch (err) {
-        res.render('index', { page: 'beranda', news: [] });
+        res.render('index', { page: 'beranda', news: [], currentFilter: 'Semua' });
+    }
+});
+
+// ROUTE BARU: Detail Berita
+app.get('/berita/:id', async (req, res) => {
+    try {
+        const newsList = await kv.get('newsList') || [];
+        const berita = newsList.find(n => n.id === parseInt(req.params.id));
+        if (!berita) return res.status(404).render('admin-404', { page: '404' });
+        res.render('berita-detail', { page: 'beranda', berita });
+    } catch (err) {
+        res.status(500).render('admin-404', { page: '404' });
     }
 });
 
@@ -110,7 +133,6 @@ app.get('/galeri', async (req, res) => {
     }
 });
 
-// ROUTE BARU: Lihat Detail Galeri (Berdasarkan ID)
 app.get('/galeri/:id', async (req, res) => {
     try {
         const albums = await kv.get('albumsList') || [];
@@ -162,7 +184,7 @@ app.get('/admin/logout', (req, res) => {
     res.redirect('/admin');
 });
 
-// --- FITUR UPLOAD & TAMBAH DATA ---
+// --- FITUR BERITA ---
 app.post('/admin/tambah-berita', requireAdmin, upload.single('image'), async (req, res) => {
     const { title, category, content, image_b64 } = req.body;
     let imageStr = image_b64 || '';
@@ -170,8 +192,58 @@ app.post('/admin/tambah-berita', requireAdmin, upload.single('image'), async (re
         imageStr = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
     }
     let news = await kv.get('newsList') || [];
-    news.unshift({ id: Date.now(), title, category, date: new Date().toLocaleDateString('id-ID'), content, image: imageStr });
+    news.unshift({ id: Date.now(), title, category, date: new Date().toLocaleDateString('id-ID'), content, image: imageStr, photos: [] });
     await kv.set('newsList', news);
+    res.redirect('/admin/dashboard');
+});
+
+// EDIT BERITA (Baru)
+app.post('/admin/edit-berita/:id', requireAdmin, upload.single('image'), async (req, res) => {
+    const { title, category, content, date, image_b64 } = req.body;
+    let news = await kv.get('newsList') || [];
+    let index = news.findIndex(n => n.id === parseInt(req.params.id));
+    if (index !== -1) {
+        news[index].title = title;
+        news[index].category = category;
+        news[index].content = content;
+        if (date) news[index].date = date; 
+        
+        let imageStr = image_b64 || '';
+        if (!imageStr && req.file) {
+            imageStr = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+        }
+        if (imageStr) news[index].image = imageStr; 
+        await kv.set('newsList', news);
+    }
+    res.redirect('/admin/dashboard');
+});
+
+// TAMBAH BANYAK FOTO KE BERITA (Baru)
+app.post('/admin/tambah-foto-berita/:id', requireAdmin, upload.array('photos', 20), async (req, res) => {
+    let photosB64 = req.body.photos_b64;
+    let newPhotos = [];
+    if (photosB64) {
+        if (!Array.isArray(photosB64)) photosB64 = [photosB64];
+        photosB64.forEach(b64 => { newPhotos.push({ id: Date.now() + Math.random(), url: b64 }); });
+    }
+    let news = await kv.get('newsList') || [];
+    let index = news.findIndex(n => n.id === parseInt(req.params.id));
+    if (index !== -1) {
+        if (!news[index].photos) news[index].photos = [];
+        news[index].photos = [...news[index].photos, ...newPhotos];
+        await kv.set('newsList', news);
+    }
+    res.redirect('/admin/dashboard');
+});
+
+// HAPUS FOTO TERTENTU DARI BERITA (Baru)
+app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req, res) => {
+    let news = await kv.get('newsList') || [];
+    let index = news.findIndex(n => n.id === parseInt(req.params.beritaId));
+    if (index !== -1 && news[index].photos) {
+        news[index].photos = news[index].photos.filter(p => p.id !== parseFloat(req.params.photoId));
+        await kv.set('newsList', news);
+    }
     res.redirect('/admin/dashboard');
 });
 
@@ -188,14 +260,13 @@ app.post('/admin/tambah-album', requireAdmin, upload.single('cover'), async (req
     res.redirect('/admin/dashboard');
 });
 
-// EDIT ALBUM GALERI (Judul & Tanggal)
 app.post('/admin/edit-album/:id', requireAdmin, upload.single('cover'), async (req, res) => {
     const { title, date, cover_b64 } = req.body;
     let albums = await kv.get('albumsList') || [];
     let index = albums.findIndex(a => a.id === parseInt(req.params.id));
     if (index !== -1) {
         albums[index].title = title;
-        if (date) albums[index].date = date; // Update tanggal
+        if (date) albums[index].date = date; 
         
         let coverStr = cover_b64 || '';
         if (!coverStr && req.file) {
@@ -207,19 +278,13 @@ app.post('/admin/edit-album/:id', requireAdmin, upload.single('cover'), async (r
     res.redirect('/admin/dashboard');
 });
 
-// TAMBAH BANYAK FOTO KE ALBUM
 app.post('/admin/tambah-foto-album/:id', requireAdmin, upload.array('photos', 20), async (req, res) => {
     let photosB64 = req.body.photos_b64;
     let newPhotos = [];
-    
-    // Dari kompresi client-side
     if (photosB64) {
         if (!Array.isArray(photosB64)) photosB64 = [photosB64];
-        photosB64.forEach(b64 => {
-            newPhotos.push({ id: Date.now() + Math.random(), url: b64 });
-        });
+        photosB64.forEach(b64 => { newPhotos.push({ id: Date.now() + Math.random(), url: b64 }); });
     }
-
     let albums = await kv.get('albumsList') || [];
     let index = albums.findIndex(a => a.id === parseInt(req.params.id));
     if (index !== -1) {
@@ -230,7 +295,6 @@ app.post('/admin/tambah-foto-album/:id', requireAdmin, upload.array('photos', 20
     res.redirect('/admin/dashboard');
 });
 
-// HAPUS FOTO TERTENTU DARI ALBUM
 app.post('/admin/hapus-foto-album/:albumId/:photoId', requireAdmin, async (req, res) => {
     let albums = await kv.get('albumsList') || [];
     let index = albums.findIndex(a => a.id === parseInt(req.params.albumId));
@@ -254,7 +318,6 @@ app.post('/admin/tambah-pengurus', requireAdmin, upload.single('image'), async (
     res.redirect('/admin/dashboard');
 });
 
-// EDIT PENGURUS
 app.post('/admin/edit-pengurus/:id', requireAdmin, upload.single('image'), async (req, res) => {
     const { name, role, image_b64 } = req.body;
     let pengurus = await kv.get('pengurusList') || [];
