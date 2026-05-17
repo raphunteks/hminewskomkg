@@ -1,0 +1,4 @@
+PORT=3000
+ADMIN_USER=hmikomkgumi
+ADMIN_PASS=komkgumi123
+SESSION_SECRET=hmi_yakusa_secret_key
