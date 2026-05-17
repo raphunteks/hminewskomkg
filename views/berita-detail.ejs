@@ -1,6 +1,5 @@
 <%- include('partials/header') %>
 
-<!-- Halaman Detail Ini Akan Muncul Ketika Anda Meng-Klik Salah Satu Berita -->
 <div class="container" style="max-width: 800px; margin-bottom: 50px;">
     
     <a href="/" style="color:#4ade80; display:inline-flex; align-items:center; gap:5px; margin-bottom:20px; font-weight:600; transition:0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#4ade80'">
@@ -18,14 +17,14 @@
         </div>
 
         <div style="width: 100%; max-height: 400px; overflow: hidden; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-            <img src="<%= berita.image %>" alt="<%= berita.title %>" style="width: 100%; height: 100%; object-fit: cover;">
+            <img src="<%= berita.image %>" alt="Cover" style="width: 100%; height: 100%; object-fit: cover;">
         </div>
 
-        <div style="color: #d1d5db; font-size: 1.1rem; line-height: 1.8; white-space: pre-wrap; margin-bottom: 40px;">
-            <%= berita.content %>
+        <!-- Rendering Penuh HTML yang diformat dari Word Editor (Quill) -->
+        <div class="rich-text-content">
+            <%- berita.content %>
         </div>
 
-        <!-- Render Foto Tambahan Jika Ada -->
         <% if(berita.photos && berita.photos.length > 0) { %>
             <h3 style="margin-bottom: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px;">Dokumentasi Tambahan</h3>
             <div class="grid-2" style="gap: 15px;">
