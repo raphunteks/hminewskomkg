@@ -4,42 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HMI KomKG-UMI</title>
-    <!-- Tailwind via CDN untuk efisiensi di Vercel -->
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <!-- MURNI MENGGUNAKAN CSS CUSTOM -->
     <link rel="stylesheet" href="/css/main.css">
     <!-- Icon Library -->
     <script src="[https://unpkg.com/lucide@latest](https://unpkg.com/lucide@latest)"></script>
 </head>
-<body class="flex flex-col text-gray-100 font-sans selection:bg-green-500 selection:text-white antialiased">
+<body>
     
+    <!-- Dekorasi Background -->
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+
     <!-- Navbar -->
-    <nav class="fixed top-0 w-full z-50 glass-header">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="/" class="flex items-center space-x-3">
-                <div class="w-12 h-12 bg-gradient-to-tr from-green-500 to-emerald-300 rounded-lg flex items-center justify-center text-black font-black text-xl shadow-lg shadow-green-500/30">
-                    HMI
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold tracking-wide text-white">KOM<span class="text-green-400">KGUMI</span></h1>
-                    <p class="text-xs text-green-200">Kedokteran Gigi UMI</p>
+    <nav class="glass-header">
+        <div class="container navbar">
+            <a href="/" class="logo-area">
+                <div class="logo-box">HMI</div>
+                <div class="logo-text">
+                    <h1>KOM<span class="text-primary">KGUMI</span></h1>
+                    <p>Kedokteran Gigi UMI</p>
                 </div>
             </a>
             
-            <div class="hidden md:flex space-x-6 items-center">
-                <a href="/" class="flex items-center px-3 py-2 <%= page === 'beranda' ? 'text-green-400 border-b-2 border-green-500 font-bold' : 'text-gray-300 hover:text-white' %>"><i data-lucide="home" class="w-4 h-4 mr-2"></i> Beranda</a>
-                <a href="/tentang" class="flex items-center px-3 py-2 <%= page === 'tentang' ? 'text-green-400 border-b-2 border-green-500 font-bold' : 'text-gray-300 hover:text-white' %>"><i data-lucide="info" class="w-4 h-4 mr-2"></i> Tentang</a>
-                <a href="/galeri" class="flex items-center px-3 py-2 <%= page === 'galeri' ? 'text-green-400 border-b-2 border-green-500 font-bold' : 'text-gray-300 hover:text-white' %>"><i data-lucide="image" class="w-4 h-4 mr-2"></i> Galeri</a>
-                <a href="/data-anggota" class="flex items-center px-3 py-2 <%= page === 'data-anggota' ? 'text-green-400 border-b-2 border-green-500 font-bold' : 'text-gray-300 hover:text-white' %>"><i data-lucide="users" class="w-4 h-4 mr-2"></i> Data Anggota</a>
-            </div>
+            <ul class="nav-links">
+                <li><a href="/" class="nav-item <%= page === 'beranda' ? 'active' : '' %>"><i data-lucide="home" style="width:18px;"></i> Beranda</a></li>
+                <li><a href="/tentang" class="nav-item <%= page === 'tentang' ? 'active' : '' %>"><i data-lucide="info" style="width:18px;"></i> Tentang</a></li>
+                <li><a href="/galeri" class="nav-item <%= page === 'galeri' ? 'active' : '' %>"><i data-lucide="image" style="width:18px;"></i> Galeri</a></li>
+                <li><a href="/data-anggota" class="nav-item <%= page === 'data-anggota' ? 'active' : '' %>"><i data-lucide="users" style="width:18px;"></i> Data Anggota</a></li>
+            </ul>
             
-            <div class="flex items-center">
-                <a href="/admin" class="p-2 bg-white/5 border border-white/10 rounded-full hover:bg-green-500/30 text-gray-300 hover:text-green-400 transition-colors" title="Login Admin">
-                    <i data-lucide="lock" class="w-5 h-5"></i>
+            <div class="nav-actions">
+                <a href="/admin" class="btn-icon" title="Login Admin">
+                    <i data-lucide="lock" style="width:20px;"></i>
                 </a>
             </div>
         </div>
     </nav>
     
-    <main class="flex-grow container mx-auto px-4 pt-28 pb-12 relative z-10">
-        <!-- Dekorasi Background -->
-        <div class="fixed top-[-10%] left-[-10%] w-96 h-96 bg-green-500/20 rounded-full blur-3xl -z-10"></div>
+    <main>
+        <div class="container">
