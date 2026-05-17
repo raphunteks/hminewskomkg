@@ -15,7 +15,6 @@
         <p class="text-muted">Update terbaru dari kegiatan komisariat</p>
     </div>
     
-    <!-- Filter Kategori yang Berfungsi -->
     <div class="filter-tags">
         <a href="/" class="filter-tag <%= currentFilter === 'Semua' ? 'active' : '' %>">Semua</a>
         <a href="/?filter=Terbaru" class="filter-tag <%= currentFilter === 'Terbaru' ? 'active' : '' %>">Terbaru</a>
@@ -30,7 +29,7 @@
         <!-- Card dapat di-klik mengarah ke halaman detail berita -->
         <a href="/berita/<%= item.id %>" class="glass news-card">
             <div class="card-img-wrap">
-                <img src="<%= item.image %>" alt="<%= item.title %>">
+                <img src="<%= item.image %>" alt="Cover Berita">
                 <div class="card-badge"><%= item.category %></div>
             </div>
             <div class="card-body">
@@ -43,7 +42,8 @@
                     <% } %>
                 </div>
                 <h3 class="card-title"><%= item.title %></h3>
-                <p class="card-text"><%= item.content %></p>
+                <!-- Membersihkan Tag HTML dari Rich Text untuk cuplikan (Preview) saja -->
+                <p class="card-text"><%- item.content.replace(/<[^>]+>/g, '').substring(0, 100) %>...</p>
                 <div class="read-more">Baca Selengkapnya <i data-lucide="chevron-right" style="width:16px;"></i></div>
             </div>
         </a>
