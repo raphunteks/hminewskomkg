@@ -51,7 +51,7 @@ async function initDefaultData() {
     }
 }
 
-// Auto-Migrasi: Menambahkan properti array 'photos' untuk Berita dan struktur lain jika belum ada
+// Auto-Migrasi
 async function upgradeDataFormat() {
     let bidang = await kv.get('bidangList');
     if (bidang && bidang.length > 0 && typeof bidang[0] === 'string') {
@@ -89,9 +89,8 @@ async function upgradeDataFormat() {
 app.get('/', async (req, res) => {
     try {
         let news = await kv.get('newsList') || [];
-        const filter = req.query.filter; // Menangkap query URL ?filter=Kategori
+        const filter = req.query.filter; 
         
-        // Logika Filter Berita
         if (filter && filter !== 'Semua') {
             news = news.filter(n => n.category.toLowerCase() === filter.toLowerCase());
         }
@@ -102,7 +101,6 @@ app.get('/', async (req, res) => {
     }
 });
 
-// ROUTE BARU: Detail Berita
 app.get('/berita/:id', async (req, res) => {
     try {
         const newsList = await kv.get('newsList') || [];
@@ -197,7 +195,6 @@ app.post('/admin/tambah-berita', requireAdmin, upload.single('image'), async (re
     res.redirect('/admin/dashboard');
 });
 
-// EDIT BERITA (Baru)
 app.post('/admin/edit-berita/:id', requireAdmin, upload.single('image'), async (req, res) => {
     const { title, category, content, date, image_b64 } = req.body;
     let news = await kv.get('newsList') || [];
@@ -218,7 +215,6 @@ app.post('/admin/edit-berita/:id', requireAdmin, upload.single('image'), async (
     res.redirect('/admin/dashboard');
 });
 
-// TAMBAH BANYAK FOTO KE BERITA (Baru)
 app.post('/admin/tambah-foto-berita/:id', requireAdmin, upload.array('photos', 20), async (req, res) => {
     let photosB64 = req.body.photos_b64;
     let newPhotos = [];
@@ -236,7 +232,6 @@ app.post('/admin/tambah-foto-berita/:id', requireAdmin, upload.array('photos', 2
     res.redirect('/admin/dashboard');
 });
 
-// HAPUS FOTO TERTENTU DARI BERITA (Baru)
 app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req, res) => {
     let news = await kv.get('newsList') || [];
     let index = news.findIndex(n => n.id === parseInt(req.params.beritaId));
