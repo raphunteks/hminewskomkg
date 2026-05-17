@@ -14,7 +14,7 @@ const upload = multer({
     limits: { fileSize: 50 * 1024 * 1024 } // Limit diatur ke 50MB
 });
 
-// Inisialisasi Koneksi ke Upstash Redis KV (Fixed: Menambahkan Fallback Token Anda agar tidak crash)
+// Inisialisasi Koneksi ke Upstash Redis KV
 const kv = createClient({
   url: process.env.KV2_KV_REST_API_URL || 'https://stable-gazelle-127629.upstash.io',
   token: process.env.KV2_KV_REST_API_TOKEN || 'gQAAAAAAAfKNAAIgcDEyZWI1YmIzNDBmNWQ0ZjY1YjI5NTZmOTU2NjMyZDFhMg',
@@ -39,7 +39,7 @@ async function initDefaultData() {
             { id: 2, title: 'Semarak Hari Santri! HMI Gelar Pengajian', category: 'Populer', date: '22 Oct 2024', content: 'Peringatan hari santri nasional...', image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80' }
         ]);
         await kv.set('albumsList', [
-            { id: 1, title: 'Basic Training (LK I) LXIII', date: '12 Maret 2025', cover: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80' }
+            { id: 1, title: 'Basic Training (LK I) LXIII', date: '12 Maret 2025', cover: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80', photos: [] }
         ]);
         await kv.set('pengurusList', [
             { id: 1, name: 'Muh. Xavier Syafwan', role: 'Ketua Umum', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=80' }
@@ -51,16 +51,26 @@ async function initDefaultData() {
     }
 }
 
-// Auto-Migrasi: Ubah struktur Bidang lama (String) menjadi Object (Bisa Punya Anggota)
+// Auto-Migrasi
 async function upgradeDataFormat() {
     let bidang = await kv.get('bidangList');
     if (bidang && bidang.length > 0 && typeof bidang[0] === 'string') {
         const upgraded = bidang.map((b, i) => ({ id: Date.now() + i, name: b, members: [] }));
         await kv.set('bidangList', upgraded);
     }
+    
+    // Migrasi Album untuk memastikan properti 'photos' (array) ada
+    let albums = await kv.get('albumsList');
+    if (albums) {
+        let updated = false;
+        albums.forEach(a => {
+            if (!a.photos) { a.photos = []; updated = true; }
+        });
+        if (updated) await kv.set('albumsList', albums);
+    }
 }
 
-// FIXED: Mengeksekusi Inisiasi DB dengan aman agar Vercel tidak CRASH saat booting
+// Eksekusi DB Aman
 (async () => {
     try {
         await initDefaultData();
@@ -71,7 +81,7 @@ async function upgradeDataFormat() {
     }
 })();
 
-// --- ROUTES HALAMAN UTAMA (Dilengkapi pengaman Try...Catch untuk cegah 500 Error) ---
+// --- ROUTES HALAMAN UTAMA ---
 app.get('/', async (req, res) => {
     try {
         const news = await kv.get('newsList') || [];
@@ -100,9 +110,21 @@ app.get('/galeri', async (req, res) => {
     }
 });
 
+// ROUTE BARU: Lihat Detail Galeri (Berdasarkan ID)
+app.get('/galeri/:id', async (req, res) => {
+    try {
+        const albums = await kv.get('albumsList') || [];
+        const album = albums.find(a => a.id === parseInt(req.params.id));
+        if (!album) return res.status(404).render('admin-404', { page: '404' });
+        res.render('galeri-detail', { page: 'galeri', album });
+    } catch (err) {
+        res.status(500).render('admin-404', { page: '404' });
+    }
+});
+
 app.get('/data-anggota', (req, res) => res.render('data-anggota', { page: 'data-anggota' }));
 
-// --- ROUTES ADMIN (FIXED LOGIN PERSISTENT) ---
+// --- ROUTES ADMIN ---
 app.get('/admin', (req, res) => {
     if(req.cookies.admin_auth === 'true') return res.redirect('/admin/dashboard');
     res.render('admin-login', { page: 'admin', error: null });
@@ -111,7 +133,6 @@ app.get('/admin', (req, res) => {
 app.post('/admin/login', (req, res) => {
     const { username, password } = req.body;
     if(username === (process.env.ADMIN_USER || 'admin') && password === (process.env.ADMIN_PASS || 'password')) {
-        // Set Cookie tahan 7 Hari, Solusi ampuh untuk Vercel
         res.cookie('admin_auth', 'true', { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true });
         res.redirect('/admin/dashboard');
     } else {
@@ -141,7 +162,7 @@ app.get('/admin/logout', (req, res) => {
     res.redirect('/admin');
 });
 
-// --- FITUR UPLOAD & TAMBAH DATA (MENDUKUNG COMPRESS DARI CLIENT) ---
+// --- FITUR UPLOAD & TAMBAH DATA ---
 app.post('/admin/tambah-berita', requireAdmin, upload.single('image'), async (req, res) => {
     const { title, category, content, image_b64 } = req.body;
     let imageStr = image_b64 || '';
@@ -154,6 +175,7 @@ app.post('/admin/tambah-berita', requireAdmin, upload.single('image'), async (re
     res.redirect('/admin/dashboard');
 });
 
+// --- FITUR ALBUM GALERI & FOTO ---
 app.post('/admin/tambah-album', requireAdmin, upload.single('cover'), async (req, res) => {
     const { title, cover_b64 } = req.body;
     let coverStr = cover_b64 || '';
@@ -161,8 +183,61 @@ app.post('/admin/tambah-album', requireAdmin, upload.single('cover'), async (req
         coverStr = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
     }
     let albums = await kv.get('albumsList') || [];
-    albums.unshift({ id: Date.now(), title, date: new Date().toLocaleDateString('id-ID'), cover: coverStr });
+    albums.unshift({ id: Date.now(), title, date: new Date().toLocaleDateString('id-ID'), cover: coverStr, photos: [] });
     await kv.set('albumsList', albums);
+    res.redirect('/admin/dashboard');
+});
+
+// EDIT ALBUM GALERI (Judul & Tanggal)
+app.post('/admin/edit-album/:id', requireAdmin, upload.single('cover'), async (req, res) => {
+    const { title, date, cover_b64 } = req.body;
+    let albums = await kv.get('albumsList') || [];
+    let index = albums.findIndex(a => a.id === parseInt(req.params.id));
+    if (index !== -1) {
+        albums[index].title = title;
+        if (date) albums[index].date = date; // Update tanggal
+        
+        let coverStr = cover_b64 || '';
+        if (!coverStr && req.file) {
+            coverStr = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+        }
+        if (coverStr) albums[index].cover = coverStr; 
+        await kv.set('albumsList', albums);
+    }
+    res.redirect('/admin/dashboard');
+});
+
+// TAMBAH BANYAK FOTO KE ALBUM
+app.post('/admin/tambah-foto-album/:id', requireAdmin, upload.array('photos', 20), async (req, res) => {
+    let photosB64 = req.body.photos_b64;
+    let newPhotos = [];
+    
+    // Dari kompresi client-side
+    if (photosB64) {
+        if (!Array.isArray(photosB64)) photosB64 = [photosB64];
+        photosB64.forEach(b64 => {
+            newPhotos.push({ id: Date.now() + Math.random(), url: b64 });
+        });
+    }
+
+    let albums = await kv.get('albumsList') || [];
+    let index = albums.findIndex(a => a.id === parseInt(req.params.id));
+    if (index !== -1) {
+        if (!albums[index].photos) albums[index].photos = [];
+        albums[index].photos = [...albums[index].photos, ...newPhotos];
+        await kv.set('albumsList', albums);
+    }
+    res.redirect('/admin/dashboard');
+});
+
+// HAPUS FOTO TERTENTU DARI ALBUM
+app.post('/admin/hapus-foto-album/:albumId/:photoId', requireAdmin, async (req, res) => {
+    let albums = await kv.get('albumsList') || [];
+    let index = albums.findIndex(a => a.id === parseInt(req.params.albumId));
+    if (index !== -1 && albums[index].photos) {
+        albums[index].photos = albums[index].photos.filter(p => p.id !== parseFloat(req.params.photoId));
+        await kv.set('albumsList', albums);
+    }
     res.redirect('/admin/dashboard');
 });
 
@@ -192,7 +267,7 @@ app.post('/admin/edit-pengurus/:id', requireAdmin, upload.single('image'), async
         if (!imageStr && req.file) {
             imageStr = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
         }
-        if (imageStr) pengurus[index].image = imageStr; // Hanya update jika ada file baru
+        if (imageStr) pengurus[index].image = imageStr;
         
         await kv.set('pengurusList', pengurus);
     }
@@ -269,7 +344,7 @@ app.use((req, res) => {
     res.status(404).render('admin-404', { page: '404' });
 });
 
-// Export untuk Vercel Serverless (Fixed: Hanya listen saat di localhost)
+// Export untuk Vercel Serverless
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
     app.listen(port, () => console.log(`Server running on port ${port}`));
 }
