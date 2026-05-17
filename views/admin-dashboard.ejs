@@ -42,7 +42,6 @@
                             </td>
                             <td><span class="cat-badge"><%= item.category %></span></td>
                             <td class="td-actions">
-                                <!-- Menyimpan HTML Content agar aman di-grab JavaScript -->
                                 <div id="raw-content-<%= item.id %>" style="display: none;"><%- item.content %></div>
 
                                 <button type="button" class="action-btn" style="color:#fff; border-color:rgba(255,255,255,0.3);" onclick="openKelolaFotoBerita('<%= item.id %>')" title="Tambah/Hapus Banyak Foto"><i data-lucide="image-plus"></i></button>
@@ -137,7 +136,7 @@
         </div>
     </div>
 
-    <!-- Bagian Kanan (Galeri & PDF) -->
+    <!-- Bagian Kanan (Galeri & Data Anggota) -->
     <div class="admin-sidebar">
         
         <!-- Panel Kelola Galeri -->
@@ -163,17 +162,32 @@
             </div>
         </div>
 
-        <!-- Panel Data Anggota PDF -->
-        <div class="glass admin-panel" style="text-align:center;">
-            <div class="upload-icon-box">
-                <i data-lucide="upload-cloud"></i>
+        <!-- Panel Kelola Data Anggota PDF (DIUPGRADE) -->
+        <div class="glass admin-panel">
+            <h3 class="panel-title" style="margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="folder-open"></i> Kelola Data Anggota</h3>
+            <button class="btn btn-add-album" onclick="openModal('modalDataAnggota')">+ Data Anggota Baru</button>
+            
+            <div class="album-list">
+                <% if(dataAnggota && dataAnggota.length > 0) { %>
+                    <% dataAnggota.forEach(item => { %>
+                    <div class="list-item-album">
+                        <span class="list-item-title">
+                            <strong><%= item.title %></strong><br>
+                            <small style="color:#4ade80;"><%= item.date %></small>
+                        </span>
+                        <div style="display:flex; gap:5px;">
+                            <button type="button" class="action-btn" style="color:#fff; border-color:rgba(255,255,255,0.3);" onclick="window.open('<%= item.file %>', '_blank')" title="Preview PDF"><i data-lucide="eye"></i></button>
+                            <button type="button" class="action-btn edit" onclick="openEditDataAnggotaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.date %>')" title="Edit Data Anggota"><i data-lucide="edit"></i></button>
+                            <form action="/admin/hapus-data-anggota/<%= item.id %>" method="POST" class="form-inline">
+                                <button type="submit" class="action-btn delete" onclick="return confirm('Hapus data anggota ini?')"><i data-lucide="trash-2"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                    <% }) %>
+                <% } else { %>
+                    <p class="text-muted" style="text-align:center; font-size:0.85rem;">Belum ada file data anggota.</p>
+                <% } %>
             </div>
-            <h3 class="upload-pdf-title">Upload PDF Anggota</h3>
-            <p class="upload-pdf-desc">Gantikan file PDF lama di halaman publik.</p>
-            <form>
-                <input type="file" id="pdf-upload" accept=".pdf" style="display:none;">
-                <label for="pdf-upload" class="btn btn-primary" style="width:100%;">Pilih File PDF</label>
-            </form>
         </div>
     </div>
 </div>
@@ -185,7 +199,65 @@
 
 <!-- ================= MODALS AREA ================= -->
 
-<!-- Modal Edit Berita (DIUPGRADE DENGAN EDITOR WORD/QUILL) -->
+<!-- Modal Tambah Data Anggota (BARU) -->
+<div class="modal-overlay" id="modalDataAnggota">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Tambah Data Anggota Baru</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalDataAnggota')"><i data-lucide="x"></i></button>
+        </div>
+        <form action="/admin/tambah-data-anggota" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Judul Data Anggota</label>
+                <input type="text" name="title" class="input-control" required placeholder="Contoh: Database Kader 2025">
+            </div>
+            <div class="form-group">
+                <label>Tanggal Rilis / Pembaruan</label>
+                <input type="text" name="date" class="input-control" required placeholder="Contoh: 15 Mei 2025">
+            </div>
+            <div class="form-group">
+                <label>Upload File PDF</label>
+                <input type="file" name="file" class="input-control file-to-b64" accept="application/pdf" required>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalDataAnggota')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Simpan Data</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Edit Data Anggota (BARU) -->
+<div class="modal-overlay" id="modalEditDataAnggota">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Data Anggota</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalEditDataAnggota')"><i data-lucide="x"></i></button>
+        </div>
+        <form id="formEditDataAnggota" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Judul Data Anggota</label>
+                <input type="text" name="title" id="editDataAnggotaTitle" class="input-control" required>
+            </div>
+            <div class="form-group">
+                <label>Tanggal Rilis / Pembaruan</label>
+                <input type="text" name="date" id="editDataAnggotaDate" class="input-control" required>
+            </div>
+            <div class="form-group">
+                <label>Upload PDF Baru (Opsional)</label>
+                <input type="file" name="file" class="input-control file-to-b64" accept="application/pdf">
+                <p class="form-hint">Kosongkan jika tidak ingin mengganti file PDF.</p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditDataAnggota')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Update Data</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Modal Edit Berita -->
 <div class="modal-overlay" id="modalEditBerita">
     <div class="modal-content" style="max-width: 800px;">
         <div class="modal-header">
@@ -213,9 +285,7 @@
             
             <div class="form-group">
                 <label>Isi Berita</label>
-                <!-- Container untuk Quill Rich Text Editor -->
                 <div id="quill-edit" style="height: 300px; color: white;"></div>
-                <!-- Input hidden penyimpan tag HTML murni untuk dikirim ke backend -->
                 <input type="hidden" name="content" id="content-edit" required>
             </div>
 
@@ -298,7 +368,6 @@
     </div>
 </div>
 
-<!-- Modal Tambah Berita (DIUPGRADE DENGAN EDITOR WORD/QUILL) -->
 <div class="modal-overlay" id="modalBerita">
     <div class="modal-content" style="max-width: 800px;">
         <div class="modal-header">
@@ -321,7 +390,6 @@
             </div>
             <div class="form-group">
                 <label>Isi Berita</label>
-                <!-- Container untuk Quill Rich Text Editor -->
                 <div id="quill-tambah" style="height: 300px; color: white;"></div>
                 <input type="hidden" name="content" id="content-tambah" required>
             </div>
@@ -458,7 +526,7 @@
 </div>
 
 <script>
-    // INISIALISASI QUILL.JS UNTUK WORD-LIKE EDITOR
+    // INISIALISASI QUILL.JS
     var toolbarOptions = [
         ['bold', 'italic', 'underline', 'strike'],        
         ['blockquote', 'code-block'],
@@ -476,7 +544,6 @@
     var quillTambah = new Quill('#quill-tambah', { theme: 'snow', modules: { toolbar: toolbarOptions } });
     var quillEdit = new Quill('#quill-edit', { theme: 'snow', modules: { toolbar: toolbarOptions } });
 
-    // Pindahkan isi Quill ke Input Hidden saat form dikirim
     document.getElementById('formTambahBerita').onsubmit = function() {
         document.getElementById('content-tambah').value = quillTambah.root.innerHTML;
     };
@@ -484,17 +551,54 @@
         document.getElementById('content-edit').value = quillEdit.root.innerHTML;
     };
 
-    // Logic Modal Umum
+    // Logic Modal
     function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
 
-    // Logic Modal Berita Terhubung Dengan Quill Editor
+    // DATA ANGGOTA (PDF)
+    function openEditDataAnggotaModal(id, title, date) {
+        document.getElementById('editDataAnggotaTitle').value = title;
+        document.getElementById('editDataAnggotaDate').value = date;
+        document.getElementById('formEditDataAnggota').action = '/admin/edit-data-anggota/' + id;
+        openModal('modalEditDataAnggota');
+    }
+
+    // PDF to Base64
+    document.querySelectorAll('.file-to-b64').forEach(input => {
+        input.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const submitBtn = input.closest('form').querySelector('.submit-btn');
+                const originalText = submitBtn.innerText;
+                
+                submitBtn.innerText = 'Memproses File... Tunggu sebentar';
+                submitBtn.disabled = true;
+
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    let hidden = input.parentElement.querySelector('.b64-hidden');
+                    if (!hidden) {
+                        hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = input.name + '_b64';
+                        hidden.className = 'b64-hidden';
+                        input.parentElement.appendChild(hidden);
+                    }
+                    hidden.value = reader.result;
+                    submitBtn.innerText = originalText;
+                    submitBtn.disabled = false;
+                };
+            }
+        });
+    });
+
+    // Modal Edit Berita
     function openEditBeritaModal(id, title, category, date) {
         document.getElementById('editBeritaTitle').value = title;
         document.getElementById('editBeritaCategory').value = category;
         document.getElementById('editBeritaDate').value = date;
         
-        // Grab Content Aman dari Elemen Hidden HTML
         const rawContent = document.getElementById('raw-content-' + id).innerHTML;
         quillEdit.root.innerHTML = rawContent;
 
@@ -580,7 +684,7 @@
         openModal('modalKelolaFotoAlbum');
     }
 
-    // Auto Compress
+    // Auto Compress Images
     async function compressImage(file, maxWidth = 1000) {
         return new Promise((resolve) => {
             const reader = new FileReader();
@@ -602,7 +706,6 @@
         });
     }
 
-    // Single Upload File Auto-Compress
     document.querySelectorAll('.file-compress').forEach(input => {
         input.addEventListener('change', async (e) => {
             const file = e.target.files[0];
@@ -625,7 +728,6 @@
         });
     });
 
-    // Multiple Upload Auto Compress
     document.querySelectorAll('.file-compress-multiple').forEach(input => {
         input.addEventListener('change', async (e) => {
             const files = e.target.files;
