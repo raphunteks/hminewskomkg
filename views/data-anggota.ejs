@@ -1,12 +1,12 @@
 <%- include('partials/header') %>
 
-<div class="max-w-4xl mx-auto text-center">
-    <h2 class="text-3xl font-bold mb-4">Data Anggota HMI KomKG-UMI</h2>
-    <p class="text-gray-400 mb-8 max-w-xl mx-auto">Database keanggotaan terupdate. Preview file PDF dibawah ini yang telah di-upload oleh admin.</p>
+<div style="max-width: 800px; margin: 0 auto; text-align: center;">
+    <h2>Data Anggota HMI KomKG-UMI</h2>
+    <p class="text-muted" style="margin-bottom: 30px;">Database keanggotaan terupdate. Preview file PDF dibawah ini yang telah di-upload oleh admin.</p>
     
-    <div class="glass-panel p-3 rounded-2xl h-[70vh] border border-white/10 bg-black/40">
+    <div class="glass" style="padding: 15px; height: 70vh;">
         <!-- PERHATIAN: Pastikan Anda menaruh file "data-anggota.pdf" di dalam folder "public/" -->
-        <iframe src="/data-anggota.pdf" class="w-full h-full rounded-xl bg-white/5 border border-white/10" frameborder="0">
+        <iframe src="/data-anggota.pdf" style="width:100%; height:100%; border-radius:10px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);" frameborder="0">
             Browser Anda tidak mendukung iframe PDF. Silakan download PDF ini.
         </iframe>
     </div>
