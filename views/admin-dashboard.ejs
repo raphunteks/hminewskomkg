@@ -1,45 +1,41 @@
 <%- include('partials/header') %>
 
-<div class="flex flex-col md:flex-row justify-between items-center bg-black/40 border border-white/10 p-6 rounded-2xl backdrop-blur-md mb-8 glass-panel">
-    <div class="flex items-center mb-4 md:mb-0">
-        <div class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center mr-4">
-            <i data-lucide="shield-check" class="text-green-400 w-6 h-6"></i>
-        </div>
+<div class="glass dashboard-header">
+    <div class="admin-info">
+        <div class="admin-icon"><i data-lucide="shield-check"></i></div>
         <div>
-            <h2 class="text-2xl font-bold">Dashboard Admin</h2>
-            <p class="text-sm text-gray-400">Selamat datang, Anda login sebagai Admin.</p>
+            <h2>Dashboard Admin</h2>
+            <p class="text-muted" style="margin:0;">Selamat datang, Anda login sebagai Admin.</p>
         </div>
     </div>
-    <a href="/admin/logout" class="flex items-center px-4 py-2 bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/50 rounded-lg transition-all font-semibold">
-        <i data-lucide="log-out" class="w-4 h-4 mr-2"></i> Logout
-    </a>
+    <a href="/admin/logout" class="btn btn-danger"><i data-lucide="log-out" style="width:18px;"></i> Logout</a>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="grid-3" style="align-items: start;">
     <!-- Panel Berita -->
-    <div class="glass-panel p-6 rounded-2xl lg:col-span-2">
-        <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-            <h3 class="text-xl font-bold flex items-center"><i data-lucide="file-text" class="mr-2 text-green-400"></i> Kelola Berita</h3>
-            <button class="bg-green-500 text-black px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-green-400">+ Tambah</button>
+    <div class="glass" style="padding: 25px; grid-column: span 2;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;">
+            <h3 style="display:flex; align-items:center; gap:10px; margin:0;"><i data-lucide="file-text" class="text-primary"></i> Kelola Berita</h3>
+            <button class="btn btn-primary" style="padding:8px 15px; font-size:0.85rem;">+ Tambah</button>
         </div>
         
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+        <div style="overflow-x:auto;">
+            <table class="admin-table">
                 <thead>
-                    <tr class="text-sm text-gray-400 border-b border-white/10">
-                        <th class="pb-3 px-2">Judul</th>
-                        <th class="pb-3 px-2">Kategori</th>
-                        <th class="pb-3 px-2 text-right">Aksi</th>
+                    <tr>
+                        <th>Judul</th>
+                        <th>Kategori</th>
+                        <th style="text-align:right;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <% news.forEach(item => { %>
-                    <tr class="border-b border-white/5 hover:bg-white/5">
-                        <td class="py-3 px-2 font-medium text-sm"><%= item.title %></td>
-                        <td class="py-3 px-2 text-sm"><span class="bg-white/10 px-2 py-1 rounded text-xs"><%= item.category %></span></td>
-                        <td class="py-3 px-2 text-right">
-                            <button class="text-blue-400 hover:bg-blue-400/20 p-1.5 rounded"><i data-lucide="edit" class="w-4 h-4"></i></button>
-                            <button class="text-red-400 hover:bg-red-400/20 p-1.5 rounded"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    <tr>
+                        <td style="font-weight:600;"><%= item.title %></td>
+                        <td><span style="background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px; font-size:0.8rem;"><%= item.category %></span></td>
+                        <td style="text-align:right;">
+                            <button class="action-btn edit"><i data-lucide="edit" style="width:18px;"></i></button>
+                            <button class="action-btn delete"><i data-lucide="trash-2" style="width:18px;"></i></button>
                         </td>
                     </tr>
                     <% }) %>
@@ -49,33 +45,31 @@
     </div>
 
     <!-- Sidebar Tools -->
-    <div class="space-y-8">
+    <div style="display:flex; flex-direction:column; gap:30px;">
         <!-- Panel Galeri -->
-        <div class="glass-panel p-6 rounded-2xl">
-            <h3 class="text-lg font-bold mb-4 border-b border-white/10 pb-2 flex items-center"><i data-lucide="image" class="mr-2 text-green-400"></i> Kelola Galeri</h3>
-            <button class="w-full bg-white/10 text-white py-2.5 rounded-xl font-semibold hover:bg-white/20 transition-colors mb-4 border border-white/10 text-sm">Buat Album Baru</button>
-            <ul class="space-y-3">
+        <div class="glass" style="padding: 25px;">
+            <h3 style="display:flex; align-items:center; gap:10px; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="image" class="text-primary"></i> Kelola Galeri</h3>
+            <button class="btn" style="width:100%; background:rgba(255,255,255,0.1); color:#fff; margin-bottom:20px; border:1px solid rgba(255,255,255,0.2);">Buat Album Baru</button>
+            <ul style="display:flex; flex-direction:column; gap:10px;">
                 <% albums.forEach(album => { %>
-                <li class="bg-black/30 p-3 rounded-xl flex items-center justify-between">
-                    <span class="text-sm truncate pr-2"><%= album.title %></span>
-                    <button class="text-red-400 hover:text-red-300"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                <li style="background:rgba(0,0,0,0.3); padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:0.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><%= album.title %></span>
+                    <button class="action-btn delete" style="padding:5px;"><i data-lucide="trash-2" style="width:16px;"></i></button>
                 </li>
                 <% }) %>
             </ul>
         </div>
 
         <!-- Panel Data Anggota -->
-        <div class="glass-panel p-6 rounded-2xl text-center">
-            <div class="w-16 h-16 mx-auto bg-green-500/20 rounded-full flex items-center justify-center mb-3">
-                <i data-lucide="upload-cloud" class="w-8 h-8 text-green-400"></i>
+        <div class="glass" style="padding: 25px; text-align:center;">
+            <div style="width:60px; height:60px; margin:0 auto 15px; background:rgba(34,197,94,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                <i data-lucide="upload-cloud" class="text-primary" style="width:30px; height:30px;"></i>
             </div>
-            <h3 class="text-lg font-bold mb-1">Upload PDF Anggota</h3>
-            <p class="text-xs text-gray-400 mb-4">Gantikan file PDF lama di halaman publik.</p>
+            <h3 style="font-size:1.1rem;">Upload PDF Anggota</h3>
+            <p class="text-muted" style="font-size:0.8rem; margin-bottom:20px;">Gantikan file PDF lama di halaman publik.</p>
             <form>
-                <input type="file" class="hidden" id="pdf-upload" accept=".pdf">
-                <label for="pdf-upload" class="cursor-pointer block w-full bg-green-500 text-black py-2.5 rounded-xl text-sm font-bold hover:bg-green-400 transition-colors">
-                    Pilih File PDF
-                </label>
+                <input type="file" id="pdf-upload" accept=".pdf" style="display:none;">
+                <label for="pdf-upload" class="btn btn-primary" style="width:100%;">Pilih File PDF</label>
             </form>
         </div>
     </div>
