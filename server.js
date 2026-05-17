@@ -1,11 +1,18 @@
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const multer = require('multer');
 const { createClient } = require('@vercel/kv');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Konfigurasi Multer untuk Vercel (Upload File ke Memory, diubah jadi Base64)
+const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 } // Batas maksimal file 5MB agar Redis tidak penuh
+});
 
 // Inisialisasi Koneksi ke Upstash Redis KV
 const kv = createClient({
@@ -19,8 +26,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Middleware untuk form data & sesi
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '10mb' }));
 
 // FIX SESI LOGIN: Agar tidak mudah logout (bertahan 7 hari)
 app.set('trust proxy', 1);
@@ -51,9 +58,9 @@ async function initDefaultData() {
         await kv.set('bidangList', ['Bidang PPPA', 'Bidang PTKP', 'Bidang KPP', 'Bidang PU']);
     }
 }
-initDefaultData(); // Panggil saat server berjalan
+initDefaultData();
 
-// --- ROUTES HALAMAN UTAMA (Dengan Async Await dari DB) ---
+// --- ROUTES HALAMAN UTAMA ---
 app.get('/', async (req, res) => {
     const news = await kv.get('newsList') || [];
     res.render('index', { page: 'beranda', news });
@@ -88,7 +95,6 @@ app.post('/admin/login', (req, res) => {
     }
 });
 
-// Middleware Proteksi Halaman Admin
 const requireAdmin = (req, res, next) => {
     if (!req.session.loggedIn) return res.redirect('/admin');
     next();
@@ -107,27 +113,49 @@ app.get('/admin/logout', (req, res) => {
     res.redirect('/admin');
 });
 
-// --- ROUTES FUNGSI ADMIN (UPDATE KE UPSTASH REDIS DB) ---
-app.post('/admin/tambah-berita', requireAdmin, async (req, res) => {
-    const { title, category, image, content } = req.body;
+// --- FITUR UPLOAD & TAMBAH DATA ---
+app.post('/admin/tambah-berita', requireAdmin, upload.single('image'), async (req, res) => {
+    const { title, category, content } = req.body;
+    let imageStr = '';
+    
+    // Konversi file gambar menjadi Base64 untuk disimpan di Redis (Aman untuk Vercel)
+    if (req.file) {
+        const b64 = Buffer.from(req.file.buffer).toString('base64');
+        imageStr = `data:${req.file.mimetype};base64,${b64}`;
+    }
+
     let news = await kv.get('newsList') || [];
-    news.unshift({ id: Date.now(), title, category, date: new Date().toLocaleDateString('id-ID'), content, image });
+    news.unshift({ id: Date.now(), title, category, date: new Date().toLocaleDateString('id-ID'), content, image: imageStr });
     await kv.set('newsList', news);
     res.redirect('/admin/dashboard');
 });
 
-app.post('/admin/tambah-album', requireAdmin, async (req, res) => {
-    const { title, cover } = req.body;
+app.post('/admin/tambah-album', requireAdmin, upload.single('cover'), async (req, res) => {
+    const { title } = req.body;
+    let coverStr = '';
+
+    if (req.file) {
+        const b64 = Buffer.from(req.file.buffer).toString('base64');
+        coverStr = `data:${req.file.mimetype};base64,${b64}`;
+    }
+
     let albums = await kv.get('albumsList') || [];
-    albums.unshift({ id: Date.now(), title, date: new Date().toLocaleDateString('id-ID'), cover });
+    albums.unshift({ id: Date.now(), title, date: new Date().toLocaleDateString('id-ID'), cover: coverStr });
     await kv.set('albumsList', albums);
     res.redirect('/admin/dashboard');
 });
 
-app.post('/admin/tambah-pengurus', requireAdmin, async (req, res) => {
-    const { name, role, image } = req.body;
+app.post('/admin/tambah-pengurus', requireAdmin, upload.single('image'), async (req, res) => {
+    const { name, role } = req.body;
+    let imageStr = '';
+
+    if (req.file) {
+        const b64 = Buffer.from(req.file.buffer).toString('base64');
+        imageStr = `data:${req.file.mimetype};base64,${b64}`;
+    }
+
     let pengurus = await kv.get('pengurusList') || [];
-    pengurus.push({ id: Date.now(), name, role, image });
+    pengurus.push({ id: Date.now(), name, role, image: imageStr });
     await kv.set('pengurusList', pengurus);
     res.redirect('/admin/dashboard');
 });
@@ -138,6 +166,36 @@ app.post('/admin/tambah-bidang', requireAdmin, async (req, res) => {
         bidang.push(req.body.bidang_name);
         await kv.set('bidangList', bidang);
     }
+    res.redirect('/admin/dashboard');
+});
+
+// --- FITUR HAPUS DATA ---
+app.post('/admin/hapus-berita/:id', requireAdmin, async (req, res) => {
+    let news = await kv.get('newsList') || [];
+    news = news.filter(n => n.id !== parseInt(req.params.id));
+    await kv.set('newsList', news);
+    res.redirect('/admin/dashboard');
+});
+
+app.post('/admin/hapus-pengurus/:id', requireAdmin, async (req, res) => {
+    let pengurus = await kv.get('pengurusList') || [];
+    pengurus = pengurus.filter(p => p.id !== parseInt(req.params.id));
+    await kv.set('pengurusList', pengurus);
+    res.redirect('/admin/dashboard');
+});
+
+app.post('/admin/hapus-album/:id', requireAdmin, async (req, res) => {
+    let albums = await kv.get('albumsList') || [];
+    albums = albums.filter(a => a.id !== parseInt(req.params.id));
+    await kv.set('albumsList', albums);
+    res.redirect('/admin/dashboard');
+});
+
+app.post('/admin/hapus-bidang', requireAdmin, async (req, res) => {
+    const { bidang_name } = req.body;
+    let bidang = await kv.get('bidangList') || [];
+    bidang = bidang.filter(b => b !== bidang_name);
+    await kv.set('bidangList', bidang);
     res.redirect('/admin/dashboard');
 });
 
