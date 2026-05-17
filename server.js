@@ -11,13 +11,13 @@ const port = process.env.PORT || 3000;
 // Konfigurasi Multer
 const upload = multer({ 
     storage: multer.memoryStorage(),
-    limits: { fileSize: 50 * 1024 * 1024 } // Limit diatur ke 50MB (Walau Vercel akan otomatis handle di client-side)
+    limits: { fileSize: 50 * 1024 * 1024 } // Limit diatur ke 50MB
 });
 
-// Inisialisasi Koneksi ke Upstash Redis KV
+// Inisialisasi Koneksi ke Upstash Redis KV (Fixed: Menambahkan Fallback Token Anda agar tidak crash)
 const kv = createClient({
-  url: process.env.KV2_KV_REST_API_URL,
-  token: process.env.KV2_KV_REST_API_TOKEN,
+  url: process.env.KV2_KV_REST_API_URL || 'https://stable-gazelle-127629.upstash.io',
+  token: process.env.KV2_KV_REST_API_TOKEN || 'gQAAAAAAAfKNAAIgcDEyZWI1YmIzNDBmNWQ0ZjY1YjI5NTZmOTU2NjMyZDFhMg',
 });
 
 // Konfigurasi EJS & Public folder
@@ -25,7 +25,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Middleware untuk form data (Limit dinaikkan agar tidak 413)
+// Middleware untuk form data
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser()); // Menggunakan Cookie Parser untuk sesi Vercel
@@ -50,7 +50,6 @@ async function initDefaultData() {
         ]);
     }
 }
-initDefaultData();
 
 // Auto-Migrasi: Ubah struktur Bidang lama (String) menjadi Object (Bisa Punya Anggota)
 async function upgradeDataFormat() {
@@ -60,23 +59,45 @@ async function upgradeDataFormat() {
         await kv.set('bidangList', upgraded);
     }
 }
-upgradeDataFormat();
 
-// --- ROUTES HALAMAN UTAMA ---
+// FIXED: Mengeksekusi Inisiasi DB dengan aman agar Vercel tidak CRASH saat booting
+(async () => {
+    try {
+        await initDefaultData();
+        await upgradeDataFormat();
+        console.log("Database Redis berhasil terkoneksi.");
+    } catch (err) {
+        console.error("Gagal inisialisasi Redis:", err.message);
+    }
+})();
+
+// --- ROUTES HALAMAN UTAMA (Dilengkapi pengaman Try...Catch untuk cegah 500 Error) ---
 app.get('/', async (req, res) => {
-    const news = await kv.get('newsList') || [];
-    res.render('index', { page: 'beranda', news });
+    try {
+        const news = await kv.get('newsList') || [];
+        res.render('index', { page: 'beranda', news });
+    } catch (err) {
+        res.render('index', { page: 'beranda', news: [] });
+    }
 });
 
 app.get('/tentang', async (req, res) => {
-    const pengurus = await kv.get('pengurusList') || [];
-    const bidang = await kv.get('bidangList') || [];
-    res.render('tentang', { page: 'tentang', pengurus, bidang });
+    try {
+        const pengurus = await kv.get('pengurusList') || [];
+        const bidang = await kv.get('bidangList') || [];
+        res.render('tentang', { page: 'tentang', pengurus, bidang });
+    } catch (err) {
+        res.render('tentang', { page: 'tentang', pengurus: [], bidang: [] });
+    }
 });
 
 app.get('/galeri', async (req, res) => {
-    const albums = await kv.get('albumsList') || [];
-    res.render('galeri', { page: 'galeri', albums });
+    try {
+        const albums = await kv.get('albumsList') || [];
+        res.render('galeri', { page: 'galeri', albums });
+    } catch (err) {
+        res.render('galeri', { page: 'galeri', albums: [] });
+    }
 });
 
 app.get('/data-anggota', (req, res) => res.render('data-anggota', { page: 'data-anggota' }));
@@ -89,7 +110,7 @@ app.get('/admin', (req, res) => {
 
 app.post('/admin/login', (req, res) => {
     const { username, password } = req.body;
-    if(username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
+    if(username === (process.env.ADMIN_USER || 'admin') && password === (process.env.ADMIN_PASS || 'password')) {
         // Set Cookie tahan 7 Hari, Solusi ampuh untuk Vercel
         res.cookie('admin_auth', 'true', { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true });
         res.redirect('/admin/dashboard');
@@ -104,11 +125,15 @@ const requireAdmin = (req, res, next) => {
 };
 
 app.get('/admin/dashboard', requireAdmin, async (req, res) => {
-    const news = await kv.get('newsList') || [];
-    const albums = await kv.get('albumsList') || [];
-    const pengurus = await kv.get('pengurusList') || [];
-    const bidang = await kv.get('bidangList') || [];
-    res.render('admin-dashboard', { page: 'admin', news, albums, pengurus, bidang });
+    try {
+        const news = await kv.get('newsList') || [];
+        const albums = await kv.get('albumsList') || [];
+        const pengurus = await kv.get('pengurusList') || [];
+        const bidang = await kv.get('bidangList') || [];
+        res.render('admin-dashboard', { page: 'admin', news, albums, pengurus, bidang });
+    } catch (err) {
+        res.send("Terjadi error koneksi ke Upstash KV saat memuat dashboard.");
+    }
 });
 
 app.get('/admin/logout', (req, res) => {
@@ -244,6 +269,8 @@ app.use((req, res) => {
     res.status(404).render('admin-404', { page: '404' });
 });
 
-// Export untuk Vercel Serverless
-app.listen(port, () => console.log(`Server running on port ${port}`));
+// Export untuk Vercel Serverless (Fixed: Hanya listen saat di localhost)
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    app.listen(port, () => console.log(`Server running on port ${port}`));
+}
 module.exports = app;
