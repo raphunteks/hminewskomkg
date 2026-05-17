@@ -65,27 +65,40 @@
             <% }) %>
         </div>
         
-        <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.1);">
-            <h3 style="margin-bottom:20px;">Bidang-Bidang</h3>
-            <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:15px;">
+        <!-- Render Bidang dan Anggotanya (UPGRADE BARU) -->
+        <div style="margin-top: 50px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <h3 style="margin-bottom:30px; text-align:center;">Bidang-Bidang</h3>
+            <div style="display:flex; flex-direction:column; gap:40px;">
                 <% bidang.forEach(b => { %>
-                    <span style="padding:10px 20px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); border-radius:10px; <%= b.toLowerCase().includes('kohati') ? 'color:#f472b6; border-color:rgba(244,114,182,0.3);' : '' %>"><%= b %></span>
+                    <div>
+                        <h4 style="color:#4ade80; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:10px; margin-bottom:20px; text-align:center;"><%= b.name %></h4>
+                        <% if(b.members && b.members.length > 0) { %>
+                            <div class="grid-4" style="justify-content:center;">
+                                <% b.members.forEach(m => { %>
+                                    <div class="glass team-card" style="padding:15px;">
+                                        <div class="team-img" style="width:80px; height:80px;"><img src="<%= m.image %>" alt="<%= m.name %>"></div>
+                                        <h4 class="team-name" style="font-size:0.95rem;"><%= m.name %></h4>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } else { %>
+                            <p style="text-align:center; color:#9ca3af; font-size:0.9rem;">Belum ada anggota yang ditambahkan.</p>
+                        <% } %>
+                    </div>
                 <% }) %>
             </div>
         </div>
+
     </div>
 </div>
 
 <!-- 4. TAB KOHATI -->
 <div id="tab-kohati" class="tab-content">
     <div class="glass" style="padding: 40px; border-left: 5px solid #f472b6;">
-        <!-- Profil Kohati -->
         <h2 style="color: #f472b6; margin-bottom:15px;"><i data-lucide="heart" style="display:inline; margin-right:5px;"></i> Profil KOHATI</h2>
         <p style="color:#d1d5db; line-height:1.7; margin-bottom:30px;">
             Korps HMI-Wati (KOHATI) adalah badan khusus HMI yang bertugas membina, mengembangkan, dan meningkatkan potensi HMI-Wati dalam wacana dan dinamika gerakan perempuan. KOHATI Komisariat Kedokteran Gigi UMI mewadahi mahasiswi muslimah untuk mencetak generasi insan cita.
         </p>
-
-        <!-- Visi Misi Kohati -->
         <h3 style="margin-bottom:15px; font-size:1.3rem;">Visi & Misi Kohati</h3>
         <div style="background:rgba(0,0,0,0.2); padding:20px; border-radius:15px; border:1px solid rgba(244,114,182,0.2); margin-bottom:30px;">
             <strong style="color:#f472b6; display:block; margin-bottom:5px;">Visi:</strong>
@@ -96,8 +109,6 @@
                 <li style="margin-bottom:5px;">2. Meningkatkan peran serta HMI-Wati dalam memajukan perempuan di bidang kesehatan.</li>
             </ul>
         </div>
-
-        <!-- Struktur Kohati -->
         <h3 style="margin-bottom:20px; font-size:1.3rem;">Struktur Kepengurusan KOHATI</h3>
         <div class="grid-3">
             <div class="glass team-card" style="border-color: rgba(244,114,182,0.2);">
