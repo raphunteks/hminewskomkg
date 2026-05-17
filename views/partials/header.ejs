@@ -10,7 +10,7 @@
     <!-- MURNI MENGGUNAKAN CSS CUSTOM -->
     <link rel="stylesheet" href="/css/main.css">
     <!-- Icon Library -->
-    <script src="[https://unpkg.com/lucide@latest](https://unpkg.com/lucide@latest)"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     
@@ -21,6 +21,11 @@
     <!-- Navbar -->
     <nav class="glass-header">
         <div class="container navbar">
+            <!-- Mobile Menu Toggle Button (Hanya tampil di layar kecil) -->
+            <button class="mobile-menu-btn" id="mobile-menu-btn">
+                <i data-lucide="menu"></i>
+            </button>
+
             <a href="/" class="logo-area">
                 <div class="logo-box">
                     <img src="/img/logo-hmikomkgumi.png" alt="Logo HMI" class="logo-img" style="width:100%; max-width:45px; object-fit:contain;">
@@ -31,7 +36,7 @@
                 </div>
             </a>
             
-            <ul class="nav-links">
+            <ul class="nav-links" id="nav-links">
                 <li><a href="/" class="nav-item <%= page === 'beranda' ? 'active' : '' %>"><i data-lucide="home" style="width:18px;"></i> Beranda</a></li>
                 <li><a href="/tentang" class="nav-item <%= page === 'tentang' ? 'active' : '' %>"><i data-lucide="info" style="width:18px;"></i> Tentang</a></li>
                 <li><a href="/galeri" class="nav-item <%= page === 'galeri' ? 'active' : '' %>"><i data-lucide="image" style="width:18px;"></i> Galeri</a></li>
@@ -48,3 +53,17 @@
     
     <main>
         <div class="container">
+
+    <script>
+        // Logika untuk menampilkan/menyembunyikan menu pada tampilan mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const navLinks = document.getElementById('nav-links');
+
+            if (mobileMenuBtn && navLinks) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                });
+            }
+        });
+    </script>
