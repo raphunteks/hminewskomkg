@@ -14,30 +14,43 @@
         <h2>Berita & Informasi</h2>
         <p class="text-muted">Update terbaru dari kegiatan komisariat</p>
     </div>
+    
+    <!-- Filter Kategori yang Berfungsi -->
     <div class="filter-tags">
-        <span class="active">Terbaru</span>
-        <span>Pin</span>
-        <span>Populer</span>
+        <a href="/" class="filter-tag <%= currentFilter === 'Semua' ? 'active' : '' %>">Semua</a>
+        <a href="/?filter=Terbaru" class="filter-tag <%= currentFilter === 'Terbaru' ? 'active' : '' %>">Terbaru</a>
+        <a href="/?filter=Pin" class="filter-tag <%= currentFilter === 'Pin' ? 'active' : '' %>">Pin</a>
+        <a href="/?filter=Populer" class="filter-tag <%= currentFilter === 'Populer' ? 'active' : '' %>">Populer</a>
     </div>
 </div>
 
 <div class="grid-3">
-    <% news.forEach(item => { %>
-    <div class="glass news-card">
-        <div class="card-img-wrap">
-            <img src="<%= item.image %>" alt="<%= item.title %>">
-            <div class="card-badge"><%= item.category %></div>
-        </div>
-        <div class="card-body">
-            <div class="card-meta">
-                <i data-lucide="calendar" style="width:14px;"></i> <%= item.date %>
+    <% if(news.length > 0) { %>
+        <% news.forEach(item => { %>
+        <!-- Card dapat di-klik mengarah ke halaman detail berita -->
+        <a href="/berita/<%= item.id %>" class="glass news-card">
+            <div class="card-img-wrap">
+                <img src="<%= item.image %>" alt="<%= item.title %>">
+                <div class="card-badge"><%= item.category %></div>
             </div>
-            <h3 class="card-title"><%= item.title %></h3>
-            <p class="text-muted" style="font-size:0.85rem; margin-bottom:15px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;"><%= item.content %></p>
-            <a href="#" class="read-more">Baca Selengkapnya <i data-lucide="chevron-right" style="width:16px;"></i></a>
-        </div>
-    </div>
-    <% }) %>
+            <div class="card-body">
+                <div class="card-meta">
+                    <i data-lucide="calendar" style="width:14px;"></i> <%= item.date %>
+                    <% if(item.photos && item.photos.length > 0) { %>
+                        <span style="margin-left:auto; color:#9ca3af; display:flex; align-items:center; gap:3px;">
+                            <i data-lucide="image" style="width:12px;"></i> +<%= item.photos.length %>
+                        </span>
+                    <% } %>
+                </div>
+                <h3 class="card-title"><%= item.title %></h3>
+                <p class="card-text"><%= item.content %></p>
+                <div class="read-more">Baca Selengkapnya <i data-lucide="chevron-right" style="width:16px;"></i></div>
+            </div>
+        </a>
+        <% }) %>
+    <% } else { %>
+        <p class="text-muted" style="grid-column: 1 / -1; text-align: center; padding: 40px 0;">Belum ada berita dalam kategori ini.</p>
+    <% } %>
 </div>
 
 <%- include('partials/footer') %>
