@@ -41,7 +41,7 @@ app.use(session({
     }
 }));
 
-// Fungsi Helper untuk Inisialisasi Default Data jika Database Kosong
+// Fungsi Helper untuk Inisialisasi Default Data
 async function initDefaultData() {
     const hasNews = await kv.get('newsList');
     if (!hasNews) {
@@ -55,10 +55,23 @@ async function initDefaultData() {
         await kv.set('pengurusList', [
             { id: 1, name: 'Muh. Xavier Syafwan', role: 'Ketua Umum', image: '[https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=80](https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=80)' }
         ]);
-        await kv.set('bidangList', ['Bidang PPPA', 'Bidang PTKP', 'Bidang KPP', 'Bidang PU']);
+        await kv.set('bidangList', [
+            { id: 101, name: 'Bidang PPPA', members: [] },
+            { id: 102, name: 'Bidang PTKP', members: [] }
+        ]);
     }
 }
 initDefaultData();
+
+// Auto-Migrasi: Ubah struktur Bidang lama (String) menjadi Object (Bisa Punya Anggota)
+async function upgradeDataFormat() {
+    let bidang = await kv.get('bidangList');
+    if (bidang && bidang.length > 0 && typeof bidang[0] === 'string') {
+        const upgraded = bidang.map((b, i) => ({ id: Date.now() + i, name: b, members: [] }));
+        await kv.set('bidangList', upgraded);
+    }
+}
+upgradeDataFormat();
 
 // --- ROUTES HALAMAN UTAMA ---
 app.get('/', async (req, res) => {
@@ -117,13 +130,10 @@ app.get('/admin/logout', (req, res) => {
 app.post('/admin/tambah-berita', requireAdmin, upload.single('image'), async (req, res) => {
     const { title, category, content } = req.body;
     let imageStr = '';
-    
-    // Konversi file gambar menjadi Base64 untuk disimpan di Redis (Aman untuk Vercel)
     if (req.file) {
         const b64 = Buffer.from(req.file.buffer).toString('base64');
         imageStr = `data:${req.file.mimetype};base64,${b64}`;
     }
-
     let news = await kv.get('newsList') || [];
     news.unshift({ id: Date.now(), title, category, date: new Date().toLocaleDateString('id-ID'), content, image: imageStr });
     await kv.set('newsList', news);
@@ -133,37 +143,69 @@ app.post('/admin/tambah-berita', requireAdmin, upload.single('image'), async (re
 app.post('/admin/tambah-album', requireAdmin, upload.single('cover'), async (req, res) => {
     const { title } = req.body;
     let coverStr = '';
-
     if (req.file) {
         const b64 = Buffer.from(req.file.buffer).toString('base64');
         coverStr = `data:${req.file.mimetype};base64,${b64}`;
     }
-
     let albums = await kv.get('albumsList') || [];
     albums.unshift({ id: Date.now(), title, date: new Date().toLocaleDateString('id-ID'), cover: coverStr });
     await kv.set('albumsList', albums);
     res.redirect('/admin/dashboard');
 });
 
+// --- FITUR PENGURUS UTAMA ---
 app.post('/admin/tambah-pengurus', requireAdmin, upload.single('image'), async (req, res) => {
     const { name, role } = req.body;
     let imageStr = '';
-
     if (req.file) {
         const b64 = Buffer.from(req.file.buffer).toString('base64');
         imageStr = `data:${req.file.mimetype};base64,${b64}`;
     }
-
     let pengurus = await kv.get('pengurusList') || [];
     pengurus.push({ id: Date.now(), name, role, image: imageStr });
     await kv.set('pengurusList', pengurus);
     res.redirect('/admin/dashboard');
 });
 
+// EDIT PENGURUS
+app.post('/admin/edit-pengurus/:id', requireAdmin, upload.single('image'), async (req, res) => {
+    const { name, role } = req.body;
+    let pengurus = await kv.get('pengurusList') || [];
+    let index = pengurus.findIndex(p => p.id === parseInt(req.params.id));
+    if (index !== -1) {
+        pengurus[index].name = name;
+        pengurus[index].role = role;
+        if (req.file) {
+            const b64 = Buffer.from(req.file.buffer).toString('base64');
+            pengurus[index].image = `data:${req.file.mimetype};base64,${b64}`;
+        }
+        await kv.set('pengurusList', pengurus);
+    }
+    res.redirect('/admin/dashboard');
+});
+
+// --- FITUR BIDANG & ANGGOTA BIDANG ---
 app.post('/admin/tambah-bidang', requireAdmin, async (req, res) => {
     if(req.body.bidang_name) {
         let bidang = await kv.get('bidangList') || [];
-        bidang.push(req.body.bidang_name);
+        bidang.push({ id: Date.now(), name: req.body.bidang_name, members: [] });
+        await kv.set('bidangList', bidang);
+    }
+    res.redirect('/admin/dashboard');
+});
+
+app.post('/admin/tambah-anggota-bidang/:bidangId', requireAdmin, upload.single('image'), async (req, res) => {
+    const { name } = req.body;
+    let imageStr = '';
+    if (req.file) {
+        const b64 = Buffer.from(req.file.buffer).toString('base64');
+        imageStr = `data:${req.file.mimetype};base64,${b64}`;
+    }
+    let bidang = await kv.get('bidangList') || [];
+    let bIndex = bidang.findIndex(b => b.id === parseInt(req.params.bidangId));
+    if (bIndex !== -1) {
+        if(!bidang[bIndex].members) bidang[bIndex].members = [];
+        bidang[bIndex].members.push({ id: Date.now(), name, image: imageStr });
         await kv.set('bidangList', bidang);
     }
     res.redirect('/admin/dashboard');
@@ -191,11 +233,20 @@ app.post('/admin/hapus-album/:id', requireAdmin, async (req, res) => {
     res.redirect('/admin/dashboard');
 });
 
-app.post('/admin/hapus-bidang', requireAdmin, async (req, res) => {
-    const { bidang_name } = req.body;
+app.post('/admin/hapus-bidang/:id', requireAdmin, async (req, res) => {
     let bidang = await kv.get('bidangList') || [];
-    bidang = bidang.filter(b => b !== bidang_name);
+    bidang = bidang.filter(b => b.id !== parseInt(req.params.id));
     await kv.set('bidangList', bidang);
+    res.redirect('/admin/dashboard');
+});
+
+app.post('/admin/hapus-anggota-bidang/:bidangId/:memberId', requireAdmin, async (req, res) => {
+    let bidang = await kv.get('bidangList') || [];
+    let bIndex = bidang.findIndex(b => b.id === parseInt(req.params.bidangId));
+    if (bIndex !== -1 && bidang[bIndex].members) {
+        bidang[bIndex].members = bidang[bIndex].members.filter(m => m.id !== parseInt(req.params.memberId));
+        await kv.set('bidangList', bidang);
+    }
     res.redirect('/admin/dashboard');
 });
 
