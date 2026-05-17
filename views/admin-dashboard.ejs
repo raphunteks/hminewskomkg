@@ -2,7 +2,10 @@
 
 <div class="glass dashboard-header">
     <div class="admin-info">
-        <div class="admin-icon"><i data-lucide="shield-check"></i></div>
+        <!-- AVATAR ADMIN MENGGUNAKAN LOGO -->
+        <div class="admin-icon">
+            <img src="/img/logo-hmikomkgumi.png" alt="Admin HMI">
+        </div>
         <div>
             <h2>Dashboard Admin</h2>
             <p class="text-muted" style="margin:0;">Selamat datang, Anda login sebagai Admin.</p>
@@ -36,9 +39,9 @@
                         <tr>
                             <td style="font-weight:600;"><%= item.title %></td>
                             <td><span style="background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px; font-size:0.8rem;"><%= item.category %></span></td>
-                            <td style="text-align:right;">
+                            <td style="text-align:right; white-space:nowrap;">
                                 <form action="/admin/hapus-berita/<%= item.id %>" method="POST" style="display:inline-block;">
-                                    <button type="submit" class="action-btn delete" onclick="return confirm('Yakin ingin menghapus berita ini?')"><i data-lucide="trash-2" style="width:18px;"></i></button>
+                                    <button type="submit" class="action-btn delete" onclick="return confirm('Yakin ingin menghapus berita ini?')" title="Hapus Berita"><i data-lucide="trash-2" style="width:16px;"></i></button>
                                 </form>
                             </td>
                         </tr>
@@ -48,13 +51,13 @@
             </div>
         </div>
 
-        <!-- Panel Kelola Pengurus Baru -->
+        <!-- Panel Kelola Pengurus Utama -->
         <div class="glass" style="padding: 25px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;">
-                <h3 style="display:flex; align-items:center; gap:10px; margin:0;"><i data-lucide="users" class="text-primary"></i> Kelola Galeri Pengurus</h3>
+                <h3 style="display:flex; align-items:center; gap:10px; margin:0;"><i data-lucide="users" class="text-primary"></i> Kelola Pengurus Harian</h3>
                 <div>
                     <button class="btn btn-primary" onclick="openModal('modalPengurus')" style="padding:8px 15px; font-size:0.85rem; margin-right:5px;">+ Pengurus</button>
-                    <button class="btn" onclick="openModal('modalBidang')" style="padding:8px 15px; font-size:0.85rem; background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2);">+ Bidang</button>
+                    <button class="btn" onclick="openModal('modalBidang')" style="padding:8px 15px; font-size:0.85rem; background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2);">+ Buat Bidang Baru</button>
                 </div>
             </div>
             
@@ -62,6 +65,7 @@
                 <table class="admin-table">
                     <thead>
                         <tr>
+                            <th>Foto</th>
                             <th>Nama Pengurus</th>
                             <th>Jabatan</th>
                             <th style="text-align:right;">Aksi</th>
@@ -70,11 +74,15 @@
                     <tbody>
                         <% pengurus.forEach(person => { %>
                         <tr>
+                            <td><img src="<%= person.image %>" style="width:40px; height:40px; border-radius:50%; object-fit:cover;"></td>
                             <td style="font-weight:600;"><%= person.name %></td>
                             <td style="color:#4ade80; font-size:0.85rem;"><%= person.role %></td>
-                            <td style="text-align:right;">
+                            <td style="text-align:right; white-space:nowrap;">
+                                <!-- Tombol Edit -->
+                                <button class="action-btn edit" onclick="openEditPengurusModal('<%= person.id %>', '<%= person.name %>', '<%= person.role %>')" title="Edit Data Pengurus"><i data-lucide="edit" style="width:16px;"></i></button>
+                                <!-- Tombol Hapus -->
                                 <form action="/admin/hapus-pengurus/<%= person.id %>" method="POST" style="display:inline-block;">
-                                    <button type="submit" class="action-btn delete" onclick="return confirm('Yakin menghapus pengurus ini?')"><i data-lucide="trash-2" style="width:18px;"></i></button>
+                                    <button type="submit" class="action-btn delete" onclick="return confirm('Yakin menghapus pengurus ini?')" title="Hapus Pengurus"><i data-lucide="trash-2" style="width:16px;"></i></button>
                                 </form>
                             </td>
                         </tr>
@@ -83,17 +91,43 @@
                 </table>
             </div>
 
-            <!-- List Bidang -->
+            <!-- List Bidang & Anggotanya (UPGRADE BESAR) -->
             <div style="margin-top: 20px; padding-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1);">
-                <h4 style="font-size: 0.9rem; color: #9ca3af; margin-bottom: 10px;">Daftar Bidang</h4>
-                <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h4 style="font-size: 1rem; color: #fff;">Daftar Bidang & Anggota</h4>
+                </div>
+                
+                <div style="display:flex; flex-direction:column; gap:15px;">
                     <% bidang.forEach(b => { %>
-                        <div style="background:rgba(0,0,0,0.3); padding:5px 10px; border-radius:8px; font-size:0.85rem; display:flex; align-items:center; gap:8px;">
-                            <%= b %>
-                            <form action="/admin/hapus-bidang" method="POST" style="display:inline-block; margin-left: 5px;">
-                                <input type="hidden" name="bidang_name" value="<%= b %>">
-                                <button type="submit" style="background:none; border:none; color:#f87171; cursor:pointer;" onclick="return confirm('Hapus bidang ini?')"><i data-lucide="x" style="width:14px; height:14px;"></i></button>
-                            </form>
+                        <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+                                <h5 style="color:#4ade80; font-size:1.1rem; margin:0;"><%= b.name %></h5>
+                                <div>
+                                    <button type="button" class="btn btn-primary" style="padding:4px 10px; font-size:0.75rem;" onclick="openModalAnggotaBidang('<%= b.id %>', '<%= b.name %>')">+ Tambah Anggota</button>
+                                    <form action="/admin/hapus-bidang/<%= b.id %>" method="POST" style="display:inline-block; margin-left:5px;">
+                                        <button type="submit" class="action-btn delete" onclick="return confirm('Hapus seluruh bidang ini beserta anggotanya?')" title="Hapus Bidang"><i data-lucide="trash-2" style="width:14px;"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <!-- List members -->
+                            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap:15px;">
+                                <% if(b.members && b.members.length > 0) { %>
+                                    <% b.members.forEach(m => { %>
+                                        <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; text-align:center; position:relative;">
+                                            <img src="<%= m.image %>" style="width:50px; height:50px; border-radius:50%; object-fit:cover; margin:0 auto 10px; border:2px solid rgba(34,197,94,0.3);">
+                                            <p style="font-size:0.8rem; font-weight:bold; margin:0;"><%= m.name %></p>
+                                            
+                                            <!-- Tombol Hapus Anggota -->
+                                            <form action="/admin/hapus-anggota-bidang/<%= b.id %>/<%= m.id %>" method="POST" style="position:absolute; top:5px; right:5px;">
+                                                <button type="submit" style="background:rgba(239,68,68,0.2); color:#ef4444; border:none; border-radius:4px; padding:2px; cursor:pointer; transition:0.3s;" onclick="return confirm('Hapus anggota ini dari bidang?')" onmouseover="this.style.background='rgba(239,68,68,0.4)'" onmouseout="this.style.background='rgba(239,68,68,0.2)'"><i data-lucide="x" style="width:12px; height:12px;"></i></button>
+                                            </form>
+                                        </div>
+                                    <% }) %>
+                                <% } else { %>
+                                    <p style="font-size:0.8rem; color:#9ca3af; margin:0; grid-column: 1 / -1;">Belum ada anggota di bidang ini.</p>
+                                <% } %>
+                            </div>
                         </div>
                     <% }) %>
                 </div>
@@ -136,7 +170,7 @@
     </div>
 </div>
 
-<!-- ================= MODALS AREA (DILENGKAPI UPLOAD FILE ASLI) ================= -->
+<!-- ================= MODALS AREA ================= -->
 
 <!-- Modal Tambah Berita -->
 <div class="modal-overlay" id="modalBerita">
@@ -193,11 +227,11 @@
     </div>
 </div>
 
-<!-- Modal Tambah Pengurus -->
+<!-- Modal Tambah Pengurus Utama -->
 <div class="modal-overlay" id="modalPengurus">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>Tambah Galeri Pengurus</h3>
+            <h3>Tambah Pengurus Utama</h3>
             <button class="close-modal" onclick="closeModal('modalPengurus')"><i data-lucide="x"></i></button>
         </div>
         <form action="/admin/tambah-pengurus" method="POST" enctype="multipart/form-data">
@@ -218,7 +252,33 @@
     </div>
 </div>
 
-<!-- Modal Tambah Bidang -->
+<!-- Modal Edit Pengurus Utama -->
+<div class="modal-overlay" id="modalEditPengurus">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Pengurus</h3>
+            <button class="close-modal" onclick="closeModal('modalEditPengurus')"><i data-lucide="x"></i></button>
+        </div>
+        <form id="formEditPengurus" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Nama Lengkap</label>
+                <input type="text" name="name" id="editPengurusName" class="input-control" required>
+            </div>
+            <div class="form-group">
+                <label>Jabatan</label>
+                <input type="text" name="role" id="editPengurusRole" class="input-control" required>
+            </div>
+            <div class="form-group">
+                <label>Upload Foto Baru (Opsional)</label>
+                <input type="file" name="image" class="input-control" accept="image/*">
+                <p style="font-size:0.75rem; color:#9ca3af; margin-top:5px;">Kosongkan jika tidak ingin mengubah foto.</p>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Update Data Pengurus</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Buat Bidang Baru -->
 <div class="modal-overlay" id="modalBidang">
     <div class="modal-content">
         <div class="modal-header">
@@ -230,17 +290,54 @@
                 <label>Nama Bidang</label>
                 <input type="text" name="bidang_name" class="input-control" required placeholder="Contoh: Bidang Humas">
             </div>
-            <button type="submit" class="btn btn-primary" style="width:100%;">Tambah Bidang</button>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Buat Bidang</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Tambah Anggota Bidang -->
+<div class="modal-overlay" id="modalAnggotaBidang">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="anggotaBidangTitle">Tambah Anggota Bidang</h3>
+            <button class="close-modal" onclick="closeModal('modalAnggotaBidang')"><i data-lucide="x"></i></button>
+        </div>
+        <form id="formAnggotaBidang" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Nama Lengkap Anggota</label>
+                <input type="text" name="name" class="input-control" required placeholder="Nama lengkap">
+            </div>
+            <div class="form-group">
+                <label>Upload Foto Anggota</label>
+                <input type="file" name="image" class="input-control" accept="image/*" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Simpan Anggota Bidang</button>
         </form>
     </div>
 </div>
 
 <script>
+    // Logic Untuk Modal Biasa
     function openModal(modalId) {
         document.getElementById(modalId).classList.add('active');
     }
     function closeModal(modalId) {
         document.getElementById(modalId).classList.remove('active');
+    }
+
+    // Logic Khusus Modal Edit Pengurus (Auto Fill Data)
+    function openEditPengurusModal(id, name, role) {
+        document.getElementById('editPengurusName').value = name;
+        document.getElementById('editPengurusRole').value = role;
+        document.getElementById('formEditPengurus').action = '/admin/edit-pengurus/' + id;
+        openModal('modalEditPengurus');
+    }
+
+    // Logic Khusus Modal Tambah Anggota Ke Bidang Tertentu
+    function openModalAnggotaBidang(bidangId, bidangName) {
+        document.getElementById('anggotaBidangTitle').innerText = "Tambah Anggota: " + bidangName;
+        document.getElementById('formAnggotaBidang').action = '/admin/tambah-anggota-bidang/' + bidangId;
+        openModal('modalAnggotaBidang');
     }
 </script>
 
