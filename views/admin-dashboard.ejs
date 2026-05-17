@@ -18,7 +18,7 @@
     <!-- Bagian Kiri (Berita, Pengurus, Bidang) -->
     <div class="admin-main-content">
         
-        <!-- Panel Kelola Berita -->
+        <!-- Panel Kelola Berita (DIUPGRADE DENGAN EDIT & MULTI-FOTO) -->
         <div class="glass admin-panel">
             <div class="panel-header">
                 <h3 class="panel-title"><i data-lucide="file-text"></i> Kelola Berita</h3>
@@ -37,9 +37,17 @@
                     <tbody>
                         <% news.forEach(item => { %>
                         <tr>
-                            <td class="fw-600"><%= item.title %></td>
+                            <td class="fw-600">
+                                <%= item.title %>
+                                <div style="font-size:0.75rem; color:#4ade80; margin-top:3px;"><%= item.date %></div>
+                            </td>
                             <td><span class="cat-badge"><%= item.category %></span></td>
                             <td class="td-actions">
+                                <!-- Tombol Kelola Foto Berita -->
+                                <button type="button" class="action-btn" style="color:#fff; border-color:rgba(255,255,255,0.3);" onclick="openKelolaFotoBerita('<%= item.id %>')" title="Tambah/Hapus Banyak Foto"><i data-lucide="image-plus"></i></button>
+                                <!-- Tombol Edit Berita -->
+                                <button type="button" class="action-btn edit" onclick="openEditBeritaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.category %>', '<%= item.date %>', `<%= item.content.replace(/`/g, "\\`") %>`)" title="Edit Berita"><i data-lucide="edit"></i></button>
+                                <!-- Tombol Hapus Berita -->
                                 <form action="/admin/hapus-berita/<%= item.id %>" method="POST" class="form-inline">
                                     <button type="submit" class="action-btn delete" onclick="return confirm('Yakin ingin menghapus berita ini?')" title="Hapus Berita"><i data-lucide="trash-2"></i></button>
                                 </form>
@@ -143,11 +151,8 @@
                         <small style="color:#4ade80;"><%= album.date %></small>
                     </span>
                     <div style="display:flex; gap:5px;">
-                        <!-- Tombol Kelola Foto (Upload multiple) -->
                         <button type="button" class="action-btn" style="color:#fff; border-color:rgba(255,255,255,0.3);" onclick="openKelolaFotoAlbum('<%= album.id %>')" title="Tambah/Hapus Banyak Foto"><i data-lucide="image-plus"></i></button>
-                        <!-- Tombol Edit Judul/Tanggal Album -->
                         <button type="button" class="action-btn edit" onclick="openEditAlbumModal('<%= album.id %>', '<%= album.title.replace(/'/g, "\\'") %>', '<%= album.date %>')" title="Edit Album"><i data-lucide="edit"></i></button>
-                        <!-- Tombol Hapus Seluruh Album -->
                         <form action="/admin/hapus-album/<%= album.id %>" method="POST" class="form-inline">
                             <button type="submit" class="action-btn delete" onclick="return confirm('Hapus album ini secara keseluruhan?')"><i data-lucide="trash-2"></i></button>
                         </form>
@@ -172,14 +177,82 @@
     </div>
 </div>
 
-<!-- DATA ALBUM DALAM BENTUK SCRIPT (UNTUK MODAL KELOLA FOTO) -->
+<!-- DATA SCRIPT (UNTUK MODAL KELOLA FOTO BERITA & ALBUM) -->
 <script>
     const albumsData = <%- JSON.stringify(albums) %>;
+    const newsData = <%- JSON.stringify(news) %>;
 </script>
 
 <!-- ================= MODALS AREA ================= -->
 
-<!-- Modal Edit Album (Judul & Tanggal) -->
+<!-- Modal Edit Berita (BARU) -->
+<div class="modal-overlay" id="modalEditBerita">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Berita</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalEditBerita')"><i data-lucide="x"></i></button>
+        </div>
+        <form id="formEditBerita" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Judul Berita</label>
+                <input type="text" name="title" id="editBeritaTitle" class="input-control" required>
+            </div>
+            <div class="form-group">
+                <label>Tanggal Rilis</label>
+                <input type="text" name="date" id="editBeritaDate" class="input-control" required placeholder="Contoh: 10 May 2025">
+            </div>
+            <div class="form-group">
+                <label>Kategori</label>
+                <select name="category" id="editBeritaCategory" class="input-control" required>
+                    <option value="Terbaru">Terbaru</option>
+                    <option value="Populer">Populer</option>
+                    <option value="Pin">Pin (Disematkan)</option>
+                    <option value="Lama">Lama (Old)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Isi Berita</label>
+                <textarea name="content" id="editBeritaContent" class="input-control" rows="5" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Ganti Foto Berita (Opsional)</label>
+                <input type="file" name="image" class="input-control file-compress" accept="image/*">
+                <p class="form-hint">Kosongkan jika tidak ingin mengubah foto cover berita.</p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditBerita')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Update Berita</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Kelola Foto Berita (BARU) -->
+<div class="modal-overlay" id="modalKelolaFotoBerita">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3 id="kelolaFotoBeritaTitle">Kelola Foto: </h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalKelolaFotoBerita')"><i data-lucide="x"></i></button>
+        </div>
+        
+        <form id="formTambahFotoBerita" method="POST" enctype="multipart/form-data" style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255,255,255,0.2);">
+            <div class="form-group">
+                <label>Upload Banyak Foto Tambahan Sekaligus</label>
+                <input type="file" name="photos" class="input-control file-compress-multiple" accept="image/*" multiple required>
+                <p class="form-hint">Pilih beberapa foto pendukung berita sekaligus.</p>
+            </div>
+            <button type="submit" class="btn btn-primary submit-btn-multi" style="width:100%;">Upload Foto Tambahan</button>
+        </form>
+
+        <h4 style="font-size:0.95rem; margin-bottom:10px;">Foto Tambahan di Berita Ini</h4>
+        <div id="existingPhotosBeritaGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px;">
+            <!-- Diisi otomatis melalui JavaScript -->
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal Edit Album -->
 <div class="modal-overlay" id="modalEditAlbum">
     <div class="modal-content">
         <div class="modal-header">
@@ -208,29 +281,23 @@
     </div>
 </div>
 
-<!-- Modal Kelola Foto Album (Upload Banyak & Hapus) -->
+<!-- Modal Kelola Foto Album -->
 <div class="modal-overlay" id="modalKelolaFotoAlbum">
     <div class="modal-content" style="max-width: 600px;">
         <div class="modal-header">
             <h3 id="kelolaFotoTitle">Kelola Foto: </h3>
             <button type="button" class="close-modal" onclick="closeModal('modalKelolaFotoAlbum')"><i data-lucide="x"></i></button>
         </div>
-        
-        <!-- Form Tambah Banyak Foto -->
         <form id="formTambahFotoAlbum" method="POST" enctype="multipart/form-data" style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255,255,255,0.2);">
             <div class="form-group">
                 <label>Upload Banyak Foto Sekaligus</label>
-                <!-- Atribut multiple memungkinkan user blok banyak file sekaligus -->
                 <input type="file" name="photos" class="input-control file-compress-multiple" accept="image/*" multiple required>
                 <p class="form-hint">Pilih beberapa foto di perangkat Anda sekaligus.</p>
             </div>
             <button type="submit" class="btn btn-primary submit-btn-multi" style="width:100%;">Upload Foto Tambahan</button>
         </form>
-
-        <!-- Grid Existing Photos (Bisa dihapus satu per satu) -->
         <h4 style="font-size:0.95rem; margin-bottom:10px;">Foto yang Sudah Tersimpan di Album Ini</h4>
         <div id="existingPhotosGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px;">
-            <!-- Diisi otomatis melalui JavaScript (openKelolaFotoAlbum) -->
         </div>
     </div>
 </div>
@@ -398,10 +465,50 @@
 </div>
 
 <script>
-    // Logic Modal
+    // Logic Modal Umum
     function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
 
+    // Logic Modal Berita
+    function openEditBeritaModal(id, title, category, date, content) {
+        document.getElementById('editBeritaTitle').value = title;
+        document.getElementById('editBeritaCategory').value = category;
+        document.getElementById('editBeritaDate').value = date;
+        document.getElementById('editBeritaContent').value = content;
+        document.getElementById('formEditBerita').action = '/admin/edit-berita/' + id;
+        openModal('modalEditBerita');
+    }
+
+    function openKelolaFotoBerita(id) {
+        const berita = newsData.find(n => n.id == id);
+        if(!berita) return;
+
+        document.getElementById('kelolaFotoBeritaTitle').innerText = 'Kelola Foto: ' + berita.title;
+        document.getElementById('formTambahFotoBerita').action = '/admin/tambah-foto-berita/' + id;
+        
+        const grid = document.getElementById('existingPhotosBeritaGrid');
+        grid.innerHTML = '';
+        
+        if (berita.photos && berita.photos.length > 0) {
+            berita.photos.forEach(p => {
+                grid.innerHTML += `
+                    <div style="position:relative; background:rgba(255,255,255,0.05); padding:5px; border-radius:8px;">
+                        <img src="${p.url}" style="width:100%; height:80px; object-fit:cover; border-radius:4px;">
+                        <form action="/admin/hapus-foto-berita/${berita.id}/${p.id}" method="POST" style="position:absolute; top:8px; right:8px;">
+                            <button type="submit" style="background:rgba(239,68,68,0.8); color:#fff; border:none; border-radius:4px; padding:4px; cursor:pointer;" onclick="return confirm('Hapus foto ini dari berita?')">
+                                <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                            </button>
+                        </form>
+                    </div>
+                `;
+            });
+        } else {
+            grid.innerHTML = '<p class="text-muted" style="grid-column: 1 / -1;">Belum ada foto tambahan di berita ini.</p>';
+        }
+        openModal('modalKelolaFotoBerita');
+    }
+
+    // Logic Modal Pengurus & Bidang
     function openEditPengurusModal(id, name, role) {
         document.getElementById('editPengurusName').value = name;
         document.getElementById('editPengurusRole').value = role;
@@ -415,6 +522,7 @@
         openModal('modalAnggotaBidang');
     }
 
+    // Logic Modal Album
     function openEditAlbumModal(id, title, date) {
         document.getElementById('editAlbumTitle').value = title;
         document.getElementById('editAlbumDate').value = date;
@@ -496,7 +604,7 @@
         });
     });
 
-    // Listener (Multiple Uploads for Gallery Photos)
+    // Listener (Multiple Uploads for Gallery/Berita Photos)
     document.querySelectorAll('.file-compress-multiple').forEach(input => {
         input.addEventListener('change', async (e) => {
             const files = e.target.files;
@@ -506,7 +614,6 @@
                 submitBtn.innerText = 'Memproses ' + files.length + ' Foto...';
                 submitBtn.disabled = true;
 
-                // Hapus old hidden inputs
                 input.parentElement.querySelectorAll('.b64-hidden-multi').forEach(el => el.remove());
 
                 for(let i=0; i < files.length; i++) {
@@ -514,7 +621,7 @@
                         const base64 = await compressImage(files[i]);
                         const hidden = document.createElement('input');
                         hidden.type = 'hidden';
-                        hidden.name = 'photos_b64'; // Bisa berupa array saat diterima server
+                        hidden.name = 'photos_b64';
                         hidden.className = 'b64-hidden-multi';
                         hidden.value = base64;
                         input.parentElement.appendChild(hidden);
