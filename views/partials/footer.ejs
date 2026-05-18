@@ -1,8 +1,8 @@
-</div>
-    </main>
+</div> <!-- Menutup div.container dari header -->
+    </main> <!-- Menutup tag main dari header -->
     
-    <!-- FIX Z-INDEX AGAR TIDAK MENUTUPI POPUP -->
-    <footer class="site-footer" style="z-index: 10;">
+    <!-- Footer Utama -->
+    <footer class="site-footer" style="z-index: 10; position: relative;">
         <div class="container">
             <div class="grid-3 footer-top">
                 <div style="grid-column: span 1;">
@@ -48,6 +48,56 @@
             </div>
         </div>
     </footer>
+
+    <!-- POPUP PENGUMUMAN DIMASUKKAN DI SINI AGAR TIDAK TERTIMPA FOOTER -->
+    <% if (typeof page !== 'undefined' && page === 'beranda' && typeof siteSettings !== 'undefined' && (siteSettings.announceActive === 'true' || siteSettings.announceActive === true)) { %>
+    <div class="modal-overlay announce-overlay" id="announceModal" style="z-index: 9999999; padding: 20px;">
+        <div class="announce-horizontal">
+            
+            <button class="close-modal announce-close-btn" onclick="closeAnnounce()">
+                <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+            </button>
+
+            <% if (siteSettings.announceImage) { %>
+            <div class="announce-left">
+                <img src="<%= siteSettings.announceImage %>" alt="Announcement">
+            </div>
+            <% } %>
+
+            <div class="announce-right">
+                <h2 class="announce-title"><%= siteSettings.announceTitle %></h2>
+                <div class="announce-divider"></div>
+
+                <div class="rich-text-content announce-text">
+                    <%- siteSettings.announceContent %>
+                </div>
+
+                <button class="btn announce-btn" onclick="readAnnounce()">Saya Sudah Membaca</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const titleKey = '<%= siteSettings.announceTitle.replace(/[^a-zA-Z0-9]/g, "_") %>';
+            const announceKey = 'announce_read_' + titleKey;
+            if (!localStorage.getItem(announceKey)) {
+                setTimeout(() => { document.getElementById('announceModal').classList.add('active'); }, 600);
+            }
+        });
+
+        function closeAnnounce() { 
+            document.getElementById('announceModal').classList.remove('active'); 
+        }
+
+        function readAnnounce() {
+            const titleKey = '<%= siteSettings.announceTitle.replace(/[^a-zA-Z0-9]/g, "_") %>';
+            const announceKey = 'announce_read_' + titleKey;
+            localStorage.setItem(announceKey, 'true');
+            closeAnnounce();
+        }
+    </script>
+    <% } %>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
