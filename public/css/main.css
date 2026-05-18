@@ -11,9 +11,9 @@ button, input, textarea, select { font-family: inherit; }
 /* FIX LUCIDE ICONS SVG SCALING */
 .lucide { display: inline-block; vertical-align: middle; width: 20px; height: 20px; stroke: currentColor; stroke-width: 2px; }
 
-/* LAYOUT */
+/* LAYOUT (Z-INDEX FIXED) */
 .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-main { flex-grow: 1; padding-top: 120px; padding-bottom: 60px; position: relative; z-index: 10; }
+main { flex-grow: 1; padding-top: 120px; padding-bottom: 60px; position: relative; z-index: 20; }
 
 .bg-blob { position: fixed; border-radius: 50%; filter: blur(100px); z-index: 1; opacity: 0.4; pointer-events: none; }
 .blob-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: #22c55e; }
@@ -161,7 +161,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .upload-icon-box svg { color: #4ade80; width: 30px; height: 30px; }
 
 /* MODALS */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); z-index: 99999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s; padding: 20px; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); z-index: 999999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s; padding: 20px; }
 .modal-overlay.active { opacity: 1; visibility: visible; }
 .modal-content { background: #111827; border: 1px solid rgba(255,255,255,0.2); border-radius: 1.5rem; width: 100%; max-width: 600px; padding: 30px; transform: translateY(20px); transition: 0.3s; max-height: 90vh; overflow-y: auto; box-shadow: 0 15px 40px rgba(0,0,0,0.4); position: relative; }
 .modal-overlay.active .modal-content { transform: translateY(0); }
@@ -237,6 +237,10 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; display: flex; justify-content: space-between; color: #6b7280; font-size: 0.85rem; }
 
 /* RESPONSIVE & LAYOUT FIX */
+@media (max-width: 992px) {
+    .admin-layout { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 768px) {
     .mobile-menu-btn { display: block; }
     .nav-links { display: none; flex-direction: column; position: absolute; top: 80px; left: 0; width: 100%; background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(10px); padding: 20px; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
