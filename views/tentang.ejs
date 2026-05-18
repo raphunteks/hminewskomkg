@@ -90,6 +90,10 @@
                                     <div class="glass team-card" style="padding:15px;">
                                         <div class="team-img" style="width:80px; height:80px;"><img src="<%= m.image %>" alt="<%= m.name %>"></div>
                                         <h4 class="team-name" style="font-size:0.95rem;"><%= m.name %></h4>
+                                        <!-- UPDATE JABATAN MUNCUL DI SINI (UMUM) -->
+                                        <% if(m.role) { %>
+                                            <p style="color:#4ade80; font-size:0.8rem; font-weight:bold; margin-top:2px;"><%= m.role %></p>
+                                        <% } %>
                                     </div>
                                 <% }) %>
                             </div>
@@ -103,7 +107,7 @@
     </div>
 </div>
 
-<!-- STRUKTUR LENGKAP KOHATI (SESUAI REQUEST) -->
+<!-- STRUKTUR LENGKAP KOHATI -->
 <% if (String(siteSettings.kohatiActive) === 'true') { %>
 <div id="tab-kohati" class="tab-content">
     <div class="glass" style="padding: 40px; border-top: 5px solid #f472b6;">
@@ -159,6 +163,10 @@
                                         <div class="glass team-card" style="padding:15px; border-color: rgba(244,114,182,0.2);">
                                             <div class="team-img" style="width:80px; height:80px; border-color: rgba(244,114,182,0.5);"><img src="<%= m.image %>"></div>
                                             <h4 class="team-name" style="font-size:0.95rem;"><%= m.name %></h4>
+                                            <!-- UPDATE JABATAN MUNCUL DI SINI (KOHATI) -->
+                                            <% if(m.role) { %>
+                                                <p style="color:#f472b6; font-size:0.8rem; font-weight:bold; margin-top:2px;"><%= m.role %></p>
+                                            <% } %>
                                         </div>
                                     <% }) %>
                                 </div>
