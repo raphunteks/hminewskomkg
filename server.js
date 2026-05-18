@@ -20,6 +20,7 @@ const kv = createClient({
   token: process.env.KV2_KV_REST_API_TOKEN || 'gQAAAAAAAfKNAAIgcDEyZWI1YmIzNDBmNWQ0ZjY1YjI5NTZmOTU2NjMyZDFhMg',
 });
 
+// Konfigurasi EJS & Public folder
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -28,9 +29,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser()); 
-// PERHATIAN: Pemanggilan express-session DIHAPUS TOTAL dari sini untuk mencegah CRASH 500 di Vercel
 
-// --- STRUKTUR SETTINGS DEFAULT TERMASUK KONTEN KOHATI BARU ---
+// --- STRUKTUR SETTINGS DEFAULT TERPERCAYA (MENAMPUNG SEMUA KONTEN ASLI) ---
 const defaultSettings = {
     webTitle: "HMI KomKG-UMI",
     headerLogo: "/img/logo-hmikomkgumi.png",
@@ -45,7 +45,7 @@ const defaultSettings = {
     footerProgrammer: "💻 Axa Xyz",
     kohatiActive: "true",
     profilText: `<p>Halaman profil ini berisi deskripsi singkat mengenai sejarah, visi, dan misi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia, serta program kerja dan kegiatan yang telah dan akan dilaksanakan oleh organisasi tersebut.</p><br><h3>Welcome</h3><p>Selamat datang di website resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia. Kami adalah sebuah organisasi mahasiswa yang terdiri dari para mahasiswa kedokteran gigi yang memiliki komitmen untuk meningkatkan kualitas diri dan mengembangkan potensi dalam bidang akademik, keislaman, sosial, dan kemanusiaan. Di sini, Anda dapat menemukan informasi terbaru tentang kegiatan kami, program kerja, dan berbagai kegiatan yang telah kami lakukan. Selamat menjelajahi situs web kami!</p>`,
-    visiMisiText: `<h3>Visi</h3><p>Terbinanya insan akademis, pencipta, pengabdi yang bernafaskan Islam dan bertanggung jawab atas terwujudnya masyarakat adil makmur yang diridhoi Allah SWT, khususnya dalam mewujudkan dokter gigi muslim yang profesional.</p><br><h3>Misi</h3><ul class="list-custom"><li>Reaktualisasi nilai-nilai ke-Islaman dalam pengembangan kapasitas diri kader.</li><li>Optimalisasi kesadaran kader terkait isu kesehatan gigi dan masyarakat.</li><li>Memelihara dan mengedepankan nilai-nilai kekeluargaan dalam aktivitas organisasi.</li></ul>`,
+    visiMisiText: `<h3>Visi</h3><p>Terbinanya insan akademis, pencipta, pengabdi yang bernafaskan Islam dan bertanggung jawab atas terwujudnya masyarakat adil makmur yang diridhoi Allah SWT, khususnya dalam mewujudkan dokter gigi muslim yang profesional.</p><br><h3>Misi</h3><ul class="list-custom"><li><span class="list-num">1.</span> Reaktualisasi nilai-nilai ke-Islaman dalam pengembangan kapasitas diri kader.</li><li><span class="list-num">2.</span> Optimalisasi kesadaran kader terkait isu kesehatan gigi dan masyarakat.</li><li><span class="list-num">3.</span> Memelihara dan mengedepankan nilai-nilai kekeluargaan dalam aktivitas organisasi.</li></ul>`,
     kohatiProfilText: `<p>Korps HMI-Wati (KOHATI) adalah badan khusus HMI yang bertugas membina, mengembangkan, dan meningkatkan potensi HMI-Wati dalam wacana dan dinamika gerakan perempuan. KOHATI Komisariat Kedokteran Gigi UMI mewadahi mahasiswi muslimah untuk mencetak generasi insan cita.</p>`,
     kohatiVisiMisiText: `<h3>Visi</h3><p>Terbinanya muslimah berkualitas insan cita.</p><br><h3>Misi</h3><ul class="list-custom"><li>Membina HMI-Wati untuk menjadi insan akademis yang profesional.</li><li>Meningkatkan peran serta HMI-Wati dalam memajukan perempuan di bidang kesehatan.</li></ul>`,
     mapsEmbed: "",
@@ -149,8 +149,9 @@ const fileHelper = (req, fieldB64) => {
     return str;
 };
 
-// Mengarahkan favicon otomatis agar tidak error 500
+// Mengarahkan favicon otomatis agar tidak error
 app.get('/favicon.ico', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
+app.get('/favicon.png', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 
 // --- ROUTES HALAMAN UTAMA ---
 app.get('/', async (req, res) => {
@@ -158,7 +159,9 @@ app.get('/', async (req, res) => {
         const { siteSettings, socialMediaList } = await getSiteData();
         let news = await kv.get('newsList') || [];
         const filter = req.query.filter; 
-        if (filter && filter !== 'Semua') news = news.filter(n => n.category.toLowerCase() === filter.toLowerCase());
+        if (filter && filter !== 'Semua') {
+            news = news.filter(n => n.category.toLowerCase() === filter.toLowerCase());
+        }
         res.render('index', { page: 'beranda', news, currentFilter: filter || 'Semua', siteSettings, socialMediaList });
     } catch (err) {
         res.render('index', { page: 'beranda', news: [], currentFilter: 'Semua', siteSettings: defaultSettings, socialMediaList: defaultSocialMedia });
@@ -218,7 +221,7 @@ app.get('/data-anggota', async (req, res) => {
     }
 });
 
-// SHORTLINK
+// SHORTLINK CUSTOM REDIRECT
 app.get('/:slug', async (req, res, next) => {
     const slug = req.params.slug.toLowerCase();
     const reserved = ['admin', 'css', 'img', 'js', 'berita', 'galeri', 'tentang', 'data-anggota'];
@@ -231,7 +234,7 @@ app.get('/:slug', async (req, res, next) => {
     next();
 });
 
-// --- ADMIN ROUTES ---
+// --- ADMIN SECURITY ---
 app.get('/admin', async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
@@ -276,7 +279,7 @@ app.get('/admin/logout', (req, res) => {
     res.redirect('/admin');
 });
 
-// --- API KELOLA BERITA ---
+// --- API KELOLA BERITA, GALERI, DATA ANGGOTA ---
 app.post('/admin/tambah-berita', requireAdmin, upload.any(), async (req, res) => {
     let news = await kv.get('newsList') || [];
     news.unshift({ id: Date.now(), title: req.body.title, category: req.body.category, date: req.body.date || new Date().toLocaleDateString('id-ID'), content: req.body.content, image: fileHelper(req, 'image_b64'), photos: [] });
@@ -308,14 +311,14 @@ app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req
     res.redirect('/admin/dashboard');
 });
 
-// --- API SETELAN WEB ---
+// --- API SETELAN WEB (AMAN DARI OVERWRITE) ---
 app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
         
         // Cek darimana request berasal (Header/Footer ATAU Tentang Kami)
         if (req.body.webTitle !== undefined) {
-            // Form Header & Footer
+            // Bagian Header & Footer Form
             siteSettings.webTitle = req.body.webTitle;
             siteSettings.heroTitle = req.body.heroTitle || siteSettings.heroTitle;
             siteSettings.headerTitle = req.body.headerTitle || siteSettings.headerTitle;
@@ -326,14 +329,14 @@ app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
             siteSettings.footerCopyright = req.body.footerCopyright || siteSettings.footerCopyright;
             siteSettings.footerProgrammer = req.body.footerProgrammer || siteSettings.footerProgrammer;
             
-            // KOHATI Toggle (Checked = 'true', Unchecked = undefined -> 'false')
+            // Pengaman Toggle KOHATI
             siteSettings.kohatiActive = req.body.kohatiActive ? 'true' : 'false';
 
             const hLogo = fileHelper(req, 'headerLogo_b64'); if (hLogo) siteSettings.headerLogo = hLogo;
             const fLogo = fileHelper(req, 'footerLogo_b64'); if (fLogo) siteSettings.footerLogo = fLogo;
         } 
         else if (req.body.profilText !== undefined) {
-            // Form Tentang Kami
+            // Bagian Tentang Kami Form (TIDAK MENGGANGGU KOHATIACTIVE)
             siteSettings.profilText = req.body.profilText;
             siteSettings.visiMisiText = req.body.visiMisiText;
             siteSettings.kohatiProfilText = req.body.kohatiProfilText;
@@ -365,17 +368,23 @@ app.post('/admin/setelan-announcement', requireAdmin, upload.any(), async (req, 
 
 // --- API SHORTLINK & SOSMED ---
 app.post('/admin/tambah-shortlink', requireAdmin, async (req, res) => {
-    let list = await kv.get('shortlinkList') || []; list.unshift({ id: Date.now(), title: req.body.title, path: req.body.path.replace(/\s+/g, '-').toLowerCase(), originalUrl: req.body.originalUrl }); await kv.set('shortlinkList', list); res.redirect('/admin/dashboard');
+    let list = await kv.get('shortlinkList') || [];
+    list.unshift({ id: Date.now(), title: req.body.title, path: req.body.path.replace(/\s+/g, '-').toLowerCase(), originalUrl: req.body.originalUrl });
+    await kv.set('shortlinkList', list); res.redirect('/admin/dashboard');
 });
 app.post('/admin/edit-shortlink/:id', requireAdmin, async (req, res) => {
-    let list = await kv.get('shortlinkList') || []; let i = list.findIndex(l => l.id == req.params.id); if(i !== -1) { list[i].title = req.body.title; list[i].path = req.body.path.replace(/\s+/g, '-').toLowerCase(); list[i].originalUrl = req.body.originalUrl; await kv.set('shortlinkList', list); } res.redirect('/admin/dashboard');
+    let list = await kv.get('shortlinkList') || []; let i = list.findIndex(l => l.id == req.params.id);
+    if(i !== -1) { list[i].title = req.body.title; list[i].path = req.body.path.replace(/\s+/g, '-').toLowerCase(); list[i].originalUrl = req.body.originalUrl; await kv.set('shortlinkList', list); }
+    res.redirect('/admin/dashboard');
 });
 app.post('/admin/hapus-shortlink/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('shortlinkList') || []; await kv.set('shortlinkList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
 });
 
 app.post('/admin/tambah-sosmed', requireAdmin, upload.any(), async (req, res) => {
-    let list = await kv.get('socialMediaList') || []; list.push({ id: Date.now(), name: req.body.name, url: req.body.url, icon: fileHelper(req, 'icon_b64') }); await kv.set('socialMediaList', list); res.redirect('/admin/dashboard');
+    let list = await kv.get('socialMediaList') || [];
+    list.push({ id: Date.now(), name: req.body.name, url: req.body.url, icon: fileHelper(req, 'icon_b64') });
+    await kv.set('socialMediaList', list); res.redirect('/admin/dashboard');
 });
 app.post('/admin/hapus-sosmed/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('socialMediaList') || []; await kv.set('socialMediaList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
@@ -438,9 +447,9 @@ app.post('/admin/edit-data-anggota/:id', requireAdmin, upload.any(), async (req,
 app.post('/admin/hapus-data-anggota/:id', requireAdmin, async (req, res) => { let dataAnggota = await kv.get('dataAnggotaList') || []; await kv.set('dataAnggotaList', dataAnggota.filter(d => d.id != req.params.id)); res.redirect('/admin/dashboard'); });
 
 // GLOBAL ERROR HANDLER
-app.use(async (req, res) => {
-    const { siteSettings, socialMediaList } = await getSiteData();
-    res.status(404).render('admin-404', { page: '404', siteSettings, socialMediaList });
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Terjadi Kesalahan Internal di Server.');
 });
 
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
