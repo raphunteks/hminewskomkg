@@ -1,12 +1,11 @@
 <%- include('partials/header') %>
 
-<!-- POPUP PENGUMUMAN HORIZONTAL (DIEMBED LANGSUNG AGAR ANTI CRASH 500) -->
 <% if (typeof siteSettings !== 'undefined' && (siteSettings.announceActive === 'true' || siteSettings.announceActive === true)) { %>
-<div class="modal-overlay announce-overlay" id="announceModal" style="z-index: 9999999; padding: 20px; display: flex; align-items: center; justify-content: center;">
+<div class="modal-overlay announce-overlay" id="announceModal">
     <div class="announce-horizontal">
         
         <button class="close-modal announce-close-btn" onclick="closeAnnounce()">
-            <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+            <i data-lucide="x"></i>
         </button>
 
         <% if (siteSettings.announceImage) { %>
@@ -50,7 +49,6 @@
 </script>
 <% } %>
 
-<!-- Hero / Selamat Datang -->
 <div class="glass hero">
     <span class="badge">Yakusa! Yakin Usaha Sampai</span>
     <h1>Selamat datang di website resmi <br><span class="text-gradient"><%= siteSettings.heroTitle || siteSettings.webTitle %></span></h1>
@@ -58,7 +56,6 @@
     <a href="/tentang" class="btn btn-primary">Kenali Kami Lebih Dekat</a>
 </div>
 
-<!-- Section Berita -->
 <div class="section-header">
     <div>
         <h2>Berita & Informasi</h2>
