@@ -75,7 +75,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 /* Format Rich Text untuk Tampilan Detail */
 .rich-text-content { line-height: 1.8; color: #d1d5db; }
 .rich-text-content p { margin-bottom: 15px; }
-.rich-text-content h1, .rich-text-content h2, .rich-text-content h3 { color: #fff; margin-top: 25px; margin-bottom: 15px; }
+.rich-text-content h1, .rich-text-content h2, .rich-text-content h3 { color: #fff; margin-top: 25px; margin-bottom: 15px; font-weight: bold; }
 .rich-text-content ul { list-style-type: disc; padding-left: 20px; margin-bottom: 15px; }
 .rich-text-content ol { list-style-type: decimal; padding-left: 20px; margin-bottom: 15px; }
 .rich-text-content a { color: #4ade80; text-decoration: underline; }
@@ -97,80 +97,81 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ==============================================================
-   ANNOUNCEMENT POP-UP (HORIZONTAL FIXED & PROPORTIONAL)
+   ANNOUNCEMENT POP-UP (KONSISTEN, ANTI-MELONJONG, & PROPORSIONAL)
 ============================================================== */
 .announce-overlay {
-    z-index: 9999999;
+    z-index: 9999999; /* Selalu di atas */
     padding: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.announce-horizontal {
-    display: flex;
-    flex-direction: row;
-    max-width: 900px; /* Lebar maksimal diperbesar sedikit */
+.announce-container {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr; /* Pembagian proporsional: kiri lebih kecil, kanan lebih lebar */
+    max-width: 800px; /* Ukuran keseluruhan di perkecil agar lebih pas di desktop */
     width: 100%;
-    max-height: 80vh; /* Tinggi maksimal dikunci agar tidak melebihi viewport */
-    background: #1b4332; 
+    max-height: 80vh; /* Kunci: Tidak akan melebihi 80% layar */
+    background: #112d22; /* Warna hijau gelap elegan */
     border-radius: 16px;
     overflow: hidden;
     position: relative;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-    border: 2px solid rgba(74,222,128,0.3);
+    border: 1px solid rgba(74,222,128,0.3);
 }
 
 .announce-close-btn {
     position: absolute;
     top: 15px;
     right: 15px;
-    z-index: 20; /* Z-index diperbesar agar selalu di atas */
+    z-index: 30; /* Dipastikan tombol close selalu di atas */
     background: rgba(0,0,0,0.5);
     border-radius: 50%;
     padding: 8px;
     color: #fff;
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
     cursor: pointer;
     transition: 0.3s;
-}
-
-.announce-close-btn:hover { background: rgba(239,68,68,0.8); }
-
-.announce-left {
-    flex: 0 0 45%; /* Menempati 45% dari lebar kontainer */
-    max-width: 45%;
-    padding: 20px; /* Memberikan border/ruang di sekitar gambar */
-    background: #064e3b; /* Warna background berbeda untuk bagian gambar */
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
+}
+
+.announce-close-btn:hover { background: rgba(239,68,68,0.9); }
+
+.announce-left {
+    background: #000;
+    padding: 20px; /* Memberikan ruang (border semu) di sekitar gambar */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .announce-left img {
     max-width: 100%;
     max-height: 100%;
-    object-fit: contain; /* Menggunakan contain agar gambar proporsional dan tidak terpotong */
+    width: 100%; /* Memaksa gambar mengikuti area padding */
+    height: auto;
+    object-fit: contain; /* KUNCI ANTI MELONJONG / DISTORSI */
     border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3); /* Menambahkan bayangan pada gambar */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 }
 
 .announce-right {
-    flex: 1; /* Menempati sisa lebar (55%) */
     padding: 30px;
     display: flex;
     flex-direction: column;
-    overflow-y: auto; /* KUNCI: Scroll hanya pada bagian teks */
+    overflow-y: auto; /* SCROLL KHUSUS HANYA UNTUK TEKS */
 }
 
 .announce-title { 
     color: #fff; 
     margin-bottom: 10px; 
-    font-size: 1.8rem; 
+    font-size: 1.6rem; /* Ukuran font disesuaikan */
     font-weight: 800; 
     line-height: 1.2; 
-    padding-right: 30px; /* Mencegah judul menabrak tombol close */
+    padding-right: 35px; /* Mencegah judul menabrak tombol close */
 }
 
 .announce-divider { 
@@ -185,7 +186,6 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .announce-text { 
     color: #d1d5db; 
     margin-bottom: 30px; 
-    line-height: 1.6; 
     font-size: 0.95rem; 
     border-left: 3px solid rgba(74, 222, 128, 0.4); 
     padding-left: 15px; 
@@ -202,12 +202,12 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     color: #4ade80;
     cursor: pointer;
     transition: 0.3s;
-    margin-top: auto; /* Mendorong tombol ke bawah */
+    margin-top: auto; /* Mendorong tombol ke bagian paling bawah area konten */
 }
 .announce-btn:hover { background: #4ade80; color: #000; }
 
 /* ==============================================================
-   ADMIN DASHBOARD UI (UPGRADE LAYOUT PROPORSIONAL)
+   ADMIN DASHBOARD UI
 ============================================================== */
 .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 25px; margin-bottom: 20px; }
 .admin-info { display: flex; align-items: center; gap: 20px; }
@@ -221,7 +221,6 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .admin-tab-pane { display: none; animation: fadeIn 0.4s ease; }
 .admin-tab-pane.active { display: block; }
 
-/* FIX LAYOUT: Grid Proposional Untuk Kerapian Admin (Kiri Lebih Besar dari Kanan) */
 .admin-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; align-items: start; }
 .admin-main-content { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
 .admin-sidebar { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
@@ -367,11 +366,27 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     .panel-header { flex-direction: column; gap: 15px; text-align: center; }
     .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
     
-    /* FIX ANNOUNCEMENT HORIZONTAL TO VERTICAL ON MOBILE */
-    .announce-horizontal { flex-direction: column !important; max-height: 90vh; overflow-y: auto; }
-    .announce-left { max-width: 100% !important; flex: none; padding: 20px; height: auto; min-height: 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .announce-left img { max-height: 40vh; width: auto; margin: 0 auto; }
-    .announce-right { padding: 20px !important; overflow-y: visible; }
+    /* FIX ANNOUNCEMENT KHUSUS HP (VERTIKAL & SCROLLABLE) */
+    .announce-container { 
+        grid-template-columns: 1fr; /* Berubah menjadi vertikal (satu kolom) di HP */
+        max-height: 85vh; /* Sedikit lebih tinggi untuk layar HP */
+        overflow-y: auto; /* Jika isi di dalam container (termasuk gambar+teks) sangat panjang, seluruh card bisa di-scroll */
+    }
+    
+    .announce-left { 
+        padding: 15px; 
+        background: #000;
+        /* Memastikan gambar di HP tidak mengambil ruang terlalu banyak */
+        height: 250px; 
+        border-bottom: 1px solid rgba(255,255,255,0.1); 
+    }
+    
+    .announce-right { 
+        padding: 20px !important; 
+        overflow-y: visible; /* Matikan scroll di dalam teks karena layar utamanya yang akan di-scroll */
+    }
+    
+    .announce-title { font-size: 1.4rem; padding-right: 0; }
 }
 
 ::-webkit-scrollbar { width: 8px; }
