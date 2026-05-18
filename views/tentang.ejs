@@ -26,7 +26,7 @@
         <% if (siteSettings.bookletPdf || siteSettings.mapsEmbed) { %>
             <div class="grid-2" style="margin-top: 50px; gap: 30px;">
                 
-                <!-- UPGRADE: DEARFLIP 3D FLIPBOOK UNTUK BUKU PEDOMAN -->
+                <!-- UPGRADE: DEARFLIP 3D FLIPBOOK UNTUK BUKU PEDOMAN (FIXED) -->
                 <% if (siteSettings.bookletPdf) { %>
                 <div style="grid-column: 1 / -1; margin-bottom: 20px;">
                     <h3 style="margin-bottom: 20px; font-size:1.5rem; text-align:center; color:#4ade80;">Buku Pedoman / Profil</h3>
@@ -35,26 +35,33 @@
                     <link href="https://unpkg.com/@dearflip/dearflip-jquery-lite@2.3.17/css/dflip.min.css" rel="stylesheet">
                     <link href="https://unpkg.com/@dearflip/dearflip-jquery-lite@2.3.17/css/themify-icons.min.css" rel="stylesheet">
                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                    
+                    <!-- KUNCI FIX: Menentukan lokasi library agar web worker PDF.js bisa merender PDF -->
+                    <script>
+                        var dFlipLocation = "https://unpkg.com/@dearflip/dearflip-jquery-lite@2.3.17/";
+                    </script>
                     <script src="https://unpkg.com/@dearflip/dearflip-jquery-lite@2.3.17/js/dflip.min.js"></script>
                     
                     <!-- Kontainer Flipbook (Proporsional & Support Mobile) -->
                     <div class="flipbook-container" style="width: 100%; height: 80vh; min-height: 500px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(74,222,128,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                        <!-- Background di-set ke #555555 agar elegan mirip GBR 2 -->
-                        <div class="_df_book" webgl="true" backgroundcolor="#555555" source="<%= siteSettings.bookletPdf %>" id="df_manual_book"></div>
+                        <!-- Background di-set ke #333333 agar elegan berwarna dark grey persis GBR 2 -->
+                        <div class="_df_book" webgl="true" backgroundcolor="#333333" source="<%= siteSettings.bookletPdf %>" id="df_manual_book" style="height: 100%; width: 100%;"></div>
                     </div>
                     
                     <p class="text-muted" style="text-align:center; margin-top:15px; font-size:0.9rem;">
-                        <i data-lucide="mouse-pointer-click" style="width:16px; display:inline; margin-bottom:-2px;"></i> Geser halaman atau klik tombol panah navigasi untuk membaca isi buku pedoman.
+                        <i data-lucide="mouse-pointer-click" style="width:16px; display:inline; margin-bottom:-2px;"></i> Geser halaman dari sudut, atau gunakan tombol navigasi di atas untuk membaca isi buku pedoman.
                     </p>
                 </div>
                 <% } %>
                 
+                <!-- MAPS SEKRETARIAT -->
                 <% if (siteSettings.mapsEmbed) { %>
                 <div style="grid-column: 1 / -1; margin-top: 20px;">
                     <h3 style="margin-bottom: 15px; font-size:1.5rem; text-align:center; color:#4ade80;">Lokasi Sekretariat</h3>
                     <div style="width: 100%; height: 400px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.2);"><%- siteSettings.mapsEmbed %></div>
                 </div>
                 <% } %>
+                
             </div>
         <% } %>
     </div>
