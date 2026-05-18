@@ -1,27 +1,46 @@
-<% if (siteSettings.announceActive) { %>
-<div class="modal-overlay announce-overlay" id="announceModal">
-    <div class="modal-content" style="padding: 0; overflow: hidden; border: 2px solid #22c55e;">
-        <button class="btn-close-announce" onclick="closeAnnounce()"><i data-lucide="x"></i></button>
+<% if (siteSettings.announceActive === 'true') { %>
+<div class="modal-overlay announce-overlay" id="announceModal" style="z-index: 10000; padding: 20px;">
+    <div class="announce-horizontal" style="display: flex; max-width: 850px; width: 100%; background: #064e3b; border-radius: 12px; overflow: hidden; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); border: 2px solid rgba(255,255,255,0.1);">
+        
+        <button class="close-modal" style="position:absolute; top: 15px; right: 15px; z-index: 10; background:rgba(0,0,0,0.5); border-radius:50%; padding:5px; color:#fff;" onclick="closeAnnounce()">
+            <i data-lucide="x"></i>
+        </button>
+
         <% if (siteSettings.announceImage) { %>
-            <div class="announce-img-box"><img src="<%= siteSettings.announceImage %>" alt="Announcement"></div>
+        <div class="announce-left" style="flex: 1; min-width: 45%;">
+            <img src="<%= siteSettings.announceImage %>" alt="Announcement" style="width: 100%; height: 100%; object-fit: cover; min-height: 100%;">
+        </div>
         <% } %>
-        <div class="announce-body" style="padding: 25px; text-align: center;">
-            <h2 style="color: #4ade80; margin-bottom: 15px; font-size: 1.8rem;"><%= siteSettings.announceTitle %></h2>
-            <div style="color: #d1d5db; margin-bottom: 25px; line-height: 1.6;" class="rich-text-content"><%- siteSettings.announceContent %></div>
-            <button class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem;" onclick="readAnnounce()">Sudah Baca</button>
+
+        <div class="announce-right" style="flex: 1; padding: 40px; display: flex; flex-direction: column; justify-content: center; position:relative;">
+            <h2 style="color: #fff; margin-bottom: 5px; font-size: 2.2rem; font-weight: 800; line-height: 1.2;"><%= siteSettings.announceTitle %></h2>
+            <div style="width: 50px; height: 4px; background: #4ade80; margin-bottom: 25px; border-radius: 2px;"></div>
+
+            <div class="rich-text-content announce-text" style="color: #e5e7eb; margin-bottom: 35px; line-height: 1.7; font-size: 0.95rem; border-left: 3px solid rgba(74, 222, 128, 0.4); padding-left: 15px; font-style: italic;">
+                <%- siteSettings.announceContent %>
+            </div>
+
+            <button class="btn btn-primary" style="align-self: flex-start; padding: 12px 30px; font-size: 1rem; border-radius: 8px; font-weight: bold; background: #fff; color: #064e3b; box-shadow: 0 4px 14px rgba(0,0,0,0.2);" onclick="readAnnounce()">Saya Mengerti</button>
         </div>
     </div>
 </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        if(!localStorage.getItem('announce_read_<%= siteSettings.announceTitle.replace(/\s+/g, "_") %>')) {
-            setTimeout(() => { document.getElementById('announceModal').classList.add('active'); }, 500);
+        const announceKey = 'announce_read_<%= siteSettings.announceTitle.replace(/[^a-zA-Z0-9]/g, "_") %>';
+        if (!localStorage.getItem(announceKey)) {
+            setTimeout(() => { document.getElementById('announceModal').classList.add('active'); }, 600);
         }
     });
-    function closeAnnounce() { document.getElementById('announceModal').classList.remove('active'); }
-    function readAnnounce() { 
-        localStorage.setItem('announce_read_<%= siteSettings.announceTitle.replace(/\s+/g, "_") %>', 'true'); 
-        closeAnnounce(); 
+
+    function closeAnnounce() { 
+        document.getElementById('announceModal').classList.remove('active'); 
+    }
+
+    function readAnnounce() {
+        const announceKey = 'announce_read_<%= siteSettings.announceTitle.replace(/[^a-zA-Z0-9]/g, "_") %>';
+        localStorage.setItem(announceKey, 'true');
+        closeAnnounce();
     }
 </script>
 <% } %>
