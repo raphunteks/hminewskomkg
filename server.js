@@ -25,7 +25,15 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
 
-// --- DATA DEFAULT AMAN ---
+app.set('trust proxy', 1);
+app.use(require('express-session')({
+    secret: process.env.SESSION_SECRET || 'secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === 'production', maxAge: 7 * 24 * 60 * 60 * 1000 }
+}));
+
+// --- STRUKTUR SETTINGS DEFAULT TERMASUK KONTEN KOHATI BARU ---
 const defaultSettings = {
     webTitle: "HMI KomKG-UMI",
     headerLogo: "/img/logo-hmikomkgumi.png",
@@ -41,6 +49,8 @@ const defaultSettings = {
     kohatiActive: "true",
     profilText: `<p>Halaman profil ini berisi deskripsi singkat mengenai sejarah, visi, dan misi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia, serta program kerja dan kegiatan yang telah dan akan dilaksanakan oleh organisasi tersebut.</p><br><h3>Welcome</h3><p>Selamat datang di website resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia. Kami adalah sebuah organisasi mahasiswa yang terdiri dari para mahasiswa kedokteran gigi yang memiliki komitmen untuk meningkatkan kualitas diri dan mengembangkan potensi dalam bidang akademik, keislaman, sosial, dan kemanusiaan. Di sini, Anda dapat menemukan informasi terbaru tentang kegiatan kami, program kerja, dan berbagai kegiatan yang telah kami lakukan. Selamat menjelajahi situs web kami!</p>`,
     visiMisiText: `<h3>Visi</h3><p>Terbinanya insan akademis, pencipta, pengabdi yang bernafaskan Islam dan bertanggung jawab atas terwujudnya masyarakat adil makmur yang diridhoi Allah SWT, khususnya dalam mewujudkan dokter gigi muslim yang profesional.</p><br><h3>Misi</h3><ul class="list-custom"><li><span class="list-num">1.</span> Reaktualisasi nilai-nilai ke-Islaman dalam pengembangan kapasitas diri kader.</li><li><span class="list-num">2.</span> Optimalisasi kesadaran kader terkait isu kesehatan gigi dan masyarakat.</li><li><span class="list-num">3.</span> Memelihara dan mengedepankan nilai-nilai kekeluargaan dalam aktivitas organisasi.</li></ul>`,
+    kohatiProfilText: `<p>Korps HMI-Wati (KOHATI) adalah badan khusus HMI yang bertugas membina, mengembangkan, dan meningkatkan potensi HMI-Wati dalam wacana dan dinamika gerakan perempuan. KOHATI Komisariat Kedokteran Gigi UMI mewadahi mahasiswi muslimah untuk mencetak generasi insan cita.</p>`,
+    kohatiVisiMisiText: `<h3>Visi</h3><p>Terbinanya muslimah berkualitas insan cita.</p><br><h3>Misi</h3><ul class="list-custom"><li>Membina HMI-Wati untuk menjadi insan akademis yang profesional.</li><li>Meningkatkan peran serta HMI-Wati dalam memajukan perempuan di bidang kesehatan.</li></ul>`,
     mapsEmbed: "",
     bookletPdf: "",
     announceActive: "false",
@@ -137,10 +147,9 @@ const fileHelper = (req, fieldB64) => {
     return str;
 };
 
-// MENCEGAH ERROR FAVICON
 app.get('/favicon.ico', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 
-// --- ROUTES HALAMAN UTAMA (Dengan Pengaman Try-Catch Kuat) ---
+// --- ROUTES HALAMAN UTAMA ---
 app.get('/', async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
@@ -295,30 +304,40 @@ app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req
     res.redirect('/admin/dashboard');
 });
 
-// --- API SETELAN WEB ---
+// --- API SETELAN WEB (DIURAIKAN AGAR TIDAK SALING OVERWRITE) ---
 app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
-        siteSettings.webTitle = req.body.webTitle || siteSettings.webTitle;
-        siteSettings.heroTitle = req.body.heroTitle || siteSettings.heroTitle;
-        siteSettings.headerTitle = req.body.headerTitle || siteSettings.headerTitle;
-        siteSettings.headerHighlight = req.body.headerHighlight || siteSettings.headerHighlight;
-        siteSettings.headerSubtitle = req.body.headerSubtitle || siteSettings.headerSubtitle;
-        siteSettings.footerTitle = req.body.footerTitle || siteSettings.footerTitle;
-        siteSettings.footerDesc = req.body.footerDesc || siteSettings.footerDesc;
-        siteSettings.footerCopyright = req.body.footerCopyright || siteSettings.footerCopyright;
-        siteSettings.footerProgrammer = req.body.footerProgrammer || siteSettings.footerProgrammer;
         
-        // PENGAMAN TOGGLE KOHATI
-        siteSettings.kohatiActive = req.body.kohatiActive ? 'true' : 'false';
+        // Pengecekan aman: Jika data dikirim dari Form Header/Footer
+        if (req.body.webTitle !== undefined) {
+            siteSettings.webTitle = req.body.webTitle;
+            siteSettings.heroTitle = req.body.heroTitle || siteSettings.heroTitle;
+            siteSettings.headerTitle = req.body.headerTitle || siteSettings.headerTitle;
+            siteSettings.headerHighlight = req.body.headerHighlight || siteSettings.headerHighlight;
+            siteSettings.headerSubtitle = req.body.headerSubtitle || siteSettings.headerSubtitle;
+            siteSettings.footerTitle = req.body.footerTitle || siteSettings.footerTitle;
+            siteSettings.footerDesc = req.body.footerDesc || siteSettings.footerDesc;
+            siteSettings.footerCopyright = req.body.footerCopyright || siteSettings.footerCopyright;
+            siteSettings.footerProgrammer = req.body.footerProgrammer || siteSettings.footerProgrammer;
+            
+            // Fixed Toggle Checkbox KOHATI
+            siteSettings.kohatiActive = req.body.kohatiActive ? 'true' : 'false';
 
-        if (req.body.profilText !== undefined) siteSettings.profilText = req.body.profilText;
-        if (req.body.visiMisiText !== undefined) siteSettings.visiMisiText = req.body.visiMisiText;
-        if (req.body.mapsEmbed !== undefined) siteSettings.mapsEmbed = req.body.mapsEmbed;
+            const hLogo = fileHelper(req, 'headerLogo_b64'); if (hLogo) siteSettings.headerLogo = hLogo;
+            const fLogo = fileHelper(req, 'footerLogo_b64'); if (fLogo) siteSettings.footerLogo = fLogo;
+        }
+        
+        // Pengecekan aman: Jika data dikirim dari Form Tentang Kami
+        if (req.body.profilText !== undefined) {
+            siteSettings.profilText = req.body.profilText;
+            siteSettings.visiMisiText = req.body.visiMisiText;
+            siteSettings.kohatiProfilText = req.body.kohatiProfilText || siteSettings.kohatiProfilText;
+            siteSettings.kohatiVisiMisiText = req.body.kohatiVisiMisiText || siteSettings.kohatiVisiMisiText;
+            siteSettings.mapsEmbed = req.body.mapsEmbed !== undefined ? req.body.mapsEmbed : siteSettings.mapsEmbed;
 
-        const hLogo = fileHelper(req, 'headerLogo_b64'); if (hLogo) siteSettings.headerLogo = hLogo;
-        const fLogo = fileHelper(req, 'footerLogo_b64'); if (fLogo) siteSettings.footerLogo = fLogo;
-        const bPdf = fileHelper(req, 'bookletPdf_b64'); if (bPdf) siteSettings.bookletPdf = bPdf;
+            const bPdf = fileHelper(req, 'bookletPdf_b64'); if (bPdf) siteSettings.bookletPdf = bPdf;
+        }
 
         await kv.set('siteSettings', siteSettings);
         res.redirect('/admin/dashboard');
@@ -329,9 +348,7 @@ app.post('/admin/setelan-announcement', requireAdmin, upload.any(), async (req, 
     try {
         const { siteSettings } = await getSiteData();
         
-        // PENGAMAN TOGGLE ANNOUNCE
         siteSettings.announceActive = req.body.announceActive ? 'true' : 'false';
-        
         siteSettings.announceTitle = req.body.announceTitle || siteSettings.announceTitle;
         siteSettings.announceContent = req.body.announceContent || siteSettings.announceContent;
 
@@ -392,7 +409,6 @@ const manageBidangMember = async (req, res, dbKey, action) => {
     } catch(e) { res.redirect('/admin/dashboard'); }
 };
 
-// Mappings Tim Umum & Kohati
 app.post('/admin/tambah-pengurus', requireAdmin, upload.any(), (req,res) => manageTeam(req,res,'pengurusList','add'));
 app.post('/admin/edit-pengurus/:id', requireAdmin, upload.any(), (req,res) => manageTeam(req,res,'pengurusList','edit'));
 app.post('/admin/hapus-pengurus/:id', requireAdmin, (req,res) => manageTeam(req,res,'pengurusList','delete'));
