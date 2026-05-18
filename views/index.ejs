@@ -24,7 +24,7 @@
 </div>
 
 <div class="grid-3">
-    <% if(news.length > 0) { %>
+    <% if(news && news.length > 0) { %>
         <% news.forEach(item => { %>
         <a href="/berita/<%= item.id %>" class="glass news-card">
             <div class="card-img-wrap">
