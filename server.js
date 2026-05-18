@@ -411,14 +411,27 @@ const manageTeam = async (req, res, dbKey, action) => {
     } catch (e) { res.redirect('/admin/dashboard'); }
 };
 
+// FIX UNTUK ROLE (JABATAN) DI DALAM ANGGOTA BIDANG (UMUM & KOHATI)
 const manageBidangMember = async (req, res, dbKey, action) => {
     try {
         let list = await kv.get(dbKey) || []; let bIndex = list.findIndex(b => b.id == req.params.bidangId);
         if (bIndex !== -1) {
             if (!list[bIndex].members) list[bIndex].members = [];
-            if (action === 'add') { list[bIndex].members.push({ id: Date.now(), name: req.body.name, image: fileHelper(req, 'image_b64') }); }
-            else if (action === 'edit') { let mIndex = list[bIndex].members.findIndex(m => m.id == req.params.memberId); if (mIndex !== -1) { list[bIndex].members[mIndex].name = req.body.name; let img = fileHelper(req, 'image_b64'); if (img) list[bIndex].members[mIndex].image = img; } }
-            else if (action === 'delete') { list[bIndex].members = list[bIndex].members.filter(m => m.id != req.params.memberId); }
+            if (action === 'add') { 
+                list[bIndex].members.push({ id: Date.now(), name: req.body.name, role: req.body.role || '', image: fileHelper(req, 'image_b64') }); 
+            }
+            else if (action === 'edit') { 
+                let mIndex = list[bIndex].members.findIndex(m => m.id == req.params.memberId); 
+                if (mIndex !== -1) { 
+                    list[bIndex].members[mIndex].name = req.body.name; 
+                    list[bIndex].members[mIndex].role = req.body.role || ''; // Simpan field role
+                    let img = fileHelper(req, 'image_b64'); 
+                    if (img) list[bIndex].members[mIndex].image = img; 
+                } 
+            }
+            else if (action === 'delete') { 
+                list[bIndex].members = list[bIndex].members.filter(m => m.id != req.params.memberId); 
+            }
             await kv.set(dbKey, list);
         }
         res.redirect('/admin/dashboard');
