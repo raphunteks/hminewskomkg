@@ -260,9 +260,9 @@
                     <input type="text" name="footerProgrammer" class="input-control" value="<%= siteSettings.footerProgrammer %>">
                 </div>
                 
-                <!-- FIX KOHATI TOGGLE -->
+                <!-- FIX KOHATI TOGGLE DENGAN STRING PENGECEKAN AMAN -->
                 <div class="form-group" style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px;">
-                    <input type="checkbox" name="kohatiActive" id="kohatiActive" value="true" <%= siteSettings.kohatiActive === 'true' ? 'checked' : '' %> style="width:20px; height:20px;">
+                    <input type="checkbox" name="kohatiActive" id="kohatiActive" value="true" <%= String(siteSettings.kohatiActive) === 'true' ? 'checked' : '' %> style="width:20px; height:20px;">
                     <label for="kohatiActive" style="margin:0; cursor:pointer;">Aktifkan Tab & Fitur KOHATI</label>
                 </div>
                 
@@ -370,7 +370,7 @@
         
         <form action="/admin/setelan-announcement" method="POST" enctype="multipart/form-data" id="formAnnounce">
             <div class="form-group" style="display:flex; align-items:center; gap:10px; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); padding:15px; border-radius:10px;">
-                <input type="checkbox" name="announceActive" id="announceActive" value="true" <%= siteSettings.announceActive === 'true' ? 'checked' : '' %> style="width:20px; height:20px;">
+                <input type="checkbox" name="announceActive" id="announceActive" value="true" <%= String(siteSettings.announceActive) === 'true' ? 'checked' : '' %> style="width:20px; height:20px;">
                 <label for="announceActive" style="margin:0; color:#4ade80; cursor:pointer;">Aktifkan Pop-up Pengumuman di Beranda</label>
             </div>
             <div class="form-group">
@@ -401,7 +401,7 @@
 <!-- ================= MODALS AREA DATA KELOLA ================= -->
 <div class="modal-overlay" id="modalSosmed">
     <div class="modal-content">
-        <div class="modal-header"><h3>Tambah Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalSosmed')"><i data-lucide="x"></i></button></div>
+        <div class="modal-header"><h3>Tambah Sosial Media Footer</h3><button type="button" class="close-modal" onclick="closeModal('modalSosmed')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-sosmed" method="POST" enctype="multipart/form-data">
             <div class="form-group"><label>Nama Sosmed</label><input type="text" name="name" class="input-control" required placeholder="Contoh: Twitter"></div>
             <div class="form-group"><label>URL Profile</label><input type="url" name="url" class="input-control" required placeholder="https://..."></div>
