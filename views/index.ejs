@@ -1,9 +1,8 @@
 <%- include('partials/header') %>
 
-<!-- POPUP PENGUMUMAN (DIEMBED LANGSUNG AGAR TIDAK ERROR 500) -->
+<!-- POPUP PENGUMUMAN HORIZONTAL (DIEMBED LANGSUNG AGAR ANTI CRASH 500) -->
 <% if (typeof siteSettings !== 'undefined' && (siteSettings.announceActive === 'true' || siteSettings.announceActive === true)) { %>
-<div class="modal-overlay announce-overlay" id="announceModal" style="z-index: 10000; padding: 20px;">
-    <!-- Desain Horizontal Pop-up Sesuai Request -->
+<div class="modal-overlay announce-overlay" id="announceModal" style="z-index: 99999; padding: 20px;">
     <div class="announce-horizontal" style="display: flex; max-width: 850px; width: 100%; background: #1b4332; border-radius: 16px; overflow: hidden; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); border: 1px solid rgba(74,222,128,0.2);">
         
         <button class="close-modal" style="position:absolute; top: 15px; right: 15px; z-index: 10; background:rgba(0,0,0,0.3); border-radius:50%; padding:8px; color:#fff; border: 1px solid rgba(255,255,255,0.1); cursor:pointer; transition:0.3s;" onmouseover="this.style.background='rgba(239,68,68,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.3)'" onclick="closeAnnounce()">
@@ -12,7 +11,7 @@
 
         <% if (siteSettings.announceImage) { %>
         <div class="announce-left" style="flex: 1; max-width: 45%; background: #000;">
-            <img src="<%= siteSettings.announceImage %>" alt="Announcement" style="width: 100%; height: 100%; object-fit: cover; min-height: 100%;">
+            <img src="<%= siteSettings.announceImage %>" alt="Announcement" style="width: 100%; height: 100%; object-fit: cover;">
         </div>
         <% } %>
 
@@ -54,7 +53,7 @@
 <!-- Hero / Selamat Datang -->
 <div class="glass hero">
     <span class="badge">Yakusa! Yakin Usaha Sampai</span>
-    <h1>Selamat datang di website resmi <br><span class="text-gradient"><%= siteSettings.webTitle %></span></h1>
+    <h1>Selamat datang di website resmi <br><span class="text-gradient"><%= siteSettings.heroTitle || siteSettings.webTitle %></span></h1>
     <p>Kami adalah sebuah organisasi mahasiswa yang terdiri dari para mahasiswa kedokteran gigi yang memiliki komitmen untuk meningkatkan kualitas diri dan mengembangkan potensi dalam bidang akademik, keislaman, sosial, dan kemanusiaan.</p>
     <a href="/tentang" class="btn btn-primary">Kenali Kami Lebih Dekat</a>
 </div>
