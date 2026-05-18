@@ -4,8 +4,8 @@
     <button class="tab-btn active" onclick="openTab('tab-profil')"><i data-lucide="user"></i> Profil</button>
     <button class="tab-btn" onclick="openTab('tab-visimisi')"><i data-lucide="target"></i> Visi & Misi</button>
     <button class="tab-btn" onclick="openTab('tab-struktur')"><i data-lucide="users"></i> Kepengurusan</button>
-    <!-- Toggle KOHATI Fixed -->
-    <% if (siteSettings.kohatiActive === 'true') { %>
+    <!-- Toggle KOHATI Fixed dengan Pengecekan Aman -->
+    <% if (String(siteSettings.kohatiActive) === 'true') { %>
         <button class="tab-btn" onclick="openTab('tab-kohati')" style="color: #f472b6;"><i data-lucide="heart"></i> Kohati</button>
     <% } %>
 </div>
@@ -85,8 +85,8 @@
     </div>
 </div>
 
-<!-- STRUKTUR KOHATI -->
-<% if (siteSettings.kohatiActive === 'true') { %>
+<!-- STRUKTUR LENGKAP KOHATI (SESUAI REQUEST) -->
+<% if (String(siteSettings.kohatiActive) === 'true') { %>
 <div id="tab-kohati" class="tab-content">
     <div class="glass" style="padding: 40px; border-top: 5px solid #f472b6;">
         
