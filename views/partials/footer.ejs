@@ -1,20 +1,19 @@
 </div>
     </main>
     
-    <!-- Footer -->
     <footer class="site-footer">
         <div class="container">
             <div class="grid-3 footer-top">
                 <div style="grid-column: span 1;">
                     <div class="footer-logo-area">
                         <div class="logo-box" style="width:40px; height:40px;">
-                            <img src="/img/logo-hmikomkgumi.png" alt="Logo HMI" class="logo-img" style="width:100%; max-width:40px; object-fit:contain;">
+                            <img src="<%= siteSettings.footerLogo %>" alt="Logo" class="logo-img" style="width:100%; max-width:40px; object-fit:contain;">
                         </div>
                         <div class="logo-text">
-                            <h2 style="font-size:1.1rem; margin:0;">Komisariat Kedokteran Gigi UMI</h2>
+                            <h2 style="font-size:1.1rem; margin:0;"><%= siteSettings.footerTitle %></h2>
                         </div>
                     </div>
-                    <p class="footer-desc">Tempat berkembang bareng untuk generasi muslim yang progresif, intelektual, dan menjunjung tinggi nilai-nilai keislaman dan keindonesiaan dalam lingkup Kedokteran Gigi.</p>
+                    <p class="footer-desc"><%= siteSettings.footerDesc %></p>
                 </div>
                 
                 <div class="footer-links">
@@ -29,30 +28,29 @@
                 <div class="footer-links">
                     <h3>Follow Kita!</h3>
                     <div class="social-links">
-                        <!-- LINK INSTAGRAM DAN FACEBOOK TELAH DIPERBAIKI -->
-                        <a href="https://www.instagram.com/hmi_komkgumi" target="_blank" class="social-btn" title="Instagram">
-                            <i data-lucide="instagram"></i>
-                        </a>
-                        <a href="https://www.facebook.com/hmi_komkgumi" target="_blank" class="social-btn" title="Facebook">
-                            <i data-lucide="facebook"></i>
-                        </a>
+                        <% socialMediaList.forEach(soc => { %>
+                            <a href="<%= soc.url %>" target="_blank" class="social-btn" title="<%= soc.name %>">
+                                <% if(soc.icon) { %>
+                                    <img src="<%= soc.icon %>" alt="<%= soc.name %>">
+                                <% } else { %>
+                                    <i data-lucide="link"></i>
+                                <% } %>
+                            </a>
+                        <% }) %>
                     </div>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <span>© 2026 HMI Komisariat Kedokteran Gigi UMI. All rights reserved.</span>
-                <span>💻 Axa Xyz</span>
+                <span><%= siteSettings.footerCopyright %></span>
+                <span><%= siteSettings.footerProgrammer %></span>
             </div>
         </div>
     </footer>
 
-    <!-- Inisialisasi Icon Lucide (Diperbaiki agar merender sempurna setelah HTML dimuat) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
+            if (typeof lucide !== 'undefined') { lucide.createIcons(); }
         });
     </script>
 </body>
