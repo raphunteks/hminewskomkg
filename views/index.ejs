@@ -1,8 +1,8 @@
 <%- include('partials/header') %>
 
 <!-- POPUP PENGUMUMAN HORIZONTAL (DIEMBED LANGSUNG AGAR ANTI CRASH 500) -->
-<% if (typeof siteSettings !== 'undefined' && (siteSettings.announceActive === 'true' || siteSettings.announceActive === true)) { %>
-<div class="modal-overlay announce-overlay" id="announceModal" style="z-index: 99999; padding: 20px;">
+<% if (typeof siteSettings !== 'undefined' && siteSettings.announceActive === 'true') { %>
+<div class="modal-overlay announce-overlay" id="announceModal" style="z-index: 9999999; padding: 20px;">
     <div class="announce-horizontal" style="display: flex; max-width: 850px; width: 100%; background: #1b4332; border-radius: 16px; overflow: hidden; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); border: 1px solid rgba(74,222,128,0.2);">
         
         <button class="close-modal" style="position:absolute; top: 15px; right: 15px; z-index: 10; background:rgba(0,0,0,0.3); border-radius:50%; padding:8px; color:#fff; border: 1px solid rgba(255,255,255,0.1); cursor:pointer; transition:0.3s;" onmouseover="this.style.background='rgba(239,68,68,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.3)'" onclick="closeAnnounce()">
