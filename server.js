@@ -23,13 +23,16 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
-app.use(cookieParser()); // Hanya menggunakan cookie-parser untuk sesi Vercel Serverless (Lebih ringan & aman)
+app.use(cookieParser()); // PENGAMAN: Hanya gunakan cookie-parser, TIDAK menggunakan express-session.
 
-// --- STRUKTUR SETTINGS DEFAULT TERPERCAYA ---
+// --- STRUKTUR SETTINGS DEFAULT (TULISAN ASLI) ---
 const defaultSettings = {
     webTitle: "HMI KomKG-UMI",
     headerLogo: "/img/logo-hmikomkgumi.png",
     footerLogo: "/img/logo-hmikomkgumi.png",
+    headerTitle: "KOM",
+    headerHighlight: "KGUMI",
+    headerSubtitle: "Kedokteran Gigi UMI",
     footerTitle: "Komisariat Kedokteran Gigi UMI",
     footerDesc: "Tempat berkembang bareng untuk generasi muslim yang progresif, intelektual, dan menjunjung tinggi nilai-nilai keislaman dan keindonesiaan dalam lingkup Kedokteran Gigi.",
     footerCopyright: "© 2026 HMI Komisariat Kedokteran Gigi UMI. All rights reserved.",
@@ -45,26 +48,32 @@ const defaultSettings = {
     announceContent: "<p>Kala dunia tersihir oleh retorika kosong dan pemikiran instan, kami memilih jalan terjal. Berpikir dalam, bertanya kritis, dan membangun gagasan yang hidup. LK I 2025 bukan sekadar awal; ia adalah dentuman pertama dari revolusi intelektual yang tak akan berhenti di ruang diskusi. Ia akan menjelma menjadi gerakan, menjadi etos, menjadi sejarah.</p>"
 };
 
-// Fungsi Helper Mengambil Data Setelan & Sosmed
+// Fungsi Helper Mengambil Data Setelan (DENGAN PENGAMAN TRY-CATCH)
 async function getSiteData() {
-    let settings = await kv.get('siteSettings');
-    if (!settings) {
-        await kv.set('siteSettings', defaultSettings);
-        settings = defaultSettings;
-    } else {
-        for (let key in defaultSettings) {
-            if (settings[key] === undefined) settings[key] = defaultSettings[key];
+    try {
+        let settings = await kv.get('siteSettings');
+        if (!settings) {
+            await kv.set('siteSettings', defaultSettings);
+            settings = defaultSettings;
+        } else {
+            // Restore properti yang hilang agar web tidak error
+            for (let key in defaultSettings) {
+                if (settings[key] === undefined) settings[key] = defaultSettings[key];
+            }
         }
+        let socialMediaList = await kv.get('socialMediaList');
+        if (!socialMediaList) {
+            socialMediaList = [
+                { id: 1, name: 'Instagram', icon: '', url: 'https://www.instagram.com/hmi_komkgumi' },
+                { id: 2, name: 'Facebook', icon: '', url: 'https://www.facebook.com/hmi_komkgumi' }
+            ];
+            await kv.set('socialMediaList', socialMediaList);
+        }
+        return { siteSettings: settings, socialMediaList };
+    } catch (e) {
+        console.log("Redis Loading Safe Mode.");
+        return { siteSettings: defaultSettings, socialMediaList: [] };
     }
-    let socialMediaList = await kv.get('socialMediaList');
-    if (!socialMediaList) {
-        socialMediaList = [
-            { id: 1, name: 'Instagram', icon: '', url: 'https://www.instagram.com/hmi_komkgumi' },
-            { id: 2, name: 'Facebook', icon: '', url: 'https://www.facebook.com/hmi_komkgumi' }
-        ];
-        await kv.set('socialMediaList', socialMediaList);
-    }
-    return { siteSettings: settings, socialMediaList };
 }
 
 // Inisialisasi Database
@@ -79,9 +88,9 @@ async function getSiteData() {
         if (!(await kv.get('kohatiBidangList'))) await kv.set('kohatiBidangList', []);
         if (!(await kv.get('dataAnggotaList'))) await kv.set('dataAnggotaList', []);
         if (!(await kv.get('shortlinkList'))) await kv.set('shortlinkList', []);
-        console.log("KV Database Siap.");
+        console.log("KV Database Siap & Tersinkronisasi.");
     } catch (err) {
-        console.error("Gagal inisialisasi KV:", err.message);
+        console.error("Gagal inisialisasi KV, melintas aman:", err.message);
     }
 })();
 
@@ -96,10 +105,7 @@ const fileHelper = (req, fieldB64) => {
 };
 
 // --- FIX FAVICON ERROR LOGS ---
-// Mengarahkan otomatis semua request favicon.ico ke logo website
-app.get('/favicon.ico', (req, res) => {
-    res.redirect('/img/logo-hmikomkgumi.png');
-});
+app.get('/favicon.ico', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 
 // --- ROUTES HALAMAN UTAMA ---
 app.get('/', async (req, res) => {
@@ -176,9 +182,11 @@ app.get('/:slug', async (req, res, next) => {
 
 // --- ADMIN SECURITY ---
 app.get('/admin', async (req, res) => {
-    const { siteSettings, socialMediaList } = await getSiteData();
-    if(req.cookies.admin_auth === 'true') return res.redirect('/admin/dashboard');
-    res.render('admin-login', { page: 'admin', error: null, siteSettings, socialMediaList });
+    try {
+        const { siteSettings, socialMediaList } = await getSiteData();
+        if(req.cookies.admin_auth === 'true') return res.redirect('/admin/dashboard');
+        res.render('admin-login', { page: 'admin', error: null, siteSettings, socialMediaList });
+    } catch (e) { res.send("Admin Load Error"); }
 });
 
 app.post('/admin/login', async (req, res) => {
@@ -219,31 +227,36 @@ app.get('/admin/logout', (req, res) => {
 
 // --- API KELOLA BERITA, GALERI, DATA ANGGOTA ---
 app.post('/admin/tambah-berita', requireAdmin, upload.any(), async (req, res) => {
-    let news = await kv.get('newsList') || [];
-    news.unshift({ id: Date.now(), title: req.body.title, category: req.body.category, date: req.body.date || new Date().toLocaleDateString('id-ID'), content: req.body.content, image: fileHelper(req, 'image_b64'), photos: [] });
-    await kv.set('newsList', news); res.redirect('/admin/dashboard');
+    try {
+        let news = await kv.get('newsList') || [];
+        news.unshift({ id: Date.now(), title: req.body.title, category: req.body.category, date: req.body.date || new Date().toLocaleDateString('id-ID'), content: req.body.content, image: fileHelper(req, 'image_b64'), photos: [] });
+        await kv.set('newsList', news); res.redirect('/admin/dashboard');
+    } catch (e) { res.redirect('/admin/dashboard'); }
 });
 app.post('/admin/edit-berita/:id', requireAdmin, upload.any(), async (req, res) => {
-    let news = await kv.get('newsList') || [];
-    let i = news.findIndex(n => n.id == req.params.id);
-    if (i !== -1) {
-        news[i].title = req.body.title; news[i].category = req.body.category; news[i].content = req.body.content;
-        if (req.body.date) news[i].date = req.body.date;
-        const img = fileHelper(req, 'image_b64'); if (img) news[i].image = img;
-        await kv.set('newsList', news);
-    }
-    res.redirect('/admin/dashboard');
+    try {
+        let news = await kv.get('newsList') || [];
+        let i = news.findIndex(n => n.id == req.params.id);
+        if (i !== -1) {
+            news[i].title = req.body.title; news[i].category = req.body.category; news[i].content = req.body.content;
+            if (req.body.date) news[i].date = req.body.date;
+            const img = fileHelper(req, 'image_b64'); if (img) news[i].image = img;
+            await kv.set('newsList', news);
+        }
+        res.redirect('/admin/dashboard');
+    } catch (e) { res.redirect('/admin/dashboard'); }
 });
 app.post('/admin/hapus-berita/:id', requireAdmin, async (req, res) => {
-    let news = await kv.get('newsList') || [];
-    await kv.set('newsList', news.filter(n => n.id != req.params.id)); res.redirect('/admin/dashboard');
+    let news = await kv.get('newsList') || []; await kv.set('newsList', news.filter(n => n.id != req.params.id)); res.redirect('/admin/dashboard');
 });
 app.post('/admin/tambah-foto-berita/:id', requireAdmin, upload.any(), async (req, res) => {
-    let photosB64 = req.body.photos_b64; let newPhotos = [];
-    if (photosB64) { if (!Array.isArray(photosB64)) photosB64 = [photosB64]; photosB64.forEach(b64 => { newPhotos.push({ id: Date.now() + Math.random(), url: b64 }); }); }
-    let news = await kv.get('newsList') || []; let index = news.findIndex(n => n.id == req.params.id);
-    if (index !== -1) { if (!news[index].photos) news[index].photos = []; news[index].photos = [...news[index].photos, ...newPhotos]; await kv.set('newsList', news); }
-    res.redirect('/admin/dashboard');
+    try {
+        let photosB64 = req.body.photos_b64; let newPhotos = [];
+        if (photosB64) { if (!Array.isArray(photosB64)) photosB64 = [photosB64]; photosB64.forEach(b64 => { newPhotos.push({ id: Date.now() + Math.random(), url: b64 }); }); }
+        let news = await kv.get('newsList') || []; let index = news.findIndex(n => n.id == req.params.id);
+        if (index !== -1) { if (!news[index].photos) news[index].photos = []; news[index].photos = [...news[index].photos, ...newPhotos]; await kv.set('newsList', news); }
+        res.redirect('/admin/dashboard');
+    } catch (e) { res.redirect('/admin/dashboard'); }
 });
 app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req, res) => {
     let news = await kv.get('newsList') || []; let index = news.findIndex(n => n.id == req.params.beritaId);
@@ -251,18 +264,20 @@ app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req
     res.redirect('/admin/dashboard');
 });
 
-// --- API SETELAN WEB (ANTI-CRASH) ---
+// --- API SETELAN WEB ---
 app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
         siteSettings.webTitle = req.body.webTitle || siteSettings.webTitle;
+        siteSettings.headerTitle = req.body.headerTitle || siteSettings.headerTitle;
+        siteSettings.headerHighlight = req.body.headerHighlight || siteSettings.headerHighlight;
+        siteSettings.headerSubtitle = req.body.headerSubtitle || siteSettings.headerSubtitle;
         siteSettings.footerTitle = req.body.footerTitle || siteSettings.footerTitle;
         siteSettings.footerDesc = req.body.footerDesc || siteSettings.footerDesc;
         siteSettings.footerCopyright = req.body.footerCopyright || siteSettings.footerCopyright;
         siteSettings.footerProgrammer = req.body.footerProgrammer || siteSettings.footerProgrammer;
         siteSettings.kohatiActive = req.body.kohatiActive === 'on';
 
-        // Tentang Kami Settings
         if (req.body.profilText !== undefined) siteSettings.profilText = req.body.profilText;
         if (req.body.visiMisiText !== undefined) siteSettings.visiMisiText = req.body.visiMisiText;
         if (req.body.mapsEmbed !== undefined) siteSettings.mapsEmbed = req.body.mapsEmbed;
@@ -273,7 +288,7 @@ app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
 
         await kv.set('siteSettings', siteSettings);
         res.redirect('/admin/dashboard');
-    } catch (err) { res.status(500).send("Gagal mengupdate setelan."); }
+    } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
 app.post('/admin/setelan-announcement', requireAdmin, upload.any(), async (req, res) => {
@@ -284,53 +299,62 @@ app.post('/admin/setelan-announcement', requireAdmin, upload.any(), async (req, 
         siteSettings.announceContent = req.body.announceContent || siteSettings.announceContent;
 
         const img = fileHelper(req, 'announceImage_b64'); if (img) siteSettings.announceImage = img;
-
         await kv.set('siteSettings', siteSettings);
         res.redirect('/admin/dashboard');
-    } catch (err) { res.status(500).send("Gagal mengupdate pengumuman."); }
+    } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
-// --- API DINAMIS PENGURUS & BIDANG (UMUM & KOHATI) ---
+// --- API SHORTLINK ---
+app.post('/admin/tambah-shortlink', requireAdmin, async (req, res) => {
+    let list = await kv.get('shortlinkList') || [];
+    list.unshift({ id: Date.now(), title: req.body.title, path: req.body.path.replace(/\s+/g, '-').toLowerCase(), originalUrl: req.body.originalUrl });
+    await kv.set('shortlinkList', list); res.redirect('/admin/dashboard');
+});
+app.post('/admin/edit-shortlink/:id', requireAdmin, async (req, res) => {
+    let list = await kv.get('shortlinkList') || []; let i = list.findIndex(l => l.id == req.params.id);
+    if(i !== -1) { list[i].title = req.body.title; list[i].path = req.body.path.replace(/\s+/g, '-').toLowerCase(); list[i].originalUrl = req.body.originalUrl; await kv.set('shortlinkList', list); }
+    res.redirect('/admin/dashboard');
+});
+app.post('/admin/hapus-shortlink/:id', requireAdmin, async (req, res) => {
+    let list = await kv.get('shortlinkList') || []; await kv.set('shortlinkList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
+});
+
+// --- API SOSIAL MEDIA ---
+app.post('/admin/tambah-sosmed', requireAdmin, upload.any(), async (req, res) => {
+    let list = await kv.get('socialMediaList') || [];
+    list.push({ id: Date.now(), name: req.body.name, url: req.body.url, icon: fileHelper(req, 'icon_b64') });
+    await kv.set('socialMediaList', list); res.redirect('/admin/dashboard');
+});
+app.post('/admin/hapus-sosmed/:id', requireAdmin, async (req, res) => {
+    let list = await kv.get('socialMediaList') || []; await kv.set('socialMediaList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
+});
+
+// --- API DINAMIS PENGURUS & BIDANG ---
 const manageTeam = async (req, res, dbKey, action) => {
-    let list = await kv.get(dbKey) || [];
-    if (action === 'add') {
-        list.push({ id: Date.now(), name: req.body.name, role: req.body.role || '', image: fileHelper(req, 'image_b64') });
-    } else if (action === 'edit') {
-        let i = list.findIndex(x => x.id == req.params.id);
-        if (i !== -1) {
-            if(req.body.name) list[i].name = req.body.name;
-            if(req.body.role) list[i].role = req.body.role;
-            let img = fileHelper(req, 'image_b64'); if (img) list[i].image = img;
-            if(req.body.bidang_name) list[i].name = req.body.bidang_name; 
-        }
-    } else if (action === 'delete') {
-        list = list.filter(x => x.id != req.params.id);
-    }
-    await kv.set(dbKey, list); res.redirect('/admin/dashboard');
+    try {
+        let list = await kv.get(dbKey) || [];
+        if (action === 'add') { list.push({ id: Date.now(), name: req.body.name, role: req.body.role || '', image: fileHelper(req, 'image_b64') }); }
+        else if (action === 'edit') { let i = list.findIndex(x => x.id == req.params.id); if (i !== -1) { if(req.body.name) list[i].name = req.body.name; if(req.body.role) list[i].role = req.body.role; let img = fileHelper(req, 'image_b64'); if (img) list[i].image = img; if(req.body.bidang_name) list[i].name = req.body.bidang_name; } }
+        else if (action === 'delete') { list = list.filter(x => x.id != req.params.id); }
+        await kv.set(dbKey, list); res.redirect('/admin/dashboard');
+    } catch (e) { res.redirect('/admin/dashboard'); }
 };
 
 const manageBidangMember = async (req, res, dbKey, action) => {
-    let list = await kv.get(dbKey) || [];
-    let bIndex = list.findIndex(b => b.id == req.params.bidangId);
-    if (bIndex !== -1) {
-        if (!list[bIndex].members) list[bIndex].members = [];
-        if (action === 'add') {
-            list[bIndex].members.push({ id: Date.now(), name: req.body.name, image: fileHelper(req, 'image_b64') });
-        } else if (action === 'edit') {
-            let mIndex = list[bIndex].members.findIndex(m => m.id == req.params.memberId);
-            if (mIndex !== -1) {
-                list[bIndex].members[mIndex].name = req.body.name;
-                let img = fileHelper(req, 'image_b64'); if (img) list[bIndex].members[mIndex].image = img;
-            }
-        } else if (action === 'delete') {
-            list[bIndex].members = list[bIndex].members.filter(m => m.id != req.params.memberId);
+    try {
+        let list = await kv.get(dbKey) || []; let bIndex = list.findIndex(b => b.id == req.params.bidangId);
+        if (bIndex !== -1) {
+            if (!list[bIndex].members) list[bIndex].members = [];
+            if (action === 'add') { list[bIndex].members.push({ id: Date.now(), name: req.body.name, image: fileHelper(req, 'image_b64') }); }
+            else if (action === 'edit') { let mIndex = list[bIndex].members.findIndex(m => m.id == req.params.memberId); if (mIndex !== -1) { list[bIndex].members[mIndex].name = req.body.name; let img = fileHelper(req, 'image_b64'); if (img) list[bIndex].members[mIndex].image = img; } }
+            else if (action === 'delete') { list[bIndex].members = list[bIndex].members.filter(m => m.id != req.params.memberId); }
+            await kv.set(dbKey, list);
         }
-        await kv.set(dbKey, list);
-    }
-    res.redirect('/admin/dashboard');
+        res.redirect('/admin/dashboard');
+    } catch(e) { res.redirect('/admin/dashboard'); }
 };
 
-// Mappings Tim Umum
+// Mappings Tim Umum & Kohati
 app.post('/admin/tambah-pengurus', requireAdmin, upload.any(), (req,res) => manageTeam(req,res,'pengurusList','add'));
 app.post('/admin/edit-pengurus/:id', requireAdmin, upload.any(), (req,res) => manageTeam(req,res,'pengurusList','edit'));
 app.post('/admin/hapus-pengurus/:id', requireAdmin, (req,res) => manageTeam(req,res,'pengurusList','delete'));
@@ -341,7 +365,6 @@ app.post('/admin/tambah-anggota-bidang/:bidangId', requireAdmin, upload.any(), (
 app.post('/admin/edit-anggota-bidang/:bidangId/:memberId', requireAdmin, upload.any(), (req,res) => manageBidangMember(req,res,'bidangList','edit'));
 app.post('/admin/hapus-anggota-bidang/:bidangId/:memberId', requireAdmin, (req,res) => manageBidangMember(req,res,'bidangList','delete'));
 
-// Mappings KOHATI
 app.post('/admin/tambah-kohati-pengurus', requireAdmin, upload.any(), (req,res) => manageTeam(req,res,'kohatiPengurusList','add'));
 app.post('/admin/edit-kohati-pengurus/:id', requireAdmin, upload.any(), (req,res) => manageTeam(req,res,'kohatiPengurusList','edit'));
 app.post('/admin/hapus-kohati-pengurus/:id', requireAdmin, (req,res) => manageTeam(req,res,'kohatiPengurusList','delete'));
@@ -352,49 +375,21 @@ app.post('/admin/tambah-anggota-kohati-bidang/:bidangId', requireAdmin, upload.a
 app.post('/admin/edit-anggota-kohati-bidang/:bidangId/:memberId', requireAdmin, upload.any(), (req,res) => manageBidangMember(req,res,'kohatiBidangList','edit'));
 app.post('/admin/hapus-anggota-kohati-bidang/:bidangId/:memberId', requireAdmin, (req,res) => manageBidangMember(req,res,'kohatiBidangList','delete'));
 
-// SHORTLINKS & SOSMED
-app.post('/admin/tambah-shortlink', requireAdmin, async (req, res) => {
-    let list = await kv.get('shortlinkList') || [];
-    list.unshift({ id: Date.now(), title: req.body.title, path: req.body.path.replace(/\s+/g, '-').toLowerCase(), originalUrl: req.body.originalUrl });
-    await kv.set('shortlinkList', list); res.redirect('/admin/dashboard');
-});
-app.post('/admin/edit-shortlink/:id', requireAdmin, async (req, res) => {
-    let list = await kv.get('shortlinkList') || [];
-    let i = list.findIndex(l => l.id == req.params.id);
-    if(i !== -1) {
-        list[i].title = req.body.title; list[i].path = req.body.path.replace(/\s+/g, '-').toLowerCase(); list[i].originalUrl = req.body.originalUrl;
-        await kv.set('shortlinkList', list);
-    }
-    res.redirect('/admin/dashboard');
-});
-app.post('/admin/hapus-shortlink/:id', requireAdmin, async (req, res) => {
-    let list = await kv.get('shortlinkList') || [];
-    await kv.set('shortlinkList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
-});
-app.post('/admin/tambah-sosmed', requireAdmin, upload.any(), async (req, res) => {
-    let list = await kv.get('socialMediaList') || [];
-    list.push({ id: Date.now(), name: req.body.name, url: req.body.url, icon: fileHelper(req, 'icon_b64') });
-    await kv.set('socialMediaList', list); res.redirect('/admin/dashboard');
-});
-app.post('/admin/hapus-sosmed/:id', requireAdmin, async (req, res) => {
-    let list = await kv.get('socialMediaList') || [];
-    await kv.set('socialMediaList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
-});
-
 // GALERI & PDF
-app.post('/admin/tambah-album', requireAdmin, upload.any(), async (req, res) => { let coverStr = fileHelper(req, 'cover_b64'); let albums = await kv.get('albumsList') || []; albums.unshift({ id: Date.now(), title: req.body.title, date: new Date().toLocaleDateString('id-ID'), cover: coverStr, photos: [] }); await kv.set('albumsList', albums); res.redirect('/admin/dashboard'); });
-app.post('/admin/edit-album/:id', requireAdmin, upload.any(), async (req, res) => { let albums = await kv.get('albumsList') || []; let index = albums.findIndex(a => a.id == req.params.id); if (index !== -1) { albums[index].title = req.body.title; if (req.body.date) albums[index].date = req.body.date; let coverStr = fileHelper(req, 'cover_b64'); if (coverStr) albums[index].cover = coverStr; await kv.set('albumsList', albums); } res.redirect('/admin/dashboard'); });
+app.post('/admin/tambah-album', requireAdmin, upload.any(), async (req, res) => { try { let coverStr = fileHelper(req, 'cover_b64'); let albums = await kv.get('albumsList') || []; albums.unshift({ id: Date.now(), title: req.body.title, date: new Date().toLocaleDateString('id-ID'), cover: coverStr, photos: [] }); await kv.set('albumsList', albums); res.redirect('/admin/dashboard'); } catch(e){ res.redirect('/admin/dashboard'); }});
+app.post('/admin/edit-album/:id', requireAdmin, upload.any(), async (req, res) => { try { let albums = await kv.get('albumsList') || []; let index = albums.findIndex(a => a.id == req.params.id); if (index !== -1) { albums[index].title = req.body.title; if (req.body.date) albums[index].date = req.body.date; let coverStr = fileHelper(req, 'cover_b64'); if (coverStr) albums[index].cover = coverStr; await kv.set('albumsList', albums); } res.redirect('/admin/dashboard'); } catch(e){ res.redirect('/admin/dashboard'); }});
 app.post('/admin/hapus-album/:id', requireAdmin, async (req, res) => { let albums = await kv.get('albumsList') || []; await kv.set('albumsList', albums.filter(a => a.id != req.params.id)); res.redirect('/admin/dashboard'); });
-app.post('/admin/tambah-foto-album/:id', requireAdmin, upload.any(), async (req, res) => { let photosB64 = req.body.photos_b64; let newPhotos = []; if (photosB64) { if (!Array.isArray(photosB64)) photosB64 = [photosB64]; photosB64.forEach(b64 => { newPhotos.push({ id: Date.now() + Math.random(), url: b64 }); }); } let albums = await kv.get('albumsList') || []; let index = albums.findIndex(a => a.id == req.params.id); if (index !== -1) { if (!albums[index].photos) albums[index].photos = []; albums[index].photos = [...albums[index].photos, ...newPhotos]; await kv.set('albumsList', albums); } res.redirect('/admin/dashboard'); });
+app.post('/admin/tambah-foto-album/:id', requireAdmin, upload.any(), async (req, res) => { try { let photosB64 = req.body.photos_b64; let newPhotos = []; if (photosB64) { if (!Array.isArray(photosB64)) photosB64 = [photosB64]; photosB64.forEach(b64 => { newPhotos.push({ id: Date.now() + Math.random(), url: b64 }); }); } let albums = await kv.get('albumsList') || []; let index = albums.findIndex(a => a.id == req.params.id); if (index !== -1) { if (!albums[index].photos) albums[index].photos = []; albums[index].photos = [...albums[index].photos, ...newPhotos]; await kv.set('albumsList', albums); } res.redirect('/admin/dashboard'); } catch(e){ res.redirect('/admin/dashboard'); }});
 app.post('/admin/hapus-foto-album/:albumId/:photoId', requireAdmin, async (req, res) => { let albums = await kv.get('albumsList') || []; let index = albums.findIndex(a => a.id == req.params.albumId); if (index !== -1 && albums[index].photos) { albums[index].photos = albums[index].photos.filter(p => p.id != req.params.photoId); await kv.set('albumsList', albums); } res.redirect('/admin/dashboard'); });
 
-app.post('/admin/tambah-data-anggota', requireAdmin, upload.any(), async (req, res) => { let fileStr = fileHelper(req, 'file_b64'); let dataAnggota = await kv.get('dataAnggotaList') || []; dataAnggota.unshift({ id: Date.now(), title: req.body.title, date: req.body.date || new Date().toLocaleDateString('id-ID'), file: fileStr }); await kv.set('dataAnggotaList', dataAnggota); res.redirect('/admin/dashboard'); });
-app.post('/admin/edit-data-anggota/:id', requireAdmin, upload.any(), async (req, res) => { let dataAnggota = await kv.get('dataAnggotaList') || []; let index = dataAnggota.findIndex(d => d.id == req.params.id); if (index !== -1) { dataAnggota[index].title = req.body.title; if (req.body.date) dataAnggota[index].date = req.body.date; let fileStr = fileHelper(req, 'file_b64'); if (fileStr) dataAnggota[index].file = fileStr; await kv.set('dataAnggotaList', dataAnggota); } res.redirect('/admin/dashboard'); });
+app.post('/admin/tambah-data-anggota', requireAdmin, upload.any(), async (req, res) => { try { let fileStr = fileHelper(req, 'file_b64'); let dataAnggota = await kv.get('dataAnggotaList') || []; dataAnggota.unshift({ id: Date.now(), title: req.body.title, date: req.body.date || new Date().toLocaleDateString('id-ID'), file: fileStr }); await kv.set('dataAnggotaList', dataAnggota); res.redirect('/admin/dashboard'); } catch(e){ res.redirect('/admin/dashboard'); }});
+app.post('/admin/edit-data-anggota/:id', requireAdmin, upload.any(), async (req, res) => { try { let dataAnggota = await kv.get('dataAnggotaList') || []; let index = dataAnggota.findIndex(d => d.id == req.params.id); if (index !== -1) { dataAnggota[index].title = req.body.title; if (req.body.date) dataAnggota[index].date = req.body.date; let fileStr = fileHelper(req, 'file_b64'); if (fileStr) dataAnggota[index].file = fileStr; await kv.set('dataAnggotaList', dataAnggota); } res.redirect('/admin/dashboard'); } catch(e){ res.redirect('/admin/dashboard'); }});
 app.post('/admin/hapus-data-anggota/:id', requireAdmin, async (req, res) => { let dataAnggota = await kv.get('dataAnggotaList') || []; await kv.set('dataAnggotaList', dataAnggota.filter(d => d.id != req.params.id)); res.redirect('/admin/dashboard'); });
 
-app.use(async (req, res) => {
-    const { siteSettings, socialMediaList } = await getSiteData();
-    res.status(404).render('admin-404', { page: '404', siteSettings, socialMediaList });
+// GLOBAL ERROR HANDLER
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Terjadi Kesalahan Internal di Server.');
 });
 
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
