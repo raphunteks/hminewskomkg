@@ -20,191 +20,193 @@
 </div>
 
 <!-- ==============================================================
-     TAB 1: KELOLA DATA UTAMA & KOHATI (GRID PROPORSIONAL FIXED)
+     TAB 1: KELOLA DATA UTAMA & KOHATI
 ============================================================== -->
 <div id="adm-kelola" class="admin-tab-pane active">
-    <!-- Grid Dinamis yang rapi menyesuaikan isi -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; align-items: start;">
+    <div class="admin-layout">
         
-        <!-- Panel Kelola Berita -->
-        <div class="glass admin-panel" style="margin-bottom:0;">
-            <div class="panel-header">
-                <h3 class="panel-title"><i data-lucide="file-text"></i> Kelola Berita</h3>
-                <button class="btn btn-primary" onclick="openModal('modalBerita')" style="padding:8px 15px; font-size:0.85rem;">+ Tambah Berita</button>
+        <!-- KOLOM UTAMA (BERITA & PENGURUS) -->
+        <div class="admin-main-content">
+            <div class="glass admin-panel" style="margin-bottom:0;">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i data-lucide="file-text"></i> Kelola Berita</h3>
+                    <button class="btn btn-primary" onclick="openModal('modalBerita')" style="padding:8px 15px; font-size:0.85rem;">+ Tambah Berita</button>
+                </div>
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead><tr><th>Judul Berita</th><th>Kategori</th><th style="text-align:right;">Aksi</th></tr></thead>
+                        <tbody>
+                            <% news.forEach(item => { %>
+                            <tr>
+                                <td class="fw-600"><%= item.title %><div style="font-size:0.75rem; color:#4ade80; margin-top:3px;"><%= item.date %></div></td>
+                                <td><span class="cat-badge"><%= item.category %></span></td>
+                                <td class="td-actions">
+                                    <div id="raw-content-<%= item.id %>" style="display: none;"><%- item.content %></div>
+                                    <button type="button" class="action-btn" style="color:#fff;" onclick="openKelolaFotoBerita('<%= item.id %>')" title="Kelola Foto"><i data-lucide="image-plus"></i></button>
+                                    <button type="button" class="action-btn edit" onclick="openEditBeritaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.category %>', '<%= item.date %>')" title="Edit Berita"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-berita/<%= item.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus berita?')"><i data-lucide="trash-2"></i></button></form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="table-wrapper">
-                <table class="admin-table">
-                    <thead><tr><th>Judul Berita</th><th>Kategori</th><th style="text-align:right;">Aksi</th></tr></thead>
-                    <tbody>
-                        <% news.forEach(item => { %>
-                        <tr>
-                            <td class="fw-600"><%= item.title %><div style="font-size:0.75rem; color:#4ade80; margin-top:3px;"><%= item.date %></div></td>
-                            <td><span class="cat-badge"><%= item.category %></span></td>
-                            <td class="td-actions">
-                                <div id="raw-content-<%= item.id %>" style="display: none;"><%- item.content %></div>
-                                <button type="button" class="action-btn" style="color:#fff;" onclick="openKelolaFotoBerita('<%= item.id %>')" title="Kelola Foto"><i data-lucide="image-plus"></i></button>
-                                <button type="button" class="action-btn edit" onclick="openEditBeritaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.category %>', '<%= item.date %>')" title="Edit Berita"><i data-lucide="edit"></i></button>
-                                <form action="/admin/hapus-berita/<%= item.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus berita?')"><i data-lucide="trash-2"></i></button></form>
-                            </td>
-                        </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
-        <!-- Panel Kelola Galeri -->
-        <div class="glass admin-panel" style="margin-bottom:0;">
-            <h3 class="panel-title" style="margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="image"></i> Kelola Galeri</h3>
-            <button class="btn btn-add-album" onclick="openModal('modalAlbum')">+ Tambah Galeri Baru</button>
-            <div class="album-list">
-                <% albums.forEach(album => { %>
-                <div class="list-item-album">
-                    <span class="list-item-title"><strong><%= album.title %></strong><br><small style="color:#4ade80;"><%= album.date %></small></span>
-                    <div style="display:flex; gap:5px;">
-                        <button type="button" class="action-btn" style="color:#fff;" onclick="openKelolaFotoAlbum('<%= album.id %>')"><i data-lucide="image-plus"></i></button>
-                        <button type="button" class="action-btn edit" onclick="openEditAlbumModal('<%= album.id %>', '<%= album.title.replace(/'/g, "\\'") %>', '<%= album.date %>')"><i data-lucide="edit"></i></button>
-                        <form action="/admin/hapus-album/<%= album.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus album?')"><i data-lucide="trash-2"></i></button></form>
+            <!-- PENGURUS & BIDANG UMUM -->
+            <div class="glass admin-panel" style="margin-bottom:0;">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i data-lucide="users"></i> Pengurus Harian (Umum)</h3>
+                    <div class="panel-actions">
+                        <button class="btn btn-primary" onclick="openModal('modalPengurus')" style="padding:8px 15px; font-size:0.85rem;">+ Pengurus</button>
+                        <button class="btn btn-secondary" onclick="openModal('modalBidang')" style="padding:8px 15px; font-size:0.85rem;">+ Buat Bidang</button>
                     </div>
                 </div>
-                <% }) %>
-            </div>
-        </div>
-
-        <!-- PENGURUS & BIDANG UMUM -->
-        <div class="glass admin-panel" style="margin-bottom:0;">
-            <div class="panel-header">
-                <h3 class="panel-title"><i data-lucide="users"></i> Pengurus Harian (Umum)</h3>
-                <div class="panel-actions">
-                    <button class="btn btn-primary" onclick="openModal('modalPengurus')" style="padding:8px 15px; font-size:0.85rem;">+ Pengurus</button>
-                    <button class="btn btn-secondary" onclick="openModal('modalBidang')" style="padding:8px 15px; font-size:0.85rem;">+ Buat Bidang</button>
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead><tr><th>Foto</th><th>Nama Pengurus</th><th>Jabatan</th><th style="text-align:right;">Aksi</th></tr></thead>
+                        <tbody>
+                            <% pengurus.forEach(person => { %>
+                            <tr>
+                                <td><img src="<%= person.image %>" style="width:40px; height:40px; border-radius:50%; object-fit:cover;"></td>
+                                <td class="fw-600"><%= person.name %></td>
+                                <td style="color:#4ade80; font-size:0.85rem;"><%= person.role %></td>
+                                <td class="td-actions">
+                                    <button type="button" class="action-btn edit" onclick="openEditDynamic('<%= person.id %>', '<%= person.name.replace(/'/g, "\\'") %>', '<%= person.role.replace(/'/g, "\\'") %>', '/admin/edit-pengurus/')"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-pengurus/<%= person.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Yakin?')"><i data-lucide="trash-2"></i></button></form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bidang-container">
+                    <h4 class="bidang-container-title">Daftar Bidang & Anggota</h4>
+                    <div class="bidang-list">
+                        <% bidang.forEach(b => { %>
+                            <div class="bidang-card">
+                                <div class="bidang-header">
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <h5 class="bidang-title"><%= b.name %></h5>
+                                        <button class="action-btn edit" style="padding:4px; border:none; background:none;" onclick="openEditBidangModal('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>', '/admin/edit-bidang/')"><i data-lucide="edit"></i></button>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-primary" style="padding:4px 10px; font-size:0.75rem;" onclick="openModalAnggotaBidang('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>', '/admin/tambah-anggota-bidang/')">+ Anggota</button>
+                                        <form action="/admin/hapus-bidang/<%= b.id %>" method="POST" class="form-inline" style="margin-left:5px;"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus seluruh bidang?')"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></form>
+                                    </div>
+                                </div>
+                                <div class="bidang-members-grid">
+                                    <% if(b.members && b.members.length > 0) { b.members.forEach(m => { %>
+                                        <div class="member-card">
+                                            <img src="<%= m.image %>" class="member-avatar">
+                                            <p class="member-name"><%= m.name %></p>
+                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '/admin/edit-anggota-bidang/')"><i data-lucide="edit" style="width:12px;"></i></button>
+                                            <form action="/admin/hapus-anggota-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota?')"><i data-lucide="x"></i></button></form>
+                                        </div>
+                                    <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
                 </div>
             </div>
-            <div class="table-wrapper">
-                <table class="admin-table">
-                    <thead><tr><th>Foto</th><th>Nama Pengurus</th><th>Jabatan</th><th style="text-align:right;">Aksi</th></tr></thead>
-                    <tbody>
-                        <% pengurus.forEach(person => { %>
-                        <tr>
-                            <td><img src="<%= person.image %>" style="width:40px; height:40px; border-radius:50%; object-fit:cover;"></td>
-                            <td class="fw-600"><%= person.name %></td>
-                            <td style="color:#4ade80; font-size:0.85rem;"><%= person.role %></td>
-                            <td class="td-actions">
-                                <button type="button" class="action-btn edit" onclick="openEditDynamic('<%= person.id %>', '<%= person.name.replace(/'/g, "\\'") %>', '<%= person.role.replace(/'/g, "\\'") %>', '/admin/edit-pengurus/')"><i data-lucide="edit"></i></button>
-                                <form action="/admin/hapus-pengurus/<%= person.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Yakin?')"><i data-lucide="trash-2"></i></button></form>
-                            </td>
-                        </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-            </div>
-            <div class="bidang-container">
-                <h4 class="bidang-container-title">Daftar Bidang & Anggota</h4>
-                <div class="bidang-list">
-                    <% bidang.forEach(b => { %>
-                        <div class="bidang-card">
-                            <div class="bidang-header">
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <h5 class="bidang-title"><%= b.name %></h5>
-                                    <button class="action-btn edit" style="padding:4px; border:none; background:none;" onclick="openEditBidangModal('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>', '/admin/edit-bidang/')"><i data-lucide="edit"></i></button>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-primary" style="padding:4px 10px; font-size:0.75rem;" onclick="openModalAnggotaBidang('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>', '/admin/tambah-anggota-bidang/')">+ Anggota</button>
-                                    <form action="/admin/hapus-bidang/<%= b.id %>" method="POST" class="form-inline" style="margin-left:5px;"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus seluruh bidang?')"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></form>
-                                </div>
-                            </div>
-                            <div class="bidang-members-grid">
-                                <% if(b.members && b.members.length > 0) { b.members.forEach(m => { %>
-                                    <div class="member-card">
-                                        <img src="<%= m.image %>" class="member-avatar">
-                                        <p class="member-name"><%= m.name %></p>
-                                        <button type="button" class="member-edit-btn" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '/admin/edit-anggota-bidang/')"><i data-lucide="edit"></i></button>
-                                        <form action="/admin/hapus-anggota-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota?')"><i data-lucide="x"></i></button></form>
+
+            <!-- PENGURUS & BIDANG KOHATI -->
+            <div class="glass admin-panel" style="margin-bottom:0; border: 1px solid rgba(244,114,182,0.3);">
+                <div class="panel-header">
+                    <h3 class="panel-title" style="color:#f472b6;"><i data-lucide="heart" style="color:#f472b6;"></i> Pengurus Harian (KOHATI)</h3>
+                    <div class="panel-actions">
+                        <button class="btn btn-primary" style="background:#f472b6; box-shadow:0 4px 15px rgba(244,114,182,0.3); color:#fff;" onclick="openModal('modalKohatiPengurus')">+ Pengurus</button>
+                        <button class="btn btn-secondary" onclick="openModal('modalKohatiBidang')">+ Bidang Kohati</button>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead><tr><th>Foto</th><th>Nama Pengurus</th><th>Jabatan</th><th style="text-align:right;">Aksi</th></tr></thead>
+                        <tbody>
+                            <% kohatiPengurus.forEach(person => { %>
+                            <tr>
+                                <td><img src="<%= person.image %>" style="width:40px; height:40px; border-radius:50%; object-fit:cover;"></td>
+                                <td class="fw-600"><%= person.name %></td>
+                                <td style="color:#f472b6; font-size:0.85rem;"><%= person.role %></td>
+                                <td class="td-actions">
+                                    <button type="button" class="action-btn edit" onclick="openEditDynamic('<%= person.id %>', '<%= person.name.replace(/'/g, "\\'") %>', '<%= person.role.replace(/'/g, "\\'") %>', '/admin/edit-kohati-pengurus/')"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-kohati-pengurus/<%= person.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus pengurus kohati?')"><i data-lucide="trash-2"></i></button></form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bidang-container">
+                    <h4 class="bidang-container-title" style="color:#f472b6;">Bidang & Anggota (KOHATI)</h4>
+                    <div class="bidang-list">
+                        <% kohatiBidang.forEach(b => { %>
+                            <div class="bidang-card">
+                                <div class="bidang-header">
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <h5 class="bidang-title" style="color:#f472b6;"><%= b.name %></h5>
+                                        <button class="action-btn edit" style="padding:4px; border:none; background:none;" onclick="openEditBidangModal('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>', '/admin/edit-kohati-bidang/')"><i data-lucide="edit"></i></button>
                                     </div>
-                                <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
+                                    <div>
+                                        <button type="button" class="btn" style="background:#f472b6; color:#fff; padding:4px 10px; font-size:0.75rem;" onclick="openModalAnggotaBidang('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>', '/admin/tambah-anggota-kohati-bidang/')">+ Anggota</button>
+                                        <form action="/admin/hapus-kohati-bidang/<%= b.id %>" method="POST" class="form-inline" style="margin-left:5px;"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus seluruh bidang?')"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></form>
+                                    </div>
+                                </div>
+                                <div class="bidang-members-grid">
+                                    <% if(b.members && b.members.length > 0) { b.members.forEach(m => { %>
+                                        <div class="member-card">
+                                            <img src="<%= m.image %>" class="member-avatar" style="border-color:rgba(244,114,182,0.5);">
+                                            <p class="member-name"><%= m.name %></p>
+                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '/admin/edit-anggota-kohati-bidang/')"><i data-lucide="edit" style="width:12px;"></i></button>
+                                            <form action="/admin/hapus-anggota-kohati-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota kohati?')"><i data-lucide="x"></i></button></form>
+                                        </div>
+                                    <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
+                                </div>
                             </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- KOLOM SAMPING (GALERI & PDF) -->
+        <div class="admin-sidebar">
+            <div class="glass admin-panel" style="margin-bottom:0;">
+                <h3 class="panel-title" style="margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="image"></i> Kelola Galeri</h3>
+                <button class="btn btn-add-album" onclick="openModal('modalAlbum')">+ Tambah Galeri Baru</button>
+                <div class="album-list">
+                    <% albums.forEach(album => { %>
+                    <div class="list-item-album">
+                        <span class="list-item-title"><strong><%= album.title %></strong><br><small style="color:#4ade80;"><%= album.date %></small></span>
+                        <div style="display:flex; gap:5px;">
+                            <button type="button" class="action-btn" style="color:#fff;" onclick="openKelolaFotoAlbum('<%= album.id %>')"><i data-lucide="image-plus"></i></button>
+                            <button type="button" class="action-btn edit" onclick="openEditAlbumModal('<%= album.id %>', '<%= album.title.replace(/'/g, "\\'") %>', '<%= album.date %>')"><i data-lucide="edit"></i></button>
+                            <form action="/admin/hapus-album/<%= album.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus album?')"><i data-lucide="trash-2"></i></button></form>
                         </div>
+                    </div>
+                    <% }) %>
+                </div>
+            </div>
+
+            <div class="glass admin-panel" style="margin-bottom:0;">
+                <h3 class="panel-title" style="margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="folder-open"></i> Data Anggota (PDF)</h3>
+                <button class="btn btn-add-album" onclick="openModal('modalDataAnggota')">+ Data Anggota Baru</button>
+                <div class="album-list">
+                    <% dataAnggota.forEach(item => { %>
+                    <div class="list-item-album">
+                        <span class="list-item-title"><strong><%= item.title %></strong><br><small style="color:#4ade80;"><%= item.date %></small></span>
+                        <div style="display:flex; gap:5px;">
+                            <button type="button" class="action-btn" style="color:#fff;" onclick="window.open('<%= item.file %>', '_blank')"><i data-lucide="eye"></i></button>
+                            <button type="button" class="action-btn edit" onclick="openEditDataAnggotaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.date %>')"><i data-lucide="edit"></i></button>
+                            <form action="/admin/hapus-data-anggota/<%= item.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus PDF?')"><i data-lucide="trash-2"></i></button></form>
+                        </div>
+                    </div>
                     <% }) %>
                 </div>
             </div>
         </div>
-
-        <!-- PENGURUS & BIDANG KOHATI -->
-        <div class="glass admin-panel" style="margin-bottom:0; border: 1px solid rgba(244,114,182,0.3);">
-            <div class="panel-header">
-                <h3 class="panel-title" style="color:#f472b6;"><i data-lucide="heart" style="color:#f472b6;"></i> Pengurus Harian (KOHATI)</h3>
-                <div class="panel-actions">
-                    <button class="btn btn-primary" style="background:#f472b6; box-shadow:0 4px 15px rgba(244,114,182,0.3); color:#fff;" onclick="openModal('modalKohatiPengurus')">+ Pengurus</button>
-                    <button class="btn btn-secondary" onclick="openModal('modalKohatiBidang')">+ Bidang Kohati</button>
-                </div>
-            </div>
-            <div class="table-wrapper">
-                <table class="admin-table">
-                    <thead><tr><th>Foto</th><th>Nama Pengurus</th><th>Jabatan</th><th style="text-align:right;">Aksi</th></tr></thead>
-                    <tbody>
-                        <% kohatiPengurus.forEach(person => { %>
-                        <tr>
-                            <td><img src="<%= person.image %>" style="width:40px; height:40px; border-radius:50%; object-fit:cover;"></td>
-                            <td class="fw-600"><%= person.name %></td>
-                            <td style="color:#f472b6; font-size:0.85rem;"><%= person.role %></td>
-                            <td class="td-actions">
-                                <button type="button" class="action-btn edit" onclick="openEditDynamic('<%= person.id %>', '<%= person.name.replace(/'/g, "\\'") %>', '<%= person.role.replace(/'/g, "\\'") %>', '/admin/edit-kohati-pengurus/')"><i data-lucide="edit"></i></button>
-                                <form action="/admin/hapus-kohati-pengurus/<%= person.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus pengurus kohati?')"><i data-lucide="trash-2"></i></button></form>
-                            </td>
-                        </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-            </div>
-            <div class="bidang-container">
-                <h4 class="bidang-container-title" style="color:#f472b6;">Bidang & Anggota (KOHATI)</h4>
-                <div class="bidang-list">
-                    <% kohatiBidang.forEach(b => { %>
-                        <div class="bidang-card">
-                            <div class="bidang-header">
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <h5 class="bidang-title" style="color:#f472b6;"><%= b.name %></h5>
-                                    <button class="action-btn edit" style="padding:4px; border:none; background:none;" onclick="openEditBidangModal('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>', '/admin/edit-kohati-bidang/')"><i data-lucide="edit"></i></button>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn" style="background:#f472b6; color:#fff; padding:4px 10px; font-size:0.75rem;" onclick="openModalAnggotaBidang('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>', '/admin/tambah-anggota-kohati-bidang/')">+ Anggota</button>
-                                    <form action="/admin/hapus-kohati-bidang/<%= b.id %>" method="POST" class="form-inline" style="margin-left:5px;"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus seluruh bidang?')"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></form>
-                                </div>
-                            </div>
-                            <div class="bidang-members-grid">
-                                <% if(b.members && b.members.length > 0) { b.members.forEach(m => { %>
-                                    <div class="member-card">
-                                        <img src="<%= m.image %>" class="member-avatar" style="border-color:rgba(244,114,182,0.5);">
-                                        <p class="member-name"><%= m.name %></p>
-                                        <button type="button" class="member-edit-btn" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '/admin/edit-anggota-kohati-bidang/')"><i data-lucide="edit"></i></button>
-                                        <form action="/admin/hapus-anggota-kohati-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota kohati?')"><i data-lucide="x"></i></button></form>
-                                    </div>
-                                <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
-                            </div>
-                        </div>
-                    <% }) %>
-                </div>
-            </div>
-        </div>
-
-        <!-- Panel Data Anggota PDF -->
-        <div class="glass admin-panel" style="margin-bottom:0;">
-            <h3 class="panel-title" style="margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="folder-open"></i> Data Anggota (PDF)</h3>
-            <button class="btn btn-add-album" onclick="openModal('modalDataAnggota')">+ Data Anggota Baru</button>
-            <div class="album-list">
-                <% dataAnggota.forEach(item => { %>
-                <div class="list-item-album">
-                    <span class="list-item-title"><strong><%= item.title %></strong><br><small style="color:#4ade80;"><%= item.date %></small></span>
-                    <div style="display:flex; gap:5px;">
-                        <button type="button" class="action-btn" style="color:#fff;" onclick="window.open('<%= item.file %>', '_blank')"><i data-lucide="eye"></i></button>
-                        <button type="button" class="action-btn edit" onclick="openEditDataAnggotaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.date %>')"><i data-lucide="edit"></i></button>
-                        <form action="/admin/hapus-data-anggota/<%= item.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus PDF?')"><i data-lucide="trash-2"></i></button></form>
-                    </div>
-                </div>
-                <% }) %>
-            </div>
-        </div>
-
     </div>
 </div>
 
@@ -222,7 +224,7 @@
                 </div>
                 <div class="form-group">
                     <label>Judul Hero (Welcome Halaman Beranda)</label>
-                    <input type="text" name="heroTitle" class="input-control" value="<%= siteSettings.heroTitle || siteSettings.webTitle %>">
+                    <input type="text" name="heroTitle" class="input-control" value="<%= siteSettings.heroTitle %>">
                 </div>
                 <div class="form-group">
                     <label>Teks Logo Kiri (Awal)</label>
@@ -260,9 +262,11 @@
                     <label>Teks Programmer / Watermark</label>
                     <input type="text" name="footerProgrammer" class="input-control" value="<%= siteSettings.footerProgrammer %>">
                 </div>
+                
+                <!-- FIX TOGGLE KOHATI CHECKBOX TERINTEGRASI -->
                 <div class="form-group" style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px;">
                     <input type="checkbox" name="kohatiActive" id="kohatiActive" value="true" <%= siteSettings.kohatiActive === 'true' || siteSettings.kohatiActive === true ? 'checked' : '' %> style="width:20px; height:20px;">
-                    <label for="kohatiActive" style="margin:0;">Aktifkan Tab & Fitur KOHATI</label>
+                    <label for="kohatiActive" style="margin:0; cursor:pointer;">Aktifkan Tab & Fitur KOHATI</label>
                 </div>
                 
                 <h4 style="margin:20px 0 10px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">Sosial Media Footer</h4>
@@ -302,10 +306,28 @@
                     <input type="file" name="bookletPdf" class="input-control file-to-b64" accept="application/pdf">
                     <% if(siteSettings.bookletPdf) { %><p class="form-hint" style="color:#4ade80;">File booklet saat ini sudah terpasang.</p><% } %>
                 </div>
+
+                <!-- SEGMEN TENTANG KOHATI -->
+                <div class="form-group" style="margin-top:40px; border-top:1px solid rgba(244,114,182,0.3); padding-top:20px;">
+                    <h4 style="color:#f472b6; margin-bottom:15px;"><i data-lucide="heart" style="width:16px;"></i> Konten Halaman Kohati</h4>
+                    <label>Teks Profil KOHATI</label>
+                    <div id="quill-kohati-profil" style="height:150px; color:white;"></div>
+                    <input type="hidden" name="kohatiProfilText" id="hidden-kohati-profil">
+                </div>
+                <div class="form-group">
+                    <label>Teks Visi & Misi KOHATI</label>
+                    <div id="quill-kohati-visimisi" style="height:150px; color:white;"></div>
+                    <input type="hidden" name="kohatiVisiMisiText" id="hidden-kohati-visimisi">
+                </div>
+
                 <button type="submit" class="btn btn-primary submit-btn" style="width:100%;">Simpan Halaman Tentang</button>
             </form>
+            
+            <!-- Hidden Data Container for Quill Editors -->
             <div id="raw-profil" style="display:none;"><%- siteSettings.profilText %></div>
             <div id="raw-visimisi" style="display:none;"><%- siteSettings.visiMisiText %></div>
+            <div id="raw-kohati-profil" style="display:none;"><%- siteSettings.kohatiProfilText %></div>
+            <div id="raw-kohati-visimisi" style="display:none;"><%- siteSettings.kohatiVisiMisiText %></div>
         </div>
     </div>
 </div>
@@ -471,7 +493,6 @@
     </div>
 </div>
 
-<!-- Modal Berita, Galeri, Pengurus (Dengan Batal button) -->
 <div class="modal-overlay" id="modalBerita">
     <div class="modal-content" style="max-width: 800px;">
         <div class="modal-header"><h3>Tambah Berita Baru</h3><button type="button" class="close-modal" onclick="closeModal('modalBerita')"><i data-lucide="x"></i></button></div>
@@ -567,8 +588,7 @@
 </div>
 
 <div class="modal-overlay" id="modalAnggotaBidang">
-    <div class="modal-content">
-        <div class="modal-header"><h3 id="anggotaBidangTitle">Tambah Anggota</h3><button type="button" class="close-modal" onclick="closeModal('modalAnggotaBidang')"><i data-lucide="x"></i></button></div>
+    <div class="modal-content"><div class="modal-header"><h3 id="anggotaBidangTitle">Tambah Anggota</h3><button type="button" class="close-modal" onclick="closeModal('modalAnggotaBidang')"><i data-lucide="x"></i></button></div>
         <form id="formAnggotaBidang" method="POST" enctype="multipart/form-data">
             <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" id="editAnggotaBidangName" class="input-control" required></div>
             <div class="form-group"><label>Upload Foto</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
@@ -595,12 +615,13 @@
         <div class="modal-header"><h3 style="color:#f472b6;">Tambah Bidang Kohati Baru</h3><button type="button" class="close-modal" onclick="closeModal('modalKohatiBidang')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-kohati-bidang" method="POST">
             <div class="form-group"><label>Nama Bidang</label><input type="text" name="bidang_name" class="input-control" required></div>
-            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalKohatiBidang')">Batal</button><button type="submit" class="btn" style="background:#f472b6; color:#000; flex:1;">Buat Bidang</button></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalKohatiBidang')">Batal</button><button type="submit" class="btn" style="background:#f472b6; color:#fff; flex:1;">Buat Bidang</button></div>
         </form>
     </div>
 </div>
 
 <script>
+    // Tab Navigation Logic for Admin Dashboard
     function openAdmTab(tabId, btn) {
         document.querySelectorAll('.admin-tab-pane').forEach(tab => tab.classList.remove('active'));
         document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
@@ -609,6 +630,7 @@
         window.dispatchEvent(new Event('resize'));
     }
 
+    // INISIALISASI QUILL.JS
     document.addEventListener('DOMContentLoaded', function() {
         var toolbarOptions = [['bold', 'italic', 'underline', 'strike'], ['blockquote'], [{ 'header': 1 }, { 'header': 2 }], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'color': [] }, { 'background': [] }], [{ 'align': [] }], ['clean']];
         var qConfig = { theme: 'snow', modules: { toolbar: toolbarOptions } };
@@ -618,14 +640,24 @@
         var quillProfil = new Quill('#quill-profil', qConfig);
         var quillVisi = new Quill('#quill-visimisi', qConfig);
         var quillAnnounce = new Quill('#quill-announce', qConfig);
+        
+        // Setup Editor KOHATI
+        var quillKohatiProfil = new Quill('#quill-kohati-profil', qConfig);
+        var quillKohatiVisi = new Quill('#quill-kohati-visimisi', qConfig);
 
+        // Init values for setelan
         quillProfil.root.innerHTML = document.getElementById('raw-profil').innerHTML;
         quillVisi.root.innerHTML = document.getElementById('raw-visimisi').innerHTML;
         quillAnnounce.root.innerHTML = document.getElementById('raw-announce').innerHTML;
+        quillKohatiProfil.root.innerHTML = document.getElementById('raw-kohati-profil').innerHTML;
+        quillKohatiVisi.root.innerHTML = document.getElementById('raw-kohati-visimisi').innerHTML;
 
+        // Submit Forms Setelan
         document.getElementById('formSetelanTentang').onsubmit = function() {
             document.getElementById('hidden-profil').value = quillProfil.root.innerHTML;
             document.getElementById('hidden-visimisi').value = quillVisi.root.innerHTML;
+            document.getElementById('hidden-kohati-profil').value = quillKohatiProfil.root.innerHTML;
+            document.getElementById('hidden-kohati-visimisi').value = quillKohatiVisi.root.innerHTML;
         };
         document.getElementById('formAnnounce').onsubmit = function() {
             document.getElementById('hidden-announce').value = quillAnnounce.root.innerHTML;
@@ -641,8 +673,10 @@
     function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
 
+    // DATA ANGGOTA (PDF)
     function openEditDataAnggotaModal(id, title, date) { document.getElementById('editDataAnggotaTitle').value = title; document.getElementById('editDataAnggotaDate').value = date; document.getElementById('formEditDataAnggota').action = '/admin/edit-data-anggota/' + id; openModal('modalEditDataAnggota'); }
 
+    // BERITA
     function openEditBeritaModal(id, title, category, date) {
         document.getElementById('editBeritaTitle').value = title; document.getElementById('editBeritaCategory').value = category; document.getElementById('editBeritaDate').value = date;
         var editEditor = Quill.find(document.getElementById('quill-edit'));
@@ -664,6 +698,7 @@
         openModal('modalKelolaFotoBerita');
     }
 
+    // PENGURUS & BIDANG UMUM
     function openEditDynamic(id, name, role, actionPath) {
         document.getElementById('editDynamicName').value = name;
         document.getElementById('editDynamicRole').value = role;
@@ -687,8 +722,8 @@
         openModal('modalAnggotaBidang'); 
     }
 
+    // ALBUM GALERI
     function openEditAlbumModal(id, title, date) { document.getElementById('editAlbumTitle').value = title; document.getElementById('editAlbumDate').value = date; document.getElementById('formEditAlbum').action = '/admin/edit-album/' + id; openModal('modalEditAlbum'); }
-    
     function openKelolaFotoAlbum(id) {
         const album = albumsData.find(a => a.id == id); if(!album) return;
         document.getElementById('kelolaFotoTitle').innerText = 'Kelola Foto: ' + album.title;
@@ -703,11 +738,13 @@
         openModal('modalKelolaFotoAlbum');
     }
 
+    // SHORTLINK
     function openEditShortlinkModal(id, title, path, url) {
         document.getElementById('editShortlinkTitle').value = title; document.getElementById('editShortlinkPath').value = path; document.getElementById('editShortlinkUrl').value = url;
         document.getElementById('formEditShortlink').action = '/admin/edit-shortlink/' + id; openModal('modalEditShortlink');
     }
 
+    // Auto Compress Images
     async function compressImage(file, maxWidth = 1000) {
         return new Promise((resolve) => {
             const reader = new FileReader(); reader.readAsDataURL(file);
