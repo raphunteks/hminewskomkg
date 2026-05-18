@@ -1,0 +1,27 @@
+<% if (siteSettings.announceActive) { %>
+<div class="modal-overlay announce-overlay" id="announceModal">
+    <div class="modal-content" style="padding: 0; overflow: hidden; border: 2px solid #22c55e;">
+        <button class="btn-close-announce" onclick="closeAnnounce()"><i data-lucide="x"></i></button>
+        <% if (siteSettings.announceImage) { %>
+            <div class="announce-img-box"><img src="<%= siteSettings.announceImage %>" alt="Announcement"></div>
+        <% } %>
+        <div class="announce-body" style="padding: 25px; text-align: center;">
+            <h2 style="color: #4ade80; margin-bottom: 15px; font-size: 1.8rem;"><%= siteSettings.announceTitle %></h2>
+            <div style="color: #d1d5db; margin-bottom: 25px; line-height: 1.6;" class="rich-text-content"><%- siteSettings.announceContent %></div>
+            <button class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem;" onclick="readAnnounce()">Sudah Baca</button>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if(!localStorage.getItem('announce_read_<%= siteSettings.announceTitle.replace(/\s+/g, "_") %>')) {
+            setTimeout(() => { document.getElementById('announceModal').classList.add('active'); }, 500);
+        }
+    });
+    function closeAnnounce() { document.getElementById('announceModal').classList.remove('active'); }
+    function readAnnounce() { 
+        localStorage.setItem('announce_read_<%= siteSettings.announceTitle.replace(/\s+/g, "_") %>', 'true'); 
+        closeAnnounce(); 
+    }
+</script>
+<% } %>
