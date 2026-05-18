@@ -20,14 +20,17 @@ const kv = createClient({
   token: process.env.KV2_KV_REST_API_TOKEN || 'gQAAAAAAAfKNAAIgcDEyZWI1YmIzNDBmNWQ0ZjY1YjI5NTZmOTU2NjMyZDFhMg',
 });
 
+// Konfigurasi EJS & Public folder
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Middleware untuk form data
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
-app.use(cookieParser()); 
+app.use(cookieParser()); // Menggunakan Cookie Parser untuk sesi Vercel
 
-// --- STRUKTUR SETTINGS DEFAULT TERPERCAYA ---
+// --- STRUKTUR SETTINGS DEFAULT (DENGAN TULISAN ASLI ANDA) ---
 const defaultSettings = {
     webTitle: "HMI KomKG-UMI",
     headerLogo: "/img/logo-hmikomkgumi.png",
@@ -80,6 +83,7 @@ async function getSiteData() {
     }
 }
 
+// Fungsi Helper untuk Inisialisasi Default Data sesuai Request Anda
 async function initDefaultData() {
     let hasNews = await kv.get('newsList');
     if (!hasNews || hasNews.length === 0) {
@@ -124,6 +128,7 @@ async function initDefaultData() {
     if (!(await kv.get('shortlinkList'))) await kv.set('shortlinkList', []);
 }
 
+// Eksekusi DB Aman
 (async () => {
     try {
         await getSiteData();
@@ -134,6 +139,7 @@ async function initDefaultData() {
     }
 })();
 
+// --- API ACTIONS HELPER ---
 const fileHelper = (req, fieldB64) => {
     let str = req.body[fieldB64] || '';
     if (!str && req.files) {
@@ -143,7 +149,7 @@ const fileHelper = (req, fieldB64) => {
     return str;
 };
 
-// MENCEGAH ERROR FAVICON 500
+// Mengarahkan favicon otomatis agar tidak error 500
 app.get('/favicon.ico', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 app.get('/favicon.png', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 
@@ -215,6 +221,7 @@ app.get('/data-anggota', async (req, res) => {
     }
 });
 
+// SHORTLINK CUSTOM REDIRECT
 app.get('/:slug', async (req, res, next) => {
     const slug = req.params.slug.toLowerCase();
     const reserved = ['admin', 'css', 'img', 'js', 'berita', 'galeri', 'tentang', 'data-anggota'];
@@ -304,13 +311,14 @@ app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req
     res.redirect('/admin/dashboard');
 });
 
-// --- API SETELAN WEB (DIPISAHKAN AGAR TIDAK SALING OVERWRITE) ---
-
-// 1. Rute Simpan Header & Footer
+// --- API SETELAN WEB (AMAN DARI OVERWRITE) ---
 app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
+        
+        // Cek darimana request berasal (Header/Footer ATAU Tentang Kami)
         if (req.body.webTitle !== undefined) {
+            // Form Header & Footer
             siteSettings.webTitle = req.body.webTitle;
             siteSettings.heroTitle = req.body.heroTitle || siteSettings.heroTitle;
             siteSettings.headerTitle = req.body.headerTitle || siteSettings.headerTitle;
@@ -323,17 +331,9 @@ app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
 
             const hLogo = fileHelper(req, 'headerLogo_b64'); if (hLogo) siteSettings.headerLogo = hLogo;
             const fLogo = fileHelper(req, 'footerLogo_b64'); if (fLogo) siteSettings.footerLogo = fLogo;
-        }
-        await kv.set('siteSettings', siteSettings);
-        res.redirect('/admin/dashboard');
-    } catch (err) { res.redirect('/admin/dashboard'); }
-});
-
-// 2. Rute Khusus Simpan Tentang Kami
-app.post('/admin/setelan-tentang', requireAdmin, upload.any(), async (req, res) => {
-    try {
-        const { siteSettings } = await getSiteData();
-        if (req.body.profilText !== undefined) {
+        } 
+        else if (req.body.profilText !== undefined) {
+            // Form Tentang Kami
             siteSettings.profilText = req.body.profilText;
             siteSettings.visiMisiText = req.body.visiMisiText;
             siteSettings.kohatiProfilText = req.body.kohatiProfilText;
@@ -342,16 +342,16 @@ app.post('/admin/setelan-tentang', requireAdmin, upload.any(), async (req, res) 
 
             const bPdf = fileHelper(req, 'bookletPdf_b64'); if (bPdf) siteSettings.bookletPdf = bPdf;
         }
+
         await kv.set('siteSettings', siteSettings);
         res.redirect('/admin/dashboard');
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
-// 3. Rute Khusus Simpan Toggle KOHATI (FIXED)
+// Rute Simpan Toggle KOHATI (Khusus & Terpisah agar tidak tertimpa form lain)
 app.post('/admin/setelan-kohati-toggle', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
-        // Checkbox akan mengirim value "true" jika di-cek, dan undefined jika tidak di-cek
         siteSettings.kohatiActive = req.body.kohatiActive ? 'true' : 'false';
         await kv.set('siteSettings', siteSettings);
         res.redirect('/admin/dashboard');
@@ -364,7 +364,9 @@ app.post('/admin/setelan-announcement', requireAdmin, upload.any(), async (req, 
         siteSettings.announceActive = req.body.announceActive ? 'true' : 'false';
         siteSettings.announceTitle = req.body.announceTitle || siteSettings.announceTitle;
         siteSettings.announceContent = req.body.announceContent || siteSettings.announceContent;
+
         const img = fileHelper(req, 'announceImage_b64'); if (img) siteSettings.announceImage = img;
+
         await kv.set('siteSettings', siteSettings);
         res.redirect('/admin/dashboard');
     } catch (err) { res.redirect('/admin/dashboard'); }
@@ -372,18 +374,23 @@ app.post('/admin/setelan-announcement', requireAdmin, upload.any(), async (req, 
 
 // --- API SHORTLINK & SOSMED ---
 app.post('/admin/tambah-shortlink', requireAdmin, async (req, res) => {
-    let list = await kv.get('shortlinkList') || []; list.unshift({ id: Date.now(), title: req.body.title, path: req.body.path.replace(/\s+/g, '-').toLowerCase(), originalUrl: req.body.originalUrl }); await kv.set('shortlinkList', list); res.redirect('/admin/dashboard');
+    let list = await kv.get('shortlinkList') || [];
+    list.unshift({ id: Date.now(), title: req.body.title, path: req.body.path.replace(/\s+/g, '-').toLowerCase(), originalUrl: req.body.originalUrl });
+    await kv.set('shortlinkList', list); res.redirect('/admin/dashboard');
 });
 app.post('/admin/edit-shortlink/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('shortlinkList') || []; let i = list.findIndex(l => l.id == req.params.id);
-    if(i !== -1) { list[i].title = req.body.title; list[i].path = req.body.path.replace(/\s+/g, '-').toLowerCase(); list[i].originalUrl = req.body.originalUrl; await kv.set('shortlinkList', list); } res.redirect('/admin/dashboard');
+    if(i !== -1) { list[i].title = req.body.title; list[i].path = req.body.path.replace(/\s+/g, '-').toLowerCase(); list[i].originalUrl = req.body.originalUrl; await kv.set('shortlinkList', list); }
+    res.redirect('/admin/dashboard');
 });
 app.post('/admin/hapus-shortlink/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('shortlinkList') || []; await kv.set('shortlinkList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
 });
 
 app.post('/admin/tambah-sosmed', requireAdmin, upload.any(), async (req, res) => {
-    let list = await kv.get('socialMediaList') || []; list.push({ id: Date.now(), name: req.body.name, url: req.body.url, icon: fileHelper(req, 'icon_b64') }); await kv.set('socialMediaList', list); res.redirect('/admin/dashboard');
+    let list = await kv.get('socialMediaList') || [];
+    list.push({ id: Date.now(), name: req.body.name, url: req.body.url, icon: fileHelper(req, 'icon_b64') });
+    await kv.set('socialMediaList', list); res.redirect('/admin/dashboard');
 });
 app.post('/admin/hapus-sosmed/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('socialMediaList') || []; await kv.set('socialMediaList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
@@ -445,7 +452,7 @@ app.post('/admin/tambah-data-anggota', requireAdmin, upload.any(), async (req, r
 app.post('/admin/edit-data-anggota/:id', requireAdmin, upload.any(), async (req, res) => { try { let dataAnggota = await kv.get('dataAnggotaList') || []; let index = dataAnggota.findIndex(d => d.id == req.params.id); if (index !== -1) { dataAnggota[index].title = req.body.title; if (req.body.date) dataAnggota[index].date = req.body.date; let fileStr = fileHelper(req, 'file_b64'); if (fileStr) dataAnggota[index].file = fileStr; await kv.set('dataAnggotaList', dataAnggota); } res.redirect('/admin/dashboard'); } catch(e){ res.redirect('/admin/dashboard'); }});
 app.post('/admin/hapus-data-anggota/:id', requireAdmin, async (req, res) => { let dataAnggota = await kv.get('dataAnggotaList') || []; await kv.set('dataAnggotaList', dataAnggota.filter(d => d.id != req.params.id)); res.redirect('/admin/dashboard'); });
 
-// GLOBAL ERROR HANDLER CATCH ALL
+// GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Terjadi Kesalahan Internal di Server.');
