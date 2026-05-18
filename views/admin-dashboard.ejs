@@ -99,7 +99,10 @@
                                         <div class="member-card">
                                             <img src="<%= m.image %>" class="member-avatar">
                                             <p class="member-name"><%= m.name %></p>
-                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '/admin/edit-anggota-bidang/')"><i data-lucide="edit" style="width:12px;"></i></button>
+                                            <p style="font-size:0.75rem; color:#4ade80; margin-top:3px; font-weight:bold;"><%= m.role || '' %></p>
+                                            
+                                            <!-- UPDATE: Fungsi onclick sekarang mengirimkan paramater (m.role) -->
+                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '<%= (m.role || '').replace(/'/g, "\\'") %>', '/admin/edit-anggota-bidang/')"><i data-lucide="edit" style="width:12px;"></i></button>
                                             <form action="/admin/hapus-anggota-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota?')"><i data-lucide="x"></i></button></form>
                                         </div>
                                     <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
@@ -157,7 +160,10 @@
                                         <div class="member-card">
                                             <img src="<%= m.image %>" class="member-avatar" style="border-color:rgba(244,114,182,0.5);">
                                             <p class="member-name"><%= m.name %></p>
-                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '/admin/edit-anggota-kohati-bidang/')"><i data-lucide="edit" style="width:12px;"></i></button>
+                                            <p style="font-size:0.75rem; color:#f472b6; margin-top:3px; font-weight:bold;"><%= m.role || '' %></p>
+                                            
+                                            <!-- UPDATE: Fungsi onclick sekarang mengirimkan paramater (m.role) -->
+                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '<%= (m.role || '').replace(/'/g, "\\'") %>', '/admin/edit-anggota-kohati-bidang/')"><i data-lucide="edit" style="width:12px;"></i></button>
                                             <form action="/admin/hapus-anggota-kohati-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota kohati?')"><i data-lucide="x"></i></button></form>
                                         </div>
                                     <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
@@ -277,7 +283,7 @@
                 </form>
             </div>
 
-            <!-- FORM TOGGLE KOHATI TERPISAH (FIXED) -->
+            <!-- FORM TOGGLE KOHATI TERPISAH -->
             <div class="glass admin-panel" style="margin-bottom:0; border-top: 4px solid #f472b6;">
                 <h3 class="panel-title" style="margin-bottom:20px; color:#f472b6;"><i data-lucide="heart"></i> Status Fitur KOHATI</h3>
                 <form action="/admin/setelan-kohati-toggle" method="POST">
@@ -291,7 +297,7 @@
             </div>
         </div>
 
-        <!-- FORM HALAMAN TENTANG KAMI (DIPISAHKAN AGAR UI VISI MISI MENJADI KARTU ELEGAN) -->
+        <!-- FORM HALAMAN TENTANG KAMI -->
         <div class="glass admin-panel" style="margin-bottom:0; align-self:start;">
             <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="file-text"></i> Halaman Tentang Kami</h3>
             <form action="/admin/setelan-tentang" method="POST" enctype="multipart/form-data" id="formSetelanTentang">
@@ -350,7 +356,6 @@
                 <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:20px;">Simpan Halaman Tentang</button>
             </form>
             
-            <!-- Hidden Data Container for Quill Editors -->
             <div id="raw-profil" style="display:none;"><%- siteSettings.profilText %></div>
             <div id="raw-welcome" style="display:none;"><%- siteSettings.welcomeText %></div>
             <div id="raw-visi" style="display:none;"><%- siteSettings.visiText %></div>
@@ -618,12 +623,35 @@
     </div>
 </div>
 
+<!-- ==========================================
+     MODAL ANGGOTA BIDANG (UPDATE JABATAN)
+=========================================== -->
 <div class="modal-overlay" id="modalAnggotaBidang">
-    <div class="modal-content"><div class="modal-header"><h3 id="anggotaBidangTitle">Tambah Anggota</h3><button type="button" class="close-modal" onclick="closeModal('modalAnggotaBidang')"><i data-lucide="x"></i></button></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="anggotaBidangTitle">Tambah Anggota</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalAnggotaBidang')"><i data-lucide="x"></i></button>
+        </div>
         <form id="formAnggotaBidang" method="POST" enctype="multipart/form-data">
-            <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" id="editAnggotaBidangName" class="input-control" required></div>
-            <div class="form-group"><label>Upload Foto</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
-            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalAnggotaBidang')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan</button></div>
+            <div class="form-group">
+                <label>Nama Lengkap</label>
+                <input type="text" name="name" id="editAnggotaBidangName" class="input-control" required>
+            </div>
+            
+            <!-- UPDATE: FIELD JABATAN BARU DITAMBAHKAN DI SINI -->
+            <div class="form-group">
+                <label>Jabatan (Opsional)</label>
+                <input type="text" name="role" id="editAnggotaBidangRole" class="input-control" placeholder="Contoh: Anggota / Ketua Bidang">
+            </div>
+
+            <div class="form-group">
+                <label>Upload Foto</label>
+                <input type="file" name="image" class="input-control file-compress" accept="image/*">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalAnggotaBidang')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Simpan</button>
+            </div>
         </form>
     </div>
 </div>
@@ -742,16 +770,19 @@
 
     function openEditBidangModal(id, name, actionPath) { document.getElementById('editBidangName').value = name; document.getElementById('formEditBidang').action = actionPath + id; openModal('modalEditBidang'); }
     
+    // UPDATE JS: Fungsi modal Tambah/Edit anggota sekarang menerima parameter Role (Jabatan)
     function openModalAnggotaBidang(bidangId, bidangName, actionPath) { 
         document.getElementById('anggotaBidangTitle').innerText = "Tambah Anggota: " + bidangName; 
         document.getElementById('editAnggotaBidangName').value = "";
+        document.getElementById('editAnggotaBidangRole').value = ""; // Kosongkan role
         document.getElementById('formAnggotaBidang').action = actionPath + bidangId; 
         openModal('modalAnggotaBidang'); 
     }
     
-    function openEditAnggotaBidangModal(bidangId, memberId, name, actionPath) { 
+    function openEditAnggotaBidangModal(bidangId, memberId, name, role, actionPath) { 
         document.getElementById('anggotaBidangTitle').innerText = "Edit Anggota"; 
         document.getElementById('editAnggotaBidangName').value = name; 
+        document.getElementById('editAnggotaBidangRole').value = role; // Isi dengan role saat ini
         document.getElementById('formAnggotaBidang').action = actionPath + bidangId + "/" + memberId; 
         openModal('modalAnggotaBidang'); 
     }
