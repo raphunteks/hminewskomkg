@@ -11,9 +11,9 @@ button, input, textarea, select { font-family: inherit; }
 /* FIX LUCIDE ICONS SVG SCALING */
 .lucide { display: inline-block; vertical-align: middle; width: 20px; height: 20px; stroke: currentColor; stroke-width: 2px; }
 
-/* LAYOUT */
+/* LAYOUT (Z-INDEX FIXED) */
 .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-main { flex-grow: 1; padding-top: 120px; padding-bottom: 60px; position: relative; z-index: 10; }
+main { flex-grow: 1; padding-top: 120px; padding-bottom: 60px; position: relative; z-index: 20; }
 
 .bg-blob { position: fixed; border-radius: 50%; filter: blur(100px); z-index: 1; opacity: 0.4; pointer-events: none; }
 .blob-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: #22c55e; }
@@ -97,7 +97,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ==============================================================
-   ANNOUNCEMENT POP-UP (ANTI-MELONJONG & PROPORSIONAL)
+   ANNOUNCEMENT POP-UP (HORIZONTAL FIXED & PROPORTIONAL)
 ============================================================== */
 .announce-overlay {
     z-index: 9999999;
@@ -110,9 +110,9 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .announce-horizontal {
     display: flex;
     flex-direction: row;
-    max-width: 900px;
+    max-width: 900px; /* Lebar maksimal diperbesar sedikit */
     width: 100%;
-    max-height: 85vh;
+    max-height: 80vh; /* Tinggi maksimal dikunci agar tidak melebihi viewport */
     background: #1b4332; 
     border-radius: 16px;
     overflow: hidden;
@@ -125,7 +125,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     position: absolute;
     top: 15px;
     right: 15px;
-    z-index: 10;
+    z-index: 20; /* Z-index diperbesar agar selalu di atas */
     background: rgba(0,0,0,0.5);
     border-radius: 50%;
     padding: 8px;
@@ -138,37 +138,58 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .announce-close-btn:hover { background: rgba(239,68,68,0.8); }
 
 .announce-left {
-    flex: 0 0 50%; /* Membagi ruang tepat setengah */
-    max-width: 50%;
-    padding: 30px; /* BORDER/MARGIN HIJAU SEPERTI DI GAMBAR REQUEST ANDA */
-    background: #1b4332; 
+    flex: 0 0 45%; /* Menempati 45% dari lebar kontainer */
+    max-width: 45%;
+    padding: 20px; /* Memberikan border/ruang di sekitar gambar */
+    background: #064e3b; /* Warna background berbeda untuk bagian gambar */
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
 .announce-left img {
     max-width: 100%;
     max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain; /* KUNCI ANTI MELONJONG / DISTORSI */
+    object-fit: contain; /* Menggunakan contain agar gambar proporsional dan tidak terpotong */
     border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3); /* Tambahan estetika bayangan pada poster */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3); /* Menambahkan bayangan pada gambar */
 }
 
 .announce-right {
-    flex: 1;
-    padding: 40px 30px 40px 0;
+    flex: 1; /* Menempati sisa lebar (55%) */
+    padding: 30px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    overflow-y: auto; /* SCROLL HANYA UNTUK TEKS JIKA TERLALU PANJANG */
+    overflow-y: auto; /* KUNCI: Scroll hanya pada bagian teks */
 }
 
-.announce-title { color: #fff; margin-bottom: 10px; font-size: 2rem; font-weight: 800; line-height: 1.2; padding-right: 30px; }
-.announce-divider { width: 40px; height: 4px; background: #4ade80; margin-bottom: 20px; border-radius: 2px; flex-shrink: 0; }
-.announce-text { color: #d1d5db; margin-bottom: 30px; line-height: 1.6; font-size: 0.95rem; border-left: 3px solid rgba(74, 222, 128, 0.4); padding-left: 15px; }
+.announce-title { 
+    color: #fff; 
+    margin-bottom: 10px; 
+    font-size: 1.8rem; 
+    font-weight: 800; 
+    line-height: 1.2; 
+    padding-right: 30px; /* Mencegah judul menabrak tombol close */
+}
+
+.announce-divider { 
+    width: 40px; 
+    height: 4px; 
+    background: #4ade80; 
+    margin-bottom: 20px; 
+    border-radius: 2px; 
+    flex-shrink: 0; 
+}
+
+.announce-text { 
+    color: #d1d5db; 
+    margin-bottom: 30px; 
+    line-height: 1.6; 
+    font-size: 0.95rem; 
+    border-left: 3px solid rgba(74, 222, 128, 0.4); 
+    padding-left: 15px; 
+}
 
 .announce-btn {
     align-self: flex-start;
@@ -201,7 +222,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .admin-tab-pane.active { display: block; }
 
 /* FIX LAYOUT: Grid Proposional Untuk Kerapian Admin (Kiri Lebih Besar dari Kanan) */
-.admin-layout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 30px; align-items: start; }
+.admin-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; align-items: start; }
 .admin-main-content { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
 .admin-sidebar { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
 
