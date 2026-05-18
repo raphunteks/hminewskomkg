@@ -82,6 +82,86 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .rich-text-content a:hover { color: #22c55e; }
 .rich-text-content blockquote { border-left: 4px solid #22c55e; padding-left: 15px; margin-left: 0; font-style: italic; color: #9ca3af; background: rgba(255,255,255,0.05); padding:10px 15px; border-radius: 0 8px 8px 0; }
 
+/* ==============================================================
+   UI KARTU VISI & MISI (UMUM & KOHATI) ELEGAN
+============================================================== */
+.vision-mission-card, .vm-card { 
+    padding: 35px; 
+    position: relative; 
+    overflow: hidden; 
+    border-radius: 20px;
+    background: #093824; /* Hijau gelap solid elegan sesuai gambar */
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-left-width: 6px;
+    border-left-style: solid;
+    text-align: left;
+}
+.vision-mission-card.v-left { border-left-color: #4ade80; }
+.vision-mission-card.m-left { border-left-color: #4ade80; } /* Disamakan aksen terang */
+.vm-card { border-left-color: #4ade80; }
+
+.icon-box, .vm-icon { 
+    width: 50px; 
+    height: 50px; 
+    background: rgba(255,255,255,0.08); 
+    border-radius: 14px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 1.5rem; 
+    margin-bottom: 20px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+}
+
+.vision-mission-card h3, .vm-title {
+    color: #4ade80;
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+.vision-mission-card p, .vm-card .rich-text-content p {
+    color: #e5e7eb;
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+/* Gaya khusus List Custom Visi & Misi agar Angka Menonjol Terang */
+.list-custom { list-style: none; padding: 0; }
+.list-custom li { display: flex; gap: 15px; margin-bottom: 15px; color: #e5e7eb; font-size: 1.05rem; line-height: 1.7; align-items: flex-start; }
+.list-num { color: #4ade80; font-weight: 800; font-size: 1.1rem; flex-shrink: 0; }
+
+/* Mengakali editor teks (Quill) agar auto-number (ol li) juga cantik & terang */
+.vm-card .rich-text-content ol {
+    list-style: none;
+    counter-reset: misi-counter;
+    padding-left: 0;
+}
+.vm-card .rich-text-content ol li {
+    counter-increment: misi-counter;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 15px;
+    color: #e5e7eb;
+    font-size: 1.05rem;
+    line-height: 1.7;
+}
+.vm-card .rich-text-content ol li::before {
+    content: counter(misi-counter) ".";
+    position: absolute;
+    left: 0;
+    color: #4ade80;
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+/* Khusus untuk KOHATI, angka/list berubah warna keaksen Pink otomatis */
+.vm-card[style*="#f472b6"] .rich-text-content ol li::before { 
+    color: #f472b6 !important; 
+}
+
 /* GRID SYSTEMS */
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
@@ -97,34 +177,27 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ==============================================================
-   ANNOUNCEMENT POP-UP (FIXED: SIZE DIPERKECIL & PROPORSIONAL)
+   ANNOUNCEMENT POP-UP (HORIZONTAL FIXED & PROPORTIONAL)
 ============================================================== */
 .announce-overlay {
-    z-index: 9999999; /* Selalu di atas */
-    padding: 15px; /* Memberikan batas layar agar pop-up tidak menyentuh ujung HP */
+    z-index: 9999999;
+    padding: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.75); 
-    backdrop-filter: blur(10px);
 }
 
 .announce-horizontal {
     display: flex;
     flex-direction: row;
-    max-width: 750px; /* DIPERKECIL untuk tampilan Desktop agar tidak memakan layar */
+    max-width: 900px; 
     width: 100%;
-    max-height: 65vh; /* DIPERKECIL: Hanya 65% dari tinggi layar agar proporsional */
-    background: #064e3b; 
+    max-height: 80vh; 
+    background: #112d22; 
     border-radius: 16px;
-    overflow: hidden; /* Kontainer utama tetap statis */
+    overflow: hidden;
     position: relative;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
     border: 2px solid rgba(74,222,128,0.3);
 }
 
@@ -132,12 +205,12 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     position: absolute;
     top: 15px;
     right: 15px;
-    z-index: 50; 
-    background: rgba(0,0,0,0.6); 
+    z-index: 30; 
+    background: rgba(0,0,0,0.5);
     border-radius: 50%;
     padding: 8px;
     color: #fff;
-    border: 1px solid rgba(255,255,255,0.3);
+    border: 1px solid rgba(255,255,255,0.2);
     cursor: pointer;
     transition: 0.3s;
     display: flex;
@@ -145,15 +218,12 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     justify-content: center;
 }
 
-.announce-close-btn:hover { 
-    background: rgba(239,68,68,0.9); 
-    border-color: #ef4444; 
-}
+.announce-close-btn:hover { background: rgba(239,68,68,0.9); }
 
 .announce-left {
     flex: 0 0 45%; 
     max-width: 45%;
-    padding: 20px; /* Jarak aman di sekitar gambar */
+    padding: 30px; 
     background: transparent; 
     display: flex;
     align-items: center;
@@ -166,51 +236,28 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     max-height: 100%;
     width: 100%; 
     height: auto;
-    object-fit: contain; /* Gambar tidak akan terpotong / melonjong */
+    object-fit: contain; 
     border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
 }
 
 .announce-right {
     flex: 1; 
-    padding: 30px 25px 30px 0; /* Padding disesuaikan dengan tinggi baru */
+    padding: 40px 30px 40px 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    overflow-y: auto; /* SCROLL KHUSUS HANYA UNTUK TEKS */
+    overflow-y: auto; 
 }
 
-.announce-title { 
-    color: #fff; 
-    margin-bottom: 10px; 
-    font-size: 1.4rem; /* Diperkecil agar lebih rapi */
-    font-weight: 800; 
-    line-height: 1.3; 
-    padding-right: 35px; /* Mencegah judul menabrak tombol X */
-}
-
-.announce-divider { 
-    width: 30px; 
-    height: 3px; 
-    background: #4ade80; 
-    margin-bottom: 15px; 
-    border-radius: 2px; 
-    flex-shrink: 0; 
-}
-
-.announce-text { 
-    color: #d1d5db; 
-    margin-bottom: 20px; 
-    line-height: 1.6; 
-    font-size: 0.85rem; /* Font size disesuaikan */
-    border-left: 3px solid rgba(74, 222, 128, 0.4); 
-    padding-left: 15px; 
-}
+.announce-title { color: #fff; margin-bottom: 10px; font-size: 1.6rem; font-weight: 800; line-height: 1.2; padding-right: 35px; }
+.announce-divider { width: 40px; height: 4px; background: #4ade80; margin-bottom: 20px; border-radius: 2px; flex-shrink: 0; }
+.announce-text { color: #d1d5db; margin-bottom: 30px; line-height: 1.6; font-size: 0.95rem; border-left: 3px solid rgba(74, 222, 128, 0.4); padding-left: 15px; }
 
 .announce-btn {
     align-self: flex-start;
-    padding: 8px 20px;
-    font-size: 0.85rem;
+    padding: 10px 24px;
+    font-size: 0.95rem;
     border-radius: 8px;
     font-weight: bold;
     background: transparent;
@@ -329,13 +376,6 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .team-name { font-size: 1.1rem; margin-bottom: 5px; }
 .team-role { color: #4ade80; font-size: 0.85rem; font-weight: bold; }
 
-.vision-mission-card { padding: 40px; position: relative; overflow: hidden; }
-.vision-mission-card.v-left { border-left: 5px solid #22c55e; background: rgba(0,0,0,0.4); }
-.vision-mission-card.m-left { border-left: 5px solid #34d399; background: rgba(6,78,59,0.4); }
-.icon-box { width: 50px; height: 50px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-.list-custom li { display: flex; gap: 15px; margin-bottom: 15px; color: #d1d5db; }
-.list-num { color: #22c55e; font-weight: bold; }
-
 .gallery-card { padding: 15px; text-align: left; display: block; transition: 0.3s; }
 .gallery-img-box { height: 220px; border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
 .gallery-img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
@@ -376,38 +416,26 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     .panel-header { flex-direction: column; gap: 15px; text-align: center; }
     .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
     
-    /* FIX ANNOUNCEMENT KHUSUS MOBILE: DIPERKECIL & SCROLL HANYA TEKS */
-    .announce-horizontal { 
-        flex-direction: column !important; 
-        max-height: 75vh; /* DIPERKECIL agar tidak memenuhi layar HP */
-        width: 95%; /* Beri ruang agar tidak menempel di sisi kiri-kanan HP */
-        overflow: hidden; /* Kontainer utama diam/statis */
+    /* FIX ANNOUNCEMENT HORIZONTAL TO VERTIKAL DI MOBILE */
+    .announce-container { 
+        grid-template-columns: 1fr; 
+        max-height: 80vh; 
+        overflow-y: auto; 
     }
     
     .announce-left { 
-        max-width: 100% !important; 
-        flex: none; 
         padding: 15px; 
-        padding-top: 25px; /* Beri jarak agar tombol X tidak tertimpa gambar */
-        height: 25vh; /* DIKECILKAN agar area teks lebih luas */
-        min-height: 150px;
-        background: transparent; 
+        background: transparent;
+        height: 200px; 
         border-bottom: 1px solid rgba(255,255,255,0.1); 
     }
     
-    .announce-left img { 
-        max-height: 100%; 
-        width: auto; 
-        margin: 0 auto; 
-    }
-    
     .announce-right { 
-        flex: 1; /* Ambil sisa ruang yang ada di dalam 75vh */
         padding: 20px !important; 
-        overflow-y: auto; /* SCROLL HANYA PADA TEKS JIKA PANJANG */
+        overflow-y: visible; 
     }
     
-    .announce-title { font-size: 1.2rem; padding-right: 0; }
+    .announce-title { font-size: 1.3rem; padding-right: 0; }
 }
 
 ::-webkit-scrollbar { width: 8px; }
