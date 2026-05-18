@@ -22,7 +22,7 @@
 <!-- ==============================================================
      TAB 1: KELOLA DATA UTAMA & KOHATI
 ============================================================== -->
-<div id="adm-kelola" class="tab-content active">
+<div id="adm-kelola" class="admin-tab-pane active">
     <div class="grid-3" style="align-items: start;">
         <div class="admin-main-content">
             
@@ -111,7 +111,7 @@
                 </div>
             </div>
 
-            <!-- PENGURUS & BIDANG KOHATI (BARU) -->
+            <!-- PENGURUS & BIDANG KOHATI -->
             <div class="glass admin-panel" style="border: 1px solid rgba(244,114,182,0.3);">
                 <div class="panel-header">
                     <h3 class="panel-title" style="color:#f472b6;"><i data-lucide="heart"></i> Pengurus Harian (KOHATI)</h3>
@@ -213,7 +213,7 @@
 <!-- ==============================================================
      TAB 2: HEADER, FOOTER, & TENTANG (SETELAN WEB)
 ============================================================== -->
-<div id="adm-setelan" class="tab-content">
+<div id="adm-setelan" class="admin-tab-pane">
     <div class="grid-2">
         <div class="glass admin-panel">
             <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="layout"></i> Header & Footer</h3>
@@ -268,7 +268,6 @@
 
         <div class="glass admin-panel">
             <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="file-text"></i> Halaman Tentang Kami</h3>
-            <!-- Di submit ke endpoint yang sama (setelan-web) -->
             <form action="/admin/setelan-web" method="POST" enctype="multipart/form-data" id="formSetelanTentang">
                 <div class="form-group">
                     <label>Teks Profil</label>
@@ -285,7 +284,7 @@
                     <textarea name="mapsEmbed" class="input-control" rows="3" placeholder='<iframe src="..."></iframe>'><%= siteSettings.mapsEmbed %></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Upload Booklet / Pedoman PDF (Akan tampil slide di Tab Profil)</label>
+                    <label>Upload Booklet / Pedoman PDF</label>
                     <input type="file" name="bookletPdf" class="input-control file-to-b64" accept="application/pdf">
                     <% if(siteSettings.bookletPdf) { %><p class="form-hint" style="color:#4ade80;">File booklet saat ini sudah terpasang.</p><% } %>
                 </div>
@@ -300,7 +299,7 @@
 <!-- ==============================================================
      TAB 3: SHORTLINK CUSTOM
 ============================================================== -->
-<div id="adm-shortlink" class="tab-content">
+<div id="adm-shortlink" class="admin-tab-pane">
     <div class="glass admin-panel" style="max-width:800px; margin:0 auto;">
         <div class="panel-header">
             <h3 class="panel-title"><i data-lucide="link"></i> Shortlink Custom</h3>
@@ -331,7 +330,7 @@
 <!-- ==============================================================
      TAB 4: ANNOUNCEMENT
 ============================================================== -->
-<div id="adm-announce" class="tab-content">
+<div id="adm-announce" class="admin-tab-pane">
     <div class="glass admin-panel" style="max-width:800px; margin:0 auto;">
         <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="bell"></i> Setelan Announcement Pop-up</h3>
         <p class="text-muted" style="margin-bottom:30px; font-size:0.9rem;">Pengumuman akan muncul di beranda sebagai popup saat pengunjung membuka web.</p>
@@ -362,11 +361,6 @@
 </div>
 
 <!-- ================= MODALS AREA ================= -->
-<script>
-    const albumsData = <%- JSON.stringify(albums) %>;
-    const newsData = <%- JSON.stringify(news) %>;
-</script>
-
 <!-- Modals Sosmed & Shortlink -->
 <div class="modal-overlay" id="modalSosmed">
     <div class="modal-content">
@@ -412,7 +406,7 @@
     </div>
 </div>
 
-<!-- Modal Berita, Galeri, Pengurus (Existing dengan Quill dan Batal button) -->
+<!-- Modal Berita, Galeri, Pengurus (Dengan Quill dan Batal button) -->
 <div class="modal-overlay" id="modalBerita">
     <div class="modal-content" style="max-width: 800px;">
         <div class="modal-header"><h3>Tambah Berita Baru</h3><button type="button" class="close-modal" onclick="closeModal('modalBerita')"><i data-lucide="x"></i></button></div>
@@ -573,7 +567,7 @@
     </div>
 </div>
 
-<!-- Modal KOHATI (BARU) -->
+<!-- Modal KOHATI -->
 <div class="modal-overlay" id="modalKohatiPengurus">
     <div class="modal-content" style="border-color:#f472b6;">
         <div class="modal-header"><h3 style="color:#f472b6;">Tambah Pengurus Kohati</h3><button type="button" class="close-modal" onclick="closeModal('modalKohatiPengurus')"><i data-lucide="x"></i></button></div>
@@ -581,7 +575,7 @@
             <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" class="input-control" required></div>
             <div class="form-group"><label>Jabatan</label><input type="text" name="role" class="input-control" required></div>
             <div class="form-group"><label>Upload Foto</label><input type="file" name="image" class="input-control file-compress" accept="image/*" required></div>
-            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalKohatiPengurus')">Batal</button><button type="submit" class="btn btn-primary submit-btn" style="background:#f472b6; box-shadow:0 4px 15px rgba(244,114,182,0.3); color:#fff;">Simpan</button></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalKohatiPengurus')">Batal</button><button type="submit" class="btn btn-primary submit-btn" style="background:#f472b6; border-color:#f472b6; color:#fff;">Simpan</button></div>
         </form>
     </div>
 </div>
@@ -592,7 +586,7 @@
             <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" id="editKohatiPengurusName" class="input-control" required></div>
             <div class="form-group"><label>Jabatan</label><input type="text" name="role" id="editKohatiPengurusRole" class="input-control" required></div>
             <div class="form-group"><label>Upload Foto (Opsional)</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
-            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditKohatiPengurus')">Batal</button><button type="submit" class="btn btn-primary submit-btn" style="background:#f472b6; color:#fff;">Update</button></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditKohatiPengurus')">Batal</button><button type="submit" class="btn btn-primary submit-btn" style="background:#f472b6; border-color:#f472b6; color:#fff;">Update</button></div>
         </form>
     </div>
 </div>
@@ -602,7 +596,7 @@
         <div class="modal-header"><h3 style="color:#f472b6;">Tambah Bidang Kohati</h3><button type="button" class="close-modal" onclick="closeModal('modalKohatiBidang')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-kohati-bidang" method="POST">
             <div class="form-group"><label>Nama Bidang</label><input type="text" name="bidang_name" class="input-control" required></div>
-            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalKohatiBidang')">Batal</button><button type="submit" class="btn btn-primary" style="background:#f472b6; color:#fff;">Buat Bidang</button></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalKohatiBidang')">Batal</button><button type="submit" class="btn btn-primary" style="background:#f472b6; border-color:#f472b6; color:#fff;">Buat Bidang</button></div>
         </form>
     </div>
 </div>
@@ -611,7 +605,7 @@
         <div class="modal-header"><h3 style="color:#f472b6;">Edit Bidang Kohati</h3><button type="button" class="close-modal" onclick="closeModal('modalEditKohatiBidang')"><i data-lucide="x"></i></button></div>
         <form id="formEditKohatiBidang" method="POST">
             <div class="form-group"><label>Nama Bidang</label><input type="text" name="bidang_name" id="editKohatiBidangName" class="input-control" required></div>
-            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditKohatiBidang')">Batal</button><button type="submit" class="btn btn-primary" style="background:#f472b6; color:#fff;">Update Bidang</button></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditKohatiBidang')">Batal</button><button type="submit" class="btn btn-primary" style="background:#f472b6; border-color:#f472b6; color:#fff;">Update Bidang</button></div>
         </form>
     </div>
 </div>
@@ -622,7 +616,7 @@
         <form id="formKohatiAnggotaBidang" method="POST" enctype="multipart/form-data">
             <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" class="input-control" required></div>
             <div class="form-group"><label>Upload Foto</label><input type="file" name="image" class="input-control file-compress" accept="image/*" required></div>
-            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalKohatiAnggotaBidang')">Batal</button><button type="submit" class="btn btn-primary submit-btn" style="background:#f472b6; color:#fff;">Simpan</button></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalKohatiAnggotaBidang')">Batal</button><button type="submit" class="btn btn-primary submit-btn" style="background:#f472b6; border-color:#f472b6; color:#fff;">Simpan</button></div>
         </form>
     </div>
 </div>
@@ -632,7 +626,7 @@
         <form id="formEditKohatiAnggotaBidang" method="POST" enctype="multipart/form-data">
             <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" id="editKohatiAnggotaBidangName" class="input-control" required></div>
             <div class="form-group"><label>Upload Foto (Opsional)</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
-            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditKohatiAnggotaBidang')">Batal</button><button type="submit" class="btn btn-primary submit-btn" style="background:#f472b6; color:#fff;">Update Data</button></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditKohatiAnggotaBidang')">Batal</button><button type="submit" class="btn btn-primary submit-btn" style="background:#f472b6; border-color:#f472b6; color:#fff;">Update Data</button></div>
         </form>
     </div>
 </div>
@@ -647,29 +641,36 @@
     }
 
     // INISIALISASI QUILL.JS
-    var toolbarOptions = [['bold', 'italic', 'underline', 'strike'], ['blockquote'], [{ 'header': 1 }, { 'header': 2 }], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'size': ['small', false, 'large', 'huge'] }], [{ 'color': [] }, { 'background': [] }], [{ 'align': [] }], ['clean']];
-    var qConfig = { theme: 'snow', modules: { toolbar: toolbarOptions } };
-    var quillTambah = new Quill('#quill-tambah', qConfig);
-    var quillEdit = new Quill('#quill-edit', qConfig);
-    var quillProfil = new Quill('#quill-profil', qConfig);
-    var quillVisi = new Quill('#quill-visimisi', qConfig);
-    var quillAnnounce = new Quill('#quill-announce', qConfig);
+    document.addEventListener('DOMContentLoaded', function() {
+        var toolbarOptions = [['bold', 'italic', 'underline', 'strike'], ['blockquote'], [{ 'header': 1 }, { 'header': 2 }], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'size': ['small', false, 'large', 'huge'] }], [{ 'color': [] }, { 'background': [] }], [{ 'align': [] }], ['clean']];
+        var qConfig = { theme: 'snow', modules: { toolbar: toolbarOptions } };
+        
+        var quillTambah = new Quill('#quill-tambah', qConfig);
+        var quillEdit = new Quill('#quill-edit', qConfig);
+        var quillProfil = new Quill('#quill-profil', qConfig);
+        var quillVisi = new Quill('#quill-visimisi', qConfig);
+        var quillAnnounce = new Quill('#quill-announce', qConfig);
 
-    // Init values for setelan
-    quillProfil.root.innerHTML = document.getElementById('raw-profil').innerHTML;
-    quillVisi.root.innerHTML = document.getElementById('raw-visimisi').innerHTML;
-    quillAnnounce.root.innerHTML = document.getElementById('raw-announce').innerHTML;
+        // Init values for setelan
+        quillProfil.root.innerHTML = document.getElementById('raw-profil').innerHTML;
+        quillVisi.root.innerHTML = document.getElementById('raw-visimisi').innerHTML;
+        quillAnnounce.root.innerHTML = document.getElementById('raw-announce').innerHTML;
 
-    // Submit Forms Setelan
-    document.getElementById('formSetelanTentang').onsubmit = function() {
-        document.getElementById('hidden-profil').value = quillProfil.root.innerHTML;
-        document.getElementById('hidden-visimisi').value = quillVisi.root.innerHTML;
-    };
-    document.getElementById('formAnnounce').onsubmit = function() {
-        document.getElementById('hidden-announce').value = quillAnnounce.root.innerHTML;
-    };
-    document.getElementById('formTambahBerita').onsubmit = function() { document.getElementById('content-tambah').value = quillTambah.root.innerHTML; };
-    document.getElementById('formEditBerita').onsubmit = function() { document.getElementById('content-edit').value = quillEdit.root.innerHTML; };
+        // Submit Forms Setelan
+        document.getElementById('formSetelanTentang').onsubmit = function() {
+            document.getElementById('hidden-profil').value = quillProfil.root.innerHTML;
+            document.getElementById('hidden-visimisi').value = quillVisi.root.innerHTML;
+        };
+        document.getElementById('formAnnounce').onsubmit = function() {
+            document.getElementById('hidden-announce').value = quillAnnounce.root.innerHTML;
+        };
+        document.getElementById('formTambahBerita').onsubmit = function() { 
+            document.getElementById('content-tambah').value = quillTambah.root.innerHTML; 
+        };
+        document.getElementById('formEditBerita').onsubmit = function() { 
+            document.getElementById('content-edit').value = quillEdit.root.innerHTML; 
+        };
+    });
 
     function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
@@ -677,26 +678,11 @@
     // DATA ANGGOTA (PDF)
     function openEditDataAnggotaModal(id, title, date) { document.getElementById('editDataAnggotaTitle').value = title; document.getElementById('editDataAnggotaDate').value = date; document.getElementById('formEditDataAnggota').action = '/admin/edit-data-anggota/' + id; openModal('modalEditDataAnggota'); }
 
-    document.querySelectorAll('.file-to-b64').forEach(input => {
-        input.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const submitBtn = input.closest('form').querySelector('.submit-btn');
-                const originalText = submitBtn.innerText; submitBtn.innerText = 'Memproses File...'; submitBtn.disabled = true;
-                const reader = new FileReader(); reader.readAsDataURL(file);
-                reader.onload = () => {
-                    let hidden = input.parentElement.querySelector('.b64-hidden');
-                    if (!hidden) { hidden = document.createElement('input'); hidden.type = 'hidden'; hidden.name = input.name + '_b64'; hidden.className = 'b64-hidden'; input.parentElement.appendChild(hidden); }
-                    hidden.value = reader.result; submitBtn.innerText = originalText; submitBtn.disabled = false;
-                };
-            }
-        });
-    });
-
     // BERITA
     function openEditBeritaModal(id, title, category, date) {
         document.getElementById('editBeritaTitle').value = title; document.getElementById('editBeritaCategory').value = category; document.getElementById('editBeritaDate').value = date;
-        quillEdit.root.innerHTML = document.getElementById('raw-content-' + id).innerHTML;
+        var editEditor = Quill.find(document.getElementById('quill-edit'));
+        editEditor.root.innerHTML = document.getElementById('raw-content-' + id).innerHTML;
         document.getElementById('formEditBerita').action = '/admin/edit-berita/' + id; openModal('modalEditBerita');
     }
 
@@ -707,8 +693,9 @@
         const grid = document.getElementById('existingPhotosBeritaGrid'); grid.innerHTML = '';
         if (berita.photos && berita.photos.length > 0) {
             berita.photos.forEach(p => {
-                grid.innerHTML += `<div style="position:relative; background:rgba(255,255,255,0.05); padding:5px; border-radius:8px;"><img src="${p.url}" style="width:100%; height:80px; object-fit:cover; border-radius:4px;"><form action="/admin/hapus-foto-berita/${berita.id}/${p.id}" method="POST" style="position:absolute; top:8px; right:8px;"><button type="submit" style="background:rgba(239,68,68,0.8); color:#fff; border:none; border-radius:4px; padding:4px; cursor:pointer;" onclick="return confirm('Hapus foto ini?')"><svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button></form></div>`;
+                grid.innerHTML += `<div style="position:relative; background:rgba(255,255,255,0.05); padding:5px; border-radius:8px;"><img src="${p.url}" style="width:100%; height:80px; object-fit:cover; border-radius:4px;"><form action="/admin/hapus-foto-berita/${berita.id}/${p.id}" method="POST" style="position:absolute; top:8px; right:8px;"><button type="submit" style="background:rgba(239,68,68,0.8); color:#fff; border:none; border-radius:4px; padding:4px; cursor:pointer;" onclick="return confirm('Hapus foto ini?')"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></form></div>`;
             });
+            lucide.createIcons();
         } else { grid.innerHTML = '<p class="text-muted" style="grid-column: 1 / -1;">Belum ada foto.</p>'; }
         openModal('modalKelolaFotoBerita');
     }
@@ -734,8 +721,9 @@
         const grid = document.getElementById('existingPhotosGrid'); grid.innerHTML = '';
         if (album.photos && album.photos.length > 0) {
             album.photos.forEach(p => {
-                grid.innerHTML += `<div style="position:relative; background:rgba(255,255,255,0.05); padding:5px; border-radius:8px;"><img src="${p.url}" style="width:100%; height:80px; object-fit:cover; border-radius:4px;"><form action="/admin/hapus-foto-album/${album.id}/${p.id}" method="POST" style="position:absolute; top:8px; right:8px;"><button type="submit" style="background:rgba(239,68,68,0.8); color:#fff; border:none; border-radius:4px; padding:4px; cursor:pointer;" onclick="return confirm('Hapus foto?')"><svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button></form></div>`;
+                grid.innerHTML += `<div style="position:relative; background:rgba(255,255,255,0.05); padding:5px; border-radius:8px;"><img src="${p.url}" style="width:100%; height:80px; object-fit:cover; border-radius:4px;"><form action="/admin/hapus-foto-album/${album.id}/${p.id}" method="POST" style="position:absolute; top:8px; right:8px;"><button type="submit" style="background:rgba(239,68,68,0.8); color:#fff; border:none; border-radius:4px; padding:4px; cursor:pointer;" onclick="return confirm('Hapus foto?')"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></form></div>`;
             });
+            lucide.createIcons();
         } else { grid.innerHTML = '<p class="text-muted" style="grid-column: 1 / -1;">Belum ada foto.</p>'; }
         openModal('modalKelolaFotoAlbum');
     }
@@ -791,6 +779,22 @@
                     }
                 }
                 submitBtn.innerText = originalText; submitBtn.disabled = false;
+            }
+        });
+    });
+
+    document.querySelectorAll('.file-to-b64').forEach(input => {
+        input.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const submitBtn = input.closest('form').querySelector('.submit-btn');
+                const originalText = submitBtn.innerText; submitBtn.innerText = 'Memproses PDF...'; submitBtn.disabled = true;
+                const reader = new FileReader(); reader.readAsDataURL(file);
+                reader.onload = () => {
+                    let hidden = input.parentElement.querySelector('.b64-hidden');
+                    if (!hidden) { hidden = document.createElement('input'); hidden.type = 'hidden'; hidden.name = input.name + '_b64'; hidden.className = 'b64-hidden'; input.parentElement.appendChild(hidden); }
+                    hidden.value = reader.result; submitBtn.innerText = originalText; submitBtn.disabled = false;
+                };
             }
         });
     });
