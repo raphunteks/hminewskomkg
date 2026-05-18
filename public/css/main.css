@@ -59,7 +59,7 @@ h1, h2, h3, h4, h5 { color: #fff; margin-bottom: 0.5rem; line-height: 1.3; }
 input[type="file"].input-control { padding: 10px; background: rgba(255,255,255,0.05); color: #4ade80; cursor: pointer; }
 select.input-control option { background: #1f2937; color: #fff; }
 
-/* QUILL.JS CUSTOM DARK THEME STYLES */
+/* QUILL.JS CUSTOM DARK THEME STYLES (WORD EDITOR) */
 .ql-toolbar.ql-snow { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15) !important; border-top-left-radius: 12px; border-top-right-radius: 12px; }
 .ql-container.ql-snow { border: 1px solid rgba(255,255,255,0.15) !important; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; background: rgba(0,0,0,0.4); font-family: inherit; font-size: 0.95rem; }
 .ql-snow .ql-stroke { stroke: #d1d5db; }
@@ -97,11 +97,11 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ==============================================================
-   ANNOUNCEMENT POP-UP (FIXED: KONSISTEN, ANTI-MELONJONG, WARNA HIJAU)
+   ANNOUNCEMENT POP-UP (FIXED: SIZE DIPERKECIL & PROPORSIONAL)
 ============================================================== */
 .announce-overlay {
-    z-index: 9999999; /* Pastikan selalu berada paling atas */
-    padding: 20px;
+    z-index: 9999999; /* Selalu di atas */
+    padding: 15px; /* Memberikan batas layar agar pop-up tidak menyentuh ujung HP */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -110,19 +110,19 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.75); /* Sedikit lebih gelap agar popup menonjol */
+    background: rgba(0,0,0,0.75); 
     backdrop-filter: blur(10px);
 }
 
 .announce-horizontal {
     display: flex;
     flex-direction: row;
-    max-width: 800px; /* Ukuran Desktop sedikit diperkecil agar pas */
+    max-width: 750px; /* DIPERKECIL untuk tampilan Desktop agar tidak memakan layar */
     width: 100%;
-    max-height: 75vh; /* Menghindari pop-up kebesaran */
-    background: #064e3b; /* WARNA HIJAU GELAP SOLID */
+    max-height: 65vh; /* DIPERKECIL: Hanya 65% dari tinggi layar agar proporsional */
+    background: #064e3b; 
     border-radius: 16px;
-    overflow: hidden;
+    overflow: hidden; /* Kontainer utama tetap statis */
     position: relative;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
     border: 2px solid rgba(74,222,128,0.3);
@@ -132,8 +132,8 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     position: absolute;
     top: 15px;
     right: 15px;
-    z-index: 50; /* Z-index tinggi agar selalu bisa di-klik */
-    background: rgba(0,0,0,0.6); /* Background lebih pekat agar tombol "X" terlihat jelas */
+    z-index: 50; 
+    background: rgba(0,0,0,0.6); 
     border-radius: 50%;
     padding: 8px;
     color: #fff;
@@ -153,8 +153,8 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .announce-left {
     flex: 0 0 45%; 
     max-width: 45%;
-    padding: 25px; /* Memberikan border semu (jarak aman) di sisi gambar */
-    background: #064e3b; /* Dipastikan warnanya hijau senada */
+    padding: 20px; /* Jarak aman di sekitar gambar */
+    background: transparent; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -166,33 +166,32 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     max-height: 100%;
     width: 100%; 
     height: auto;
-    object-fit: contain; /* Gambar tidak akan pernah melonjong / distorsi */
+    object-fit: contain; /* Gambar tidak akan terpotong / melonjong */
     border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.4); 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
 }
 
 .announce-right {
     flex: 1; 
-    padding: 35px 25px 35px 0; /* Padding kanan & atas/bawah. Kiri 0 krn padding gambar sudah cukup */
+    padding: 30px 25px 30px 0; /* Padding disesuaikan dengan tinggi baru */
     display: flex;
     flex-direction: column;
     justify-content: center;
-    overflow-y: auto; /* SCROLL KHUSUS UNTUK TEKS SAJA JIKA PANJANG */
-    background: #064e3b; /* Hijau senada */
+    overflow-y: auto; /* SCROLL KHUSUS HANYA UNTUK TEKS */
 }
 
 .announce-title { 
     color: #fff; 
     margin-bottom: 10px; 
-    font-size: 1.6rem; /* Ukuran font disesuaikan */
+    font-size: 1.4rem; /* Diperkecil agar lebih rapi */
     font-weight: 800; 
     line-height: 1.3; 
-    padding-right: 40px; /* Jarak aman agar judul tidak tertutup tombol silang (X) */
+    padding-right: 35px; /* Mencegah judul menabrak tombol X */
 }
 
 .announce-divider { 
-    width: 40px; 
-    height: 4px; 
+    width: 30px; 
+    height: 3px; 
     background: #4ade80; 
     margin-bottom: 15px; 
     border-radius: 2px; 
@@ -201,17 +200,17 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 
 .announce-text { 
     color: #d1d5db; 
-    margin-bottom: 25px; 
+    margin-bottom: 20px; 
     line-height: 1.6; 
-    font-size: 0.9rem; 
+    font-size: 0.85rem; /* Font size disesuaikan */
     border-left: 3px solid rgba(74, 222, 128, 0.4); 
     padding-left: 15px; 
 }
 
 .announce-btn {
     align-self: flex-start;
-    padding: 10px 24px;
-    font-size: 0.9rem;
+    padding: 8px 20px;
+    font-size: 0.85rem;
     border-radius: 8px;
     font-weight: bold;
     background: transparent;
@@ -219,7 +218,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     color: #4ade80;
     cursor: pointer;
     transition: 0.3s;
-    margin-top: auto; /* Mendorong tombol ke bagian paling bawah area konten */
+    margin-top: auto; 
 }
 .announce-btn:hover { background: #4ade80; color: #000; }
 
@@ -377,30 +376,22 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     .panel-header { flex-direction: column; gap: 15px; text-align: center; }
     .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
     
-    /* FIX ANNOUNCEMENT HORIZONTAL TO VERTIKAL DI MOBILE: UI PROPORSIONAL */
+    /* FIX ANNOUNCEMENT KHUSUS MOBILE: DIPERKECIL & SCROLL HANYA TEKS */
     .announce-horizontal { 
         flex-direction: column !important; 
-        max-height: 75vh; /* DIKECILKAN agar tidak menutupi seluruh layar */
-        overflow: hidden; 
-        background: #064e3b;
+        max-height: 75vh; /* DIPERKECIL agar tidak memenuhi layar HP */
+        width: 95%; /* Beri ruang agar tidak menempel di sisi kiri-kanan HP */
+        overflow: hidden; /* Kontainer utama diam/statis */
     }
     
-    .announce-close-btn {
-        top: 10px;
-        right: 10px;
-        padding: 6px;
-        background: rgba(0,0,0,0.6);
-        z-index: 50;
-    }
-
     .announce-left { 
         max-width: 100% !important; 
         flex: none; 
         padding: 15px; 
-        padding-top: 30px; /* Space for close button */
-        height: 30vh; /* Perkecil tinggi gambar di HP */
-        min-height: 180px;
-        background: #064e3b; 
+        padding-top: 25px; /* Beri jarak agar tombol X tidak tertimpa gambar */
+        height: 25vh; /* DIKECILKAN agar area teks lebih luas */
+        min-height: 150px;
+        background: transparent; 
         border-bottom: 1px solid rgba(255,255,255,0.1); 
     }
     
@@ -408,20 +399,15 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
         max-height: 100%; 
         width: auto; 
         margin: 0 auto; 
-        object-fit: contain;
     }
     
     .announce-right { 
-        flex: 1; /* Fill the rest */
-        padding: 20px 20px 25px 20px !important; /* Margin di sekeliling teks agar proporsional */
-        overflow-y: auto; /* Bisa discroll HANYA bagian teksnya */
-        background: #064e3b;
+        flex: 1; /* Ambil sisa ruang yang ada di dalam 75vh */
+        padding: 20px !important; 
+        overflow-y: auto; /* SCROLL HANYA PADA TEKS JIKA PANJANG */
     }
     
-    .announce-title { font-size: 1.25rem; padding-right: 0; margin-bottom: 8px; }
-    .announce-divider { margin-bottom: 12px; }
-    .announce-text { font-size: 0.85rem; margin-bottom: 20px; line-height: 1.5; padding-left: 12px; }
-    .announce-btn { margin-top: 10px; padding: 8px 20px; font-size: 0.85rem; }
+    .announce-title { font-size: 1.2rem; padding-right: 0; }
 }
 
 ::-webkit-scrollbar { width: 8px; }
