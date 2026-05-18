@@ -12,8 +12,15 @@
 
 <div id="tab-profil" class="tab-content active">
     <div class="glass" style="padding: 40px; margin-bottom: 40px;">
-        <h2 style="border-bottom: 1px solid rgba(34,197,94,0.3); padding-bottom:10px; margin-bottom:20px; display:inline-block;" class="text-gradient">Profil</h2>
-        <div class="rich-text-content"><%- siteSettings.profilText %></div>
+        <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size:1.8rem;">Profil</h2>
+        <div class="rich-text-content" style="margin-bottom: 40px; font-size:1.05rem; line-height:1.7;">
+            <%- siteSettings.profilText || '' %>
+        </div>
+
+        <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size:1.8rem;">Welcome</h2>
+        <div class="rich-text-content" style="font-size:1.05rem; line-height:1.7;">
+            <%- siteSettings.welcomeText || '' %>
+        </div>
         
         <!-- MODULE BOOKLET PDF & MAPS -->
         <% if (siteSettings.bookletPdf || siteSettings.mapsEmbed) { %>
@@ -37,11 +44,22 @@
 
 <div id="tab-visimisi" class="tab-content">
     <div style="text-align: center; margin-bottom: 30px;">
-        <h2>Visi dan Misi</h2>
-        <p class="text-muted">Arah juang Komisariat Kedokteran Gigi UMI.</p>
+        <h2 style="font-size:2rem; margin-bottom:10px;">Visi dan Misi</h2>
+        <p class="text-muted" style="font-size:1.05rem;">Panduan bagi HMI Komisariat Kedokteran Gigi UMI untuk merencanakan kegiatan organisasi.</p>
     </div>
-    <div class="glass" style="padding: 40px; margin-bottom: 50px;">
-        <div class="rich-text-content"><%- siteSettings.visiMisiText %></div>
+    
+    <div style="max-width: 900px; margin: 0 auto; margin-bottom: 50px;">
+        <div class="vm-card">
+            <div class="vm-icon">🚀</div>
+            <h3 class="vm-title">Visi</h3>
+            <div class="rich-text-content"><%- siteSettings.visiText || '' %></div>
+        </div>
+
+        <div class="vm-card">
+            <div class="vm-icon">📈</div>
+            <h3 class="vm-title">Misi</h3>
+            <div class="rich-text-content"><%- siteSettings.misiText || '' %></div>
+        </div>
     </div>
 </div>
 
@@ -93,13 +111,26 @@
         <!-- PROFIL KOHATI -->
         <div style="margin-bottom: 50px;">
             <h2 style="color: #f472b6; margin-bottom: 20px; border-bottom: 1px solid rgba(244,114,182,0.3); padding-bottom: 10px; display: inline-block;"><i data-lucide="heart"></i> Profil KOHATI</h2>
-            <div class="rich-text-content"><%- siteSettings.kohatiProfilText %></div>
+            <div class="rich-text-content" style="font-size:1.05rem; line-height:1.7;">
+                <%- siteSettings.kohatiProfilText || '' %>
+            </div>
         </div>
 
         <!-- VISI & MISI KOHATI -->
         <div style="margin-bottom: 50px;">
-            <h2 style="color: #f472b6; margin-bottom: 20px; border-bottom: 1px solid rgba(244,114,182,0.3); padding-bottom: 10px; display: inline-block;"><i data-lucide="target"></i> Visi & Misi KOHATI</h2>
-            <div class="rich-text-content"><%- siteSettings.kohatiVisiMisiText %></div>
+            <h2 style="color: #f472b6; margin-bottom: 20px; border-bottom: 1px solid rgba(244,114,182,0.3); padding-bottom: 10px; display: inline-block; width:100%;"><i data-lucide="target"></i> Visi & Misi KOHATI</h2>
+            
+            <div class="vm-card" style="border-left-color: #f472b6; background: rgba(244,114,182,0.1);">
+                <div class="vm-icon" style="color: #f472b6;">🚀</div>
+                <h3 class="vm-title" style="color: #f472b6;">Visi KOHATI</h3>
+                <div class="rich-text-content"><%- siteSettings.kohatiVisiText || '' %></div>
+            </div>
+
+            <div class="vm-card" style="border-left-color: #f472b6; background: rgba(244,114,182,0.1);">
+                <div class="vm-icon" style="color: #f472b6;">📈</div>
+                <h3 class="vm-title" style="color: #f472b6;">Misi KOHATI</h3>
+                <div class="rich-text-content"><%- siteSettings.kohatiMisiText || '' %></div>
+            </div>
         </div>
 
         <div style="text-align: center;">
