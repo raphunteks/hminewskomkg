@@ -59,7 +59,7 @@ h1, h2, h3, h4, h5 { color: #fff; margin-bottom: 0.5rem; line-height: 1.3; }
 input[type="file"].input-control { padding: 10px; background: rgba(255,255,255,0.05); color: #4ade80; cursor: pointer; }
 select.input-control option { background: #1f2937; color: #fff; }
 
-/* QUILL.JS CUSTOM DARK THEME STYLES (WORD EDITOR) */
+/* QUILL.JS CUSTOM DARK THEME STYLES */
 .ql-toolbar.ql-snow { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15) !important; border-top-left-radius: 12px; border-top-right-radius: 12px; }
 .ql-container.ql-snow { border: 1px solid rgba(255,255,255,0.15) !important; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; background: rgba(0,0,0,0.4); font-family: inherit; font-size: 0.95rem; }
 .ql-snow .ql-stroke { stroke: #d1d5db; }
@@ -82,64 +82,6 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .rich-text-content a:hover { color: #22c55e; }
 .rich-text-content blockquote { border-left: 4px solid #22c55e; padding-left: 15px; margin-left: 0; font-style: italic; color: #9ca3af; background: rgba(255,255,255,0.05); padding:10px 15px; border-radius: 0 8px 8px 0; }
 
-/* NEW: KARTU VISI MISI YANG ELEGAN & PROPORSIONAL */
-.vm-card {
-    background: #064e3b; /* Warna solid dark green sesuai screenshot */
-    border-radius: 16px;
-    padding: 30px;
-    position: relative;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    overflow: hidden;
-    margin-bottom: 25px;
-}
-.vm-card::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 6px;
-    background: #4ade80; /* Garis aksen hijau muda di sebelah kiri */
-    border-radius: 6px 0 0 6px;
-}
-.vm-icon {
-    width: 45px;
-    height: 45px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-}
-.vm-title {
-    color: #4ade80;
-    font-size: 1.5rem;
-    margin-bottom: 15px;
-    font-weight: 800;
-}
-/* Memaksa list (Misi) di dalam kartu agar rapi dan bernomor hijau */
-.vm-card .rich-text-content ol {
-    list-style: none;
-    counter-reset: my-counter;
-    padding-left: 0;
-}
-.vm-card .rich-text-content ol li {
-    counter-increment: my-counter;
-    position: relative;
-    padding-left: 30px;
-    margin-bottom: 15px;
-    color: #d1d5db;
-}
-.vm-card .rich-text-content ol li::before {
-    content: counter(my-counter) ".";
-    position: absolute;
-    left: 0;
-    color: #4ade80;
-    font-weight: bold;
-}
-
 /* GRID SYSTEMS */
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
@@ -155,27 +97,34 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ==============================================================
-   ANNOUNCEMENT POP-UP (HORIZONTAL FIXED & PROPORTIONAL)
+   ANNOUNCEMENT POP-UP (FIXED: KONSISTEN, ANTI-MELONJONG, WARNA HIJAU)
 ============================================================== */
 .announce-overlay {
-    z-index: 9999999;
+    z-index: 9999999; /* Pastikan selalu berada paling atas */
     padding: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.75); /* Sedikit lebih gelap agar popup menonjol */
+    backdrop-filter: blur(10px);
 }
 
 .announce-horizontal {
     display: flex;
     flex-direction: row;
-    max-width: 900px; 
+    max-width: 800px; /* Ukuran Desktop sedikit diperkecil agar pas */
     width: 100%;
-    max-height: 80vh; 
-    background: #112d22; 
+    max-height: 75vh; /* Menghindari pop-up kebesaran */
+    background: #064e3b; /* WARNA HIJAU GELAP SOLID */
     border-radius: 16px;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
     border: 2px solid rgba(74,222,128,0.3);
 }
 
@@ -183,12 +132,12 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     position: absolute;
     top: 15px;
     right: 15px;
-    z-index: 30; 
-    background: rgba(0,0,0,0.5);
+    z-index: 50; /* Z-index tinggi agar selalu bisa di-klik */
+    background: rgba(0,0,0,0.6); /* Background lebih pekat agar tombol "X" terlihat jelas */
     border-radius: 50%;
     padding: 8px;
     color: #fff;
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
     cursor: pointer;
     transition: 0.3s;
     display: flex;
@@ -196,13 +145,16 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     justify-content: center;
 }
 
-.announce-close-btn:hover { background: rgba(239,68,68,0.9); }
+.announce-close-btn:hover { 
+    background: rgba(239,68,68,0.9); 
+    border-color: #ef4444; 
+}
 
 .announce-left {
     flex: 0 0 45%; 
     max-width: 45%;
-    padding: 30px; 
-    background: transparent; 
+    padding: 25px; /* Memberikan border semu (jarak aman) di sisi gambar */
+    background: #064e3b; /* Dipastikan warnanya hijau senada */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -214,28 +166,52 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     max-height: 100%;
     width: 100%; 
     height: auto;
-    object-fit: contain; 
+    object-fit: contain; /* Gambar tidak akan pernah melonjong / distorsi */
     border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4); 
 }
 
 .announce-right {
     flex: 1; 
-    padding: 40px 30px 40px 0;
+    padding: 35px 25px 35px 0; /* Padding kanan & atas/bawah. Kiri 0 krn padding gambar sudah cukup */
     display: flex;
     flex-direction: column;
     justify-content: center;
-    overflow-y: auto; 
+    overflow-y: auto; /* SCROLL KHUSUS UNTUK TEKS SAJA JIKA PANJANG */
+    background: #064e3b; /* Hijau senada */
 }
 
-.announce-title { color: #fff; margin-bottom: 10px; font-size: 1.6rem; font-weight: 800; line-height: 1.2; padding-right: 35px; }
-.announce-divider { width: 40px; height: 4px; background: #4ade80; margin-bottom: 20px; border-radius: 2px; flex-shrink: 0; }
-.announce-text { color: #d1d5db; margin-bottom: 30px; line-height: 1.6; font-size: 0.95rem; border-left: 3px solid rgba(74, 222, 128, 0.4); padding-left: 15px; }
+.announce-title { 
+    color: #fff; 
+    margin-bottom: 10px; 
+    font-size: 1.6rem; /* Ukuran font disesuaikan */
+    font-weight: 800; 
+    line-height: 1.3; 
+    padding-right: 40px; /* Jarak aman agar judul tidak tertutup tombol silang (X) */
+}
+
+.announce-divider { 
+    width: 40px; 
+    height: 4px; 
+    background: #4ade80; 
+    margin-bottom: 15px; 
+    border-radius: 2px; 
+    flex-shrink: 0; 
+}
+
+.announce-text { 
+    color: #d1d5db; 
+    margin-bottom: 25px; 
+    line-height: 1.6; 
+    font-size: 0.9rem; 
+    border-left: 3px solid rgba(74, 222, 128, 0.4); 
+    padding-left: 15px; 
+}
 
 .announce-btn {
     align-self: flex-start;
     padding: 10px 24px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     border-radius: 8px;
     font-weight: bold;
     background: transparent;
@@ -243,7 +219,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     color: #4ade80;
     cursor: pointer;
     transition: 0.3s;
-    margin-top: auto; 
+    margin-top: auto; /* Mendorong tombol ke bagian paling bawah area konten */
 }
 .announce-btn:hover { background: #4ade80; color: #000; }
 
@@ -354,6 +330,13 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .team-name { font-size: 1.1rem; margin-bottom: 5px; }
 .team-role { color: #4ade80; font-size: 0.85rem; font-weight: bold; }
 
+.vision-mission-card { padding: 40px; position: relative; overflow: hidden; }
+.vision-mission-card.v-left { border-left: 5px solid #22c55e; background: rgba(0,0,0,0.4); }
+.vision-mission-card.m-left { border-left: 5px solid #34d399; background: rgba(6,78,59,0.4); }
+.icon-box { width: 50px; height: 50px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.list-custom li { display: flex; gap: 15px; margin-bottom: 15px; color: #d1d5db; }
+.list-num { color: #22c55e; font-weight: bold; }
+
 .gallery-card { padding: 15px; text-align: left; display: block; transition: 0.3s; }
 .gallery-img-box { height: 220px; border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
 .gallery-img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
@@ -394,26 +377,51 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     .panel-header { flex-direction: column; gap: 15px; text-align: center; }
     .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
     
-    /* FIX ANNOUNCEMENT HORIZONTAL TO VERTIKAL DI MOBILE */
-    .announce-container { 
-        grid-template-columns: 1fr; 
-        max-height: 80vh; 
-        overflow-y: auto; 
+    /* FIX ANNOUNCEMENT HORIZONTAL TO VERTIKAL DI MOBILE: UI PROPORSIONAL */
+    .announce-horizontal { 
+        flex-direction: column !important; 
+        max-height: 75vh; /* DIKECILKAN agar tidak menutupi seluruh layar */
+        overflow: hidden; 
+        background: #064e3b;
     }
     
+    .announce-close-btn {
+        top: 10px;
+        right: 10px;
+        padding: 6px;
+        background: rgba(0,0,0,0.6);
+        z-index: 50;
+    }
+
     .announce-left { 
+        max-width: 100% !important; 
+        flex: none; 
         padding: 15px; 
-        background: transparent;
-        height: 200px; 
+        padding-top: 30px; /* Space for close button */
+        height: 30vh; /* Perkecil tinggi gambar di HP */
+        min-height: 180px;
+        background: #064e3b; 
         border-bottom: 1px solid rgba(255,255,255,0.1); 
     }
     
-    .announce-right { 
-        padding: 20px !important; 
-        overflow-y: visible; 
+    .announce-left img { 
+        max-height: 100%; 
+        width: auto; 
+        margin: 0 auto; 
+        object-fit: contain;
     }
     
-    .announce-title { font-size: 1.3rem; padding-right: 0; }
+    .announce-right { 
+        flex: 1; /* Fill the rest */
+        padding: 20px 20px 25px 20px !important; /* Margin di sekeliling teks agar proporsional */
+        overflow-y: auto; /* Bisa discroll HANYA bagian teksnya */
+        background: #064e3b;
+    }
+    
+    .announce-title { font-size: 1.25rem; padding-right: 0; margin-bottom: 8px; }
+    .announce-divider { margin-bottom: 12px; }
+    .announce-text { font-size: 0.85rem; margin-bottom: 20px; line-height: 1.5; padding-left: 12px; }
+    .announce-btn { margin-top: 10px; padding: 8px 20px; font-size: 0.85rem; }
 }
 
 ::-webkit-scrollbar { width: 8px; }
