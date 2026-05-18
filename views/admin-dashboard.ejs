@@ -2,704 +2,760 @@
 
 <div class="glass dashboard-header">
     <div class="admin-info">
-        <div class="admin-icon">
-            <img src="/img/logo-hmikomkgumi.png" alt="Admin HMI">
-        </div>
+        <div class="admin-icon"><img src="<%= siteSettings.headerLogo %>" alt="Admin HMI"></div>
         <div>
             <h2>Dashboard Admin</h2>
-            <p class="text-muted" style="margin:0;">Selamat datang, Anda login sebagai Admin.</p>
+            <p class="text-muted" style="margin:0;">Kelola Website HMI KomKGUMI</p>
         </div>
     </div>
-    <a href="/admin/logout" class="btn btn-danger"><i data-lucide="log-out" style="width:18px;"></i> Logout</a>
+    <a href="/admin/logout" class="btn btn-danger"><i data-lucide="log-out"></i> Logout</a>
 </div>
 
-<div class="grid-3" style="align-items: start;">
-    
-    <div class="admin-main-content">
-        
-        <!-- Panel Kelola Berita -->
-        <div class="glass admin-panel">
-            <div class="panel-header">
-                <h3 class="panel-title"><i data-lucide="file-text"></i> Kelola Berita</h3>
-                <button class="btn btn-primary" onclick="openModal('modalBerita')" style="padding:8px 15px; font-size:0.85rem;">+ Tambah Berita</button>
-            </div>
+<!-- NAVIGASI TAB ADMIN -->
+<div class="admin-tab-nav">
+    <button class="admin-tab-btn active" onclick="openAdmTab('adm-kelola')">1. Kelola Data</button>
+    <button class="admin-tab-btn" onclick="openAdmTab('adm-setelan')">2. Header, Footer & Tentang</button>
+    <button class="admin-tab-btn" onclick="openAdmTab('adm-shortlink')">3. Shortlink Custom</button>
+    <button class="admin-tab-btn" onclick="openAdmTab('adm-announce')">4. Announcement</button>
+</div>
+
+<!-- ==============================================================
+     TAB 1: KELOLA DATA UTAMA & KOHATI
+============================================================== -->
+<div id="adm-kelola" class="tab-content active">
+    <div class="grid-3" style="align-items: start;">
+        <div class="admin-main-content">
             
-            <div class="table-wrapper">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Judul Berita</th>
-                            <th>Kategori</th>
-                            <th style="text-align:right;">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% news.forEach(item => { %>
-                        <tr>
-                            <td class="fw-600">
-                                <%= item.title %>
-                                <div style="font-size:0.75rem; color:#4ade80; margin-top:3px;"><%= item.date %></div>
-                            </td>
-                            <td><span class="cat-badge"><%= item.category %></span></td>
-                            <td class="td-actions">
-                                <div id="raw-content-<%= item.id %>" style="display: none;"><%- item.content %></div>
-
-                                <button type="button" class="action-btn" style="color:#fff; border-color:rgba(255,255,255,0.3);" onclick="openKelolaFotoBerita('<%= item.id %>')" title="Tambah/Hapus Banyak Foto"><i data-lucide="image-plus"></i></button>
-                                
-                                <button type="button" class="action-btn edit" onclick="openEditBeritaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.category %>', '<%= item.date %>')" title="Edit Berita"><i data-lucide="edit"></i></button>
-                                
-                                <form action="/admin/hapus-berita/<%= item.id %>" method="POST" class="form-inline">
-                                    <button type="submit" class="action-btn delete" onclick="return confirm('Yakin ingin menghapus berita ini?')" title="Hapus Berita"><i data-lucide="trash-2"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Panel Kelola Pengurus Utama -->
-        <div class="glass admin-panel">
-            <div class="panel-header">
-                <h3 class="panel-title"><i data-lucide="users"></i> Kelola Pengurus Harian</h3>
-                <div class="panel-actions">
-                    <button class="btn btn-primary" onclick="openModal('modalPengurus')" style="padding:8px 15px; font-size:0.85rem;">+ Pengurus</button>
-                    <button class="btn btn-secondary" onclick="openModal('modalBidang')" style="padding:8px 15px; font-size:0.85rem;">+ Buat Bidang</button>
+            <div class="glass admin-panel">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i data-lucide="file-text"></i> Kelola Berita</h3>
+                    <button class="btn btn-primary" onclick="openModal('modalBerita')" style="padding:8px 15px; font-size:0.85rem;">+ Tambah Berita</button>
+                </div>
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead><tr><th>Judul Berita</th><th>Kategori</th><th style="text-align:right;">Aksi</th></tr></thead>
+                        <tbody>
+                            <% news.forEach(item => { %>
+                            <tr>
+                                <td class="fw-600"><%= item.title %><div style="font-size:0.75rem; color:#4ade80; margin-top:3px;"><%= item.date %></div></td>
+                                <td><span class="cat-badge"><%= item.category %></span></td>
+                                <td class="td-actions">
+                                    <div id="raw-content-<%= item.id %>" style="display: none;"><%- item.content %></div>
+                                    <button type="button" class="action-btn" style="color:#fff;" onclick="openKelolaFotoBerita('<%= item.id %>')" title="Kelola Foto"><i data-lucide="image-plus"></i></button>
+                                    <button type="button" class="action-btn edit" onclick="openEditBeritaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.category %>', '<%= item.date %>')" title="Edit Berita"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-berita/<%= item.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus berita?')"><i data-lucide="trash-2"></i></button></form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            
-            <div class="table-wrapper">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Foto</th>
-                            <th>Nama Pengurus</th>
-                            <th>Jabatan</th>
-                            <th style="text-align:right;">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% pengurus.forEach(person => { %>
-                        <tr>
-                            <td><img src="<%= person.image %>" style="width:40px; height:40px; border-radius:50%; object-fit:cover;"></td>
-                            <td class="fw-600"><%= person.name %></td>
-                            <td style="color:#4ade80; font-size:0.85rem;"><%= person.role %></td>
-                            <td class="td-actions">
-                                <button type="button" class="action-btn edit" onclick="openEditPengurusModal('<%= person.id %>', '<%= person.name.replace(/'/g, "\\'") %>', '<%= person.role.replace(/'/g, "\\'") %>')" title="Edit Data"><i data-lucide="edit"></i></button>
-                                <form action="/admin/hapus-pengurus/<%= person.id %>" method="POST" class="form-inline">
-                                    <button type="submit" class="action-btn delete" onclick="return confirm('Yakin menghapus pengurus ini?')" title="Hapus Pengurus"><i data-lucide="trash-2"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-            </div>
 
-            <!-- List Bidang & Anggotanya -->
-            <div class="bidang-container">
-                <h4 class="bidang-container-title">Daftar Bidang & Anggota</h4>
-                
-                <div class="bidang-list">
-                    <% bidang.forEach(b => { %>
-                        <div class="bidang-card">
-                            <div class="bidang-header">
-                                <h5 class="bidang-title"><%= b.name %></h5>
-                                <div>
-                                    <button type="button" class="btn btn-primary" style="padding:4px 10px; font-size:0.75rem;" onclick="openModalAnggotaBidang('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>')">+ Tambah Anggota</button>
-                                    <form action="/admin/hapus-bidang/<%= b.id %>" method="POST" class="form-inline" style="margin-left:5px;">
-                                        <button type="submit" class="action-btn delete" onclick="return confirm('Hapus seluruh bidang ini beserta anggotanya?')" title="Hapus Bidang"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button>
-                                    </form>
+            <!-- PENGURUS & BIDANG UMUM -->
+            <div class="glass admin-panel">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i data-lucide="users"></i> Pengurus Harian (Umum)</h3>
+                    <div class="panel-actions">
+                        <button class="btn btn-primary" onclick="openModal('modalPengurus')" style="padding:8px 15px; font-size:0.85rem;">+ Pengurus</button>
+                        <button class="btn btn-secondary" onclick="openModal('modalBidang')" style="padding:8px 15px; font-size:0.85rem;">+ Bidang</button>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead><tr><th>Foto</th><th>Nama Pengurus</th><th>Jabatan</th><th style="text-align:right;">Aksi</th></tr></thead>
+                        <tbody>
+                            <% pengurus.forEach(person => { %>
+                            <tr>
+                                <td><img src="<%= person.image %>" style="width:40px; height:40px; border-radius:50%; object-fit:cover;"></td>
+                                <td class="fw-600"><%= person.name %></td>
+                                <td style="color:#4ade80; font-size:0.85rem;"><%= person.role %></td>
+                                <td class="td-actions">
+                                    <button type="button" class="action-btn edit" onclick="openEditPengurusModal('<%= person.id %>', '<%= person.name.replace(/'/g, "\\'") %>', '<%= person.role.replace(/'/g, "\\'") %>')" title="Edit Data"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-pengurus/<%= person.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus pengurus?')"><i data-lucide="trash-2"></i></button></form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="bidang-container">
+                    <h4 class="bidang-container-title">Bidang & Anggota (Umum)</h4>
+                    <div class="bidang-list">
+                        <% bidang.forEach(b => { %>
+                            <div class="bidang-card">
+                                <div class="bidang-header">
+                                    <h5 class="bidang-title"><%= b.name %></h5>
+                                    <div>
+                                        <button type="button" class="btn btn-primary" style="padding:4px 10px; font-size:0.75rem;" onclick="openModalAnggotaBidang('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>')">+ Anggota</button>
+                                        <button type="button" class="action-btn edit" style="padding:4px;" onclick="openEditBidangModal('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>')"><i data-lucide="edit" style="width:14px;"></i></button>
+                                        <form action="/admin/hapus-bidang/<%= b.id %>" method="POST" class="form-inline">
+                                            <button type="submit" class="action-btn delete" style="padding:4px;" onclick="return confirm('Hapus bidang beserta anggotanya?')"><i data-lucide="trash-2" style="width:14px;"></i></button>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            <div class="bidang-members-grid">
-                                <% if(b.members && b.members.length > 0) { %>
-                                    <% b.members.forEach(m => { %>
+                                <div class="bidang-members-grid">
+                                    <% if(b.members && b.members.length > 0) { b.members.forEach(m => { %>
                                         <div class="member-card">
                                             <img src="<%= m.image %>" class="member-avatar">
                                             <p class="member-name"><%= m.name %></p>
-                                            <form action="/admin/hapus-anggota-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn" title="Keluarkan Anggota">
-                                                <button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota ini dari bidang?')"><i data-lucide="x"></i></button>
-                                            </form>
+                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>')"><i data-lucide="edit" style="width:12px;"></i></button>
+                                            <form action="/admin/hapus-anggota-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota?')"><i data-lucide="x"></i></button></form>
                                         </div>
-                                    <% }) %>
-                                <% } else { %>
-                                    <p class="empty-member">Belum ada anggota di bidang ini.</p>
-                                <% } %>
+                                    <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
+                                </div>
                             </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PENGURUS & BIDANG KOHATI (BARU) -->
+            <div class="glass admin-panel" style="border: 1px solid rgba(244,114,182,0.3);">
+                <div class="panel-header">
+                    <h3 class="panel-title" style="color:#f472b6;"><i data-lucide="heart"></i> Pengurus Harian (KOHATI)</h3>
+                    <div class="panel-actions">
+                        <button class="btn btn-primary" style="background:#f472b6; box-shadow:0 4px 15px rgba(244,114,182,0.3); color:#fff;" onclick="openModal('modalKohatiPengurus')">+ Pengurus</button>
+                        <button class="btn btn-secondary" onclick="openModal('modalKohatiBidang')">+ Bidang Kohati</button>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead><tr><th>Foto</th><th>Nama Pengurus</th><th>Jabatan</th><th style="text-align:right;">Aksi</th></tr></thead>
+                        <tbody>
+                            <% kohatiPengurus.forEach(person => { %>
+                            <tr>
+                                <td><img src="<%= person.image %>" style="width:40px; height:40px; border-radius:50%; object-fit:cover;"></td>
+                                <td class="fw-600"><%= person.name %></td>
+                                <td style="color:#f472b6; font-size:0.85rem;"><%= person.role %></td>
+                                <td class="td-actions">
+                                    <button type="button" class="action-btn edit" onclick="openEditKohatiPengurusModal('<%= person.id %>', '<%= person.name.replace(/'/g, "\\'") %>', '<%= person.role.replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-kohati-pengurus/<%= person.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus pengurus kohati?')"><i data-lucide="trash-2"></i></button></form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="bidang-container">
+                    <h4 class="bidang-container-title" style="color:#f472b6;">Bidang & Anggota (KOHATI)</h4>
+                    <div class="bidang-list">
+                        <% kohatiBidang.forEach(b => { %>
+                            <div class="bidang-card">
+                                <div class="bidang-header">
+                                    <h5 class="bidang-title" style="color:#f472b6;"><%= b.name %></h5>
+                                    <div>
+                                        <button type="button" class="btn" style="background:#f472b6; color:#fff; padding:4px 10px; font-size:0.75rem;" onclick="openModalKohatiAnggotaBidang('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>')">+ Anggota</button>
+                                        <button type="button" class="action-btn edit" style="padding:4px;" onclick="openEditKohatiBidangModal('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>')"><i data-lucide="edit" style="width:14px;"></i></button>
+                                        <form action="/admin/hapus-kohati-bidang/<%= b.id %>" method="POST" class="form-inline">
+                                            <button type="submit" class="action-btn delete" style="padding:4px;" onclick="return confirm('Hapus bidang kohati?')"><i data-lucide="trash-2" style="width:14px;"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="bidang-members-grid">
+                                    <% if(b.members && b.members.length > 0) { b.members.forEach(m => { %>
+                                        <div class="member-card">
+                                            <img src="<%= m.image %>" class="member-avatar" style="border-color:rgba(244,114,182,0.5);">
+                                            <p class="member-name"><%= m.name %></p>
+                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditKohatiAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>')"><i data-lucide="edit" style="width:12px;"></i></button>
+                                            <form action="/admin/hapus-anggota-kohati-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota kohati?')"><i data-lucide="x"></i></button></form>
+                                        </div>
+                                    <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="admin-sidebar">
+            <div class="glass admin-panel">
+                <h3 class="panel-title" style="margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="image"></i> Kelola Galeri</h3>
+                <button class="btn btn-add-album" onclick="openModal('modalAlbum')">+ Tambah Galeri Baru</button>
+                <div class="album-list">
+                    <% albums.forEach(album => { %>
+                    <div class="list-item-album">
+                        <span class="list-item-title"><strong><%= album.title %></strong><br><small style="color:#4ade80;"><%= album.date %></small></span>
+                        <div style="display:flex; gap:5px;">
+                            <button type="button" class="action-btn" style="color:#fff;" onclick="openKelolaFotoAlbum('<%= album.id %>')"><i data-lucide="image-plus"></i></button>
+                            <button type="button" class="action-btn edit" onclick="openEditAlbumModal('<%= album.id %>', '<%= album.title.replace(/'/g, "\\'") %>', '<%= album.date %>')"><i data-lucide="edit"></i></button>
+                            <form action="/admin/hapus-album/<%= album.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus album?')"><i data-lucide="trash-2"></i></button></form>
                         </div>
+                    </div>
                     <% }) %>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Bagian Kanan (Galeri & Data Anggota) -->
-    <div class="admin-sidebar">
-        
-        <!-- Panel Kelola Galeri -->
-        <div class="glass admin-panel">
-            <h3 class="panel-title" style="margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="image"></i> Kelola Galeri</h3>
-            <button class="btn btn-add-album" onclick="openModal('modalAlbum')">+ Tambah Galeri Baru</button>
-            <div class="album-list">
-                <% albums.forEach(album => { %>
-                <div class="list-item-album">
-                    <span class="list-item-title">
-                        <strong><%= album.title %></strong><br>
-                        <small style="color:#4ade80;"><%= album.date %></small>
-                    </span>
-                    <div style="display:flex; gap:5px;">
-                        <button type="button" class="action-btn" style="color:#fff; border-color:rgba(255,255,255,0.3);" onclick="openKelolaFotoAlbum('<%= album.id %>')" title="Tambah/Hapus Banyak Foto"><i data-lucide="image-plus"></i></button>
-                        <button type="button" class="action-btn edit" onclick="openEditAlbumModal('<%= album.id %>', '<%= album.title.replace(/'/g, "\\'") %>', '<%= album.date %>')" title="Edit Album"><i data-lucide="edit"></i></button>
-                        <form action="/admin/hapus-album/<%= album.id %>" method="POST" class="form-inline">
-                            <button type="submit" class="action-btn delete" onclick="return confirm('Hapus album ini secara keseluruhan?')"><i data-lucide="trash-2"></i></button>
-                        </form>
-                    </div>
-                </div>
-                <% }) %>
-            </div>
-        </div>
-
-        <!-- Panel Kelola Data Anggota PDF (DIUPGRADE) -->
-        <div class="glass admin-panel">
-            <h3 class="panel-title" style="margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="folder-open"></i> Kelola Data Anggota</h3>
-            <button class="btn btn-add-album" onclick="openModal('modalDataAnggota')">+ Data Anggota Baru</button>
-            
-            <div class="album-list">
-                <% if(dataAnggota && dataAnggota.length > 0) { %>
+            <div class="glass admin-panel">
+                <h3 class="panel-title" style="margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="folder-open"></i> Data Anggota (PDF)</h3>
+                <button class="btn btn-add-album" onclick="openModal('modalDataAnggota')">+ Data Anggota Baru</button>
+                <div class="album-list">
                     <% dataAnggota.forEach(item => { %>
                     <div class="list-item-album">
-                        <span class="list-item-title">
-                            <strong><%= item.title %></strong><br>
-                            <small style="color:#4ade80;"><%= item.date %></small>
-                        </span>
+                        <span class="list-item-title"><strong><%= item.title %></strong><br><small style="color:#4ade80;"><%= item.date %></small></span>
                         <div style="display:flex; gap:5px;">
-                            <button type="button" class="action-btn" style="color:#fff; border-color:rgba(255,255,255,0.3);" onclick="window.open('<%= item.file %>', '_blank')" title="Preview PDF"><i data-lucide="eye"></i></button>
-                            <button type="button" class="action-btn edit" onclick="openEditDataAnggotaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.date %>')" title="Edit Data Anggota"><i data-lucide="edit"></i></button>
-                            <form action="/admin/hapus-data-anggota/<%= item.id %>" method="POST" class="form-inline">
-                                <button type="submit" class="action-btn delete" onclick="return confirm('Hapus data anggota ini?')"><i data-lucide="trash-2"></i></button>
-                            </form>
+                            <button type="button" class="action-btn" style="color:#fff;" onclick="window.open('<%= item.file %>', '_blank')"><i data-lucide="eye"></i></button>
+                            <button type="button" class="action-btn edit" onclick="openEditDataAnggotaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.date %>')"><i data-lucide="edit"></i></button>
+                            <form action="/admin/hapus-data-anggota/<%= item.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus PDF?')"><i data-lucide="trash-2"></i></button></form>
                         </div>
                     </div>
                     <% }) %>
-                <% } else { %>
-                    <p class="text-muted" style="text-align:center; font-size:0.85rem;">Belum ada file data anggota.</p>
-                <% } %>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- ==============================================================
+     TAB 2: HEADER, FOOTER, & TENTANG (SETELAN WEB)
+============================================================== -->
+<div id="adm-setelan" class="tab-content">
+    <div class="grid-2">
+        <div class="glass admin-panel">
+            <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="layout"></i> Header & Footer</h3>
+            <form action="/admin/setelan-web" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Judul Web (Title/Favicon)</label>
+                    <input type="text" name="webTitle" class="input-control" value="<%= siteSettings.webTitle %>">
+                </div>
+                <div class="form-group">
+                    <label>Logo Header & Favicon (Biarkan kosong jika tetap)</label>
+                    <input type="file" name="headerLogo" class="input-control file-compress" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label>Logo Footer (Biarkan kosong jika tetap)</label>
+                    <input type="file" name="footerLogo" class="input-control file-compress" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label>Teks Judul Footer</label>
+                    <input type="text" name="footerTitle" class="input-control" value="<%= siteSettings.footerTitle %>">
+                </div>
+                <div class="form-group">
+                    <label>Deskripsi Footer</label>
+                    <textarea name="footerDesc" class="input-control" rows="3"><%= siteSettings.footerDesc %></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Teks Hak Cipta (Copyright)</label>
+                    <input type="text" name="footerCopyright" class="input-control" value="<%= siteSettings.footerCopyright %>">
+                </div>
+                <div class="form-group">
+                    <label>Teks Programmer / Watermark</label>
+                    <input type="text" name="footerProgrammer" class="input-control" value="<%= siteSettings.footerProgrammer %>">
+                </div>
+                <div class="form-group" style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px;">
+                    <input type="checkbox" name="kohatiActive" id="kohatiActive" <%= siteSettings.kohatiActive ? 'checked' : '' %> style="width:20px; height:20px;">
+                    <label for="kohatiActive" style="margin:0;">Aktifkan Tab & Fitur KOHATI</label>
+                </div>
+                
+                <h4 style="margin:20px 0 10px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">Sosial Media Footer</h4>
+                <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+                    <% socialMediaList.forEach(soc => { %>
+                        <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:0.85rem;"><%= soc.name %>: <a href="<%= soc.url %>" target="_blank" style="color:#4ade80;">Link</a></span>
+                            <form action="/admin/hapus-sosmed/<%= soc.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" style="padding:4px;"><i data-lucide="trash-2" style="width:14px;"></i></button></form>
+                        </div>
+                    <% }) %>
+                    <button type="button" class="btn btn-secondary" onclick="openModal('modalSosmed')" style="font-size:0.8rem; padding:8px;">+ Tambah Sosial Media (Icon Upload)</button>
+                </div>
+                
+                <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:15px;">Simpan Perubahan Web</button>
+            </form>
+        </div>
+
+        <div class="glass admin-panel">
+            <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="file-text"></i> Halaman Tentang Kami</h3>
+            <!-- Di submit ke endpoint yang sama (setelan-web) -->
+            <form action="/admin/setelan-web" method="POST" enctype="multipart/form-data" id="formSetelanTentang">
+                <div class="form-group">
+                    <label>Teks Profil</label>
+                    <div id="quill-profil" style="height:200px; color:white;"></div>
+                    <input type="hidden" name="profilText" id="hidden-profil">
+                </div>
+                <div class="form-group">
+                    <label>Teks Visi & Misi</label>
+                    <div id="quill-visimisi" style="height:200px; color:white;"></div>
+                    <input type="hidden" name="visiMisiText" id="hidden-visimisi">
+                </div>
+                <div class="form-group">
+                    <label>Embed Code Google Maps (Iframe)</label>
+                    <textarea name="mapsEmbed" class="input-control" rows="3" placeholder='<iframe src="..."></iframe>'><%= siteSettings.mapsEmbed %></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Upload Booklet / Pedoman PDF (Akan tampil slide di Tab Profil)</label>
+                    <input type="file" name="bookletPdf" class="input-control file-to-b64" accept="application/pdf">
+                    <% if(siteSettings.bookletPdf) { %><p class="form-hint" style="color:#4ade80;">File booklet saat ini sudah terpasang.</p><% } %>
+                </div>
+                <button type="submit" class="btn btn-primary submit-btn" style="width:100%;">Simpan Halaman Tentang</button>
+            </form>
+            <div id="raw-profil" style="display:none;"><%- siteSettings.profilText %></div>
+            <div id="raw-visimisi" style="display:none;"><%- siteSettings.visiMisiText %></div>
+        </div>
+    </div>
+</div>
+
+<!-- ==============================================================
+     TAB 3: SHORTLINK CUSTOM
+============================================================== -->
+<div id="adm-shortlink" class="tab-content">
+    <div class="glass admin-panel" style="max-width:800px; margin:0 auto;">
+        <div class="panel-header">
+            <h3 class="panel-title"><i data-lucide="link"></i> Shortlink Custom</h3>
+            <button class="btn btn-primary" onclick="openModal('modalShortlink')" style="padding:8px 15px; font-size:0.85rem;">+ Buat Link</button>
+        </div>
+        <p class="text-muted" style="margin-bottom:20px; font-size:0.9rem;">Buat URL kustom untuk website Anda, contoh: <code>domain.com/daftar</code> -> mengarah ke Google Form.</p>
+        <div class="table-wrapper">
+            <table class="admin-table">
+                <thead><tr><th>Judul / Keterangan</th><th>Short Path</th><th>Tujuan Asli (Original URL)</th><th style="text-align:right;">Aksi</th></tr></thead>
+                <tbody>
+                    <% shortlinks.forEach(l => { %>
+                    <tr>
+                        <td class="fw-600"><%= l.title %></td>
+                        <td style="color:#4ade80;">/<%= l.path %></td>
+                        <td style="font-size:0.8rem; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><a href="<%= l.originalUrl %>" target="_blank"><%= l.originalUrl %></a></td>
+                        <td class="td-actions">
+                            <button type="button" class="action-btn edit" onclick="openEditShortlinkModal('<%= l.id %>', '<%= l.title.replace(/'/g, "\\'") %>', '<%= l.path.replace(/'/g, "\\'") %>', '<%= l.originalUrl.replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
+                            <form action="/admin/hapus-shortlink/<%= l.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus shortlink ini?')"><i data-lucide="trash-2"></i></button></form>
+                        </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ==============================================================
+     TAB 4: ANNOUNCEMENT
+============================================================== -->
+<div id="adm-announce" class="tab-content">
+    <div class="glass admin-panel" style="max-width:800px; margin:0 auto;">
+        <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="bell"></i> Setelan Announcement Pop-up</h3>
+        <p class="text-muted" style="margin-bottom:30px; font-size:0.9rem;">Pengumuman akan muncul di beranda sebagai popup saat pengunjung membuka web.</p>
+        
+        <form action="/admin/setelan-announcement" method="POST" enctype="multipart/form-data" id="formAnnounce">
+            <div class="form-group" style="display:flex; align-items:center; gap:10px; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); padding:15px; border-radius:10px;">
+                <input type="checkbox" name="announceActive" id="announceActive" <%= siteSettings.announceActive ? 'checked' : '' %> style="width:20px; height:20px;">
+                <label for="announceActive" style="margin:0; color:#4ade80;">Aktifkan Pop-up Pengumuman di Beranda</label>
+            </div>
+            <div class="form-group">
+                <label>Judul Pengumuman</label>
+                <input type="text" name="announceTitle" class="input-control" value="<%= siteSettings.announceTitle %>">
+            </div>
+            <div class="form-group">
+                <label>Upload Poster/Foto Pengumuman (Opsional)</label>
+                <input type="file" name="announceImage" class="input-control file-compress" accept="image/*">
+                <% if(siteSettings.announceImage) { %><img src="<%= siteSettings.announceImage %>" style="width:100px; margin-top:10px; border-radius:8px;"><% } %>
+            </div>
+            <div class="form-group">
+                <label>Isi Teks Pengumuman</label>
+                <div id="quill-announce" style="height:200px; color:white;"></div>
+                <input type="hidden" name="announceContent" id="hidden-announce">
+            </div>
+            <div id="raw-announce" style="display:none;"><%- siteSettings.announceContent %></div>
+            <button type="submit" class="btn btn-primary submit-btn" style="width:100%;">Simpan Setelan Pengumuman</button>
+        </form>
+    </div>
+</div>
+
+<!-- ================= MODALS AREA ================= -->
 <script>
     const albumsData = <%- JSON.stringify(albums) %>;
     const newsData = <%- JSON.stringify(news) %>;
 </script>
 
-<!-- ================= MODALS AREA ================= -->
-
-<!-- Modal Tambah Data Anggota (BARU) -->
-<div class="modal-overlay" id="modalDataAnggota">
+<!-- Modals Sosmed & Shortlink -->
+<div class="modal-overlay" id="modalSosmed">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3>Tambah Data Anggota Baru</h3>
-            <button type="button" class="close-modal" onclick="closeModal('modalDataAnggota')"><i data-lucide="x"></i></button>
-        </div>
-        <form action="/admin/tambah-data-anggota" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label>Judul Data Anggota</label>
-                <input type="text" name="title" class="input-control" required placeholder="Contoh: Database Kader 2025">
+        <div class="modal-header"><h3>Tambah Sosial Media Footer</h3><button type="button" class="close-modal" onclick="closeModal('modalSosmed')"><i data-lucide="x"></i></button></div>
+        <form action="/admin/tambah-sosmed" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Nama Sosmed</label><input type="text" name="name" class="input-control" required placeholder="Contoh: Twitter"></div>
+            <div class="form-group"><label>URL Profile</label><input type="url" name="url" class="input-control" required placeholder="https://..."></div>
+            <div class="form-group"><label>Upload Icon/Logo Sosmed</label><input type="file" name="icon" class="input-control file-compress" accept="image/*" required></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalSosmed')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan</button></div>
+        </form>
+    </div>
+</div>
+<div class="modal-overlay" id="modalShortlink">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Tambah Shortlink</h3><button type="button" class="close-modal" onclick="closeModal('modalShortlink')"><i data-lucide="x"></i></button></div>
+        <form action="/admin/tambah-shortlink" method="POST">
+            <div class="form-group"><label>Judul / Keterangan</label><input type="text" name="title" class="input-control" required placeholder="Contoh: Form Pendaftaran LK 1"></div>
+            <div class="form-group"><label>Path (URL Pendek)</label>
+                <div style="display:flex; align-items:center;">
+                    <span style="background:rgba(255,255,255,0.1); padding:14px; border-radius:12px 0 0 12px; border:1px solid rgba(255,255,255,0.1); border-right:none;">domain.com/</span>
+                    <input type="text" name="path" class="input-control" style="border-radius:0 12px 12px 0;" required placeholder="daftar">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Tanggal Rilis / Pembaruan</label>
-                <input type="text" name="date" class="input-control" required placeholder="Contoh: 15 Mei 2025">
+            <div class="form-group"><label>URL Asli (Tujuan)</label><input type="url" name="originalUrl" class="input-control" required placeholder="https://docs.google.com/forms/..."></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalShortlink')">Batal</button><button type="submit" class="btn btn-primary">Simpan</button></div>
+        </form>
+    </div>
+</div>
+<div class="modal-overlay" id="modalEditShortlink">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Edit Shortlink</h3><button type="button" class="close-modal" onclick="closeModal('modalEditShortlink')"><i data-lucide="x"></i></button></div>
+        <form id="formEditShortlink" method="POST">
+            <div class="form-group"><label>Judul / Keterangan</label><input type="text" name="title" id="editShortlinkTitle" class="input-control" required></div>
+            <div class="form-group"><label>Path (URL Pendek)</label>
+                <div style="display:flex; align-items:center;">
+                    <span style="background:rgba(255,255,255,0.1); padding:14px; border-radius:12px 0 0 12px; border:1px solid rgba(255,255,255,0.1); border-right:none;">domain.com/</span>
+                    <input type="text" name="path" id="editShortlinkPath" class="input-control" style="border-radius:0 12px 12px 0;" required>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Upload File PDF</label>
-                <input type="file" name="file" class="input-control file-to-b64" accept="application/pdf" required>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modalDataAnggota')">Batal</button>
-                <button type="submit" class="btn btn-primary submit-btn">Simpan Data</button>
-            </div>
+            <div class="form-group"><label>URL Asli (Tujuan)</label><input type="url" name="originalUrl" id="editShortlinkUrl" class="input-control" required></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditShortlink')">Batal</button><button type="submit" class="btn btn-primary">Update</button></div>
         </form>
     </div>
 </div>
 
-<!-- Modal Edit Data Anggota (BARU) -->
-<div class="modal-overlay" id="modalEditDataAnggota">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Edit Data Anggota</h3>
-            <button type="button" class="close-modal" onclick="closeModal('modalEditDataAnggota')"><i data-lucide="x"></i></button>
-        </div>
-        <form id="formEditDataAnggota" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label>Judul Data Anggota</label>
-                <input type="text" name="title" id="editDataAnggotaTitle" class="input-control" required>
-            </div>
-            <div class="form-group">
-                <label>Tanggal Rilis / Pembaruan</label>
-                <input type="text" name="date" id="editDataAnggotaDate" class="input-control" required>
-            </div>
-            <div class="form-group">
-                <label>Upload PDF Baru (Opsional)</label>
-                <input type="file" name="file" class="input-control file-to-b64" accept="application/pdf">
-                <p class="form-hint">Kosongkan jika tidak ingin mengganti file PDF.</p>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditDataAnggota')">Batal</button>
-                <button type="submit" class="btn btn-primary submit-btn">Update Data</button>
-            </div>
+<!-- Modal Berita, Galeri, Pengurus (Existing dengan Quill dan Batal button) -->
+<div class="modal-overlay" id="modalBerita">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header"><h3>Tambah Berita Baru</h3><button type="button" class="close-modal" onclick="closeModal('modalBerita')"><i data-lucide="x"></i></button></div>
+        <form action="/admin/tambah-berita" method="POST" enctype="multipart/form-data" id="formTambahBerita">
+            <div class="form-group"><label>Judul Berita</label><input type="text" name="title" class="input-control" required></div>
+            <div class="form-group"><label>Kategori</label><select name="category" class="input-control" required><option value="Terbaru">Terbaru</option><option value="Populer">Populer</option><option value="Pin">Pin</option><option value="Lama">Lama</option></select></div>
+            <div class="form-group"><label>Isi Berita</label><div id="quill-tambah" style="height: 300px; color: white;"></div><input type="hidden" name="content" id="content-tambah" required></div>
+            <div class="form-group"><label>Upload Foto Berita</label><input type="file" name="image" class="input-control file-compress" accept="image/*" required></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalBerita')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan Berita</button></div>
         </form>
     </div>
 </div>
 
-
-<!-- Modal Edit Berita -->
 <div class="modal-overlay" id="modalEditBerita">
     <div class="modal-content" style="max-width: 800px;">
-        <div class="modal-header">
-            <h3>Edit Berita</h3>
-            <button type="button" class="close-modal" onclick="closeModal('modalEditBerita')"><i data-lucide="x"></i></button>
-        </div>
+        <div class="modal-header"><h3>Edit Berita</h3><button type="button" class="close-modal" onclick="closeModal('modalEditBerita')"><i data-lucide="x"></i></button></div>
         <form id="formEditBerita" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label>Judul Berita</label>
-                <input type="text" name="title" id="editBeritaTitle" class="input-control" required>
-            </div>
-            <div class="form-group">
-                <label>Tanggal Rilis</label>
-                <input type="text" name="date" id="editBeritaDate" class="input-control" required placeholder="Contoh: 10 May 2025">
-            </div>
-            <div class="form-group">
-                <label>Kategori</label>
-                <select name="category" id="editBeritaCategory" class="input-control" required>
-                    <option value="Terbaru">Terbaru</option>
-                    <option value="Populer">Populer</option>
-                    <option value="Pin">Pin (Disematkan)</option>
-                    <option value="Lama">Lama (Old)</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Isi Berita</label>
-                <div id="quill-edit" style="height: 300px; color: white;"></div>
-                <input type="hidden" name="content" id="content-edit" required>
-            </div>
-
-            <div class="form-group">
-                <label>Ganti Foto Berita (Opsional)</label>
-                <input type="file" name="image" class="input-control file-compress" accept="image/*">
-                <p class="form-hint">Kosongkan jika tidak ingin mengubah foto cover berita.</p>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditBerita')">Batal</button>
-                <button type="submit" class="btn btn-primary submit-btn">Update Berita</button>
-            </div>
+            <div class="form-group"><label>Judul Berita</label><input type="text" name="title" id="editBeritaTitle" class="input-control" required></div>
+            <div class="form-group"><label>Tanggal Rilis</label><input type="text" name="date" id="editBeritaDate" class="input-control" required></div>
+            <div class="form-group"><label>Kategori</label><select name="category" id="editBeritaCategory" class="input-control" required><option value="Terbaru">Terbaru</option><option value="Populer">Populer</option><option value="Pin">Pin</option><option value="Lama">Lama</option></select></div>
+            <div class="form-group"><label>Isi Berita</label><div id="quill-edit" style="height: 300px; color: white;"></div><input type="hidden" name="content" id="content-edit" required></div>
+            <div class="form-group"><label>Ganti Foto (Opsional)</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditBerita')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Update Berita</button></div>
         </form>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalKelolaFotoBerita">
     <div class="modal-content" style="max-width: 600px;">
-        <div class="modal-header">
-            <h3 id="kelolaFotoBeritaTitle">Kelola Foto: </h3>
-            <button type="button" class="close-modal" onclick="closeModal('modalKelolaFotoBerita')"><i data-lucide="x"></i></button>
-        </div>
+        <div class="modal-header"><h3 id="kelolaFotoBeritaTitle">Kelola Foto: </h3><button type="button" class="close-modal" onclick="closeModal('modalKelolaFotoBerita')"><i data-lucide="x"></i></button></div>
         <form id="formTambahFotoBerita" method="POST" enctype="multipart/form-data" style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255,255,255,0.2);">
-            <div class="form-group">
-                <label>Upload Banyak Foto Tambahan Sekaligus</label>
-                <input type="file" name="photos" class="input-control file-compress-multiple" accept="image/*" multiple required>
-                <p class="form-hint">Pilih beberapa foto pendukung berita sekaligus.</p>
-            </div>
+            <div class="form-group"><label>Upload Banyak Foto Sekaligus</label><input type="file" name="photos" class="input-control file-compress-multiple" accept="image/*" multiple required></div>
             <button type="submit" class="btn btn-primary submit-btn-multi" style="width:100%;">Upload Foto Tambahan</button>
         </form>
-        <h4 style="font-size:0.95rem; margin-bottom:10px;">Foto Tambahan di Berita Ini</h4>
         <div id="existingPhotosBeritaGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px;"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalAlbum">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Tambah Galeri Kegiatan</h3><button type="button" class="close-modal" onclick="closeModal('modalAlbum')"><i data-lucide="x"></i></button></div>
+        <form action="/admin/tambah-album" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Judul Kegiatan</label><input type="text" name="title" class="input-control" required></div>
+            <div class="form-group"><label>Upload Foto Utama (Cover)</label><input type="file" name="cover" class="input-control file-compress" accept="image/*" required></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalAlbum')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan Galeri</button></div>
+        </form>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalEditAlbum">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3>Edit Kegiatan Galeri</h3>
-            <button type="button" class="close-modal" onclick="closeModal('modalEditAlbum')"><i data-lucide="x"></i></button>
-        </div>
+        <div class="modal-header"><h3>Edit Kegiatan Galeri</h3><button type="button" class="close-modal" onclick="closeModal('modalEditAlbum')"><i data-lucide="x"></i></button></div>
         <form id="formEditAlbum" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label>Judul Kegiatan</label>
-                <input type="text" name="title" id="editAlbumTitle" class="input-control" required>
-            </div>
-            <div class="form-group">
-                <label>Tanggal Kegiatan</label>
-                <input type="text" name="date" id="editAlbumDate" class="input-control" required placeholder="Contoh: 12 Maret 2025">
-            </div>
-            <div class="form-group">
-                <label>Ganti Foto Cover (Opsional)</label>
-                <input type="file" name="cover" class="input-control file-compress" accept="image/*">
-                <p class="form-hint">Kosongkan jika tidak ingin mengganti cover album.</p>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditAlbum')">Batal</button>
-                <button type="submit" class="btn btn-primary submit-btn">Update Album</button>
-            </div>
+            <div class="form-group"><label>Judul Kegiatan</label><input type="text" name="title" id="editAlbumTitle" class="input-control" required></div>
+            <div class="form-group"><label>Tanggal Kegiatan</label><input type="text" name="date" id="editAlbumDate" class="input-control" required></div>
+            <div class="form-group"><label>Ganti Foto (Opsional)</label><input type="file" name="cover" class="input-control file-compress" accept="image/*"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditAlbum')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Update Album</button></div>
         </form>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalKelolaFotoAlbum">
     <div class="modal-content" style="max-width: 600px;">
-        <div class="modal-header">
-            <h3 id="kelolaFotoTitle">Kelola Foto: </h3>
-            <button type="button" class="close-modal" onclick="closeModal('modalKelolaFotoAlbum')"><i data-lucide="x"></i></button>
-        </div>
+        <div class="modal-header"><h3 id="kelolaFotoTitle">Kelola Foto: </h3><button type="button" class="close-modal" onclick="closeModal('modalKelolaFotoAlbum')"><i data-lucide="x"></i></button></div>
         <form id="formTambahFotoAlbum" method="POST" enctype="multipart/form-data" style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255,255,255,0.2);">
-            <div class="form-group">
-                <label>Upload Banyak Foto Sekaligus</label>
-                <input type="file" name="photos" class="input-control file-compress-multiple" accept="image/*" multiple required>
-                <p class="form-hint">Pilih beberapa foto di perangkat Anda sekaligus.</p>
-            </div>
+            <div class="form-group"><label>Upload Banyak Foto Sekaligus</label><input type="file" name="photos" class="input-control file-compress-multiple" accept="image/*" multiple required></div>
             <button type="submit" class="btn btn-primary submit-btn-multi" style="width:100%;">Upload Foto Tambahan</button>
         </form>
-        <h4 style="font-size:0.95rem; margin-bottom:10px;">Foto yang Sudah Tersimpan di Album Ini</h4>
         <div id="existingPhotosGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px;"></div>
     </div>
 </div>
 
-<div class="modal-overlay" id="modalBerita">
-    <div class="modal-content" style="max-width: 800px;">
-        <div class="modal-header">
-            <h3>Tambah Berita Baru</h3>
-            <button type="button" class="close-modal" onclick="closeModal('modalBerita')"><i data-lucide="x"></i></button>
-        </div>
-        <form action="/admin/tambah-berita" method="POST" enctype="multipart/form-data" id="formTambahBerita">
-            <div class="form-group">
-                <label>Judul Berita</label>
-                <input type="text" name="title" class="input-control" required placeholder="Contoh: Kegiatan HMI KomKGUMI">
-            </div>
-            <div class="form-group">
-                <label>Kategori</label>
-                <select name="category" class="input-control" required>
-                    <option value="Terbaru">Terbaru</option>
-                    <option value="Populer">Populer</option>
-                    <option value="Pin">Pin (Disematkan)</option>
-                    <option value="Lama">Lama (Old)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Isi Berita</label>
-                <div id="quill-tambah" style="height: 300px; color: white;"></div>
-                <input type="hidden" name="content" id="content-tambah" required>
-            </div>
-            <div class="form-group">
-                <label>Upload Foto Berita</label>
-                <input type="file" name="image" class="input-control file-compress" accept="image/*" required>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modalBerita')">Batal</button>
-                <button type="submit" class="btn btn-primary submit-btn">Simpan Berita</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="modal-overlay" id="modalAlbum">
+<div class="modal-overlay" id="modalDataAnggota">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3>Tambah Galeri Kegiatan</h3>
-            <button type="button" class="close-modal" onclick="closeModal('modalAlbum')"><i data-lucide="x"></i></button>
-        </div>
-        <form action="/admin/tambah-album" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label>Judul Kegiatan</label>
-                <input type="text" name="title" class="input-control" required placeholder="Contoh: Basic Training I">
-            </div>
-            <div class="form-group">
-                <label>Upload Foto Utama (Cover)</label>
-                <input type="file" name="cover" class="input-control file-compress" accept="image/*" required>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modalAlbum')">Batal</button>
-                <button type="submit" class="btn btn-primary submit-btn">Simpan Galeri</button>
-            </div>
+        <div class="modal-header"><h3>Tambah Data Anggota Baru</h3><button type="button" class="close-modal" onclick="closeModal('modalDataAnggota')"><i data-lucide="x"></i></button></div>
+        <form action="/admin/tambah-data-anggota" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Judul Data</label><input type="text" name="title" class="input-control" required></div>
+            <div class="form-group"><label>Tanggal Rilis</label><input type="text" name="date" class="input-control" required></div>
+            <div class="form-group"><label>Upload PDF</label><input type="file" name="file" class="input-control file-to-b64" accept="application/pdf" required></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalDataAnggota')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan</button></div>
         </form>
     </div>
 </div>
 
+<div class="modal-overlay" id="modalEditDataAnggota">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Edit Data Anggota</h3><button type="button" class="close-modal" onclick="closeModal('modalEditDataAnggota')"><i data-lucide="x"></i></button></div>
+        <form id="formEditDataAnggota" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Judul Data</label><input type="text" name="title" id="editDataAnggotaTitle" class="input-control" required></div>
+            <div class="form-group"><label>Tanggal Rilis</label><input type="text" name="date" id="editDataAnggotaDate" class="input-control" required></div>
+            <div class="form-group"><label>Upload PDF Baru (Opsional)</label><input type="file" name="file" class="input-control file-to-b64" accept="application/pdf"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditDataAnggota')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Update</button></div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Pengurus (UMUM) -->
 <div class="modal-overlay" id="modalPengurus">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3>Tambah Pengurus Utama</h3>
-            <button type="button" class="close-modal" onclick="closeModal('modalPengurus')"><i data-lucide="x"></i></button>
-        </div>
+        <div class="modal-header"><h3>Tambah Pengurus Utama</h3><button type="button" class="close-modal" onclick="closeModal('modalPengurus')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-pengurus" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label>Nama Lengkap</label>
-                <input type="text" name="name" class="input-control" required placeholder="Nama lengkap pengurus">
-            </div>
-            <div class="form-group">
-                <label>Jabatan</label>
-                <input type="text" name="role" class="input-control" required placeholder="Contoh: Ketua Umum / Sekretaris">
-            </div>
-            <div class="form-group">
-                <label>Upload Foto Pengurus</label>
-                <input type="file" name="image" class="input-control file-compress" accept="image/*" required>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modalPengurus')">Batal</button>
-                <button type="submit" class="btn btn-primary submit-btn">Simpan Pengurus</button>
-            </div>
+            <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" class="input-control" required></div>
+            <div class="form-group"><label>Jabatan</label><input type="text" name="role" class="input-control" required></div>
+            <div class="form-group"><label>Upload Foto</label><input type="file" name="image" class="input-control file-compress" accept="image/*" required></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalPengurus')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan</button></div>
         </form>
     </div>
 </div>
-
 <div class="modal-overlay" id="modalEditPengurus">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3>Edit Pengurus</h3>
-            <button type="button" class="close-modal" onclick="closeModal('modalEditPengurus')"><i data-lucide="x"></i></button>
-        </div>
+        <div class="modal-header"><h3>Edit Pengurus</h3><button type="button" class="close-modal" onclick="closeModal('modalEditPengurus')"><i data-lucide="x"></i></button></div>
         <form id="formEditPengurus" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label>Nama Lengkap</label>
-                <input type="text" name="name" id="editPengurusName" class="input-control" required>
-            </div>
-            <div class="form-group">
-                <label>Jabatan</label>
-                <input type="text" name="role" id="editPengurusRole" class="input-control" required>
-            </div>
-            <div class="form-group">
-                <label>Upload Foto Baru (Opsional)</label>
-                <input type="file" name="image" class="input-control file-compress" accept="image/*">
-                <p class="form-hint">Kosongkan jika tidak ingin mengubah foto.</p>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditPengurus')">Batal</button>
-                <button type="submit" class="btn btn-primary submit-btn">Update Data</button>
-            </div>
+            <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" id="editPengurusName" class="input-control" required></div>
+            <div class="form-group"><label>Jabatan</label><input type="text" name="role" id="editPengurusRole" class="input-control" required></div>
+            <div class="form-group"><label>Upload Foto (Opsional)</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditPengurus')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Update</button></div>
         </form>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalBidang">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3>Tambah Bidang Baru</h3>
-            <button type="button" class="close-modal" onclick="closeModal('modalBidang')"><i data-lucide="x"></i></button>
-        </div>
+        <div class="modal-header"><h3>Tambah Bidang Baru</h3><button type="button" class="close-modal" onclick="closeModal('modalBidang')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-bidang" method="POST">
-            <div class="form-group">
-                <label>Nama Bidang</label>
-                <input type="text" name="bidang_name" class="input-control" required placeholder="Contoh: Bidang Humas">
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modalBidang')">Batal</button>
-                <button type="submit" class="btn btn-primary">Buat Bidang</button>
-            </div>
+            <div class="form-group"><label>Nama Bidang</label><input type="text" name="bidang_name" class="input-control" required></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalBidang')">Batal</button><button type="submit" class="btn btn-primary">Buat Bidang</button></div>
+        </form>
+    </div>
+</div>
+<div class="modal-overlay" id="modalEditBidang">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Edit Bidang</h3><button type="button" class="close-modal" onclick="closeModal('modalEditBidang')"><i data-lucide="x"></i></button></div>
+        <form id="formEditBidang" method="POST">
+            <div class="form-group"><label>Nama Bidang</label><input type="text" name="bidang_name" id="editBidangName" class="input-control" required></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditBidang')">Batal</button><button type="submit" class="btn btn-primary">Update Bidang</button></div>
         </form>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalAnggotaBidang">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="anggotaBidangTitle">Tambah Anggota Bidang</h3>
-            <button type="button" class="close-modal" onclick="closeModal('modalAnggotaBidang')"><i data-lucide="x"></i></button>
-        </div>
+        <div class="modal-header"><h3 id="anggotaBidangTitle">Tambah Anggota</h3><button type="button" class="close-modal" onclick="closeModal('modalAnggotaBidang')"><i data-lucide="x"></i></button></div>
         <form id="formAnggotaBidang" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label>Nama Lengkap Anggota</label>
-                <input type="text" name="name" class="input-control" required placeholder="Nama lengkap">
-            </div>
-            <div class="form-group">
-                <label>Upload Foto Anggota</label>
-                <input type="file" name="image" class="input-control file-compress" accept="image/*" required>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('modalAnggotaBidang')">Batal</button>
-                <button type="submit" class="btn btn-primary submit-btn">Simpan Anggota</button>
-            </div>
+            <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" class="input-control" required></div>
+            <div class="form-group"><label>Upload Foto</label><input type="file" name="image" class="input-control file-compress" accept="image/*" required></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalAnggotaBidang')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan</button></div>
+        </form>
+    </div>
+</div>
+<div class="modal-overlay" id="modalEditAnggotaBidang">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Edit Anggota Bidang</h3><button type="button" class="close-modal" onclick="closeModal('modalEditAnggotaBidang')"><i data-lucide="x"></i></button></div>
+        <form id="formEditAnggotaBidang" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" id="editAnggotaBidangName" class="input-control" required></div>
+            <div class="form-group"><label>Upload Foto (Opsional)</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditAnggotaBidang')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Update Data</button></div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal KOHATI (BARU) -->
+<div class="modal-overlay" id="modalKohatiPengurus">
+    <div class="modal-content" style="border-color:#f472b6;">
+        <div class="modal-header"><h3 style="color:#f472b6;">Tambah Pengurus Kohati</h3><button type="button" class="close-modal" onclick="closeModal('modalKohatiPengurus')"><i data-lucide="x"></i></button></div>
+        <form action="/admin/tambah-kohati-pengurus" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" class="input-control" required></div>
+            <div class="form-group"><label>Jabatan</label><input type="text" name="role" class="input-control" required></div>
+            <div class="form-group"><label>Upload Foto</label><input type="file" name="image" class="input-control file-compress" accept="image/*" required></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalKohatiPengurus')">Batal</button><button type="submit" class="btn btn-primary submit-btn" style="background:#f472b6; box-shadow:0 4px 15px rgba(244,114,182,0.3); color:#fff;">Simpan</button></div>
+        </form>
+    </div>
+</div>
+<div class="modal-overlay" id="modalEditKohatiPengurus">
+    <div class="modal-content" style="border-color:#f472b6;">
+        <div class="modal-header"><h3 style="color:#f472b6;">Edit Pengurus Kohati</h3><button type="button" class="close-modal" onclick="closeModal('modalEditKohatiPengurus')"><i data-lucide="x"></i></button></div>
+        <form id="formEditKohatiPengurus" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" id="editKohatiPengurusName" class="input-control" required></div>
+            <div class="form-group"><label>Jabatan</label><input type="text" name="role" id="editKohatiPengurusRole" class="input-control" required></div>
+            <div class="form-group"><label>Upload Foto (Opsional)</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditKohatiPengurus')">Batal</button><button type="submit" class="btn btn-primary submit-btn" style="background:#f472b6; color:#fff;">Update</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalKohatiBidang">
+    <div class="modal-content" style="border-color:#f472b6;">
+        <div class="modal-header"><h3 style="color:#f472b6;">Tambah Bidang Kohati</h3><button type="button" class="close-modal" onclick="closeModal('modalKohatiBidang')"><i data-lucide="x"></i></button></div>
+        <form action="/admin/tambah-kohati-bidang" method="POST">
+            <div class="form-group"><label>Nama Bidang</label><input type="text" name="bidang_name" class="input-control" required></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalKohatiBidang')">Batal</button><button type="submit" class="btn btn-primary" style="background:#f472b6; color:#fff;">Buat Bidang</button></div>
+        </form>
+    </div>
+</div>
+<div class="modal-overlay" id="modalEditKohatiBidang">
+    <div class="modal-content" style="border-color:#f472b6;">
+        <div class="modal-header"><h3 style="color:#f472b6;">Edit Bidang Kohati</h3><button type="button" class="close-modal" onclick="closeModal('modalEditKohatiBidang')"><i data-lucide="x"></i></button></div>
+        <form id="formEditKohatiBidang" method="POST">
+            <div class="form-group"><label>Nama Bidang</label><input type="text" name="bidang_name" id="editKohatiBidangName" class="input-control" required></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditKohatiBidang')">Batal</button><button type="submit" class="btn btn-primary" style="background:#f472b6; color:#fff;">Update Bidang</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalKohatiAnggotaBidang">
+    <div class="modal-content" style="border-color:#f472b6;">
+        <div class="modal-header"><h3 id="kohatiAnggotaBidangTitle" style="color:#f472b6;">Tambah Anggota</h3><button type="button" class="close-modal" onclick="closeModal('modalKohatiAnggotaBidang')"><i data-lucide="x"></i></button></div>
+        <form id="formKohatiAnggotaBidang" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" class="input-control" required></div>
+            <div class="form-group"><label>Upload Foto</label><input type="file" name="image" class="input-control file-compress" accept="image/*" required></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalKohatiAnggotaBidang')">Batal</button><button type="submit" class="btn btn-primary submit-btn" style="background:#f472b6; color:#fff;">Simpan</button></div>
+        </form>
+    </div>
+</div>
+<div class="modal-overlay" id="modalEditKohatiAnggotaBidang">
+    <div class="modal-content" style="border-color:#f472b6;">
+        <div class="modal-header"><h3 style="color:#f472b6;">Edit Anggota Kohati</h3><button type="button" class="close-modal" onclick="closeModal('modalEditKohatiAnggotaBidang')"><i data-lucide="x"></i></button></div>
+        <form id="formEditKohatiAnggotaBidang" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" id="editKohatiAnggotaBidangName" class="input-control" required></div>
+            <div class="form-group"><label>Upload Foto (Opsional)</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditKohatiAnggotaBidang')">Batal</button><button type="submit" class="btn btn-primary submit-btn" style="background:#f472b6; color:#fff;">Update Data</button></div>
         </form>
     </div>
 </div>
 
 <script>
+    // TAB ADMIN DASHBOARD LOGIC
+    function openAdmTab(tabId) {
+        document.querySelectorAll('#adm-kelola, #adm-setelan, #adm-shortlink, #adm-announce').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
     // INISIALISASI QUILL.JS
-    var toolbarOptions = [
-        ['bold', 'italic', 'underline', 'strike'],        
-        ['blockquote', 'code-block'],
-        [{ 'header': 1 }, { 'header': 2 }],               
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        [{ 'script': 'sub'}, { 'script': 'super' }],      
-        [{ 'indent': '-1'}, { 'indent': '+1' }],          
-        [{ 'size': ['small', false, 'large', 'huge'] }],  
-        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-        [{ 'color': [] }, { 'background': [] }],          
-        [{ 'align': [] }],
-        ['clean']                                         
-    ];
+    var toolbarOptions = [['bold', 'italic', 'underline', 'strike'], ['blockquote'], [{ 'header': 1 }, { 'header': 2 }], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'size': ['small', false, 'large', 'huge'] }], [{ 'color': [] }, { 'background': [] }], [{ 'align': [] }], ['clean']];
+    var qConfig = { theme: 'snow', modules: { toolbar: toolbarOptions } };
+    var quillTambah = new Quill('#quill-tambah', qConfig);
+    var quillEdit = new Quill('#quill-edit', qConfig);
+    var quillProfil = new Quill('#quill-profil', qConfig);
+    var quillVisi = new Quill('#quill-visimisi', qConfig);
+    var quillAnnounce = new Quill('#quill-announce', qConfig);
 
-    var quillTambah = new Quill('#quill-tambah', { theme: 'snow', modules: { toolbar: toolbarOptions } });
-    var quillEdit = new Quill('#quill-edit', { theme: 'snow', modules: { toolbar: toolbarOptions } });
+    // Init values for setelan
+    quillProfil.root.innerHTML = document.getElementById('raw-profil').innerHTML;
+    quillVisi.root.innerHTML = document.getElementById('raw-visimisi').innerHTML;
+    quillAnnounce.root.innerHTML = document.getElementById('raw-announce').innerHTML;
 
-    document.getElementById('formTambahBerita').onsubmit = function() {
-        document.getElementById('content-tambah').value = quillTambah.root.innerHTML;
+    // Submit Forms Setelan
+    document.getElementById('formSetelanTentang').onsubmit = function() {
+        document.getElementById('hidden-profil').value = quillProfil.root.innerHTML;
+        document.getElementById('hidden-visimisi').value = quillVisi.root.innerHTML;
     };
-    document.getElementById('formEditBerita').onsubmit = function() {
-        document.getElementById('content-edit').value = quillEdit.root.innerHTML;
+    document.getElementById('formAnnounce').onsubmit = function() {
+        document.getElementById('hidden-announce').value = quillAnnounce.root.innerHTML;
     };
+    document.getElementById('formTambahBerita').onsubmit = function() { document.getElementById('content-tambah').value = quillTambah.root.innerHTML; };
+    document.getElementById('formEditBerita').onsubmit = function() { document.getElementById('content-edit').value = quillEdit.root.innerHTML; };
 
-    // Logic Modal
     function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
 
     // DATA ANGGOTA (PDF)
-    function openEditDataAnggotaModal(id, title, date) {
-        document.getElementById('editDataAnggotaTitle').value = title;
-        document.getElementById('editDataAnggotaDate').value = date;
-        document.getElementById('formEditDataAnggota').action = '/admin/edit-data-anggota/' + id;
-        openModal('modalEditDataAnggota');
-    }
+    function openEditDataAnggotaModal(id, title, date) { document.getElementById('editDataAnggotaTitle').value = title; document.getElementById('editDataAnggotaDate').value = date; document.getElementById('formEditDataAnggota').action = '/admin/edit-data-anggota/' + id; openModal('modalEditDataAnggota'); }
 
-    // PDF to Base64
     document.querySelectorAll('.file-to-b64').forEach(input => {
         input.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (file) {
                 const submitBtn = input.closest('form').querySelector('.submit-btn');
-                const originalText = submitBtn.innerText;
-                
-                submitBtn.innerText = 'Memproses File... Tunggu sebentar';
-                submitBtn.disabled = true;
-
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
+                const originalText = submitBtn.innerText; submitBtn.innerText = 'Memproses File...'; submitBtn.disabled = true;
+                const reader = new FileReader(); reader.readAsDataURL(file);
                 reader.onload = () => {
                     let hidden = input.parentElement.querySelector('.b64-hidden');
-                    if (!hidden) {
-                        hidden = document.createElement('input');
-                        hidden.type = 'hidden';
-                        hidden.name = input.name + '_b64';
-                        hidden.className = 'b64-hidden';
-                        input.parentElement.appendChild(hidden);
-                    }
-                    hidden.value = reader.result;
-                    submitBtn.innerText = originalText;
-                    submitBtn.disabled = false;
+                    if (!hidden) { hidden = document.createElement('input'); hidden.type = 'hidden'; hidden.name = input.name + '_b64'; hidden.className = 'b64-hidden'; input.parentElement.appendChild(hidden); }
+                    hidden.value = reader.result; submitBtn.innerText = originalText; submitBtn.disabled = false;
                 };
             }
         });
     });
 
-    // Modal Edit Berita
+    // BERITA
     function openEditBeritaModal(id, title, category, date) {
-        document.getElementById('editBeritaTitle').value = title;
-        document.getElementById('editBeritaCategory').value = category;
-        document.getElementById('editBeritaDate').value = date;
-        
-        const rawContent = document.getElementById('raw-content-' + id).innerHTML;
-        quillEdit.root.innerHTML = rawContent;
-
-        document.getElementById('formEditBerita').action = '/admin/edit-berita/' + id;
-        openModal('modalEditBerita');
+        document.getElementById('editBeritaTitle').value = title; document.getElementById('editBeritaCategory').value = category; document.getElementById('editBeritaDate').value = date;
+        quillEdit.root.innerHTML = document.getElementById('raw-content-' + id).innerHTML;
+        document.getElementById('formEditBerita').action = '/admin/edit-berita/' + id; openModal('modalEditBerita');
     }
 
     function openKelolaFotoBerita(id) {
-        const berita = newsData.find(n => n.id == id);
-        if(!berita) return;
-
+        const berita = newsData.find(n => n.id == id); if(!berita) return;
         document.getElementById('kelolaFotoBeritaTitle').innerText = 'Kelola Foto: ' + berita.title;
         document.getElementById('formTambahFotoBerita').action = '/admin/tambah-foto-berita/' + id;
-        
-        const grid = document.getElementById('existingPhotosBeritaGrid');
-        grid.innerHTML = '';
-        
+        const grid = document.getElementById('existingPhotosBeritaGrid'); grid.innerHTML = '';
         if (berita.photos && berita.photos.length > 0) {
             berita.photos.forEach(p => {
-                grid.innerHTML += `
-                    <div style="position:relative; background:rgba(255,255,255,0.05); padding:5px; border-radius:8px;">
-                        <img src="${p.url}" style="width:100%; height:80px; object-fit:cover; border-radius:4px;">
-                        <form action="/admin/hapus-foto-berita/${berita.id}/${p.id}" method="POST" style="position:absolute; top:8px; right:8px;">
-                            <button type="submit" style="background:rgba(239,68,68,0.8); color:#fff; border:none; border-radius:4px; padding:4px; cursor:pointer;" onclick="return confirm('Hapus foto ini dari berita?')">
-                                <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                            </button>
-                        </form>
-                    </div>
-                `;
+                grid.innerHTML += `<div style="position:relative; background:rgba(255,255,255,0.05); padding:5px; border-radius:8px;"><img src="${p.url}" style="width:100%; height:80px; object-fit:cover; border-radius:4px;"><form action="/admin/hapus-foto-berita/${berita.id}/${p.id}" method="POST" style="position:absolute; top:8px; right:8px;"><button type="submit" style="background:rgba(239,68,68,0.8); color:#fff; border:none; border-radius:4px; padding:4px; cursor:pointer;" onclick="return confirm('Hapus foto ini?')"><svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button></form></div>`;
             });
-        } else {
-            grid.innerHTML = '<p class="text-muted" style="grid-column: 1 / -1;">Belum ada foto tambahan di berita ini.</p>';
-        }
+        } else { grid.innerHTML = '<p class="text-muted" style="grid-column: 1 / -1;">Belum ada foto.</p>'; }
         openModal('modalKelolaFotoBerita');
     }
 
-    function openEditPengurusModal(id, name, role) {
-        document.getElementById('editPengurusName').value = name;
-        document.getElementById('editPengurusRole').value = role;
-        document.getElementById('formEditPengurus').action = '/admin/edit-pengurus/' + id;
-        openModal('modalEditPengurus');
-    }
+    // PENGURUS & BIDANG UMUM
+    function openEditPengurusModal(id, name, role) { document.getElementById('editPengurusName').value = name; document.getElementById('editPengurusRole').value = role; document.getElementById('formEditPengurus').action = '/admin/edit-pengurus/' + id; openModal('modalEditPengurus'); }
+    function openEditBidangModal(id, name) { document.getElementById('editBidangName').value = name; document.getElementById('formEditBidang').action = '/admin/edit-bidang/' + id; openModal('modalEditBidang'); }
+    function openModalAnggotaBidang(bidangId, bidangName) { document.getElementById('anggotaBidangTitle').innerText = "Tambah Anggota: " + bidangName; document.getElementById('formAnggotaBidang').action = '/admin/tambah-anggota-bidang/' + bidangId; openModal('modalAnggotaBidang'); }
+    function openEditAnggotaBidangModal(bidangId, memberId, name) { document.getElementById('editAnggotaBidangName').value = name; document.getElementById('formEditAnggotaBidang').action = `/admin/edit-anggota-bidang/${bidangId}/${memberId}`; openModal('modalEditAnggotaBidang'); }
 
-    function openModalAnggotaBidang(bidangId, bidangName) {
-        document.getElementById('anggotaBidangTitle').innerText = "Tambah Anggota: " + bidangName;
-        document.getElementById('formAnggotaBidang').action = '/admin/tambah-anggota-bidang/' + bidangId;
-        openModal('modalAnggotaBidang');
-    }
+    // PENGURUS & BIDANG KOHATI
+    function openEditKohatiPengurusModal(id, name, role) { document.getElementById('editKohatiPengurusName').value = name; document.getElementById('editKohatiPengurusRole').value = role; document.getElementById('formEditKohatiPengurus').action = '/admin/edit-kohati-pengurus/' + id; openModal('modalEditKohatiPengurus'); }
+    function openEditKohatiBidangModal(id, name) { document.getElementById('editKohatiBidangName').value = name; document.getElementById('formEditKohatiBidang').action = '/admin/edit-kohati-bidang/' + id; openModal('modalEditKohatiBidang'); }
+    function openModalKohatiAnggotaBidang(bidangId, bidangName) { document.getElementById('kohatiAnggotaBidangTitle').innerText = "Tambah Anggota: " + bidangName; document.getElementById('formKohatiAnggotaBidang').action = '/admin/tambah-anggota-kohati-bidang/' + bidangId; openModal('modalKohatiAnggotaBidang'); }
+    function openEditKohatiAnggotaBidangModal(bidangId, memberId, name) { document.getElementById('editKohatiAnggotaBidangName').value = name; document.getElementById('formEditKohatiAnggotaBidang').action = `/admin/edit-anggota-kohati-bidang/${bidangId}/${memberId}`; openModal('modalEditKohatiAnggotaBidang'); }
 
-    function openEditAlbumModal(id, title, date) {
-        document.getElementById('editAlbumTitle').value = title;
-        document.getElementById('editAlbumDate').value = date;
-        document.getElementById('formEditAlbum').action = '/admin/edit-album/' + id;
-        openModal('modalEditAlbum');
-    }
-
+    // ALBUM GALERI
+    function openEditAlbumModal(id, title, date) { document.getElementById('editAlbumTitle').value = title; document.getElementById('editAlbumDate').value = date; document.getElementById('formEditAlbum').action = '/admin/edit-album/' + id; openModal('modalEditAlbum'); }
     function openKelolaFotoAlbum(id) {
-        const album = albumsData.find(a => a.id == id);
-        if(!album) return;
-
+        const album = albumsData.find(a => a.id == id); if(!album) return;
         document.getElementById('kelolaFotoTitle').innerText = 'Kelola Foto: ' + album.title;
         document.getElementById('formTambahFotoAlbum').action = '/admin/tambah-foto-album/' + id;
-        
-        const grid = document.getElementById('existingPhotosGrid');
-        grid.innerHTML = '';
-        
+        const grid = document.getElementById('existingPhotosGrid'); grid.innerHTML = '';
         if (album.photos && album.photos.length > 0) {
             album.photos.forEach(p => {
-                grid.innerHTML += `
-                    <div style="position:relative; background:rgba(255,255,255,0.05); padding:5px; border-radius:8px;">
-                        <img src="${p.url}" style="width:100%; height:80px; object-fit:cover; border-radius:4px;">
-                        <form action="/admin/hapus-foto-album/${album.id}/${p.id}" method="POST" style="position:absolute; top:8px; right:8px;">
-                            <button type="submit" style="background:rgba(239,68,68,0.8); color:#fff; border:none; border-radius:4px; padding:4px; cursor:pointer;" onclick="return confirm('Hapus foto ini dari galeri?')">
-                                <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                            </button>
-                        </form>
-                    </div>
-                `;
+                grid.innerHTML += `<div style="position:relative; background:rgba(255,255,255,0.05); padding:5px; border-radius:8px;"><img src="${p.url}" style="width:100%; height:80px; object-fit:cover; border-radius:4px;"><form action="/admin/hapus-foto-album/${album.id}/${p.id}" method="POST" style="position:absolute; top:8px; right:8px;"><button type="submit" style="background:rgba(239,68,68,0.8); color:#fff; border:none; border-radius:4px; padding:4px; cursor:pointer;" onclick="return confirm('Hapus foto?')"><svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button></form></div>`;
             });
-        } else {
-            grid.innerHTML = '<p class="text-muted" style="grid-column: 1 / -1;">Belum ada foto tambahan yang di-upload ke kegiatan ini.</p>';
-        }
+        } else { grid.innerHTML = '<p class="text-muted" style="grid-column: 1 / -1;">Belum ada foto.</p>'; }
         openModal('modalKelolaFotoAlbum');
+    }
+
+    // SHORTLINK
+    function openEditShortlinkModal(id, title, path, url) {
+        document.getElementById('editShortlinkTitle').value = title; document.getElementById('editShortlinkPath').value = path; document.getElementById('editShortlinkUrl').value = url;
+        document.getElementById('formEditShortlink').action = '/admin/edit-shortlink/' + id; openModal('modalEditShortlink');
     }
 
     // Auto Compress Images
     async function compressImage(file, maxWidth = 1000) {
         return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
+            const reader = new FileReader(); reader.readAsDataURL(file);
             reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target.result;
+                const img = new Image(); img.src = event.target.result;
                 img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
+                    const canvas = document.createElement('canvas'); let width = img.width; let height = img.height;
                     if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; }
-                    canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
                     resolve(canvas.toDataURL('image/webp', 0.6)); 
                 };
             };
@@ -711,19 +767,11 @@
             const file = e.target.files[0];
             if (file && file.type.startsWith('image/')) {
                 const submitBtn = input.closest('form').querySelector('.submit-btn');
-                const originalText = submitBtn.innerText;
-                submitBtn.innerText = 'Mengompresi Gambar...';
-                submitBtn.disabled = true;
-
+                const originalText = submitBtn.innerText; submitBtn.innerText = 'Mengompresi Gambar...'; submitBtn.disabled = true;
                 const base64 = await compressImage(file);
                 let hidden = input.parentElement.querySelector('.b64-hidden');
-                if (!hidden) {
-                    hidden = document.createElement('input');
-                    hidden.type = 'hidden'; hidden.name = input.name + '_b64'; hidden.className = 'b64-hidden';
-                    input.parentElement.appendChild(hidden);
-                }
-                hidden.value = base64;
-                submitBtn.innerText = originalText; submitBtn.disabled = false;
+                if (!hidden) { hidden = document.createElement('input'); hidden.type = 'hidden'; hidden.name = input.name + '_b64'; hidden.className = 'b64-hidden'; input.parentElement.appendChild(hidden); }
+                hidden.value = base64; submitBtn.innerText = originalText; submitBtn.disabled = false;
             }
         });
     });
@@ -733,25 +781,16 @@
             const files = e.target.files;
             if (files && files.length > 0) {
                 const submitBtn = input.closest('form').querySelector('.submit-btn-multi');
-                const originalText = submitBtn.innerText;
-                submitBtn.innerText = 'Memproses ' + files.length + ' Foto...';
-                submitBtn.disabled = true;
-
+                const originalText = submitBtn.innerText; submitBtn.innerText = 'Memproses ' + files.length + ' Foto...'; submitBtn.disabled = true;
                 input.parentElement.querySelectorAll('.b64-hidden-multi').forEach(el => el.remove());
-
                 for(let i=0; i < files.length; i++) {
                     if (files[i].type.startsWith('image/')) {
                         const base64 = await compressImage(files[i]);
-                        const hidden = document.createElement('input');
-                        hidden.type = 'hidden';
-                        hidden.name = 'photos_b64';
-                        hidden.className = 'b64-hidden-multi';
-                        hidden.value = base64;
+                        const hidden = document.createElement('input'); hidden.type = 'hidden'; hidden.name = 'photos_b64'; hidden.className = 'b64-hidden-multi'; hidden.value = base64;
                         input.parentElement.appendChild(hidden);
                     }
                 }
-                submitBtn.innerText = originalText;
-                submitBtn.disabled = false;
+                submitBtn.innerText = originalText; submitBtn.disabled = false;
             }
         });
     });
