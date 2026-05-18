@@ -23,7 +23,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
-app.use(cookieParser()); // PENGAMAN: Hanya gunakan cookie-parser, TIDAK menggunakan express-session.
+app.use(cookieParser());
 
 // --- STRUKTUR SETTINGS DEFAULT (TULISAN ASLI) ---
 const defaultSettings = {
@@ -37,18 +37,18 @@ const defaultSettings = {
     footerDesc: "Tempat berkembang bareng untuk generasi muslim yang progresif, intelektual, dan menjunjung tinggi nilai-nilai keislaman dan keindonesiaan dalam lingkup Kedokteran Gigi.",
     footerCopyright: "© 2026 HMI Komisariat Kedokteran Gigi UMI. All rights reserved.",
     footerProgrammer: "💻 Axa Xyz",
-    kohatiActive: true,
+    kohatiActive: 'true',
     profilText: `<p>Halaman profil ini berisi deskripsi singkat mengenai sejarah, visi, dan misi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia, serta program kerja dan kegiatan yang telah dan akan dilaksanakan oleh organisasi tersebut.</p><br><h3>Welcome</h3><p>Selamat datang di website resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia. Kami adalah sebuah organisasi mahasiswa yang terdiri dari para mahasiswa kedokteran gigi yang memiliki komitmen untuk meningkatkan kualitas diri dan mengembangkan potensi dalam bidang akademik, keislaman, sosial, dan kemanusiaan. Di sini, Anda dapat menemukan informasi terbaru tentang kegiatan kami, program kerja, dan berbagai kegiatan yang telah kami lakukan. Selamat menjelajahi situs web kami!</p>`,
-    visiMisiText: `<h3>Visi</h3><p>Terbinanya insan akademis, pencipta, pengabdi yang bernafaskan Islam dan bertanggung jawab atas terwujudnya masyarakat adil makmur yang diridhoi Allah SWT, khususnya dalam mewujudkan dokter gigi muslim yang profesional.</p><br><h3>Misi</h3><ul class="list-custom"><li><span class="list-num">1.</span> Reaktualisasi nilai-nilai ke-Islaman dalam pengembangan kapasitas diri kader.</li><li><span class="list-num">2.</span> Optimalisasi kesadaran kader terkait isu kesehatan gigi dan masyarakat.</li><li><span class="list-num">3.</span> Memelihara dan mengedepankan nilai-nilai kekeluargaan dalam aktivitas organisasi.</li></ul>`,
+    visiMisiText: `<h3>Visi</h3><p>Terbinanya insan akademis, pencipta, pengabdi yang bernafaskan Islam dan bertanggung jawab atas terwujudnya masyarakat adil makmur yang diridhoi Allah SWT, khususnya dalam mewujudkan dokter gigi muslim yang profesional.</p><br><h3>Misi</h3><ul class="list-custom"><li>Reaktualisasi nilai-nilai ke-Islaman dalam pengembangan kapasitas diri kader.</li><li>Optimalisasi kesadaran kader terkait isu kesehatan gigi dan masyarakat.</li><li>Memelihara dan mengedepankan nilai-nilai kekeluargaan dalam aktivitas organisasi.</li></ul>`,
     mapsEmbed: "",
     bookletPdf: "",
-    announceActive: false,
+    announceActive: 'false',
     announceImage: "",
     announceTitle: "Latihan Kader I 2025",
     announceContent: "<p>Kala dunia tersihir oleh retorika kosong dan pemikiran instan, kami memilih jalan terjal. Berpikir dalam, bertanya kritis, dan membangun gagasan yang hidup. LK I 2025 bukan sekadar awal; ia adalah dentuman pertama dari revolusi intelektual yang tak akan berhenti di ruang diskusi. Ia akan menjelma menjadi gerakan, menjadi etos, menjadi sejarah.</p>"
 };
 
-// Fungsi Helper Mengambil Data Setelan (DENGAN PENGAMAN TRY-CATCH)
+// Fungsi Helper Mengambil Data Setelan & Sosmed
 async function getSiteData() {
     try {
         let settings = await kv.get('siteSettings');
@@ -56,13 +56,12 @@ async function getSiteData() {
             await kv.set('siteSettings', defaultSettings);
             settings = defaultSettings;
         } else {
-            // Restore properti yang hilang agar web tidak error
             for (let key in defaultSettings) {
                 if (settings[key] === undefined) settings[key] = defaultSettings[key];
             }
         }
         let socialMediaList = await kv.get('socialMediaList');
-        if (!socialMediaList) {
+        if (!socialMediaList || socialMediaList.length === 0) {
             socialMediaList = [
                 { id: 1, name: 'Instagram', icon: '', url: 'https://www.instagram.com/hmi_komkgumi' },
                 { id: 2, name: 'Facebook', icon: '', url: 'https://www.facebook.com/hmi_komkgumi' }
@@ -71,8 +70,37 @@ async function getSiteData() {
         }
         return { siteSettings: settings, socialMediaList };
     } catch (e) {
-        console.log("Redis Loading Safe Mode.");
         return { siteSettings: defaultSettings, socialMediaList: [] };
+    }
+}
+
+// Fungsi Helper untuk Inisialisasi Default Data Konten (Berita, Pengurus, Bidang)
+async function initDefaultData() {
+    let hasNews = await kv.get('newsList');
+    if (!hasNews || hasNews.length === 0) {
+        await kv.set('newsList', [
+            { id: 1, title: 'Silaturahmi, Penghargaan dan Launching Kaos', category: 'Terbaru', date: '10 May 2025', content: 'Kegiatan silaturahmi kader...', image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=800&q=80', photos: [] },
+            { id: 2, title: 'Semarak Hari Santri! HMI Gelar Pengajian', category: 'Populer', date: '22 Oct 2024', content: 'Peringatan hari santri nasional...', image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80', photos: [] }
+        ]);
+    }
+    let hasAlbums = await kv.get('albumsList');
+    if (!hasAlbums || hasAlbums.length === 0) {
+        await kv.set('albumsList', [
+            { id: 1, title: 'Basic Training (LK I) LXIII', date: '12 Maret 2025', cover: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80', photos: [] }
+        ]);
+    }
+    let hasPengurus = await kv.get('pengurusList');
+    if (!hasPengurus || hasPengurus.length === 0) {
+        await kv.set('pengurusList', [
+            { id: 1, name: 'Muh. Xavier Syafwan', role: 'Ketua Umum', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=80' }
+        ]);
+    }
+    let hasBidang = await kv.get('bidangList');
+    if (!hasBidang || hasBidang.length === 0) {
+        await kv.set('bidangList', [
+            { id: 101, name: 'Bidang PPPA', members: [] },
+            { id: 102, name: 'Bidang PTKP', members: [] }
+        ]);
     }
 }
 
@@ -80,14 +108,14 @@ async function getSiteData() {
 (async () => {
     try {
         await getSiteData();
-        if (!(await kv.get('newsList'))) await kv.set('newsList', []);
-        if (!(await kv.get('albumsList'))) await kv.set('albumsList', []);
-        if (!(await kv.get('pengurusList'))) await kv.set('pengurusList', []);
-        if (!(await kv.get('bidangList'))) await kv.set('bidangList', []);
+        await initDefaultData();
+        
+        // Cek struktur lainnya
         if (!(await kv.get('kohatiPengurusList'))) await kv.set('kohatiPengurusList', []);
         if (!(await kv.get('kohatiBidangList'))) await kv.set('kohatiBidangList', []);
         if (!(await kv.get('dataAnggotaList'))) await kv.set('dataAnggotaList', []);
         if (!(await kv.get('shortlinkList'))) await kv.set('shortlinkList', []);
+        
         console.log("KV Database Siap & Tersinkronisasi.");
     } catch (err) {
         console.error("Gagal inisialisasi KV, melintas aman:", err.message);
@@ -182,11 +210,9 @@ app.get('/:slug', async (req, res, next) => {
 
 // --- ADMIN SECURITY ---
 app.get('/admin', async (req, res) => {
-    try {
-        const { siteSettings, socialMediaList } = await getSiteData();
-        if(req.cookies.admin_auth === 'true') return res.redirect('/admin/dashboard');
-        res.render('admin-login', { page: 'admin', error: null, siteSettings, socialMediaList });
-    } catch (e) { res.send("Admin Load Error"); }
+    const { siteSettings, socialMediaList } = await getSiteData();
+    if(req.cookies.admin_auth === 'true') return res.redirect('/admin/dashboard');
+    res.render('admin-login', { page: 'admin', error: null, siteSettings, socialMediaList });
 });
 
 app.post('/admin/login', async (req, res) => {
@@ -227,36 +253,30 @@ app.get('/admin/logout', (req, res) => {
 
 // --- API KELOLA BERITA, GALERI, DATA ANGGOTA ---
 app.post('/admin/tambah-berita', requireAdmin, upload.any(), async (req, res) => {
-    try {
-        let news = await kv.get('newsList') || [];
-        news.unshift({ id: Date.now(), title: req.body.title, category: req.body.category, date: req.body.date || new Date().toLocaleDateString('id-ID'), content: req.body.content, image: fileHelper(req, 'image_b64'), photos: [] });
-        await kv.set('newsList', news); res.redirect('/admin/dashboard');
-    } catch (e) { res.redirect('/admin/dashboard'); }
+    let news = await kv.get('newsList') || [];
+    news.unshift({ id: Date.now(), title: req.body.title, category: req.body.category, date: req.body.date || new Date().toLocaleDateString('id-ID'), content: req.body.content, image: fileHelper(req, 'image_b64'), photos: [] });
+    await kv.set('newsList', news); res.redirect('/admin/dashboard');
 });
 app.post('/admin/edit-berita/:id', requireAdmin, upload.any(), async (req, res) => {
-    try {
-        let news = await kv.get('newsList') || [];
-        let i = news.findIndex(n => n.id == req.params.id);
-        if (i !== -1) {
-            news[i].title = req.body.title; news[i].category = req.body.category; news[i].content = req.body.content;
-            if (req.body.date) news[i].date = req.body.date;
-            const img = fileHelper(req, 'image_b64'); if (img) news[i].image = img;
-            await kv.set('newsList', news);
-        }
-        res.redirect('/admin/dashboard');
-    } catch (e) { res.redirect('/admin/dashboard'); }
+    let news = await kv.get('newsList') || [];
+    let i = news.findIndex(n => n.id == req.params.id);
+    if (i !== -1) {
+        news[i].title = req.body.title; news[i].category = req.body.category; news[i].content = req.body.content;
+        if (req.body.date) news[i].date = req.body.date;
+        const img = fileHelper(req, 'image_b64'); if (img) news[i].image = img;
+        await kv.set('newsList', news);
+    }
+    res.redirect('/admin/dashboard');
 });
 app.post('/admin/hapus-berita/:id', requireAdmin, async (req, res) => {
     let news = await kv.get('newsList') || []; await kv.set('newsList', news.filter(n => n.id != req.params.id)); res.redirect('/admin/dashboard');
 });
 app.post('/admin/tambah-foto-berita/:id', requireAdmin, upload.any(), async (req, res) => {
-    try {
-        let photosB64 = req.body.photos_b64; let newPhotos = [];
-        if (photosB64) { if (!Array.isArray(photosB64)) photosB64 = [photosB64]; photosB64.forEach(b64 => { newPhotos.push({ id: Date.now() + Math.random(), url: b64 }); }); }
-        let news = await kv.get('newsList') || []; let index = news.findIndex(n => n.id == req.params.id);
-        if (index !== -1) { if (!news[index].photos) news[index].photos = []; news[index].photos = [...news[index].photos, ...newPhotos]; await kv.set('newsList', news); }
-        res.redirect('/admin/dashboard');
-    } catch (e) { res.redirect('/admin/dashboard'); }
+    let photosB64 = req.body.photos_b64; let newPhotos = [];
+    if (photosB64) { if (!Array.isArray(photosB64)) photosB64 = [photosB64]; photosB64.forEach(b64 => { newPhotos.push({ id: Date.now() + Math.random(), url: b64 }); }); }
+    let news = await kv.get('newsList') || []; let index = news.findIndex(n => n.id == req.params.id);
+    if (index !== -1) { if (!news[index].photos) news[index].photos = []; news[index].photos = [...news[index].photos, ...newPhotos]; await kv.set('newsList', news); }
+    res.redirect('/admin/dashboard');
 });
 app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req, res) => {
     let news = await kv.get('newsList') || []; let index = news.findIndex(n => n.id == req.params.beritaId);
@@ -264,7 +284,7 @@ app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req
     res.redirect('/admin/dashboard');
 });
 
-// --- API SETELAN WEB ---
+// --- API SETELAN WEB (ANTI-CRASH) ---
 app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
@@ -276,8 +296,11 @@ app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
         siteSettings.footerDesc = req.body.footerDesc || siteSettings.footerDesc;
         siteSettings.footerCopyright = req.body.footerCopyright || siteSettings.footerCopyright;
         siteSettings.footerProgrammer = req.body.footerProgrammer || siteSettings.footerProgrammer;
-        siteSettings.kohatiActive = req.body.kohatiActive === 'on';
+        
+        // PENGAMAN TOGGLE KOHATI
+        siteSettings.kohatiActive = req.body.kohatiActive ? 'true' : 'false';
 
+        // Tentang Kami Settings
         if (req.body.profilText !== undefined) siteSettings.profilText = req.body.profilText;
         if (req.body.visiMisiText !== undefined) siteSettings.visiMisiText = req.body.visiMisiText;
         if (req.body.mapsEmbed !== undefined) siteSettings.mapsEmbed = req.body.mapsEmbed;
@@ -294,11 +317,15 @@ app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
 app.post('/admin/setelan-announcement', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
-        siteSettings.announceActive = req.body.announceActive === 'on';
+        
+        // PENGAMAN TOGGLE ANNOUNCE
+        siteSettings.announceActive = req.body.announceActive ? 'true' : 'false';
+        
         siteSettings.announceTitle = req.body.announceTitle || siteSettings.announceTitle;
         siteSettings.announceContent = req.body.announceContent || siteSettings.announceContent;
 
         const img = fileHelper(req, 'announceImage_b64'); if (img) siteSettings.announceImage = img;
+
         await kv.set('siteSettings', siteSettings);
         res.redirect('/admin/dashboard');
     } catch (err) { res.redirect('/admin/dashboard'); }
@@ -329,7 +356,7 @@ app.post('/admin/hapus-sosmed/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('socialMediaList') || []; await kv.set('socialMediaList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
 });
 
-// --- API DINAMIS PENGURUS & BIDANG ---
+// --- API DINAMIS PENGURUS & BIDANG (UMUM & KOHATI) ---
 const manageTeam = async (req, res, dbKey, action) => {
     try {
         let list = await kv.get(dbKey) || [];
@@ -386,10 +413,9 @@ app.post('/admin/tambah-data-anggota', requireAdmin, upload.any(), async (req, r
 app.post('/admin/edit-data-anggota/:id', requireAdmin, upload.any(), async (req, res) => { try { let dataAnggota = await kv.get('dataAnggotaList') || []; let index = dataAnggota.findIndex(d => d.id == req.params.id); if (index !== -1) { dataAnggota[index].title = req.body.title; if (req.body.date) dataAnggota[index].date = req.body.date; let fileStr = fileHelper(req, 'file_b64'); if (fileStr) dataAnggota[index].file = fileStr; await kv.set('dataAnggotaList', dataAnggota); } res.redirect('/admin/dashboard'); } catch(e){ res.redirect('/admin/dashboard'); }});
 app.post('/admin/hapus-data-anggota/:id', requireAdmin, async (req, res) => { let dataAnggota = await kv.get('dataAnggotaList') || []; await kv.set('dataAnggotaList', dataAnggota.filter(d => d.id != req.params.id)); res.redirect('/admin/dashboard'); });
 
-// GLOBAL ERROR HANDLER
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Terjadi Kesalahan Internal di Server.');
+app.use(async (req, res) => {
+    const { siteSettings, socialMediaList } = await getSiteData();
+    res.status(404).render('admin-404', { page: '404', siteSettings, socialMediaList });
 });
 
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
