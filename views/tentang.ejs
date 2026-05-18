@@ -4,7 +4,7 @@
     <button class="tab-btn active" onclick="openTab('tab-profil')"><i data-lucide="user"></i> Profil</button>
     <button class="tab-btn" onclick="openTab('tab-visimisi')"><i data-lucide="target"></i> Visi & Misi</button>
     <button class="tab-btn" onclick="openTab('tab-struktur')"><i data-lucide="users"></i> Kepengurusan</button>
-    <% if (siteSettings.kohatiActive) { %>
+    <% if (siteSettings.kohatiActive === true || siteSettings.kohatiActive === 'true') { %>
         <button class="tab-btn" onclick="openTab('tab-kohati')" style="color: #f472b6;"><i data-lucide="heart"></i> Kohati</button>
     <% } %>
 </div>
@@ -20,13 +20,13 @@
                 <% if (siteSettings.bookletPdf) { %>
                 <div>
                     <h3 style="margin-bottom: 15px; font-size:1.3rem;">Buku Pedoman / Profil</h3>
-                    <div class="booklet-container"><iframe src="<%= siteSettings.bookletPdf %>" frameborder="0"></iframe></div>
+                    <div style="width: 100%; height: 400px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);"><iframe src="<%= siteSettings.bookletPdf %>" frameborder="0" width="100%" height="100%"></iframe></div>
                 </div>
                 <% } %>
                 <% if (siteSettings.mapsEmbed) { %>
                 <div>
                     <h3 style="margin-bottom: 15px; font-size:1.3rem;">Lokasi Sekretariat</h3>
-                    <div class="maps-container"><%- siteSettings.mapsEmbed %></div>
+                    <div style="width: 100%; height: 400px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);"><%- siteSettings.mapsEmbed %></div>
                 </div>
                 <% } %>
             </div>
@@ -85,7 +85,7 @@
 </div>
 
 <!-- STRUKTUR KOHATI -->
-<% if (siteSettings.kohatiActive) { %>
+<% if (siteSettings.kohatiActive === true || siteSettings.kohatiActive === 'true') { %>
 <div id="tab-kohati" class="tab-content">
     <div class="glass" style="padding: 40px; border-left: 5px solid #f472b6; text-align: center;">
         <h2 style="color: #f472b6; margin-bottom: 10px;"><i data-lucide="heart"></i> KOHATI</h2>
