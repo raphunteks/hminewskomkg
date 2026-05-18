@@ -59,7 +59,7 @@ h1, h2, h3, h4, h5 { color: #fff; margin-bottom: 0.5rem; line-height: 1.3; }
 input[type="file"].input-control { padding: 10px; background: rgba(255,255,255,0.05); color: #4ade80; cursor: pointer; }
 select.input-control option { background: #1f2937; color: #fff; }
 
-/* QUILL.JS CUSTOM DARK THEME STYLES (WORD EDITOR) */
+/* QUILL.JS CUSTOM DARK THEME STYLES */
 .ql-toolbar.ql-snow { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15) !important; border-top-left-radius: 12px; border-top-right-radius: 12px; }
 .ql-container.ql-snow { border: 1px solid rgba(255,255,255,0.15) !important; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; background: rgba(0,0,0,0.4); font-family: inherit; font-size: 0.95rem; }
 .ql-snow .ql-stroke { stroke: #d1d5db; }
@@ -82,58 +82,52 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .rich-text-content a:hover { color: #22c55e; }
 .rich-text-content blockquote { border-left: 4px solid #22c55e; padding-left: 15px; margin-left: 0; font-style: italic; color: #9ca3af; background: rgba(255,255,255,0.05); padding:10px 15px; border-radius: 0 8px 8px 0; }
 
-/* ==============================================================
-   UI KARTU VISI & MISI (UMUM & KOHATI) ELEGAN
-============================================================== */
-.vision-mission-card, .vm-card { 
-    padding: 35px; 
-    position: relative; 
-    overflow: hidden; 
+/* NEW: KARTU VISI MISI YANG ELEGAN & PROPORSIONAL */
+.vm-card {
+    background: #093824; /* Hijau solid elegan */
     border-radius: 20px;
-    background: #093824;
+    padding: 35px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    overflow: hidden;
     margin-bottom: 25px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-left-width: 6px;
     border-left-style: solid;
+    border-left-color: #4ade80;
     text-align: left;
 }
-.vision-mission-card.v-left { border-left-color: #4ade80; }
-.vision-mission-card.m-left { border-left-color: #4ade80; } 
-.vm-card { border-left-color: #4ade80; }
 
-.icon-box, .vm-icon { 
-    width: 50px; 
-    height: 50px; 
-    background: rgba(255,255,255,0.08); 
-    border-radius: 14px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    font-size: 1.5rem; 
-    margin-bottom: 20px; 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+.vm-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.vision-mission-card h3, .vm-title {
+.vm-title {
     color: #4ade80;
     font-size: 1.6rem;
-    font-weight: 800;
     margin-bottom: 15px;
+    font-weight: 800;
 }
 
-.vision-mission-card p, .vm-card .rich-text-content p {
+.vm-card .rich-text-content p {
     color: #e5e7eb;
     line-height: 1.7;
     font-size: 1.05rem;
 }
 
-/* Gaya khusus List Custom Visi & Misi agar Angka Menonjol Terang */
 .list-custom { list-style: none; padding: 0; }
 .list-custom li { display: flex; gap: 15px; margin-bottom: 15px; color: #e5e7eb; font-size: 1.05rem; line-height: 1.7; align-items: flex-start; }
 .list-num { color: #4ade80; font-weight: 800; font-size: 1.1rem; flex-shrink: 0; }
 
-/* Mengakali editor teks (Quill) agar auto-number (ol li) juga cantik & terang */
 .vm-card .rich-text-content ol {
     list-style: none;
     counter-reset: misi-counter;
@@ -157,9 +151,24 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     font-size: 1.1rem;
 }
 
-/* Khusus untuk KOHATI, angka/list berubah warna keaksen Pink otomatis */
 .vm-card[style*="#f472b6"] .rich-text-content ol li::before { 
     color: #f472b6 !important; 
+}
+
+/* ==============================================================
+   DEARFLIP (3D FLIPBOOK) SUPPORT
+============================================================== */
+.flipbook-container {
+    position: relative;
+    z-index: 10;
+}
+/* Menjaga UI DearFlip agar tidak rusak oleh base CSS kita */
+.df-ui-btn {
+    box-sizing: content-box !important;
+}
+._df_book {
+    width: 100%;
+    height: 100%;
 }
 
 /* GRID SYSTEMS */
@@ -176,13 +185,12 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .tab-content.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-
 /* ==============================================================
-   ANNOUNCEMENT POP-UP (100% FIXED, ELEGAN, SESUAI GBR 1 & 2)
+   ANNOUNCEMENT POP-UP (FIXED: SIZE DIPERKECIL & PROPORSIONAL)
 ============================================================== */
 .announce-overlay {
-    z-index: 9999999; /* Posisi terdepan bebas footer */
-    padding: 20px;
+    z-index: 9999999;
+    padding: 15px; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -191,34 +199,34 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.75);
-    backdrop-filter: blur(8px);
+    background: rgba(0,0,0,0.75); 
+    backdrop-filter: blur(10px);
 }
 
 .announce-horizontal {
     display: flex;
     flex-direction: row;
-    max-width: 750px; /* Ukuran Compact, tidak memakan seluruh layar */
+    max-width: 750px; 
     width: 100%;
-    max-height: 65vh; /* Proporsional tinggi */
-    background: #093824; /* Background Solid Dark Green */
-    border-radius: 12px;
-    overflow: hidden;
+    max-height: 65vh; 
+    background: #064e3b; 
+    border-radius: 16px;
+    overflow: hidden; 
     position: relative;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(74,222,128,0.2);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(74,222,128,0.3);
 }
 
-/* Tombol X yang elegan menyatu */
 .announce-close-btn {
     position: absolute;
     top: 15px;
     right: 15px;
     z-index: 50; 
-    background: transparent;
-    border: none;
-    padding: 5px;
-    color: #9ca3af;
+    background: rgba(0,0,0,0.6); 
+    border-radius: 50%;
+    padding: 8px;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.3);
     cursor: pointer;
     transition: 0.3s;
     display: flex;
@@ -227,15 +235,14 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 }
 
 .announce-close-btn:hover { 
-    color: #fff;
-    transform: scale(1.1); 
+    background: rgba(239,68,68,0.9); 
+    border-color: #ef4444; 
 }
 
-/* Container Gambar Poster */
 .announce-left {
     flex: 0 0 45%; 
     max-width: 45%;
-    padding: 25px; /* Memberikan border (jarak aman keliling) */
+    padding: 20px; 
     background: transparent; 
     display: flex;
     align-items: center;
@@ -246,30 +253,29 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .announce-left img {
     max-width: 100%;
     max-height: 100%;
-    width: auto; 
+    width: 100%; 
     height: auto;
-    object-fit: contain; /* Gambar tidak akan terpotong / melonjong */
+    object-fit: contain; 
     border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
 }
 
-/* Container Teks */
 .announce-right {
     flex: 1; 
-    padding: 35px 35px 35px 0; /* Memberi jarak nyaman antar elemen */
+    padding: 30px 25px 30px 0; 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    overflow-y: auto; /* Memungkinkan Scroll Khusus Text Area jika panjang */
+    justify-content: center;
+    overflow-y: auto; 
 }
 
-/* Tipografi Teks */
 .announce-title { 
     color: #fff; 
     margin-bottom: 10px; 
-    font-size: 1.3rem; /* Proporsional font */
-    font-weight: 700; 
+    font-size: 1.4rem; 
+    font-weight: 800; 
     line-height: 1.3; 
-    padding-right: 30px; 
+    padding-right: 35px; 
 }
 
 .announce-divider { 
@@ -285,28 +291,25 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     color: #d1d5db; 
     margin-bottom: 20px; 
     line-height: 1.6; 
-    font-size: 0.9rem; /* Lebih bersih */
-    /* Hapus border kiri kotor */
-    border-left: none; 
-    padding-left: 0; 
+    font-size: 0.85rem; 
+    border-left: 3px solid rgba(74, 222, 128, 0.4); 
+    padding-left: 15px; 
 }
 
-/* Tombol (Bisa dihilangkan sesuai HTML, jika tampil tetap rapi) */
 .announce-btn {
     align-self: flex-start;
-    padding: 8px 16px;
+    padding: 8px 20px;
     font-size: 0.85rem;
-    border-radius: 6px;
-    font-weight: 600;
+    border-radius: 8px;
+    font-weight: bold;
     background: transparent;
-    border: 1px solid rgba(74, 222, 128, 0.5);
+    border: 1px solid #4ade80;
     color: #4ade80;
     cursor: pointer;
     transition: 0.3s;
     margin-top: auto; 
 }
-.announce-btn:hover { background: rgba(74, 222, 128, 0.1); border-color: #4ade80; color: #4ade80; }
-
+.announce-btn:hover { background: #4ade80; color: #000; }
 
 /* ==============================================================
    ADMIN DASHBOARD UI
@@ -415,13 +418,6 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .team-name { font-size: 1.1rem; margin-bottom: 5px; }
 .team-role { color: #4ade80; font-size: 0.85rem; font-weight: bold; }
 
-.vision-mission-card { padding: 40px; position: relative; overflow: hidden; }
-.vision-mission-card.v-left { border-left: 5px solid #22c55e; background: rgba(0,0,0,0.4); }
-.vision-mission-card.m-left { border-left: 5px solid #34d399; background: rgba(6,78,59,0.4); }
-.icon-box { width: 50px; height: 50px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-.list-custom li { display: flex; gap: 15px; margin-bottom: 15px; color: #d1d5db; }
-.list-num { color: #22c55e; font-weight: bold; }
-
 .gallery-card { padding: 15px; text-align: left; display: block; transition: 0.3s; }
 .gallery-img-box { height: 220px; border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
 .gallery-img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
@@ -462,33 +458,38 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     .panel-header { flex-direction: column; gap: 15px; text-align: center; }
     .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
     
-    /* MOBILE FIX UNTUK POP-UP: 100% RAPI, TIDAK TERTUTUP, TIDAK BESAR */
+    /* FIX ANNOUNCEMENT HORIZONTAL TO VERTIKAL DI MOBILE: UI PROPORSIONAL */
     .announce-horizontal { 
         flex-direction: column !important; 
         max-height: 75vh; 
+        width: 95%; 
+        overflow: hidden; 
     }
     
-    .announce-close-btn {
-        top: 10px;
-        right: 10px;
-        background: rgba(0,0,0,0.5);
-        border-radius: 50%;
-        color: #fff;
-    }
-
     .announce-left { 
         max-width: 100% !important; 
         flex: none; 
-        padding: 20px; 
-        height: 35vh; /* DIKUNCI 35% tinggi HP agar porsi teks bawah lebih pas */
-        min-height: 180px;
-        border-bottom: 1px solid rgba(255,255,255,0.05); 
+        padding: 15px; 
+        padding-top: 25px; 
+        height: 25vh; 
+        min-height: 150px;
+        background: transparent; 
+        border-bottom: 1px solid rgba(255,255,255,0.1); 
+    }
+    
+    .announce-left img { 
+        max-height: 100%; 
+        width: auto; 
+        margin: 0 auto; 
     }
     
     .announce-right { 
-        padding: 20px 20px 25px 20px !important; 
-        overflow-y: auto; /* SCROLL TEKS */
+        flex: 1; 
+        padding: 20px !important; 
+        overflow-y: auto; 
     }
+    
+    .announce-title { font-size: 1.2rem; padding-right: 0; }
 }
 
 ::-webkit-scrollbar { width: 8px; }
