@@ -1,8 +1,9 @@
 <%- include('partials/header') %>
 
+<!-- POPUP PENGUMUMAN HORIZONTAL (DIEMBED LANGSUNG AGAR ANTI CRASH 500) -->
 <% if (typeof siteSettings !== 'undefined' && (siteSettings.announceActive === 'true' || siteSettings.announceActive === true)) { %>
 <div class="modal-overlay announce-overlay" id="announceModal">
-    <div class="announce-horizontal">
+    <div class="announce-container">
         
         <button class="close-modal announce-close-btn" onclick="closeAnnounce()">
             <i data-lucide="x"></i>
@@ -49,6 +50,7 @@
 </script>
 <% } %>
 
+<!-- Hero / Selamat Datang -->
 <div class="glass hero">
     <span class="badge">Yakusa! Yakin Usaha Sampai</span>
     <h1>Selamat datang di website resmi <br><span class="text-gradient"><%= siteSettings.heroTitle || siteSettings.webTitle %></span></h1>
@@ -56,6 +58,7 @@
     <a href="/tentang" class="btn btn-primary">Kenali Kami Lebih Dekat</a>
 </div>
 
+<!-- Section Berita -->
 <div class="section-header">
     <div>
         <h2>Berita & Informasi</h2>
