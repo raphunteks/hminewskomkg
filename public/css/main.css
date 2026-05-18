@@ -11,9 +11,9 @@ button, input, textarea, select { font-family: inherit; }
 /* FIX LUCIDE ICONS SVG SCALING */
 .lucide { display: inline-block; vertical-align: middle; width: 20px; height: 20px; stroke: currentColor; stroke-width: 2px; }
 
-/* LAYOUT (Z-INDEX FIXED) */
+/* LAYOUT */
 .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-main { flex-grow: 1; padding-top: 120px; padding-bottom: 60px; position: relative; z-index: 20; }
+main { flex-grow: 1; padding-top: 120px; padding-bottom: 60px; position: relative; z-index: 10; }
 
 .bg-blob { position: fixed; border-radius: 50%; filter: blur(100px); z-index: 1; opacity: 0.4; pointer-events: none; }
 .blob-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: #22c55e; }
@@ -97,20 +97,20 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ==============================================================
-   ANNOUNCEMENT POP-UP (ANTI-MELONJONG & RESPONSIVE)
+   ANNOUNCEMENT POP-UP (HORIZONTAL FIXED)
 ============================================================== */
 .announce-wrapper {
     display: flex;
     flex-direction: row;
     max-width: 850px;
     width: 100%;
-    max-height: 80vh; /* Kunci: Tidak akan membesar lebih dari 80% layar */
+    max-height: 85vh;
     background: #1b4332;
     border-radius: 16px;
     overflow: hidden;
     position: relative;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(74,222,128,0.2);
+    border: 2px solid rgba(74,222,128,0.3);
 }
 
 .announce-close-btn {
@@ -132,26 +132,28 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .announce-left {
     flex: 0 0 45%;
     max-width: 45%;
-    background: #064e3b;
-    position: relative;
-    min-height: 300px;
+    padding: 20px; /* BORDER/JARAK DARI TEPI BOX SEPERTI GAMBAR */
+    background: #1b4332; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .announce-left img {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
-    height: 100%;
-    object-fit: cover; /* Foto tetap proporsional mengikuti kotaknya */
+    height: auto;
+    max-height: 100%;
+    object-fit: contain; /* GAMBAR MENETAP PROPORSIONAL ANTI MELONJONG */
+    border-radius: 8px;
 }
 
 .announce-right {
     flex: 1;
-    padding: 40px 30px;
+    padding: 30px 30px 30px 10px;
     display: flex;
     flex-direction: column;
-    overflow-y: auto; /* Kunci: Teks yang sangat panjang akan memunculkan scrollbar di sini */
+    overflow-y: auto; /* SCROLL HANYA UNTUK TEKS JIKA TERLALU PANJANG */
+    background: #1b4332;
 }
 
 .announce-title { color: #fff; margin-bottom: 10px; font-size: 2rem; font-weight: 800; line-height: 1.2; padding-right: 30px; }
@@ -171,7 +173,6 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     cursor: pointer;
     transition: 0.3s;
 }
-
 .announce-btn:hover { background: #4ade80; color: #000; }
 
 /* ==============================================================
@@ -189,10 +190,12 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .admin-tab-pane { display: none; animation: fadeIn 0.4s ease; }
 .admin-tab-pane.active { display: block; }
 
-/* FIX LAYOUT: Grid Untuk Kerapian Berita & Galeri Admin */
-.admin-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; align-items: start; }
+/* FIX LAYOUT: Grid Proposional Untuk Kerapian Admin (Kiri Lebih Besar dari Kanan) */
+.admin-layout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 30px; align-items: start; }
+.admin-main-content { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
+.admin-sidebar { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
 
-.admin-panel { padding: 25px; margin-bottom: 30px; overflow: hidden; }
+.admin-panel { padding: 25px; overflow: hidden; }
 .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; flex-wrap: wrap; gap: 10px; }
 .panel-title { display: flex; align-items: center; gap: 10px; margin: 0; }
 .panel-title svg { color: #4ade80; }
@@ -334,8 +337,9 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
     
     /* FIX ANNOUNCEMENT HORIZONTAL TO VERTICAL ON MOBILE */
-    .announce-horizontal { flex-direction: column !important; }
-    .announce-left { min-height: 250px; max-width: 100% !important; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .announce-horizontal { flex-direction: column !important; max-height: 90vh; }
+    .announce-left { max-width: 100% !important; padding: 15px; min-height: auto; max-height: 40vh; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .announce-left img { max-height: 35vh; }
     .announce-right { padding: 25px !important; }
 }
 
