@@ -25,7 +25,6 @@
 <div id="adm-kelola" class="admin-tab-pane active">
     <div class="admin-layout">
         
-        <!-- KOLOM UTAMA (BERITA & PENGURUS) -->
         <div class="admin-main-content">
             <div class="glass admin-panel" style="margin-bottom:0;">
                 <div class="panel-header">
@@ -100,7 +99,7 @@
                                         <div class="member-card">
                                             <img src="<%= m.image %>" class="member-avatar">
                                             <p class="member-name"><%= m.name %></p>
-                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '/admin/edit-anggota-bidang/')"><i data-lucide="edit" style="width:12px;"></i></button>
+                                            <button type="button" class="member-edit-btn" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '/admin/edit-anggota-bidang/')"><i data-lucide="edit"></i></button>
                                             <form action="/admin/hapus-anggota-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota?')"><i data-lucide="x"></i></button></form>
                                         </div>
                                     <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
@@ -158,7 +157,7 @@
                                         <div class="member-card">
                                             <img src="<%= m.image %>" class="member-avatar" style="border-color:rgba(244,114,182,0.5);">
                                             <p class="member-name"><%= m.name %></p>
-                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '/admin/edit-anggota-kohati-bidang/')"><i data-lucide="edit" style="width:12px;"></i></button>
+                                            <button type="button" class="member-edit-btn" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '/admin/edit-anggota-kohati-bidang/')"><i data-lucide="edit"></i></button>
                                             <form action="/admin/hapus-anggota-kohati-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota kohati?')"><i data-lucide="x"></i></button></form>
                                         </div>
                                     <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
@@ -168,10 +167,8 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
-        <!-- KOLOM SAMPING (GALERI & PDF) -->
         <div class="admin-sidebar">
             <div class="glass admin-panel" style="margin-bottom:0;">
                 <h3 class="panel-title" style="margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="image"></i> Kelola Galeri</h3>
@@ -263,7 +260,7 @@
                     <input type="text" name="footerProgrammer" class="input-control" value="<%= siteSettings.footerProgrammer %>">
                 </div>
                 
-                <!-- FIX TOGGLE KOHATI CHECKBOX TERINTEGRASI -->
+                <!-- FIX KOHATI TOGGLE -->
                 <div class="form-group" style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px;">
                     <input type="checkbox" name="kohatiActive" id="kohatiActive" value="true" <%= siteSettings.kohatiActive === 'true' || siteSettings.kohatiActive === true ? 'checked' : '' %> style="width:20px; height:20px;">
                     <label for="kohatiActive" style="margin:0; cursor:pointer;">Aktifkan Tab & Fitur KOHATI</label>
@@ -307,7 +304,6 @@
                     <% if(siteSettings.bookletPdf) { %><p class="form-hint" style="color:#4ade80;">File booklet saat ini sudah terpasang.</p><% } %>
                 </div>
 
-                <!-- SEGMEN TENTANG KOHATI -->
                 <div class="form-group" style="margin-top:40px; border-top:1px solid rgba(244,114,182,0.3); padding-top:20px;">
                     <h4 style="color:#f472b6; margin-bottom:15px;"><i data-lucide="heart" style="width:16px;"></i> Konten Halaman Kohati</h4>
                     <label>Teks Profil KOHATI</label>
@@ -322,8 +318,6 @@
 
                 <button type="submit" class="btn btn-primary submit-btn" style="width:100%;">Simpan Halaman Tentang</button>
             </form>
-            
-            <!-- Hidden Data Container for Quill Editors -->
             <div id="raw-profil" style="display:none;"><%- siteSettings.profilText %></div>
             <div id="raw-visimisi" style="display:none;"><%- siteSettings.visiMisiText %></div>
             <div id="raw-kohati-profil" style="display:none;"><%- siteSettings.kohatiProfilText %></div>
@@ -375,7 +369,7 @@
         <form action="/admin/setelan-announcement" method="POST" enctype="multipart/form-data" id="formAnnounce">
             <div class="form-group" style="display:flex; align-items:center; gap:10px; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); padding:15px; border-radius:10px;">
                 <input type="checkbox" name="announceActive" id="announceActive" value="true" <%= siteSettings.announceActive === 'true' || siteSettings.announceActive === true ? 'checked' : '' %> style="width:20px; height:20px;">
-                <label for="announceActive" style="margin:0; color:#4ade80;">Aktifkan Pop-up Pengumuman di Beranda</label>
+                <label for="announceActive" style="margin:0; color:#4ade80; cursor:pointer;">Aktifkan Pop-up Pengumuman di Beranda</label>
             </div>
             <div class="form-group">
                 <label>Judul Pengumuman</label>
@@ -402,7 +396,7 @@
     const newsData = <%- JSON.stringify(news) %>;
 </script>
 
-<!-- ================= MODALS AREA DATA KELOLA ================= -->
+<!-- ================= MODALS AREA ================= -->
 <div class="modal-overlay" id="modalSosmed">
     <div class="modal-content">
         <div class="modal-header"><h3>Tambah Sosial Media Footer</h3><button type="button" class="close-modal" onclick="closeModal('modalSosmed')"><i data-lucide="x"></i></button></div>
@@ -599,8 +593,7 @@
 
 <!-- Modal KOHATI -->
 <div class="modal-overlay" id="modalKohatiPengurus">
-    <div class="modal-content" style="border-color:#f472b6;">
-        <div class="modal-header"><h3 style="color:#f472b6;">Tambah Pengurus Kohati</h3><button type="button" class="close-modal" onclick="closeModal('modalKohatiPengurus')"><i data-lucide="x"></i></button></div>
+    <div class="modal-content" style="border-color:#f472b6;"><div class="modal-header"><h3 style="color:#f472b6;">Tambah Pengurus Kohati</h3><button type="button" class="close-modal" onclick="closeModal('modalKohatiPengurus')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-kohati-pengurus" method="POST" enctype="multipart/form-data">
             <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" class="input-control" required></div>
             <div class="form-group"><label>Jabatan Kohati</label><input type="text" name="role" class="input-control" required></div>
@@ -611,8 +604,7 @@
 </div>
 
 <div class="modal-overlay" id="modalKohatiBidang">
-    <div class="modal-content" style="border-color:#f472b6;">
-        <div class="modal-header"><h3 style="color:#f472b6;">Tambah Bidang Kohati Baru</h3><button type="button" class="close-modal" onclick="closeModal('modalKohatiBidang')"><i data-lucide="x"></i></button></div>
+    <div class="modal-content" style="border-color:#f472b6;"><div class="modal-header"><h3 style="color:#f472b6;">Tambah Bidang Kohati Baru</h3><button type="button" class="close-modal" onclick="closeModal('modalKohatiBidang')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-kohati-bidang" method="POST">
             <div class="form-group"><label>Nama Bidang</label><input type="text" name="bidang_name" class="input-control" required></div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalKohatiBidang')">Batal</button><button type="submit" class="btn" style="background:#f472b6; color:#fff; flex:1;">Buat Bidang</button></div>
@@ -621,7 +613,6 @@
 </div>
 
 <script>
-    // Tab Navigation Logic for Admin Dashboard
     function openAdmTab(tabId, btn) {
         document.querySelectorAll('.admin-tab-pane').forEach(tab => tab.classList.remove('active'));
         document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
@@ -630,7 +621,6 @@
         window.dispatchEvent(new Event('resize'));
     }
 
-    // INISIALISASI QUILL.JS
     document.addEventListener('DOMContentLoaded', function() {
         var toolbarOptions = [['bold', 'italic', 'underline', 'strike'], ['blockquote'], [{ 'header': 1 }, { 'header': 2 }], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'color': [] }, { 'background': [] }], [{ 'align': [] }], ['clean']];
         var qConfig = { theme: 'snow', modules: { toolbar: toolbarOptions } };
@@ -640,19 +630,15 @@
         var quillProfil = new Quill('#quill-profil', qConfig);
         var quillVisi = new Quill('#quill-visimisi', qConfig);
         var quillAnnounce = new Quill('#quill-announce', qConfig);
-        
-        // Setup Editor KOHATI
         var quillKohatiProfil = new Quill('#quill-kohati-profil', qConfig);
         var quillKohatiVisi = new Quill('#quill-kohati-visimisi', qConfig);
 
-        // Init values for setelan
         quillProfil.root.innerHTML = document.getElementById('raw-profil').innerHTML;
         quillVisi.root.innerHTML = document.getElementById('raw-visimisi').innerHTML;
         quillAnnounce.root.innerHTML = document.getElementById('raw-announce').innerHTML;
         quillKohatiProfil.root.innerHTML = document.getElementById('raw-kohati-profil').innerHTML;
         quillKohatiVisi.root.innerHTML = document.getElementById('raw-kohati-visimisi').innerHTML;
 
-        // Submit Forms Setelan
         document.getElementById('formSetelanTentang').onsubmit = function() {
             document.getElementById('hidden-profil').value = quillProfil.root.innerHTML;
             document.getElementById('hidden-visimisi').value = quillVisi.root.innerHTML;
@@ -673,10 +659,8 @@
     function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
 
-    // DATA ANGGOTA (PDF)
     function openEditDataAnggotaModal(id, title, date) { document.getElementById('editDataAnggotaTitle').value = title; document.getElementById('editDataAnggotaDate').value = date; document.getElementById('formEditDataAnggota').action = '/admin/edit-data-anggota/' + id; openModal('modalEditDataAnggota'); }
 
-    // BERITA
     function openEditBeritaModal(id, title, category, date) {
         document.getElementById('editBeritaTitle').value = title; document.getElementById('editBeritaCategory').value = category; document.getElementById('editBeritaDate').value = date;
         var editEditor = Quill.find(document.getElementById('quill-edit'));
@@ -698,7 +682,6 @@
         openModal('modalKelolaFotoBerita');
     }
 
-    // PENGURUS & BIDANG UMUM
     function openEditDynamic(id, name, role, actionPath) {
         document.getElementById('editDynamicName').value = name;
         document.getElementById('editDynamicRole').value = role;
@@ -722,8 +705,8 @@
         openModal('modalAnggotaBidang'); 
     }
 
-    // ALBUM GALERI
     function openEditAlbumModal(id, title, date) { document.getElementById('editAlbumTitle').value = title; document.getElementById('editAlbumDate').value = date; document.getElementById('formEditAlbum').action = '/admin/edit-album/' + id; openModal('modalEditAlbum'); }
+    
     function openKelolaFotoAlbum(id) {
         const album = albumsData.find(a => a.id == id); if(!album) return;
         document.getElementById('kelolaFotoTitle').innerText = 'Kelola Foto: ' + album.title;
@@ -738,13 +721,11 @@
         openModal('modalKelolaFotoAlbum');
     }
 
-    // SHORTLINK
     function openEditShortlinkModal(id, title, path, url) {
         document.getElementById('editShortlinkTitle').value = title; document.getElementById('editShortlinkPath').value = path; document.getElementById('editShortlinkUrl').value = url;
         document.getElementById('formEditShortlink').action = '/admin/edit-shortlink/' + id; openModal('modalEditShortlink');
     }
 
-    // Auto Compress Images
     async function compressImage(file, maxWidth = 1000) {
         return new Promise((resolve) => {
             const reader = new FileReader(); reader.readAsDataURL(file);
