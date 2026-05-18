@@ -157,7 +157,7 @@
                                         <div class="member-card">
                                             <img src="<%= m.image %>" class="member-avatar" style="border-color:rgba(244,114,182,0.5);">
                                             <p class="member-name"><%= m.name %></p>
-                                            <button type="button" class="member-edit-btn" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '/admin/edit-anggota-kohati-bidang/')"><i data-lucide="edit"></i></button>
+                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '/admin/edit-anggota-kohati-bidang/')"><i data-lucide="edit" style="width:12px;"></i></button>
                                             <form action="/admin/hapus-anggota-kohati-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota kohati?')"><i data-lucide="x"></i></button></form>
                                         </div>
                                     <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
@@ -212,128 +212,130 @@
 ============================================================== -->
 <div id="adm-setelan" class="admin-tab-pane">
     <div class="grid-2">
-        <div class="glass admin-panel">
-            <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="layout"></i> Header & Footer</h3>
-            <form action="/admin/setelan-web" method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label>Judul Web (Title Tab/Browser)</label>
-                    <input type="text" name="webTitle" class="input-control" value="<%= siteSettings.webTitle %>">
-                </div>
-                <div class="form-group">
-                    <label>Judul Hero (Welcome Halaman Beranda)</label>
-                    <input type="text" name="heroTitle" class="input-control" value="<%= siteSettings.heroTitle %>">
-                </div>
-                <div class="form-group">
-                    <label>Teks Logo Kiri (Awal)</label>
-                    <input type="text" name="headerTitle" class="input-control" value="<%= siteSettings.headerTitle %>">
-                </div>
-                <div class="form-group">
-                    <label>Teks Logo Kanan (Warna Hijau)</label>
-                    <input type="text" name="headerHighlight" class="input-control" value="<%= siteSettings.headerHighlight %>">
-                </div>
-                <div class="form-group">
-                    <label>Teks Bawah Logo</label>
-                    <input type="text" name="headerSubtitle" class="input-control" value="<%= siteSettings.headerSubtitle %>">
-                </div>
-                <div class="form-group">
-                    <label>Logo Header & Favicon (Biarkan kosong jika tetap)</label>
-                    <input type="file" name="headerLogo" class="input-control file-compress" accept="image/*">
-                </div>
-                <div class="form-group">
-                    <label>Logo Footer (Biarkan kosong jika tetap)</label>
-                    <input type="file" name="footerLogo" class="input-control file-compress" accept="image/*">
-                </div>
-                <div class="form-group" style="margin-top:30px; border-top:1px dashed rgba(255,255,255,0.2); padding-top:20px;">
-                    <label>Teks Judul Footer</label>
-                    <input type="text" name="footerTitle" class="input-control" value="<%= siteSettings.footerTitle %>">
-                </div>
-                <div class="form-group">
-                    <label>Deskripsi Footer</label>
-                    <textarea name="footerDesc" class="input-control" rows="3"><%= siteSettings.footerDesc %></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Teks Hak Cipta (Copyright)</label>
-                    <input type="text" name="footerCopyright" class="input-control" value="<%= siteSettings.footerCopyright %>">
-                </div>
-                <div class="form-group">
-                    <label>Teks Programmer / Watermark</label>
-                    <input type="text" name="footerProgrammer" class="input-control" value="<%= siteSettings.footerProgrammer %>">
-                </div>
-                
-                <h4 style="margin:20px 0 10px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">Sosial Media Footer</h4>
-                <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
-                    <% socialMediaList.forEach(soc => { %>
-                        <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-size:0.85rem;"><%= soc.name %>: <a href="<%= soc.url %>" target="_blank" style="color:#4ade80;">Link</a></span>
-                            <!-- Form Delete Sosmed remains same -->
-                        </div>
-                    <% }) %>
-                    <button type="button" class="btn btn-secondary" onclick="openModal('modalSosmed')" style="font-size:0.8rem; padding:8px;">+ Tambah Sosial Media (Icon Upload)</button>
-                </div>
-                
-                <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:15px;">Simpan Header & Footer</button>
-            </form>
-        </div>
+        
+        <div style="display:flex; flex-direction:column; gap:30px;">
+            <!-- FORM HEADER & FOOTER -->
+            <div class="glass admin-panel" style="margin-bottom:0;">
+                <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="layout"></i> Header & Footer</h3>
+                <form action="/admin/setelan-web" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Judul Web (Title Tab/Browser)</label>
+                        <input type="text" name="webTitle" class="input-control" value="<%= siteSettings.webTitle %>">
+                    </div>
+                    <div class="form-group">
+                        <label>Judul Hero (Welcome Halaman Beranda)</label>
+                        <input type="text" name="heroTitle" class="input-control" value="<%= siteSettings.heroTitle %>">
+                    </div>
+                    <div class="form-group">
+                        <label>Teks Logo Kiri (Awal)</label>
+                        <input type="text" name="headerTitle" class="input-control" value="<%= siteSettings.headerTitle %>">
+                    </div>
+                    <div class="form-group">
+                        <label>Teks Logo Kanan (Warna Hijau)</label>
+                        <input type="text" name="headerHighlight" class="input-control" value="<%= siteSettings.headerHighlight %>">
+                    </div>
+                    <div class="form-group">
+                        <label>Teks Bawah Logo</label>
+                        <input type="text" name="headerSubtitle" class="input-control" value="<%= siteSettings.headerSubtitle %>">
+                    </div>
+                    <div class="form-group">
+                        <label>Logo Header & Favicon (Biarkan kosong jika tetap)</label>
+                        <input type="file" name="headerLogo" class="input-control file-compress" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label>Logo Footer (Biarkan kosong jika tetap)</label>
+                        <input type="file" name="footerLogo" class="input-control file-compress" accept="image/*">
+                    </div>
+                    <div class="form-group" style="margin-top:30px; border-top:1px dashed rgba(255,255,255,0.2); padding-top:20px;">
+                        <label>Teks Judul Footer</label>
+                        <input type="text" name="footerTitle" class="input-control" value="<%= siteSettings.footerTitle %>">
+                    </div>
+                    <div class="form-group">
+                        <label>Deskripsi Footer</label>
+                        <textarea name="footerDesc" class="input-control" rows="3"><%= siteSettings.footerDesc %></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Teks Hak Cipta (Copyright)</label>
+                        <input type="text" name="footerCopyright" class="input-control" value="<%= siteSettings.footerCopyright %>">
+                    </div>
+                    <div class="form-group">
+                        <label>Teks Programmer / Watermark</label>
+                        <input type="text" name="footerProgrammer" class="input-control" value="<%= siteSettings.footerProgrammer %>">
+                    </div>
+                    
+                    <h4 style="margin:20px 0 10px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">Sosial Media Footer</h4>
+                    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+                        <% socialMediaList.forEach(soc => { %>
+                            <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:0.85rem;"><%= soc.name %>: <a href="<%= soc.url %>" target="_blank" style="color:#4ade80;">Link</a></span>
+                                <form action="/admin/hapus-sosmed/<%= soc.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" style="padding:4px;"><i data-lucide="trash-2" style="width:14px;"></i></button></form>
+                            </div>
+                        <% }) %>
+                        <button type="button" class="btn btn-secondary" onclick="openModal('modalSosmed')" style="font-size:0.8rem; padding:8px;">+ Tambah Sosial Media (Icon Upload)</button>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:15px;">Simpan Perubahan Web</button>
+                </form>
+            </div>
 
-        <div>
-            <!-- PANEL KHUSUS TOGGLE KOHATI AGAR TIDAK SALING TIMPA (FIXED) -->
-            <div class="glass admin-panel" style="border-top: 4px solid #f472b6;">
+            <!-- FORM TOGGLE KOHATI TERPISAH (FIXED) -->
+            <div class="glass admin-panel" style="margin-bottom:0; border-top: 4px solid #f472b6;">
                 <h3 class="panel-title" style="margin-bottom:20px; color:#f472b6;"><i data-lucide="heart"></i> Status Fitur KOHATI</h3>
-                <form action="/admin/setelan-kohati-toggle" method="POST" enctype="multipart/form-data">
+                <form action="/admin/setelan-kohati-toggle" method="POST">
                     <p class="text-muted" style="font-size:0.85rem; margin-bottom:15px;">Aktifkan atau Nonaktifkan seluruh tab dan fitur KOHATI di halaman publik.</p>
                     <div class="form-group" style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px;">
-                        <input type="checkbox" name="kohatiActive" id="kohatiActiveCheck" value="true" <%= siteSettings.kohatiActive === 'true' || siteSettings.kohatiActive === true ? 'checked' : '' %> style="width:20px; height:20px;">
+                        <input type="checkbox" name="kohatiActive" id="kohatiActiveCheck" value="true" <%= siteSettings.kohatiActive === 'true' ? 'checked' : '' %> style="width:20px; height:20px;">
                         <label for="kohatiActiveCheck" style="margin:0; cursor:pointer;">Tampilkan Fitur KOHATI</label>
                     </div>
-                    <button type="submit" class="btn btn-primary submit-btn" style="width:100%; background:#f472b6; border-color:#f472b6; color:#fff;">Simpan Status KOHATI</button>
+                    <button type="submit" class="btn btn-primary" style="width:100%; background:#f472b6; border-color:#f472b6; color:#fff;">Simpan Status KOHATI</button>
                 </form>
             </div>
+        </div>
 
-            <!-- PANEL TENTANG KAMI -->
-            <div class="glass admin-panel">
-                <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="file-text"></i> Halaman Tentang Kami</h3>
-                <form action="/admin/setelan-tentang" method="POST" enctype="multipart/form-data" id="formSetelanTentang">
-                    <div class="form-group">
-                        <label>Teks Profil</label>
-                        <div id="quill-profil" style="height:200px; color:white;"></div>
-                        <input type="hidden" name="profilText" id="hidden-profil">
-                    </div>
-                    <div class="form-group">
-                        <label>Teks Visi & Misi</label>
-                        <div id="quill-visimisi" style="height:200px; color:white;"></div>
-                        <input type="hidden" name="visiMisiText" id="hidden-visimisi">
-                    </div>
-                    <div class="form-group">
-                        <label>Embed Code Google Maps (Iframe)</label>
-                        <textarea name="mapsEmbed" class="input-control" rows="3" placeholder='<iframe src="..."></iframe>'><%= siteSettings.mapsEmbed %></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Upload Booklet / Pedoman PDF</label>
-                        <input type="file" name="bookletPdf" class="input-control file-to-b64" accept="application/pdf">
-                        <% if(siteSettings.bookletPdf) { %><p class="form-hint" style="color:#4ade80;">File booklet saat ini sudah terpasang.</p><% } %>
-                    </div>
+        <!-- FORM HALAMAN TENTANG KAMI -->
+        <div class="glass admin-panel" style="margin-bottom:0; align-self:start;">
+            <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="file-text"></i> Halaman Tentang Kami</h3>
+            <form action="/admin/setelan-tentang" method="POST" enctype="multipart/form-data" id="formSetelanTentang">
+                <div class="form-group">
+                    <label>Teks Profil</label>
+                    <div id="quill-profil" style="height:200px; color:white;"></div>
+                    <input type="hidden" name="profilText" id="hidden-profil">
+                </div>
+                <div class="form-group">
+                    <label>Teks Visi & Misi</label>
+                    <div id="quill-visimisi" style="height:200px; color:white;"></div>
+                    <input type="hidden" name="visiMisiText" id="hidden-visimisi">
+                </div>
+                <div class="form-group">
+                    <label>Embed Code Google Maps (Iframe)</label>
+                    <textarea name="mapsEmbed" class="input-control" rows="3" placeholder='<iframe src="..."></iframe>'><%= siteSettings.mapsEmbed %></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Upload Booklet / Pedoman PDF</label>
+                    <input type="file" name="bookletPdf" class="input-control file-to-b64" accept="application/pdf">
+                    <% if(siteSettings.bookletPdf) { %><p class="form-hint" style="color:#4ade80;">File booklet saat ini sudah terpasang.</p><% } %>
+                </div>
 
-                    <!-- SEGMEN TENTANG KOHATI -->
-                    <div class="form-group" style="margin-top:40px; border-top:1px solid rgba(244,114,182,0.3); padding-top:20px;">
-                        <h4 style="color:#f472b6; margin-bottom:15px;"><i data-lucide="heart" style="width:16px;"></i> Konten Halaman Kohati</h4>
-                        <label>Teks Profil KOHATI</label>
-                        <div id="quill-kohati-profil" style="height:150px; color:white;"></div>
-                        <input type="hidden" name="kohatiProfilText" id="hidden-kohati-profil">
-                    </div>
-                    <div class="form-group">
-                        <label>Teks Visi & Misi KOHATI</label>
-                        <div id="quill-kohati-visimisi" style="height:150px; color:white;"></div>
-                        <input type="hidden" name="kohatiVisiMisiText" id="hidden-kohati-visimisi">
-                    </div>
+                <!-- SEGMEN TENTANG KOHATI -->
+                <div class="form-group" style="margin-top:40px; border-top:1px solid rgba(244,114,182,0.3); padding-top:20px;">
+                    <h4 style="color:#f472b6; margin-bottom:15px;"><i data-lucide="heart" style="width:16px;"></i> Konten Halaman Kohati</h4>
+                    <label>Teks Profil KOHATI</label>
+                    <div id="quill-kohati-profil" style="height:150px; color:white;"></div>
+                    <input type="hidden" name="kohatiProfilText" id="hidden-kohati-profil">
+                </div>
+                <div class="form-group">
+                    <label>Teks Visi & Misi KOHATI</label>
+                    <div id="quill-kohati-visimisi" style="height:150px; color:white;"></div>
+                    <input type="hidden" name="kohatiVisiMisiText" id="hidden-kohati-visimisi">
+                </div>
 
-                    <button type="submit" class="btn btn-primary submit-btn" style="width:100%;">Simpan Halaman Tentang</button>
-                </form>
-                
-                <div id="raw-profil" style="display:none;"><%- siteSettings.profilText %></div>
-                <div id="raw-visimisi" style="display:none;"><%- siteSettings.visiMisiText %></div>
-                <div id="raw-kohati-profil" style="display:none;"><%- siteSettings.kohatiProfilText %></div>
-                <div id="raw-kohati-visimisi" style="display:none;"><%- siteSettings.kohatiVisiMisiText %></div>
-            </div>
+                <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:20px;">Simpan Halaman Tentang</button>
+            </form>
+            
+            <div id="raw-profil" style="display:none;"><%- siteSettings.profilText %></div>
+            <div id="raw-visimisi" style="display:none;"><%- siteSettings.visiMisiText %></div>
+            <div id="raw-kohati-profil" style="display:none;"><%- siteSettings.kohatiProfilText %></div>
+            <div id="raw-kohati-visimisi" style="display:none;"><%- siteSettings.kohatiVisiMisiText %></div>
         </div>
     </div>
 </div>
