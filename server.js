@@ -11,7 +11,7 @@ const port = process.env.PORT || 3000;
 // Konfigurasi Multer
 const upload = multer({ 
     storage: multer.memoryStorage(),
-    limits: { fileSize: 50 * 1024 * 1024 } // Limit diatur ke 50MB
+    limits: { fileSize: 50 * 1024 * 1024 } 
 });
 
 // Inisialisasi Koneksi ke Upstash Redis KV
@@ -24,13 +24,11 @@ const kv = createClient({
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Middleware untuk form data
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
-app.use(cookieParser()); // Menggunakan Cookie Parser untuk sesi Vercel
+app.use(cookieParser());
 
-// --- STRUKTUR SETTINGS DEFAULT (DENGAN TULISAN ASLI ANDA) ---
+// --- STRUKTUR SETTINGS DEFAULT (DIPISAHKAN AGAR UI VISI MISI MENJADI KARTU PROPORSIONAL) ---
 const defaultSettings = {
     webTitle: "HMI KomKG-UMI",
     headerLogo: "/img/logo-hmikomkgumi.png",
@@ -44,16 +42,23 @@ const defaultSettings = {
     footerCopyright: "© 2026 HMI Komisariat Kedokteran Gigi UMI. All rights reserved.",
     footerProgrammer: "💻 Axa Xyz",
     kohatiActive: "true",
-    profilText: `<p>Halaman profil ini berisi deskripsi singkat mengenai sejarah, visi, dan misi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia, serta program kerja dan kegiatan yang telah dan akan dilaksanakan oleh organisasi tersebut.</p><br><h3>Welcome</h3><p>Selamat datang di website resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia. Kami adalah sebuah organisasi mahasiswa yang terdiri dari para mahasiswa kedokteran gigi yang memiliki komitmen untuk meningkatkan kualitas diri dan mengembangkan potensi dalam bidang akademik, keislaman, sosial, dan kemanusiaan. Di sini, Anda dapat menemukan informasi terbaru tentang kegiatan kami, program kerja, dan berbagai kegiatan yang telah kami lakukan. Selamat menjelajahi situs web kami!</p>`,
-    visiMisiText: `<h3>Visi</h3><p>Terbinanya insan akademis, pencipta, pengabdi yang bernafaskan Islam dan bertanggung jawab atas terwujudnya masyarakat adil makmur yang diridhoi Allah SWT, khususnya dalam mewujudkan dokter gigi muslim yang profesional.</p><br><h3>Misi</h3><ul class="list-custom"><li><span class="list-num">1.</span> Reaktualisasi nilai-nilai ke-Islaman dalam pengembangan kapasitas diri kader.</li><li><span class="list-num">2.</span> Optimalisasi kesadaran kader terkait isu kesehatan gigi dan masyarakat.</li><li><span class="list-num">3.</span> Memelihara dan mengedepankan nilai-nilai kekeluargaan dalam aktivitas organisasi.</li></ul>`,
+    
+    // PEMISAHAN KONTEN HALAMAN TENTANG KAMI
+    profilText: `<p>Halaman profil ini berisi deskripsi singkat mengenai sejarah, visi, dan misi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia, serta program kerja dan kegiatan yang telah dan akan dilaksanakan oleh organisasi tersebut.</p>`,
+    welcomeText: `<p>Selamat datang di website resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia. Kami adalah sebuah organisasi mahasiswa yang terdiri dari para mahasiswa kedokteran gigi yang memiliki komitmen untuk meningkatkan kualitas diri dan mengembangkan potensi dalam bidang akademik, keislaman, sosial, dan kemanusiaan. Di sini, Anda dapat menemukan informasi terbaru tentang kegiatan kami, program kerja, dan berbagai kegiatan yang telah kami lakukan. Selamat menjelajahi situs web kami!</p>`,
+    visiText: `<p>Terbinanya insan akademis, pencipta, pengabdi yang bernafaskan Islam dan bertanggung jawab atas terwujudnya masyarakat adil makmur yang diridhoi Allah SWT, khususnya dalam mewujudkan dokter gigi muslim yang profesional.</p>`,
+    misiText: `<ol><li>Reaktualisasi nilai-nilai ke-Islaman dalam pengembangan kapasitas diri kader.</li><li>Optimalisasi kesadaran kader terkait isu kesehatan gigi dan masyarakat.</li><li>Memelihara dan mengedepankan nilai-nilai kekeluargaan dalam aktivitas organisasi.</li></ol>`,
+    
     kohatiProfilText: `<p>Korps HMI-Wati (KOHATI) adalah badan khusus HMI yang bertugas membina, mengembangkan, dan meningkatkan potensi HMI-Wati dalam wacana dan dinamika gerakan perempuan. KOHATI Komisariat Kedokteran Gigi UMI mewadahi mahasiswi muslimah untuk mencetak generasi insan cita.</p>`,
-    kohatiVisiMisiText: `<h3>Visi</h3><p>Terbinanya muslimah berkualitas insan cita.</p><br><h3>Misi</h3><ul class="list-custom"><li>Membina HMI-Wati untuk menjadi insan akademis yang profesional.</li><li>Meningkatkan peran serta HMI-Wati dalam memajukan perempuan di bidang kesehatan.</li></ul>`,
+    kohatiVisiText: `<p>Terbinanya muslimah berkualitas insan cita.</p>`,
+    kohatiMisiText: `<ol><li>Membina HMI-Wati untuk menjadi insan akademis yang profesional.</li><li>Meningkatkan peran serta HMI-Wati dalam memajukan perempuan di bidang kesehatan.</li></ol>`,
+    
     mapsEmbed: "",
     bookletPdf: "",
     announceActive: "false",
     announceImage: "",
     announceTitle: "Latihan Kader I 2025",
-    announceContent: "<p>Kala dunia tersihir oleh retorika kosong dan pemikiran instan, kami memilih jalan terjal. Berpikir dalam, bertanya kritis, dan membangun gagasan yang hidup. LK I 2025 bukan sekadar awal; ia adalah dentuman pertama dari revolusi intelektual yang tak akan berhenti di ruang diskusi. Ia akan menjelma menjadi gerakan, menjadi etos, menjadi sejarah.</p>"
+    announceContent: "<p>Kala dunia tersihir oleh retorika kosong dan pemikiran instan, kami memilih jalan terjal. Berpikir dalam, bertanya kritis, dan membangun gagasan yang hidup. LK I 2025 bukan sekadar awal; ia adalah dentuman pertama dari revolusi intelektual yang tak akan berhenti di ruang diskusi.</p>"
 };
 
 const defaultSocialMedia = [
@@ -83,7 +88,6 @@ async function getSiteData() {
     }
 }
 
-// Fungsi Helper untuk Inisialisasi Default Data sesuai Request Anda
 async function initDefaultData() {
     let hasNews = await kv.get('newsList');
     if (!hasNews || hasNews.length === 0) {
@@ -128,7 +132,6 @@ async function initDefaultData() {
     if (!(await kv.get('shortlinkList'))) await kv.set('shortlinkList', []);
 }
 
-// Eksekusi DB Aman
 (async () => {
     try {
         await getSiteData();
@@ -139,7 +142,6 @@ async function initDefaultData() {
     }
 })();
 
-// --- API ACTIONS HELPER ---
 const fileHelper = (req, fieldB64) => {
     let str = req.body[fieldB64] || '';
     if (!str && req.files) {
@@ -149,7 +151,6 @@ const fileHelper = (req, fieldB64) => {
     return str;
 };
 
-// Mengarahkan favicon otomatis agar tidak error 500
 app.get('/favicon.ico', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 app.get('/favicon.png', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 
@@ -221,7 +222,6 @@ app.get('/data-anggota', async (req, res) => {
     }
 });
 
-// SHORTLINK CUSTOM REDIRECT
 app.get('/:slug', async (req, res, next) => {
     const slug = req.params.slug.toLowerCase();
     const reserved = ['admin', 'css', 'img', 'js', 'berita', 'galeri', 'tentang', 'data-anggota'];
@@ -312,13 +312,12 @@ app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req
 });
 
 // --- API SETELAN WEB (AMAN DARI OVERWRITE) ---
+
+// 1. Simpan Header & Footer
 app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
-        
-        // Cek darimana request berasal (Header/Footer ATAU Tentang Kami)
         if (req.body.webTitle !== undefined) {
-            // Form Header & Footer
             siteSettings.webTitle = req.body.webTitle;
             siteSettings.heroTitle = req.body.heroTitle || siteSettings.heroTitle;
             siteSettings.headerTitle = req.body.headerTitle || siteSettings.headerTitle;
@@ -332,27 +331,39 @@ app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
             const hLogo = fileHelper(req, 'headerLogo_b64'); if (hLogo) siteSettings.headerLogo = hLogo;
             const fLogo = fileHelper(req, 'footerLogo_b64'); if (fLogo) siteSettings.footerLogo = fLogo;
         } 
-        else if (req.body.profilText !== undefined) {
-            // Form Tentang Kami
-            siteSettings.profilText = req.body.profilText;
-            siteSettings.visiMisiText = req.body.visiMisiText;
-            siteSettings.kohatiProfilText = req.body.kohatiProfilText;
-            siteSettings.kohatiVisiMisiText = req.body.kohatiVisiMisiText;
-            siteSettings.mapsEmbed = req.body.mapsEmbed !== undefined ? req.body.mapsEmbed : siteSettings.mapsEmbed;
-
-            const bPdf = fileHelper(req, 'bookletPdf_b64'); if (bPdf) siteSettings.bookletPdf = bPdf;
-        }
-
         await kv.set('siteSettings', siteSettings);
         res.redirect('/admin/dashboard');
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
-// Rute Simpan Toggle KOHATI (Khusus & Terpisah agar tidak tertimpa form lain)
+// 2. Simpan Toggle KOHATI Terpisah
 app.post('/admin/setelan-kohati-toggle', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
         siteSettings.kohatiActive = req.body.kohatiActive ? 'true' : 'false';
+        await kv.set('siteSettings', siteSettings);
+        res.redirect('/admin/dashboard');
+    } catch (err) { res.redirect('/admin/dashboard'); }
+});
+
+// 3. Simpan Hal. Tentang Kami (DIPISAH PROFIL, WELCOME, VISI, MISI)
+app.post('/admin/setelan-tentang', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        const { siteSettings } = await getSiteData();
+        if (req.body.profilText !== undefined) {
+            siteSettings.profilText = req.body.profilText;
+            siteSettings.welcomeText = req.body.welcomeText || siteSettings.welcomeText;
+            siteSettings.visiText = req.body.visiText || siteSettings.visiText;
+            siteSettings.misiText = req.body.misiText || siteSettings.misiText;
+            
+            siteSettings.kohatiProfilText = req.body.kohatiProfilText || siteSettings.kohatiProfilText;
+            siteSettings.kohatiVisiText = req.body.kohatiVisiText || siteSettings.kohatiVisiText;
+            siteSettings.kohatiMisiText = req.body.kohatiMisiText || siteSettings.kohatiMisiText;
+            
+            siteSettings.mapsEmbed = req.body.mapsEmbed !== undefined ? req.body.mapsEmbed : siteSettings.mapsEmbed;
+
+            const bPdf = fileHelper(req, 'bookletPdf_b64'); if (bPdf) siteSettings.bookletPdf = bPdf;
+        }
         await kv.set('siteSettings', siteSettings);
         res.redirect('/admin/dashboard');
     } catch (err) { res.redirect('/admin/dashboard'); }
@@ -364,9 +375,7 @@ app.post('/admin/setelan-announcement', requireAdmin, upload.any(), async (req, 
         siteSettings.announceActive = req.body.announceActive ? 'true' : 'false';
         siteSettings.announceTitle = req.body.announceTitle || siteSettings.announceTitle;
         siteSettings.announceContent = req.body.announceContent || siteSettings.announceContent;
-
         const img = fileHelper(req, 'announceImage_b64'); if (img) siteSettings.announceImage = img;
-
         await kv.set('siteSettings', siteSettings);
         res.redirect('/admin/dashboard');
     } catch (err) { res.redirect('/admin/dashboard'); }
@@ -374,23 +383,18 @@ app.post('/admin/setelan-announcement', requireAdmin, upload.any(), async (req, 
 
 // --- API SHORTLINK & SOSMED ---
 app.post('/admin/tambah-shortlink', requireAdmin, async (req, res) => {
-    let list = await kv.get('shortlinkList') || [];
-    list.unshift({ id: Date.now(), title: req.body.title, path: req.body.path.replace(/\s+/g, '-').toLowerCase(), originalUrl: req.body.originalUrl });
-    await kv.set('shortlinkList', list); res.redirect('/admin/dashboard');
+    let list = await kv.get('shortlinkList') || []; list.unshift({ id: Date.now(), title: req.body.title, path: req.body.path.replace(/\s+/g, '-').toLowerCase(), originalUrl: req.body.originalUrl }); await kv.set('shortlinkList', list); res.redirect('/admin/dashboard');
 });
 app.post('/admin/edit-shortlink/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('shortlinkList') || []; let i = list.findIndex(l => l.id == req.params.id);
-    if(i !== -1) { list[i].title = req.body.title; list[i].path = req.body.path.replace(/\s+/g, '-').toLowerCase(); list[i].originalUrl = req.body.originalUrl; await kv.set('shortlinkList', list); }
-    res.redirect('/admin/dashboard');
+    if(i !== -1) { list[i].title = req.body.title; list[i].path = req.body.path.replace(/\s+/g, '-').toLowerCase(); list[i].originalUrl = req.body.originalUrl; await kv.set('shortlinkList', list); } res.redirect('/admin/dashboard');
 });
 app.post('/admin/hapus-shortlink/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('shortlinkList') || []; await kv.set('shortlinkList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
 });
 
 app.post('/admin/tambah-sosmed', requireAdmin, upload.any(), async (req, res) => {
-    let list = await kv.get('socialMediaList') || [];
-    list.push({ id: Date.now(), name: req.body.name, url: req.body.url, icon: fileHelper(req, 'icon_b64') });
-    await kv.set('socialMediaList', list); res.redirect('/admin/dashboard');
+    let list = await kv.get('socialMediaList') || []; list.push({ id: Date.now(), name: req.body.name, url: req.body.url, icon: fileHelper(req, 'icon_b64') }); await kv.set('socialMediaList', list); res.redirect('/admin/dashboard');
 });
 app.post('/admin/hapus-sosmed/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('socialMediaList') || []; await kv.set('socialMediaList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
