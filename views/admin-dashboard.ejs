@@ -212,7 +212,6 @@
 ============================================================== -->
 <div id="adm-setelan" class="admin-tab-pane">
     <div class="grid-2">
-        
         <div style="display:flex; flex-direction:column; gap:30px;">
             <!-- FORM HEADER & FOOTER -->
             <div class="glass admin-panel" style="margin-bottom:0;">
@@ -292,21 +291,36 @@
             </div>
         </div>
 
-        <!-- FORM HALAMAN TENTANG KAMI -->
+        <!-- FORM HALAMAN TENTANG KAMI (DIPISAHKAN AGAR UI VISI MISI MENJADI KARTU ELEGAN) -->
         <div class="glass admin-panel" style="margin-bottom:0; align-self:start;">
             <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="file-text"></i> Halaman Tentang Kami</h3>
             <form action="/admin/setelan-tentang" method="POST" enctype="multipart/form-data" id="formSetelanTentang">
+                
+                <h4 style="color:#4ade80; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Bagian Profil Umum</h4>
                 <div class="form-group">
-                    <label>Teks Profil</label>
-                    <div id="quill-profil" style="height:200px; color:white;"></div>
+                    <label>Teks Profil (Bagian Atas)</label>
+                    <div id="quill-profil" style="height:150px; color:white;"></div>
                     <input type="hidden" name="profilText" id="hidden-profil">
                 </div>
                 <div class="form-group">
-                    <label>Teks Visi & Misi</label>
-                    <div id="quill-visimisi" style="height:200px; color:white;"></div>
-                    <input type="hidden" name="visiMisiText" id="hidden-visimisi">
+                    <label>Teks Welcome (Sambutan)</label>
+                    <div id="quill-welcome" style="height:150px; color:white;"></div>
+                    <input type="hidden" name="welcomeText" id="hidden-welcome">
+                </div>
+                
+                <h4 style="color:#4ade80; margin-top:30px; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Bagian Visi & Misi Umum</h4>
+                <div class="form-group">
+                    <label>Teks Visi Umum</label>
+                    <div id="quill-visi" style="height:150px; color:white;"></div>
+                    <input type="hidden" name="visiText" id="hidden-visi">
                 </div>
                 <div class="form-group">
+                    <label>Teks Misi Umum (Gunakan fitur urutan angka/bullet)</label>
+                    <div id="quill-misi" style="height:150px; color:white;"></div>
+                    <input type="hidden" name="misiText" id="hidden-misi">
+                </div>
+
+                <div class="form-group" style="margin-top:30px;">
                     <label>Embed Code Google Maps (Iframe)</label>
                     <textarea name="mapsEmbed" class="input-control" rows="3" placeholder='<iframe src="..."></iframe>'><%= siteSettings.mapsEmbed %></textarea>
                 </div>
@@ -319,23 +333,32 @@
                 <!-- SEGMEN TENTANG KOHATI -->
                 <div class="form-group" style="margin-top:40px; border-top:1px solid rgba(244,114,182,0.3); padding-top:20px;">
                     <h4 style="color:#f472b6; margin-bottom:15px;"><i data-lucide="heart" style="width:16px;"></i> Konten Halaman Kohati</h4>
-                    <label>Teks Profil KOHATI</label>
-                    <div id="quill-kohati-profil" style="height:150px; color:white;"></div>
+                    
+                    <label style="margin-top:15px;">Teks Profil KOHATI</label>
+                    <div id="quill-kohati-profil" style="height:150px; color:white; margin-bottom:15px;"></div>
                     <input type="hidden" name="kohatiProfilText" id="hidden-kohati-profil">
-                </div>
-                <div class="form-group">
-                    <label>Teks Visi & Misi KOHATI</label>
-                    <div id="quill-kohati-visimisi" style="height:150px; color:white;"></div>
-                    <input type="hidden" name="kohatiVisiMisiText" id="hidden-kohati-visimisi">
+                    
+                    <label style="margin-top:15px;">Teks Visi KOHATI</label>
+                    <div id="quill-kohati-visi" style="height:150px; color:white; margin-bottom:15px;"></div>
+                    <input type="hidden" name="kohatiVisiText" id="hidden-kohati-visi">
+
+                    <label style="margin-top:15px;">Teks Misi KOHATI</label>
+                    <div id="quill-kohati-misi" style="height:150px; color:white; margin-bottom:15px;"></div>
+                    <input type="hidden" name="kohatiMisiText" id="hidden-kohati-misi">
                 </div>
 
                 <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:20px;">Simpan Halaman Tentang</button>
             </form>
             
+            <!-- Hidden Data Container for Quill Editors -->
             <div id="raw-profil" style="display:none;"><%- siteSettings.profilText %></div>
-            <div id="raw-visimisi" style="display:none;"><%- siteSettings.visiMisiText %></div>
+            <div id="raw-welcome" style="display:none;"><%- siteSettings.welcomeText %></div>
+            <div id="raw-visi" style="display:none;"><%- siteSettings.visiText %></div>
+            <div id="raw-misi" style="display:none;"><%- siteSettings.misiText %></div>
+            
             <div id="raw-kohati-profil" style="display:none;"><%- siteSettings.kohatiProfilText %></div>
-            <div id="raw-kohati-visimisi" style="display:none;"><%- siteSettings.kohatiVisiMisiText %></div>
+            <div id="raw-kohati-visi" style="display:none;"><%- siteSettings.kohatiVisiText %></div>
+            <div id="raw-kohati-misi" style="display:none;"><%- siteSettings.kohatiMisiText %></div>
         </div>
     </div>
 </div>
@@ -410,14 +433,14 @@
     const newsData = <%- JSON.stringify(news) %>;
 </script>
 
-<!-- ================= MODALS AREA ================= -->
+<!-- ================= MODALS AREA DATA KELOLA ================= -->
 <div class="modal-overlay" id="modalSosmed">
     <div class="modal-content">
-        <div class="modal-header"><h3>Tambah Sosial Media Footer</h3><button type="button" class="close-modal" onclick="closeModal('modalSosmed')"><i data-lucide="x"></i></button></div>
+        <div class="modal-header"><h3>Tambah Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalSosmed')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-sosmed" method="POST" enctype="multipart/form-data">
             <div class="form-group"><label>Nama Sosmed</label><input type="text" name="name" class="input-control" required placeholder="Contoh: Twitter"></div>
             <div class="form-group"><label>URL Profile</label><input type="url" name="url" class="input-control" required placeholder="https://..."></div>
-            <div class="form-group"><label>Upload Icon/Logo Sosmed</label><input type="file" name="icon" class="input-control file-compress" accept="image/*" required></div>
+            <div class="form-group"><label>Upload Icon/Logo</label><input type="file" name="icon" class="input-control file-compress" accept="image/*" required></div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalSosmed')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan</button></div>
         </form>
     </div>
@@ -641,24 +664,38 @@
         
         var quillTambah = new Quill('#quill-tambah', qConfig);
         var quillEdit = new Quill('#quill-edit', qConfig);
+        
+        // PISAHKAN EDITOR UNTUK TENTANG KAMI
         var quillProfil = new Quill('#quill-profil', qConfig);
-        var quillVisi = new Quill('#quill-visimisi', qConfig);
-        var quillAnnounce = new Quill('#quill-announce', qConfig);
+        var quillWelcome = new Quill('#quill-welcome', qConfig);
+        var quillVisi = new Quill('#quill-visi', qConfig);
+        var quillMisi = new Quill('#quill-misi', qConfig);
         var quillKohatiProfil = new Quill('#quill-kohati-profil', qConfig);
-        var quillKohatiVisi = new Quill('#quill-kohati-visimisi', qConfig);
+        var quillKohatiVisi = new Quill('#quill-kohati-visi', qConfig);
+        var quillKohatiMisi = new Quill('#quill-kohati-misi', qConfig);
+        var quillAnnounce = new Quill('#quill-announce', qConfig);
 
+        // INISIALISASI KONTEN
         quillProfil.root.innerHTML = document.getElementById('raw-profil').innerHTML;
-        quillVisi.root.innerHTML = document.getElementById('raw-visimisi').innerHTML;
-        quillAnnounce.root.innerHTML = document.getElementById('raw-announce').innerHTML;
+        quillWelcome.root.innerHTML = document.getElementById('raw-welcome').innerHTML;
+        quillVisi.root.innerHTML = document.getElementById('raw-visi').innerHTML;
+        quillMisi.root.innerHTML = document.getElementById('raw-misi').innerHTML;
+        
         quillKohatiProfil.root.innerHTML = document.getElementById('raw-kohati-profil').innerHTML;
-        quillKohatiVisi.root.innerHTML = document.getElementById('raw-kohati-visimisi').innerHTML;
+        quillKohatiVisi.root.innerHTML = document.getElementById('raw-kohati-visi').innerHTML;
+        quillKohatiMisi.root.innerHTML = document.getElementById('raw-kohati-misi').innerHTML;
+        quillAnnounce.root.innerHTML = document.getElementById('raw-announce').innerHTML;
 
         document.getElementById('formSetelanTentang').onsubmit = function() {
             document.getElementById('hidden-profil').value = quillProfil.root.innerHTML;
-            document.getElementById('hidden-visimisi').value = quillVisi.root.innerHTML;
+            document.getElementById('hidden-welcome').value = quillWelcome.root.innerHTML;
+            document.getElementById('hidden-visi').value = quillVisi.root.innerHTML;
+            document.getElementById('hidden-misi').value = quillMisi.root.innerHTML;
             document.getElementById('hidden-kohati-profil').value = quillKohatiProfil.root.innerHTML;
-            document.getElementById('hidden-kohati-visimisi').value = quillKohatiVisi.root.innerHTML;
+            document.getElementById('hidden-kohati-visi').value = quillKohatiVisi.root.innerHTML;
+            document.getElementById('hidden-kohati-misi').value = quillKohatiMisi.root.innerHTML;
         };
+        
         document.getElementById('formAnnounce').onsubmit = function() {
             document.getElementById('hidden-announce').value = quillAnnounce.root.innerHTML;
         };
