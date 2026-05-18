@@ -141,7 +141,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .announce-close-btn:hover { background: rgba(239,68,68,0.9); }
 
 .announce-left {
-    background: transparent;
+    background: transparent; /* FIXED: Latar belakang hitam dihapus agar sesuai dengan background modal */
     padding: 20px; /* Memberikan ruang (border semu) di sekitar gambar */
     display: flex;
     align-items: center;
