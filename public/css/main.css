@@ -90,7 +90,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     position: relative; 
     overflow: hidden; 
     border-radius: 20px;
-    background: #093824; /* Hijau gelap solid elegan sesuai gambar */
+    background: #093824;
     margin-bottom: 25px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -99,7 +99,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     text-align: left;
 }
 .vision-mission-card.v-left { border-left-color: #4ade80; }
-.vision-mission-card.m-left { border-left-color: #4ade80; } /* Disamakan aksen terang */
+.vision-mission-card.m-left { border-left-color: #4ade80; } 
 .vm-card { border-left-color: #4ade80; }
 
 .icon-box, .vm-icon { 
@@ -176,41 +176,49 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .tab-content.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+
 /* ==============================================================
-   ANNOUNCEMENT POP-UP (HORIZONTAL FIXED & PROPORTIONAL)
+   ANNOUNCEMENT POP-UP (100% FIXED, ELEGAN, SESUAI GBR 1 & 2)
 ============================================================== */
 .announce-overlay {
-    z-index: 9999999;
+    z-index: 9999999; /* Posisi terdepan bebas footer */
     padding: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(8px);
 }
 
 .announce-horizontal {
     display: flex;
     flex-direction: row;
-    max-width: 900px; 
+    max-width: 750px; /* Ukuran Compact, tidak memakan seluruh layar */
     width: 100%;
-    max-height: 80vh; 
-    background: #112d22; 
-    border-radius: 16px;
+    max-height: 65vh; /* Proporsional tinggi */
+    background: #093824; /* Background Solid Dark Green */
+    border-radius: 12px;
     overflow: hidden;
     position: relative;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-    border: 2px solid rgba(74,222,128,0.3);
+    border: 1px solid rgba(74,222,128,0.2);
 }
 
+/* Tombol X yang elegan menyatu */
 .announce-close-btn {
     position: absolute;
     top: 15px;
     right: 15px;
-    z-index: 30; 
-    background: rgba(0,0,0,0.5);
-    border-radius: 50%;
-    padding: 8px;
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.2);
+    z-index: 50; 
+    background: transparent;
+    border: none;
+    padding: 5px;
+    color: #9ca3af;
     cursor: pointer;
     transition: 0.3s;
     display: flex;
@@ -218,12 +226,16 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     justify-content: center;
 }
 
-.announce-close-btn:hover { background: rgba(239,68,68,0.9); }
+.announce-close-btn:hover { 
+    color: #fff;
+    transform: scale(1.1); 
+}
 
+/* Container Gambar Poster */
 .announce-left {
     flex: 0 0 45%; 
     max-width: 45%;
-    padding: 30px; 
+    padding: 25px; /* Memberikan border (jarak aman keliling) */
     background: transparent; 
     display: flex;
     align-items: center;
@@ -234,40 +246,67 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .announce-left img {
     max-width: 100%;
     max-height: 100%;
-    width: 100%; 
+    width: auto; 
     height: auto;
-    object-fit: contain; 
+    object-fit: contain; /* Gambar tidak akan terpotong / melonjong */
     border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
 }
 
+/* Container Teks */
 .announce-right {
     flex: 1; 
-    padding: 40px 30px 40px 0;
+    padding: 35px 35px 35px 0; /* Memberi jarak nyaman antar elemen */
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    overflow-y: auto; 
+    justify-content: flex-start;
+    overflow-y: auto; /* Memungkinkan Scroll Khusus Text Area jika panjang */
 }
 
-.announce-title { color: #fff; margin-bottom: 10px; font-size: 1.6rem; font-weight: 800; line-height: 1.2; padding-right: 35px; }
-.announce-divider { width: 40px; height: 4px; background: #4ade80; margin-bottom: 20px; border-radius: 2px; flex-shrink: 0; }
-.announce-text { color: #d1d5db; margin-bottom: 30px; line-height: 1.6; font-size: 0.95rem; border-left: 3px solid rgba(74, 222, 128, 0.4); padding-left: 15px; }
+/* Tipografi Teks */
+.announce-title { 
+    color: #fff; 
+    margin-bottom: 10px; 
+    font-size: 1.3rem; /* Proporsional font */
+    font-weight: 700; 
+    line-height: 1.3; 
+    padding-right: 30px; 
+}
 
+.announce-divider { 
+    width: 30px; 
+    height: 3px; 
+    background: #4ade80; 
+    margin-bottom: 15px; 
+    border-radius: 2px; 
+    flex-shrink: 0; 
+}
+
+.announce-text { 
+    color: #d1d5db; 
+    margin-bottom: 20px; 
+    line-height: 1.6; 
+    font-size: 0.9rem; /* Lebih bersih */
+    /* Hapus border kiri kotor */
+    border-left: none; 
+    padding-left: 0; 
+}
+
+/* Tombol (Bisa dihilangkan sesuai HTML, jika tampil tetap rapi) */
 .announce-btn {
     align-self: flex-start;
-    padding: 10px 24px;
-    font-size: 0.95rem;
-    border-radius: 8px;
-    font-weight: bold;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    font-weight: 600;
     background: transparent;
-    border: 1px solid #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.5);
     color: #4ade80;
     cursor: pointer;
     transition: 0.3s;
     margin-top: auto; 
 }
-.announce-btn:hover { background: #4ade80; color: #000; }
+.announce-btn:hover { background: rgba(74, 222, 128, 0.1); border-color: #4ade80; color: #4ade80; }
+
 
 /* ==============================================================
    ADMIN DASHBOARD UI
@@ -376,6 +415,13 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .team-name { font-size: 1.1rem; margin-bottom: 5px; }
 .team-role { color: #4ade80; font-size: 0.85rem; font-weight: bold; }
 
+.vision-mission-card { padding: 40px; position: relative; overflow: hidden; }
+.vision-mission-card.v-left { border-left: 5px solid #22c55e; background: rgba(0,0,0,0.4); }
+.vision-mission-card.m-left { border-left: 5px solid #34d399; background: rgba(6,78,59,0.4); }
+.icon-box { width: 50px; height: 50px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.list-custom li { display: flex; gap: 15px; margin-bottom: 15px; color: #d1d5db; }
+.list-num { color: #22c55e; font-weight: bold; }
+
 .gallery-card { padding: 15px; text-align: left; display: block; transition: 0.3s; }
 .gallery-img-box { height: 220px; border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
 .gallery-img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
@@ -416,26 +462,33 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     .panel-header { flex-direction: column; gap: 15px; text-align: center; }
     .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
     
-    /* FIX ANNOUNCEMENT HORIZONTAL TO VERTIKAL DI MOBILE */
-    .announce-container { 
-        grid-template-columns: 1fr; 
-        max-height: 80vh; 
-        overflow-y: auto; 
+    /* MOBILE FIX UNTUK POP-UP: 100% RAPI, TIDAK TERTUTUP, TIDAK BESAR */
+    .announce-horizontal { 
+        flex-direction: column !important; 
+        max-height: 75vh; 
     }
     
+    .announce-close-btn {
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.5);
+        border-radius: 50%;
+        color: #fff;
+    }
+
     .announce-left { 
-        padding: 15px; 
-        background: transparent;
-        height: 200px; 
-        border-bottom: 1px solid rgba(255,255,255,0.1); 
+        max-width: 100% !important; 
+        flex: none; 
+        padding: 20px; 
+        height: 35vh; /* DIKUNCI 35% tinggi HP agar porsi teks bawah lebih pas */
+        min-height: 180px;
+        border-bottom: 1px solid rgba(255,255,255,0.05); 
     }
     
     .announce-right { 
-        padding: 20px !important; 
-        overflow-y: visible; 
+        padding: 20px 20px 25px 20px !important; 
+        overflow-y: auto; /* SCROLL TEKS */
     }
-    
-    .announce-title { font-size: 1.3rem; padding-right: 0; }
 }
 
 ::-webkit-scrollbar { width: 8px; }
