@@ -29,6 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser()); 
+// EXPRESS-SESSION TELAH DIHAPUS TOTAL AGAR VERCEL TIDAK CRASH (500 ERROR)
 
 // --- STRUKTUR SETTINGS DEFAULT TERPERCAYA (MENAMPUNG SEMUA KONTEN ASLI) ---
 const defaultSettings = {
@@ -133,7 +134,7 @@ async function initDefaultData() {
     try {
         await getSiteData();
         await initDefaultData();
-        console.log("Database Redis berhasil terkoneksi.");
+        console.log("Database Redis berhasil terkoneksi & sinkronisasi sukses.");
     } catch (err) {
         console.error("Gagal inisialisasi Redis:", err.message);
     }
@@ -149,7 +150,7 @@ const fileHelper = (req, fieldB64) => {
     return str;
 };
 
-// Mengarahkan favicon otomatis agar tidak error
+// MENCEGAH ERROR FAVICON 500
 app.get('/favicon.ico', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 app.get('/favicon.png', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 
@@ -318,7 +319,7 @@ app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
         
         // Cek darimana request berasal (Header/Footer ATAU Tentang Kami)
         if (req.body.webTitle !== undefined) {
-            // Bagian Header & Footer Form
+            // Form Header & Footer
             siteSettings.webTitle = req.body.webTitle;
             siteSettings.heroTitle = req.body.heroTitle || siteSettings.heroTitle;
             siteSettings.headerTitle = req.body.headerTitle || siteSettings.headerTitle;
@@ -329,14 +330,14 @@ app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
             siteSettings.footerCopyright = req.body.footerCopyright || siteSettings.footerCopyright;
             siteSettings.footerProgrammer = req.body.footerProgrammer || siteSettings.footerProgrammer;
             
-            // Pengaman Toggle KOHATI
+            // PENGAMAN TOGGLE KOHATI AGAR SELALU MENJADI STRING 'true'/'false'
             siteSettings.kohatiActive = req.body.kohatiActive ? 'true' : 'false';
 
             const hLogo = fileHelper(req, 'headerLogo_b64'); if (hLogo) siteSettings.headerLogo = hLogo;
             const fLogo = fileHelper(req, 'footerLogo_b64'); if (fLogo) siteSettings.footerLogo = fLogo;
         } 
         else if (req.body.profilText !== undefined) {
-            // Bagian Tentang Kami Form (TIDAK MENGGANGGU KOHATIACTIVE)
+            // Form Tentang Kami
             siteSettings.profilText = req.body.profilText;
             siteSettings.visiMisiText = req.body.visiMisiText;
             siteSettings.kohatiProfilText = req.body.kohatiProfilText;
@@ -446,7 +447,7 @@ app.post('/admin/tambah-data-anggota', requireAdmin, upload.any(), async (req, r
 app.post('/admin/edit-data-anggota/:id', requireAdmin, upload.any(), async (req, res) => { try { let dataAnggota = await kv.get('dataAnggotaList') || []; let index = dataAnggota.findIndex(d => d.id == req.params.id); if (index !== -1) { dataAnggota[index].title = req.body.title; if (req.body.date) dataAnggota[index].date = req.body.date; let fileStr = fileHelper(req, 'file_b64'); if (fileStr) dataAnggota[index].file = fileStr; await kv.set('dataAnggotaList', dataAnggota); } res.redirect('/admin/dashboard'); } catch(e){ res.redirect('/admin/dashboard'); }});
 app.post('/admin/hapus-data-anggota/:id', requireAdmin, async (req, res) => { let dataAnggota = await kv.get('dataAnggotaList') || []; await kv.set('dataAnggotaList', dataAnggota.filter(d => d.id != req.params.id)); res.redirect('/admin/dashboard'); });
 
-// GLOBAL ERROR HANDLER
+// GLOBAL ERROR HANDLER CATCH ALL
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Terjadi Kesalahan Internal di Server.');
