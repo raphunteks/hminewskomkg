@@ -1,60 +1,54 @@
 <%- include('partials/header') %>
 
-<!-- Navigasi Tabs -->
 <div class="tab-nav">
-    <button class="tab-btn active" onclick="openTab('tab-profil')"><i data-lucide="user" style="width:16px; display:inline; margin-right:5px;"></i> Profil</button>
-    <button class="tab-btn" onclick="openTab('tab-visimisi')"><i data-lucide="target" style="width:16px; display:inline; margin-right:5px;"></i> Visi & Misi</button>
-    <button class="tab-btn" onclick="openTab('tab-struktur')"><i data-lucide="users" style="width:16px; display:inline; margin-right:5px;"></i> Struktur Kepengurusan</button>
-    <button class="tab-btn" onclick="openTab('tab-kohati')" style="color: #f472b6;"><i data-lucide="heart" style="width:16px; display:inline; margin-right:5px;"></i> Kohati</button>
+    <button class="tab-btn active" onclick="openTab('tab-profil')"><i data-lucide="user"></i> Profil</button>
+    <button class="tab-btn" onclick="openTab('tab-visimisi')"><i data-lucide="target"></i> Visi & Misi</button>
+    <button class="tab-btn" onclick="openTab('tab-struktur')"><i data-lucide="users"></i> Struktur Umum</button>
+    <% if (siteSettings.kohatiActive) { %>
+        <button class="tab-btn" onclick="openTab('tab-kohati')" style="color: #f472b6;"><i data-lucide="heart"></i> Kohati</button>
+    <% } %>
 </div>
 
-<!-- KONTEN TABS -->
-
-<!-- 1. TAB PROFIL -->
 <div id="tab-profil" class="tab-content active">
     <div class="glass" style="padding: 40px; margin-bottom: 40px;">
         <h2 style="border-bottom: 1px solid rgba(34,197,94,0.3); padding-bottom:10px; margin-bottom:20px; display:inline-block;" class="text-gradient">Profil</h2>
-        <p style="color:#d1d5db; line-height:1.7; margin-bottom:30px; font-size:1.1rem;">
-            Halaman profil ini berisi deskripsi singkat mengenai sejarah, visi, dan misi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia, serta program kerja dan kegiatan yang telah dan akan dilaksanakan oleh organisasi tersebut.
-        </p>
+        <div class="rich-text-content"><%- siteSettings.profilText %></div>
         
-        <h3 style="margin-bottom:15px; font-size:1.5rem;">Welcome</h3>
-        <p style="color:#d1d5db; line-height:1.7;">
-            Selamat datang di website resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia. Kami adalah sebuah organisasi mahasiswa yang terdiri dari para mahasiswa kedokteran gigi yang memiliki komitmen untuk meningkatkan kualitas diri dan mengembangkan potensi dalam bidang akademik, keislaman, sosial, dan kemanusiaan. Di sini, Anda dapat menemukan informasi terbaru tentang kegiatan kami, program kerja, dan berbagai kegiatan yang telah kami lakukan. Selamat menjelajahi situs web kami!
-        </p>
+        <!-- MODULE BOOKLET PDF & MAPS -->
+        <% if (siteSettings.bookletPdf || siteSettings.mapsEmbed) { %>
+            <div class="grid-2" style="margin-top: 50px; gap: 30px;">
+                <% if (siteSettings.bookletPdf) { %>
+                <div>
+                    <h3 style="margin-bottom: 15px; font-size:1.3rem;">Buku Pedoman / Profil</h3>
+                    <div class="booklet-container"><iframe src="<%= siteSettings.bookletPdf %>" frameborder="0"></iframe></div>
+                </div>
+                <% } %>
+                <% if (siteSettings.mapsEmbed) { %>
+                <div>
+                    <h3 style="margin-bottom: 15px; font-size:1.3rem;">Lokasi Sekretariat</h3>
+                    <div class="maps-container"><%- siteSettings.mapsEmbed %></div>
+                </div>
+                <% } %>
+            </div>
+        <% } %>
     </div>
 </div>
 
-<!-- 2. TAB VISI & MISI -->
 <div id="tab-visimisi" class="tab-content">
     <div style="text-align: center; margin-bottom: 30px;">
         <h2>Visi dan Misi</h2>
-        <p class="text-muted">Panduan bagi HMI Komisariat Kedokteran Gigi UMI untuk merencanakan kegiatan organisasi.</p>
+        <p class="text-muted">Arah juang Komisariat Kedokteran Gigi UMI.</p>
     </div>
-    <div class="grid-2" style="margin-bottom: 50px;">
-        <div class="glass vision-mission-card v-left">
-            <div class="icon-box">🚀</div>
-            <h3 class="text-primary">Visi</h3>
-            <p style="color:#d1d5db; line-height:1.6;">Terbinanya insan akademis, pencipta, pengabdi yang bernafaskan Islam dan bertanggung jawab atas terwujudnya masyarakat adil makmur yang diridhoi Allah SWT, khususnya dalam mewujudkan dokter gigi muslim yang profesional.</p>
-        </div>
-        <div class="glass vision-mission-card m-left">
-            <div class="icon-box">📈</div>
-            <h3 style="color:#34d399;">Misi</h3>
-            <ul class="list-custom">
-                <li><span class="list-num">1.</span> Reaktualisasi nilai-nilai ke-Islaman dalam pengembangan kapasitas diri kader.</li>
-                <li><span class="list-num">2.</span> Optimalisasi kesadaran kader terkait isu kesehatan gigi dan masyarakat.</li>
-                <li><span class="list-num">3.</span> Memelihara dan mengedepankan nilai-nilai kekeluargaan dalam aktivitas organisasi.</li>
-            </ul>
-        </div>
+    <div class="glass" style="padding: 40px; margin-bottom: 50px;">
+        <div class="rich-text-content"><%- siteSettings.visiMisiText %></div>
     </div>
 </div>
 
-<!-- 3. TAB STRUKTUR KEPENGURUSAN -->
+<!-- STRUKTUR UMUM -->
 <div id="tab-struktur" class="tab-content">
     <div class="glass" style="padding: 40px; text-align: center;">
         <h2>Struktur Kepengurusan</h2>
-        <p class="text-muted" style="margin-bottom: 40px;">Periode 2025-2026</p>
-        
+        <p class="text-muted" style="margin-bottom: 40px;">Pengurus Harian</p>
         <div class="grid-4">
             <% pengurus.forEach(person => { %>
             <div class="glass team-card">
@@ -65,7 +59,6 @@
             <% }) %>
         </div>
         
-        <!-- Render Bidang dan Anggotanya (UPGRADE BARU) -->
         <div style="margin-top: 50px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1);">
             <h3 style="margin-bottom:30px; text-align:center;">Bidang-Bidang</h3>
             <div style="display:flex; flex-direction:column; gap:40px;">
@@ -82,54 +75,62 @@
                                 <% }) %>
                             </div>
                         <% } else { %>
-                            <p style="text-align:center; color:#9ca3af; font-size:0.9rem;">Belum ada anggota yang ditambahkan.</p>
+                            <p style="text-align:center; color:#9ca3af; font-size:0.9rem;">Belum ada anggota.</p>
                         <% } %>
                     </div>
                 <% }) %>
             </div>
         </div>
-
     </div>
 </div>
 
-<!-- 4. TAB KOHATI -->
+<!-- STRUKTUR KOHATI -->
+<% if (siteSettings.kohatiActive) { %>
 <div id="tab-kohati" class="tab-content">
-    <div class="glass" style="padding: 40px; border-left: 5px solid #f472b6;">
-        <h2 style="color: #f472b6; margin-bottom:15px;"><i data-lucide="heart" style="display:inline; margin-right:5px;"></i> Profil KOHATI</h2>
-        <p style="color:#d1d5db; line-height:1.7; margin-bottom:30px;">
-            Korps HMI-Wati (KOHATI) adalah badan khusus HMI yang bertugas membina, mengembangkan, dan meningkatkan potensi HMI-Wati dalam wacana dan dinamika gerakan perempuan. KOHATI Komisariat Kedokteran Gigi UMI mewadahi mahasiswi muslimah untuk mencetak generasi insan cita.
-        </p>
-        <h3 style="margin-bottom:15px; font-size:1.3rem;">Visi & Misi Kohati</h3>
-        <div style="background:rgba(0,0,0,0.2); padding:20px; border-radius:15px; border:1px solid rgba(244,114,182,0.2); margin-bottom:30px;">
-            <strong style="color:#f472b6; display:block; margin-bottom:5px;">Visi:</strong>
-            <p style="color:#d1d5db; margin-bottom:15px;">Terbinanya muslimah berkualitas insan cita.</p>
-            <strong style="color:#f472b6; display:block; margin-bottom:5px;">Misi:</strong>
-            <ul style="color:#d1d5db; padding-left:20px;">
-                <li style="margin-bottom:5px;">1. Membina HMI-Wati untuk menjadi insan akademis yang profesional.</li>
-                <li style="margin-bottom:5px;">2. Meningkatkan peran serta HMI-Wati dalam memajukan perempuan di bidang kesehatan.</li>
-            </ul>
-        </div>
-        <h3 style="margin-bottom:20px; font-size:1.3rem;">Struktur Kepengurusan KOHATI</h3>
-        <div class="grid-3">
+    <div class="glass" style="padding: 40px; border-left: 5px solid #f472b6; text-align: center;">
+        <h2 style="color: #f472b6; margin-bottom: 10px;"><i data-lucide="heart"></i> KOHATI</h2>
+        <p class="text-muted" style="margin-bottom: 40px;">Korps HMI-Wati Pengurus Harian</p>
+        
+        <div class="grid-4">
+            <% kohatiPengurus.forEach(person => { %>
             <div class="glass team-card" style="border-color: rgba(244,114,182,0.2);">
-                <div class="team-img" style="border-color: rgba(244,114,182,0.5);"><img src="[https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80](https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80)" alt="Ketua Kohati"></div>
-                <h4 class="team-name">Andi Nurul Hidayah</h4>
-                <p style="color:#f472b6; font-size: 0.85rem; font-weight: bold;">Ketua Umum KOHATI</p>
+                <div class="team-img" style="border-color: rgba(244,114,182,0.5);"><img src="<%= person.image %>"></div>
+                <h4 class="team-name"><%= person.name %></h4>
+                <p style="color:#f472b6; font-size:0.85rem; font-weight:bold;"><%= person.role %></p>
             </div>
-             <div class="glass team-card" style="border-color: rgba(244,114,182,0.2);">
-                <div class="team-img" style="border-color: rgba(244,114,182,0.5);"><img src="[https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80](https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80)" alt="Sekretaris Kohati"></div>
-                <h4 class="team-name">Siti Fatimah</h4>
-                <p style="color:#f472b6; font-size: 0.85rem; font-weight: bold;">Sekretaris KOHATI</p>
+            <% }) %>
+        </div>
+        
+        <div style="margin-top: 50px; padding-top: 40px; border-top: 1px solid rgba(244,114,182,0.2);">
+            <h3 style="margin-bottom:30px; text-align:center; color:#f472b6;">Bidang-Bidang Kohati</h3>
+            <div style="display:flex; flex-direction:column; gap:40px;">
+                <% kohatiBidang.forEach(b => { %>
+                    <div>
+                        <h4 style="color:#f472b6; border-bottom:1px dashed rgba(244,114,182,0.3); padding-bottom:10px; margin-bottom:20px; text-align:center;"><%= b.name %></h4>
+                        <% if(b.members && b.members.length > 0) { %>
+                            <div class="grid-4" style="justify-content:center;">
+                                <% b.members.forEach(m => { %>
+                                    <div class="glass team-card" style="padding:15px; border-color: rgba(244,114,182,0.2);">
+                                        <div class="team-img" style="width:80px; height:80px; border-color: rgba(244,114,182,0.5);"><img src="<%= m.image %>"></div>
+                                        <h4 class="team-name" style="font-size:0.95rem;"><%= m.name %></h4>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } else { %>
+                            <p style="text-align:center; color:#9ca3af; font-size:0.9rem;">Belum ada anggota.</p>
+                        <% } %>
+                    </div>
+                <% }) %>
             </div>
         </div>
     </div>
 </div>
+<% } %>
 
 <script>
     function openTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
         event.currentTarget.classList.add('active');
     }
