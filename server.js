@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
 
-// --- STRUKTUR SETTINGS DEFAULT (DIPISAHKAN AGAR UI VISI MISI MENJADI KARTU PROPORSIONAL) ---
+// --- STRUKTUR SETTINGS DEFAULT ---
 const defaultSettings = {
     webTitle: "HMI KomKG-UMI",
     headerLogo: "/img/logo-hmikomkgumi.png",
@@ -43,7 +43,6 @@ const defaultSettings = {
     footerProgrammer: "💻 Axa Xyz",
     kohatiActive: "true",
     
-    // PEMISAHAN KONTEN HALAMAN TENTANG KAMI
     profilText: `<p>Halaman profil ini berisi deskripsi singkat mengenai sejarah, visi, dan misi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia, serta program kerja dan kegiatan yang telah dan akan dilaksanakan oleh organisasi tersebut.</p>`,
     welcomeText: `<p>Selamat datang di website resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia. Kami adalah sebuah organisasi mahasiswa yang terdiri dari para mahasiswa kedokteran gigi yang memiliki komitmen untuk meningkatkan kualitas diri dan mengembangkan potensi dalam bidang akademik, keislaman, sosial, dan kemanusiaan. Di sini, Anda dapat menemukan informasi terbaru tentang kegiatan kami, program kerja, dan berbagai kegiatan yang telah kami lakukan. Selamat menjelajahi situs web kami!</p>`,
     visiText: `<p>Terbinanya insan akademis, pencipta, pengabdi yang bernafaskan Islam dan bertanggung jawab atas terwujudnya masyarakat adil makmur yang diridhoi Allah SWT, khususnya dalam mewujudkan dokter gigi muslim yang profesional.</p>`,
@@ -92,8 +91,7 @@ async function initDefaultData() {
     let hasNews = await kv.get('newsList');
     if (!hasNews || hasNews.length === 0) {
         await kv.set('newsList', [
-            { id: 1, title: 'Silaturahmi, Penghargaan dan Launching Kaos', category: 'Terbaru', date: '10 May 2025', content: 'Kegiatan silaturahmi kader...', image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=800&q=80', photos: [] },
-            { id: 2, title: 'Semarak Hari Santri! HMI Gelar Pengajian', category: 'Populer', date: '22 Oct 2024', content: 'Peringatan hari santri nasional...', image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80', photos: [] }
+            { id: 1, title: 'Silaturahmi, Penghargaan dan Launching Kaos', category: 'Terbaru', date: '10 May 2025', content: 'Kegiatan silaturahmi kader...', image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=800&q=80', photos: [] }
         ]);
     }
     let hasAlbums = await kv.get('albumsList');
@@ -118,8 +116,7 @@ async function initDefaultData() {
     let hasKohatiPengurus = await kv.get('kohatiPengurusList');
     if (!hasKohatiPengurus || hasKohatiPengurus.length === 0) {
         await kv.set('kohatiPengurusList', [
-            { id: 1, name: 'Andi Nurul Hidayah', role: 'Ketua Umum KOHATI', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80' },
-            { id: 2, name: 'Siti Fatimah', role: 'Sekretaris KOHATI', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80' }
+            { id: 1, name: 'Andi Nurul Hidayah', role: 'Ketua Umum KOHATI', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80' }
         ]);
     }
     let hasKohatiBidang = await kv.get('kohatiBidangList');
@@ -153,6 +150,31 @@ const fileHelper = (req, fieldB64) => {
 
 app.get('/favicon.ico', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 app.get('/favicon.png', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
+
+// =========================================================================
+// API ROUTE KHUSUS DEARFLIP (3D FLIPBOOK FIX)
+// Ini mengubah Base64 menjadi file PDF asli agar Flipbook tidak error blank
+// =========================================================================
+app.get('/api/booklet.pdf', async (req, res) => {
+    try {
+        const { siteSettings } = await getSiteData();
+        if (siteSettings && siteSettings.bookletPdf) {
+            // Ambil hanya data Base64 mentahnya saja tanpa prefix 'data:application/pdf;base64,'
+            const base64Data = siteSettings.bookletPdf.split(';base64,').pop();
+            const imgBuffer = Buffer.from(base64Data, 'base64');
+            
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', 'inline; filename="Buku_Pedoman_HMI.pdf"');
+            res.send(imgBuffer);
+        } else {
+            res.status(404).send('PDF tidak ditemukan');
+        }
+    } catch (err) {
+        console.error("Error meload PDF DearFlip:", err);
+        res.status(500).send('Error internal server');
+    }
+});
+// =========================================================================
 
 // --- ROUTES HALAMAN UTAMA ---
 app.get('/', async (req, res) => {
@@ -224,7 +246,7 @@ app.get('/data-anggota', async (req, res) => {
 
 app.get('/:slug', async (req, res, next) => {
     const slug = req.params.slug.toLowerCase();
-    const reserved = ['admin', 'css', 'img', 'js', 'berita', 'galeri', 'tentang', 'data-anggota'];
+    const reserved = ['admin', 'css', 'img', 'js', 'berita', 'galeri', 'tentang', 'data-anggota', 'api'];
     if (reserved.includes(slug)) return next();
     try {
         const shortlinks = await kv.get('shortlinkList') || [];
@@ -312,8 +334,6 @@ app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req
 });
 
 // --- API SETELAN WEB (AMAN DARI OVERWRITE) ---
-
-// 1. Simpan Header & Footer
 app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
@@ -336,7 +356,6 @@ app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
-// 2. Simpan Toggle KOHATI Terpisah
 app.post('/admin/setelan-kohati-toggle', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
@@ -346,7 +365,6 @@ app.post('/admin/setelan-kohati-toggle', requireAdmin, upload.any(), async (req,
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
-// 3. Simpan Hal. Tentang Kami (DIPISAH PROFIL, WELCOME, VISI, MISI)
 app.post('/admin/setelan-tentang', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
@@ -411,27 +429,14 @@ const manageTeam = async (req, res, dbKey, action) => {
     } catch (e) { res.redirect('/admin/dashboard'); }
 };
 
-// FIX UNTUK ROLE (JABATAN) DI DALAM ANGGOTA BIDANG (UMUM & KOHATI)
 const manageBidangMember = async (req, res, dbKey, action) => {
     try {
         let list = await kv.get(dbKey) || []; let bIndex = list.findIndex(b => b.id == req.params.bidangId);
         if (bIndex !== -1) {
             if (!list[bIndex].members) list[bIndex].members = [];
-            if (action === 'add') { 
-                list[bIndex].members.push({ id: Date.now(), name: req.body.name, role: req.body.role || '', image: fileHelper(req, 'image_b64') }); 
-            }
-            else if (action === 'edit') { 
-                let mIndex = list[bIndex].members.findIndex(m => m.id == req.params.memberId); 
-                if (mIndex !== -1) { 
-                    list[bIndex].members[mIndex].name = req.body.name; 
-                    list[bIndex].members[mIndex].role = req.body.role || ''; // Simpan field role
-                    let img = fileHelper(req, 'image_b64'); 
-                    if (img) list[bIndex].members[mIndex].image = img; 
-                } 
-            }
-            else if (action === 'delete') { 
-                list[bIndex].members = list[bIndex].members.filter(m => m.id != req.params.memberId); 
-            }
+            if (action === 'add') { list[bIndex].members.push({ id: Date.now(), name: req.body.name, role: req.body.role || '', image: fileHelper(req, 'image_b64') }); }
+            else if (action === 'edit') { let mIndex = list[bIndex].members.findIndex(m => m.id == req.params.memberId); if (mIndex !== -1) { list[bIndex].members[mIndex].name = req.body.name; list[bIndex].members[mIndex].role = req.body.role || ''; let img = fileHelper(req, 'image_b64'); if (img) list[bIndex].members[mIndex].image = img; } }
+            else if (action === 'delete') { list[bIndex].members = list[bIndex].members.filter(m => m.id != req.params.memberId); }
             await kv.set(dbKey, list);
         }
         res.redirect('/admin/dashboard');
