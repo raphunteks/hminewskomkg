@@ -82,6 +82,64 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .rich-text-content a:hover { color: #22c55e; }
 .rich-text-content blockquote { border-left: 4px solid #22c55e; padding-left: 15px; margin-left: 0; font-style: italic; color: #9ca3af; background: rgba(255,255,255,0.05); padding:10px 15px; border-radius: 0 8px 8px 0; }
 
+/* NEW: KARTU VISI MISI YANG ELEGAN & PROPORSIONAL */
+.vm-card {
+    background: #064e3b; /* Warna solid dark green sesuai screenshot */
+    border-radius: 16px;
+    padding: 30px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    overflow: hidden;
+    margin-bottom: 25px;
+}
+.vm-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 6px;
+    background: #4ade80; /* Garis aksen hijau muda di sebelah kiri */
+    border-radius: 6px 0 0 6px;
+}
+.vm-icon {
+    width: 45px;
+    height: 45px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+.vm-title {
+    color: #4ade80;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    font-weight: 800;
+}
+/* Memaksa list (Misi) di dalam kartu agar rapi dan bernomor hijau */
+.vm-card .rich-text-content ol {
+    list-style: none;
+    counter-reset: my-counter;
+    padding-left: 0;
+}
+.vm-card .rich-text-content ol li {
+    counter-increment: my-counter;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 15px;
+    color: #d1d5db;
+}
+.vm-card .rich-text-content ol li::before {
+    content: counter(my-counter) ".";
+    position: absolute;
+    left: 0;
+    color: #4ade80;
+    font-weight: bold;
+}
+
 /* GRID SYSTEMS */
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
@@ -97,35 +155,35 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ==============================================================
-   ANNOUNCEMENT POP-UP (KONSISTEN, ANTI-MELONJONG, & PROPORSIONAL)
+   ANNOUNCEMENT POP-UP (HORIZONTAL FIXED & PROPORTIONAL)
 ============================================================== */
 .announce-overlay {
-    z-index: 9999999; /* Selalu di atas */
+    z-index: 9999999;
     padding: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.announce-container {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr; /* Pembagian proporsional: kiri lebih kecil, kanan lebih lebar */
-    max-width: 700px; /* Ukuran keseluruhan di perkecil agar lebih pas di desktop */
+.announce-horizontal {
+    display: flex;
+    flex-direction: row;
+    max-width: 900px; 
     width: 100%;
-    max-height: 80vh; /* Kunci: Tidak akan melebihi 80% layar */
-    background: #112d22; /* Warna hijau gelap elegan */
+    max-height: 80vh; 
+    background: #112d22; 
     border-radius: 16px;
     overflow: hidden;
     position: relative;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(74,222,128,0.3);
+    border: 2px solid rgba(74,222,128,0.3);
 }
 
 .announce-close-btn {
     position: absolute;
     top: 15px;
     right: 15px;
-    z-index: 30; /* Dipastikan tombol close selalu di atas */
+    z-index: 30; 
     background: rgba(0,0,0,0.5);
     border-radius: 50%;
     padding: 8px;
@@ -141,60 +199,43 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .announce-close-btn:hover { background: rgba(239,68,68,0.9); }
 
 .announce-left {
-    background: transparent; /* FIXED: Latar belakang hitam dihapus agar sesuai dengan background modal */
-    padding: 20px; /* Memberikan ruang (border semu) di sekitar gambar */
+    flex: 0 0 45%; 
+    max-width: 45%;
+    padding: 30px; 
+    background: transparent; 
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
 .announce-left img {
     max-width: 100%;
     max-height: 100%;
-    width: 100%; /* Memaksa gambar mengikuti area padding */
+    width: 100%; 
     height: auto;
-    object-fit: contain; /* KUNCI ANTI MELONJONG / DISTORSI */
+    object-fit: contain; 
     border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
 }
 
 .announce-right {
-    padding: 30px;
+    flex: 1; 
+    padding: 40px 30px 40px 0;
     display: flex;
     flex-direction: column;
-    overflow-y: auto; /* SCROLL KHUSUS HANYA UNTUK TEKS */
+    justify-content: center;
+    overflow-y: auto; 
 }
 
-.announce-title { 
-    color: #fff; 
-    margin-bottom: 10px; 
-    font-size: 1.4rem; /* Ukuran font disesuaikan */
-    font-weight: 800; 
-    line-height: 1.2; 
-    padding-right: 35px; /* Mencegah judul menabrak tombol close */
-}
-
-.announce-divider { 
-    width: 40px; 
-    height: 4px; 
-    background: #4ade80; 
-    margin-bottom: 15px; 
-    border-radius: 2px; 
-    flex-shrink: 0; 
-}
-
-.announce-text { 
-    color: #d1d5db; 
-    margin-bottom: 25px; 
-    font-size: 0.9rem; 
-    border-left: 3px solid rgba(74, 222, 128, 0.4); 
-    padding-left: 15px; 
-}
+.announce-title { color: #fff; margin-bottom: 10px; font-size: 1.6rem; font-weight: 800; line-height: 1.2; padding-right: 35px; }
+.announce-divider { width: 40px; height: 4px; background: #4ade80; margin-bottom: 20px; border-radius: 2px; flex-shrink: 0; }
+.announce-text { color: #d1d5db; margin-bottom: 30px; line-height: 1.6; font-size: 0.95rem; border-left: 3px solid rgba(74, 222, 128, 0.4); padding-left: 15px; }
 
 .announce-btn {
     align-self: flex-start;
-    padding: 8px 20px;
-    font-size: 0.9rem;
+    padding: 10px 24px;
+    font-size: 0.95rem;
     border-radius: 8px;
     font-weight: bold;
     background: transparent;
@@ -202,7 +243,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     color: #4ade80;
     cursor: pointer;
     transition: 0.3s;
-    margin-top: auto; /* Mendorong tombol ke bagian paling bawah area konten */
+    margin-top: auto; 
 }
 .announce-btn:hover { background: #4ade80; color: #000; }
 
@@ -313,24 +354,11 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .team-name { font-size: 1.1rem; margin-bottom: 5px; }
 .team-role { color: #4ade80; font-size: 0.85rem; font-weight: bold; }
 
-.vision-mission-card { padding: 40px; position: relative; overflow: hidden; }
-.vision-mission-card.v-left { border-left: 5px solid #22c55e; background: rgba(0,0,0,0.4); }
-.vision-mission-card.m-left { border-left: 5px solid #34d399; background: rgba(6,78,59,0.4); }
-.icon-box { width: 50px; height: 50px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-.list-custom li { display: flex; gap: 15px; margin-bottom: 15px; color: #d1d5db; }
-.list-num { color: #22c55e; font-weight: bold; }
-
 .gallery-card { padding: 15px; text-align: left; display: block; transition: 0.3s; }
 .gallery-img-box { height: 220px; border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
 .gallery-img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
 .gallery-card:hover .gallery-img-box img { transform: scale(1.05); }
 .photo-count { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; display: flex; align-items: center; gap: 5px; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); color:#fff; }
-
-.auth-wrapper { min-height: 60vh; display: flex; align-items: center; justify-content: center; }
-.auth-card { width: 100%; max-width: 450px; padding: 40px; position: relative; overflow: hidden; }
-.auth-top-line { position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: linear-gradient(to right, #4ade80, #059669); }
-.auth-header { text-align: center; margin-bottom: 30px; }
-.auth-icon { width: 60px; height: 60px; background: rgba(34,197,94,0.1); color: #4ade80; border-radius: 15px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(34,197,94,0.2); }
 
 /* FOOTER */
 .site-footer { background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.1); padding: 60px 0 30px; position: relative; z-index: 1; margin-top: auto; box-shadow: 0 -5px 20px rgba(0,0,0,0.2); }
