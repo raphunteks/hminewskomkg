@@ -1,39 +1,10 @@
 <%- include('partials/header') %>
-
-<!-- POPUP PENGUMUMAN (DIEMBED LANGSUNG AGAR TIDAK ERROR 500) -->
-<% if (siteSettings && (siteSettings.announceActive === true || siteSettings.announceActive === 'true')) { %>
-<div class="modal-overlay announce-overlay" id="announceModal" style="z-index: 10000;">
-    <div class="modal-content" style="max-width: 500px; padding: 0; overflow: hidden; background: rgba(17, 24, 39, 0.95); position:relative; border: 2px solid #22c55e;">
-        <button class="close-modal" style="position:absolute; top: 15px; right: 15px; z-index: 10; background:rgba(0,0,0,0.5); border-radius:50%; padding:5px; color:#fff;" onclick="closeAnnounce()"><i data-lucide="x"></i></button>
-        <% if (siteSettings.announceImage) { %>
-            <img src="<%= siteSettings.announceImage %>" style="width: 100%; height: auto; max-height: 300px; object-fit: cover;">
-        <% } %>
-        <div style="padding: 25px; text-align: center;">
-            <h3 style="margin-bottom: 15px; font-size: 1.5rem; color:#4ade80;"><%= siteSettings.announceTitle %></h3>
-            <div class="rich-text-content" style="color: #d1d5db; margin-bottom: 25px; line-height: 1.6; text-align:left;"><%- siteSettings.announceContent %></div>
-            <button class="btn btn-primary" style="width: 100%;" onclick="closeAnnounce()">Sudah Baca</button>
-        </div>
-    </div>
-</div>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const announceKey = 'announce_read_<%= siteSettings.announceTitle.replace(/[^a-zA-Z0-9]/g, "_") %>';
-        if (!localStorage.getItem(announceKey)) {
-            setTimeout(() => { document.getElementById('announceModal').classList.add('active'); }, 500);
-        }
-    });
-    function closeAnnounce() {
-        const announceKey = 'announce_read_<%= siteSettings.announceTitle.replace(/[^a-zA-Z0-9]/g, "_") %>';
-        localStorage.setItem(announceKey, 'true');
-        document.getElementById('announceModal').classList.remove('active');
-    }
-</script>
-<% } %>
+<%- include('announce') %>
 
 <!-- Hero / Selamat Datang -->
 <div class="glass hero">
     <span class="badge">Yakusa! Yakin Usaha Sampai</span>
-    <h1>Selamat datang di website resmi <br><span class="text-gradient"><%= siteSettings.webTitle %></span></h1>
+    <h1>Selamat datang di website resmi <br><span class="text-gradient"><%= siteSettings.heroTitle || siteSettings.webTitle %></span></h1>
     <p>Kami adalah sebuah organisasi mahasiswa yang terdiri dari para mahasiswa kedokteran gigi yang memiliki komitmen untuk meningkatkan kualitas diri dan mengembangkan potensi dalam bidang akademik, keislaman, sosial, dan kemanusiaan.</p>
     <a href="/tentang" class="btn btn-primary">Kenali Kami Lebih Dekat</a>
 </div>
