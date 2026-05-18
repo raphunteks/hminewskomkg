@@ -8,7 +8,7 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Konfigurasi Multer
+// Konfigurasi Multer (Limit besar untuk PDF Base64)
 const upload = multer({ 
     storage: multer.memoryStorage(),
     limits: { fileSize: 50 * 1024 * 1024 } 
@@ -28,7 +28,6 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
 
-// --- STRUKTUR SETTINGS DEFAULT ---
 const defaultSettings = {
     webTitle: "HMI KomKG-UMI",
     headerLogo: "/img/logo-hmikomkgumi.png",
@@ -42,16 +41,13 @@ const defaultSettings = {
     footerCopyright: "© 2026 HMI Komisariat Kedokteran Gigi UMI. All rights reserved.",
     footerProgrammer: "💻 Axa Xyz",
     kohatiActive: "true",
-    
     profilText: `<p>Halaman profil ini berisi deskripsi singkat mengenai sejarah, visi, dan misi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia, serta program kerja dan kegiatan yang telah dan akan dilaksanakan oleh organisasi tersebut.</p>`,
     welcomeText: `<p>Selamat datang di website resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia. Kami adalah sebuah organisasi mahasiswa yang terdiri dari para mahasiswa kedokteran gigi yang memiliki komitmen untuk meningkatkan kualitas diri dan mengembangkan potensi dalam bidang akademik, keislaman, sosial, dan kemanusiaan. Di sini, Anda dapat menemukan informasi terbaru tentang kegiatan kami, program kerja, dan berbagai kegiatan yang telah kami lakukan. Selamat menjelajahi situs web kami!</p>`,
     visiText: `<p>Terbinanya insan akademis, pencipta, pengabdi yang bernafaskan Islam dan bertanggung jawab atas terwujudnya masyarakat adil makmur yang diridhoi Allah SWT, khususnya dalam mewujudkan dokter gigi muslim yang profesional.</p>`,
     misiText: `<ol><li>Reaktualisasi nilai-nilai ke-Islaman dalam pengembangan kapasitas diri kader.</li><li>Optimalisasi kesadaran kader terkait isu kesehatan gigi dan masyarakat.</li><li>Memelihara dan mengedepankan nilai-nilai kekeluargaan dalam aktivitas organisasi.</li></ol>`,
-    
     kohatiProfilText: `<p>Korps HMI-Wati (KOHATI) adalah badan khusus HMI yang bertugas membina, mengembangkan, dan meningkatkan potensi HMI-Wati dalam wacana dan dinamika gerakan perempuan. KOHATI Komisariat Kedokteran Gigi UMI mewadahi mahasiswi muslimah untuk mencetak generasi insan cita.</p>`,
     kohatiVisiText: `<p>Terbinanya muslimah berkualitas insan cita.</p>`,
     kohatiMisiText: `<ol><li>Membina HMI-Wati untuk menjadi insan akademis yang profesional.</li><li>Meningkatkan peran serta HMI-Wati dalam memajukan perempuan di bidang kesehatan.</li></ol>`,
-    
     mapsEmbed: "",
     bookletPdf: "",
     announceActive: "false",
@@ -151,32 +147,6 @@ const fileHelper = (req, fieldB64) => {
 app.get('/favicon.ico', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 app.get('/favicon.png', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 
-// =========================================================================
-// API ROUTE KHUSUS DEARFLIP (3D FLIPBOOK FIX)
-// Ini mengubah Base64 menjadi file PDF asli agar Flipbook tidak error blank
-// =========================================================================
-app.get('/api/booklet.pdf', async (req, res) => {
-    try {
-        const { siteSettings } = await getSiteData();
-        if (siteSettings && siteSettings.bookletPdf) {
-            // Ambil hanya data Base64 mentahnya saja tanpa prefix 'data:application/pdf;base64,'
-            const base64Data = siteSettings.bookletPdf.split(';base64,').pop();
-            const imgBuffer = Buffer.from(base64Data, 'base64');
-            
-            res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', 'inline; filename="Buku_Pedoman_HMI.pdf"');
-            res.send(imgBuffer);
-        } else {
-            res.status(404).send('PDF tidak ditemukan');
-        }
-    } catch (err) {
-        console.error("Error meload PDF DearFlip:", err);
-        res.status(500).send('Error internal server');
-    }
-});
-// =========================================================================
-
-// --- ROUTES HALAMAN UTAMA ---
 app.get('/', async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
@@ -246,7 +216,7 @@ app.get('/data-anggota', async (req, res) => {
 
 app.get('/:slug', async (req, res, next) => {
     const slug = req.params.slug.toLowerCase();
-    const reserved = ['admin', 'css', 'img', 'js', 'berita', 'galeri', 'tentang', 'data-anggota', 'api'];
+    const reserved = ['admin', 'css', 'img', 'js', 'berita', 'galeri', 'tentang', 'data-anggota'];
     if (reserved.includes(slug)) return next();
     try {
         const shortlinks = await kv.get('shortlinkList') || [];
