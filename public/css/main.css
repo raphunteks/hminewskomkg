@@ -110,7 +110,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .announce-container {
     display: grid;
     grid-template-columns: 1fr 1.5fr; /* Pembagian proporsional: kiri lebih kecil, kanan lebih lebar */
-    max-width: 800px; /* Ukuran keseluruhan di perkecil agar lebih pas di desktop */
+    max-width: 700px; /* Ukuran keseluruhan di perkecil agar lebih pas di desktop */
     width: 100%;
     max-height: 80vh; /* Kunci: Tidak akan melebihi 80% layar */
     background: #112d22; /* Warna hijau gelap elegan */
@@ -141,7 +141,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .announce-close-btn:hover { background: rgba(239,68,68,0.9); }
 
 .announce-left {
-    background: #000;
+    background: transparent;
     padding: 20px; /* Memberikan ruang (border semu) di sekitar gambar */
     display: flex;
     align-items: center;
@@ -168,7 +168,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .announce-title { 
     color: #fff; 
     margin-bottom: 10px; 
-    font-size: 1.6rem; /* Ukuran font disesuaikan */
+    font-size: 1.4rem; /* Ukuran font disesuaikan */
     font-weight: 800; 
     line-height: 1.2; 
     padding-right: 35px; /* Mencegah judul menabrak tombol close */
@@ -178,23 +178,23 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     width: 40px; 
     height: 4px; 
     background: #4ade80; 
-    margin-bottom: 20px; 
+    margin-bottom: 15px; 
     border-radius: 2px; 
     flex-shrink: 0; 
 }
 
 .announce-text { 
     color: #d1d5db; 
-    margin-bottom: 30px; 
-    font-size: 0.95rem; 
+    margin-bottom: 25px; 
+    font-size: 0.9rem; 
     border-left: 3px solid rgba(74, 222, 128, 0.4); 
     padding-left: 15px; 
 }
 
 .announce-btn {
     align-self: flex-start;
-    padding: 10px 24px;
-    font-size: 0.95rem;
+    padding: 8px 20px;
+    font-size: 0.9rem;
     border-radius: 8px;
     font-weight: bold;
     background: transparent;
@@ -332,7 +332,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .auth-header { text-align: center; margin-bottom: 30px; }
 .auth-icon { width: 60px; height: 60px; background: rgba(34,197,94,0.1); color: #4ade80; border-radius: 15px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(34,197,94,0.2); }
 
-/* FOOTER (FIX Z-INDEX) */
+/* FOOTER */
 .site-footer { background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.1); padding: 60px 0 30px; position: relative; z-index: 1; margin-top: auto; box-shadow: 0 -5px 20px rgba(0,0,0,0.2); }
 .footer-top { margin-bottom: 40px; }
 .footer-logo-area { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
@@ -366,27 +366,26 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     .panel-header { flex-direction: column; gap: 15px; text-align: center; }
     .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
     
-    /* FIX ANNOUNCEMENT KHUSUS HP (VERTIKAL & SCROLLABLE) */
+    /* FIX ANNOUNCEMENT HORIZONTAL TO VERTIKAL DI MOBILE */
     .announce-container { 
-        grid-template-columns: 1fr; /* Berubah menjadi vertikal (satu kolom) di HP */
-        max-height: 85vh; /* Sedikit lebih tinggi untuk layar HP */
-        overflow-y: auto; /* Jika isi di dalam container (termasuk gambar+teks) sangat panjang, seluruh card bisa di-scroll */
+        grid-template-columns: 1fr; 
+        max-height: 80vh; 
+        overflow-y: auto; 
     }
     
     .announce-left { 
         padding: 15px; 
-        background: #000;
-        /* Memastikan gambar di HP tidak mengambil ruang terlalu banyak */
-        height: 250px; 
+        background: transparent;
+        height: 200px; 
         border-bottom: 1px solid rgba(255,255,255,0.1); 
     }
     
     .announce-right { 
         padding: 20px !important; 
-        overflow-y: visible; /* Matikan scroll di dalam teks karena layar utamanya yang akan di-scroll */
+        overflow-y: visible; 
     }
     
-    .announce-title { font-size: 1.4rem; padding-right: 0; }
+    .announce-title { font-size: 1.3rem; padding-right: 0; }
 }
 
 ::-webkit-scrollbar { width: 8px; }
