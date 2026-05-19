@@ -42,7 +42,7 @@
                     </script>
                     <script src="https://cdn.jsdelivr.net/npm/dflip@2.2.23/js/dflip.min.js"></script>
                     
-                    <!-- Kontainer Flipbook (Proporsional & Support Mobile) -->
+                    <!-- Kontainer Flipbook -->
                     <div class="flipbook-container" style="width: 100%; height: 80vh; min-height: 500px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(74,222,128,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
                         <!-- Elemen kosong untuk diinisialisasi manual via Javascript -->
                         <div id="df_manual_book" style="height: 100%; width: 100%;"></div>
@@ -52,27 +52,15 @@
                         <i data-lucide="mouse-pointer-click" style="width:16px; display:inline; margin-bottom:-2px;"></i> Geser halaman dari sudut, atau gunakan tombol navigasi di atas untuk membaca isi buku pedoman.
                     </p>
 
-                    <!-- KUNCI FIX 2: Konversi Base64 Ke Blob URL agar bisa dibaca Web Worker PDF.js -->
+                    <!-- KUNCI FIX 2: Data Base64 disembunyikan di elemen HTML agar tidak merusak Script (Anti Syntax Error) -->
+                    <input type="hidden" id="bookletPdfData" value="<%= siteSettings.bookletPdf %>">
+
+                    <!-- KUNCI FIX 3: Konversi Menggunakan Native Fetch API (Anti Nge-freeze/Crash) -->
                     <script>
                         $(document).ready(function () {
-                            var pdfBase64 = "<%= siteSettings.bookletPdf %>";
-                            
-                            function base64ToBlobUrl(base64) {
-                                var parts = base64.split(';base64,');
-                                var contentType = parts[0].split(':')[1];
-                                var raw = window.atob(parts[1]);
-                                var rawLength = raw.length;
-                                var uInt8Array = new Uint8Array(rawLength);
-                                for (var i = 0; i < rawLength; ++i) {
-                                    uInt8Array[i] = raw.charCodeAt(i);
-                                }
-                                var blob = new Blob([uInt8Array], { type: contentType });
-                                return URL.createObjectURL(blob);
-                            }
+                            var pdfBase64 = document.getElementById('bookletPdfData').value;
 
-                            if (pdfBase64 && pdfBase64.includes('base64,')) {
-                                var pdfUrl = base64ToBlobUrl(pdfBase64);
-                                
+                            if (pdfBase64) {
                                 var options = {
                                     webgl: true,
                                     backgroundColor: "#333333", /* Dark grey background persis seperti GBR 2 */
@@ -80,9 +68,21 @@
                                     width: "100%",
                                     duration: 800
                                 };
-                                
-                                // Inisialisasi Flipbook
-                                $("#df_manual_book").FlipBook(pdfUrl, options);
+
+                                if (pdfBase64.includes('base64,')) {
+                                    // Gunakan Fetch API untuk konversi (Sangat Cepat & Tidak Membekukan Browser)
+                                    fetch(pdfBase64)
+                                        .then(res => res.blob())
+                                        .then(blob => {
+                                            var pdfUrl = URL.createObjectURL(blob);
+                                            // Inisialisasi Flipbook setelah Blob URL berhasil dibuat
+                                            $("#df_manual_book").FlipBook(pdfUrl, options);
+                                        })
+                                        .catch(err => console.error("Error memproses PDF:", err));
+                                } else {
+                                    // Jika yang tersimpan adalah Link URL PDF biasa
+                                    $("#df_manual_book").FlipBook(pdfBase64, options);
+                                }
                             }
                         });
                     </script>
