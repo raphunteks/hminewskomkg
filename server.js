@@ -444,7 +444,6 @@ app.post('/admin/tambah-data-anggota', requireAdmin, upload.any(), async (req, r
 app.post('/admin/edit-data-anggota/:id', requireAdmin, upload.any(), async (req, res) => { try { let dataAnggota = await kv.get('dataAnggotaList') || []; let index = dataAnggota.findIndex(d => d.id == req.params.id); if (index !== -1) { dataAnggota[index].title = req.body.title; if (req.body.date) dataAnggota[index].date = req.body.date; let fileStr = fileHelper(req, 'file_b64'); if (fileStr) dataAnggota[index].file = fileStr; await kv.set('dataAnggotaList', dataAnggota); } res.redirect('/admin/dashboard'); } catch(e){ res.redirect('/admin/dashboard'); }});
 app.post('/admin/hapus-data-anggota/:id', requireAdmin, async (req, res) => { let dataAnggota = await kv.get('dataAnggotaList') || []; await kv.set('dataAnggotaList', dataAnggota.filter(d => d.id != req.params.id)); res.redirect('/admin/dashboard'); });
 
-// GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Terjadi Kesalahan Internal di Server.');
