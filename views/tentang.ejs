@@ -31,7 +31,7 @@
                 <div style="grid-column: 1 / -1; margin-bottom: 20px;">
                     <h3 style="margin-bottom: 20px; font-size:1.5rem; text-align:center; color:#4ade80;">Buku Pedoman / Profil</h3>
                     
-                    <!-- Kebutuhan Library DearFlip (CDN JSDelivr Lebih Stabil) -->
+                    <!-- Kebutuhan Library DearFlip -->
                     <link href="https://cdn.jsdelivr.net/npm/dflip@2.2.23/css/dflip.min.css" rel="stylesheet">
                     <link href="https://cdn.jsdelivr.net/npm/dflip@2.2.23/css/themify-icons.min.css" rel="stylesheet">
                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -44,7 +44,7 @@
                     
                     <!-- Kontainer Flipbook -->
                     <div class="flipbook-container" style="width: 100%; height: 80vh; min-height: 500px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(74,222,128,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                        <!-- Elemen kosong untuk diinisialisasi manual via Javascript -->
+                        <!-- KUNCI FIX 2: HAPUS CLASS "_df_book" AGAR TIDAK BENTROK (DOUBLE RENDER). KITA PANGGIL MANUAL VIA ID. -->
                         <div id="df_manual_book" style="height: 100%; width: 100%;"></div>
                     </div>
                     
@@ -52,15 +52,14 @@
                         <i data-lucide="mouse-pointer-click" style="width:16px; display:inline; margin-bottom:-2px;"></i> Geser halaman dari sudut, atau gunakan tombol navigasi di atas untuk membaca isi buku pedoman.
                     </p>
 
-                    <!-- KUNCI FIX 2: Data Base64 disembunyikan di elemen HTML agar tidak merusak Script (Anti Syntax Error) -->
                     <input type="hidden" id="bookletPdfData" value="<%= siteSettings.bookletPdf %>">
 
-                    <!-- KUNCI FIX 3: Konversi Menggunakan Native Fetch API (Anti Nge-freeze/Crash) -->
+                    <!-- KUNCI FIX 3: KONVERSI BASE64 KE BLOB YANG AMAN UNTUK DEARFLIP -->
                     <script>
                         $(document).ready(function () {
-                            var pdfBase64 = document.getElementById('bookletPdfData').value;
+                            var pdfData = document.getElementById('bookletPdfData').value;
 
-                            if (pdfBase64) {
+                            if (pdfData) {
                                 var options = {
                                     webgl: true,
                                     backgroundColor: "#333333", /* Dark grey background persis seperti GBR 2 */
@@ -69,19 +68,28 @@
                                     duration: 800
                                 };
 
-                                if (pdfBase64.includes('base64,')) {
-                                    // Gunakan Fetch API untuk konversi (Sangat Cepat & Tidak Membekukan Browser)
-                                    fetch(pdfBase64)
-                                        .then(res => res.blob())
-                                        .then(blob => {
-                                            var pdfUrl = URL.createObjectURL(blob);
-                                            // Inisialisasi Flipbook setelah Blob URL berhasil dibuat
-                                            $("#df_manual_book").FlipBook(pdfUrl, options);
-                                        })
-                                        .catch(err => console.error("Error memproses PDF:", err));
+                                if (pdfData.includes('base64,')) {
+                                    try {
+                                        // Ubah Base64 menjadi Blob agar dikenali sebagai file fisik oleh DearFlip
+                                        var base64String = pdfData.split(',')[1];
+                                        var byteCharacters = atob(base64String);
+                                        var byteNumbers = new Array(byteCharacters.length);
+                                        for (var i = 0; i < byteCharacters.length; i++) {
+                                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                                        }
+                                        var byteArray = new Uint8Array(byteNumbers);
+                                        var blob = new Blob([byteArray], { type: 'application/pdf' });
+                                        var pdfUrl = URL.createObjectURL(blob);
+
+                                        // Render Flipbook
+                                        $("#df_manual_book").FlipBook(pdfUrl, options);
+                                    } catch (err) {
+                                        console.error("Gagal merender PDF Flipbook:", err);
+                                        $("#df_manual_book").html("<p style='color:white; text-align:center; padding: 20px;'>Gagal memuat PDF. Harap upload ulang file PDF.</p>");
+                                    }
                                 } else {
-                                    // Jika yang tersimpan adalah Link URL PDF biasa
-                                    $("#df_manual_book").FlipBook(pdfBase64, options);
+                                    // Jika formatnya adalah URL biasa
+                                    $("#df_manual_book").FlipBook(pdfData, options);
                                 }
                             }
                         });
