@@ -339,10 +339,21 @@
                     <label>Embed Code Google Maps (Iframe)</label>
                     <textarea name="mapsEmbed" class="input-control" rows="3" placeholder='<iframe src="..."></iframe>'><%= siteSettings.mapsEmbed %></textarea>
                 </div>
-                <div class="form-group">
-                    <label>Upload Booklet / Pedoman PDF</label>
+                
+                <!-- UPDATE BIG FIX: FORM INPUT PDF DUAL (URL / FILE) -->
+                <div class="form-group" style="margin-top:30px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px dashed rgba(255,255,255,0.2);">
+                    <label style="color:#4ade80; font-size:1rem; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">Upload Booklet / Pedoman PDF</label>
+                    <p class="text-muted" style="font-size:0.8rem; margin-bottom: 15px;">Pilih salah satu metode di bawah. Disarankan menggunakan Link Google Drive agar tidak membebani server/Error 500.</p>
+                    
+                    <label style="font-size:0.85rem;">Metode 1: Link Google Drive (Sangat Disarankan)</label>
+                    <input type="url" name="bookletPdfUrl" class="input-control" placeholder="Paste link Google Drive disini...">
+                    
+                    <div style="text-align:center; color:#9ca3af; margin: 15px 0; font-size:0.8rem; font-weight:bold;">ATAU</div>
+                    
+                    <label style="font-size:0.85rem;">Metode 2: Upload File Lokal (Maksimal 1 MB)</label>
                     <input type="file" name="bookletPdf" class="input-control file-to-b64" accept="application/pdf">
-                    <% if(siteSettings.bookletPdf) { %><p class="form-hint" style="color:#4ade80;">File booklet saat ini sudah terpasang.</p><% } %>
+                    
+                    <% if(siteSettings.bookletPdf) { %><p class="form-hint" style="color:#4ade80; margin-top:10px;">✅ Status: File/Link Booklet sudah tersedia dan aktif.</p><% } %>
                 </div>
 
                 <!-- SEGMEN TENTANG KOHATI -->
@@ -362,7 +373,7 @@
                     <input type="hidden" name="kohatiMisiText" id="hidden-kohati-misi">
                 </div>
 
-                <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:20px;">Simpan Halaman Tentang</button>
+                <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:20px;">Simpan Halaman Tentang & PDF</button>
             </form>
             
             <div id="raw-profil" style="display:none;"><%- siteSettings.profilText %></div>
