@@ -1,3 +1,4 @@
+
 </div> <!-- Menutup div.container dari header -->
     </main> <!-- Menutup tag main dari header -->
     
@@ -31,10 +32,23 @@
                     <div class="social-links">
                         <% socialMediaList.forEach(soc => { %>
                             <a href="<%= soc.url %>" target="_blank" class="social-btn" title="<%= soc.name %>">
-                                <% if(soc.icon) { %>
+                                <!-- LOGIKA PINTAR: JIKA ADA GAMBAR PAKAI GAMBAR, JIKA TIDAK DETEKSI DARI NAMA -->
+                                <% if(soc.icon && soc.icon.length > 0) { %>
                                     <img src="<%= soc.icon %>" alt="<%= soc.name %>">
                                 <% } else { %>
-                                    <i data-lucide="link"></i>
+                                    <% if (soc.name.toLowerCase().includes('instagram') || soc.name.toLowerCase().includes('ig')) { %>
+                                        <i data-lucide="instagram"></i>
+                                    <% } else if (soc.name.toLowerCase().includes('facebook') || soc.name.toLowerCase().includes('fb')) { %>
+                                        <i data-lucide="facebook"></i>
+                                    <% } else if (soc.name.toLowerCase().includes('twitter') || soc.name.toLowerCase().includes('x')) { %>
+                                        <i data-lucide="twitter"></i>
+                                    <% } else if (soc.name.toLowerCase().includes('youtube') || soc.name.toLowerCase().includes('yt')) { %>
+                                        <i data-lucide="youtube"></i>
+                                    <% } else if (soc.name.toLowerCase().includes('tiktok')) { %>
+                                        <i data-lucide="tv"></i>
+                                    <% } else { %>
+                                        <i data-lucide="link"></i>
+                                    <% } %>
                                 <% } %>
                             </a>
                         <% }) %>
