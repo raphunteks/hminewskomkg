@@ -82,7 +82,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .rich-text-content a:hover { color: #22c55e; }
 .rich-text-content blockquote { border-left: 4px solid #22c55e; padding-left: 15px; margin-left: 0; font-style: italic; color: #9ca3af; background: rgba(255,255,255,0.05); padding:10px 15px; border-radius: 0 8px 8px 0; }
 
-/* NEW: KARTU VISI MISI YANG ELEGAN & PROPORSIONAL */
+/* KARTU VISI MISI YANG ELEGAN & PROPORSIONAL */
 .vm-card {
     background: #093824;
     border-radius: 20px;
@@ -156,19 +156,67 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 }
 
 /* ==============================================================
-   DEARFLIP (3D FLIPBOOK) SUPPORT
+   DEARFLIP (3D FLIPBOOK) & INSTAGRAM WIDGET SUPPORT (RESPONSIVE FIX)
 ============================================================== */
-.flipbook-container {
+/* Mencegah offside dan horizontal scroll pada Container Flipbook */
+.flipbook-container, .flipbook-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 12px;
+    overflow: hidden !important; 
     position: relative;
     z-index: 10;
 }
-/* Memastikan gaya tombol bawaan DearFlip tidak rusak oleh CSS Global ini */
+
+/* Memaksa elemen core DearFlip agar patuh pada batas layar Mobile */
+._df_book {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
+/* Fix agar tombol UI DearFlip tidak meledak keluar/berantakan */
 .df-ui-btn {
     box-sizing: content-box !important;
 }
-._df_book {
-    width: 100%;
-    height: 100%;
+
+/* Mencegah offside pada section Instagram Feed */
+.instagram-feed-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important; 
+    border-radius: 1.5rem;
+    box-sizing: border-box;
+}
+
+/* Target khusus untuk wrapper dari Elfsight Widget */
+[class*="elfsight-app"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    box-sizing: border-box;
+}
+
+/* Pengunci rasio proporsional untuk elemen Embed (Maps, Video, dll) */
+.ratio { 
+    position: relative; 
+    width: 100%; 
+    border-radius: 12px; 
+    overflow: hidden; 
+}
+.ratio-16x9::before { 
+    display: block; 
+    padding-top: 56.25%; 
+    content: ""; 
+}
+.ratio > iframe, .ratio > embed, .ratio > object, .ratio > div { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    border: 0; 
 }
 
 /* GRID SYSTEMS */
@@ -416,13 +464,6 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .team-img img { width: 100%; height: 100%; object-fit: cover; }
 .team-name { font-size: 1.1rem; margin-bottom: 5px; }
 .team-role { color: #4ade80; font-size: 0.85rem; font-weight: bold; }
-
-.vision-mission-card { padding: 40px; position: relative; overflow: hidden; }
-.vision-mission-card.v-left { border-left: 5px solid #22c55e; background: rgba(0,0,0,0.4); }
-.vision-mission-card.m-left { border-left: 5px solid #34d399; background: rgba(6,78,59,0.4); }
-.icon-box { width: 50px; height: 50px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-.list-custom li { display: flex; gap: 15px; margin-bottom: 15px; color: #d1d5db; }
-.list-num { color: #22c55e; font-weight: bold; }
 
 .gallery-card { padding: 15px; text-align: left; display: block; transition: 0.3s; }
 .gallery-img-box { height: 220px; border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
