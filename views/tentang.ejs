@@ -1,3 +1,4 @@
+
 <%- include('partials/header') %>
 
 <div class="tab-nav">
@@ -26,7 +27,7 @@
         <% if (siteSettings.bookletPdf || siteSettings.mapsEmbed) { %>
             <div class="grid-2" style="margin-top: 50px; gap: 30px;">
                 
-                <!-- UPGRADE: DEARFLIP 3D FLIPBOOK UNTUK BUKU PEDOMAN (SUPER FIXED) -->
+                <!-- UPGRADE: DEARFLIP 3D FLIPBOOK MENGGUNAKAN API ENDPOINT (SUPER CEPAT & AMAN) -->
                 <% if (siteSettings.bookletPdf) { %>
                 <div style="grid-column: 1 / -1; margin-bottom: 20px;">
                     <h3 style="margin-bottom: 20px; font-size:1.5rem; text-align:center; color:#4ade80;">Buku Pedoman / Profil</h3>
@@ -44,7 +45,6 @@
                     
                     <!-- Kontainer Flipbook -->
                     <div class="flipbook-container" style="width: 100%; height: 80vh; min-height: 500px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(74,222,128,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                        <!-- KUNCI FIX 2: HAPUS CLASS "_df_book" AGAR TIDAK BENTROK (DOUBLE RENDER). KITA PANGGIL MANUAL VIA ID. -->
                         <div id="df_manual_book" style="height: 100%; width: 100%;"></div>
                     </div>
                     
@@ -52,46 +52,19 @@
                         <i data-lucide="mouse-pointer-click" style="width:16px; display:inline; margin-bottom:-2px;"></i> Geser halaman dari sudut, atau gunakan tombol navigasi di atas untuk membaca isi buku pedoman.
                     </p>
 
-                    <input type="hidden" id="bookletPdfData" value="<%= siteSettings.bookletPdf %>">
-
-                    <!-- KUNCI FIX 3: KONVERSI BASE64 KE BLOB YANG AMAN UNTUK DEARFLIP -->
+                    <!-- KUNCI FIX 2: HAPUS HIDDEN INPUT BASE64 YANG BERAT. LANGSUNG PANGGIL VIA API -->
                     <script>
                         $(document).ready(function () {
-                            var pdfData = document.getElementById('bookletPdfData').value;
-
-                            if (pdfData) {
-                                var options = {
-                                    webgl: true,
-                                    backgroundColor: "#333333", /* Dark grey background persis seperti GBR 2 */
-                                    height: "100%",
-                                    width: "100%",
-                                    duration: 800
-                                };
-
-                                if (pdfData.includes('base64,')) {
-                                    try {
-                                        // Ubah Base64 menjadi Blob agar dikenali sebagai file fisik oleh DearFlip
-                                        var base64String = pdfData.split(',')[1];
-                                        var byteCharacters = atob(base64String);
-                                        var byteNumbers = new Array(byteCharacters.length);
-                                        for (var i = 0; i < byteCharacters.length; i++) {
-                                            byteNumbers[i] = byteCharacters.charCodeAt(i);
-                                        }
-                                        var byteArray = new Uint8Array(byteNumbers);
-                                        var blob = new Blob([byteArray], { type: 'application/pdf' });
-                                        var pdfUrl = URL.createObjectURL(blob);
-
-                                        // Render Flipbook
-                                        $("#df_manual_book").FlipBook(pdfUrl, options);
-                                    } catch (err) {
-                                        console.error("Gagal merender PDF Flipbook:", err);
-                                        $("#df_manual_book").html("<p style='color:white; text-align:center; padding: 20px;'>Gagal memuat PDF. Harap upload ulang file PDF.</p>");
-                                    }
-                                } else {
-                                    // Jika formatnya adalah URL biasa
-                                    $("#df_manual_book").FlipBook(pdfData, options);
-                                }
-                            }
+                            var options = {
+                                webgl: true,
+                                backgroundColor: "#333333", /* Dark grey background */
+                                height: "100%",
+                                width: "100%",
+                                duration: 800
+                            };
+                            
+                            // Langsung memanggil API Endpoint yang telah kita buat di server.js
+                            $("#df_manual_book").FlipBook("/api/booklet.pdf", options);
                         });
                     </script>
                 </div>
