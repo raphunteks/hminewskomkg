@@ -1,3 +1,4 @@
+
 <%- include('partials/header') %>
 
 <div class="glass dashboard-header">
@@ -23,8 +24,8 @@
      TAB 1: KELOLA DATA UTAMA & KOHATI
 ============================================================== -->
 <div id="adm-kelola" class="admin-tab-pane active">
+    <!-- Kode Tab 1 Tetap Sama -->
     <div class="admin-layout">
-        
         <div class="admin-main-content">
             <div class="glass admin-panel" style="margin-bottom:0;">
                 <div class="panel-header">
@@ -100,8 +101,6 @@
                                             <img src="<%= m.image %>" class="member-avatar">
                                             <p class="member-name"><%= m.name %></p>
                                             <p style="font-size:0.75rem; color:#4ade80; margin-top:3px; font-weight:bold;"><%= m.role || '' %></p>
-                                            
-                                            <!-- UPDATE: Fungsi onclick sekarang mengirimkan paramater (m.role) -->
                                             <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '<%= (m.role || '').replace(/'/g, "\\'") %>', '/admin/edit-anggota-bidang/')"><i data-lucide="edit" style="width:12px;"></i></button>
                                             <form action="/admin/hapus-anggota-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota?')"><i data-lucide="x"></i></button></form>
                                         </div>
@@ -161,8 +160,6 @@
                                             <img src="<%= m.image %>" class="member-avatar" style="border-color:rgba(244,114,182,0.5);">
                                             <p class="member-name"><%= m.name %></p>
                                             <p style="font-size:0.75rem; color:#f472b6; margin-top:3px; font-weight:bold;"><%= m.role || '' %></p>
-                                            
-                                            <!-- UPDATE: Fungsi onclick sekarang mengirimkan paramater (m.role) -->
                                             <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '<%= (m.role || '').replace(/'/g, "\\'") %>', '/admin/edit-anggota-kohati-bidang/')"><i data-lucide="edit" style="width:12px;"></i></button>
                                             <form action="/admin/hapus-anggota-kohati-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota kohati?')"><i data-lucide="x"></i></button></form>
                                         </div>
@@ -219,10 +216,11 @@
 <div id="adm-setelan" class="admin-tab-pane">
     <div class="grid-2">
         <div style="display:flex; flex-direction:column; gap:30px;">
-            <!-- FORM HEADER & FOOTER -->
+            
+            <!-- UPDATE BIG FIX: FORM HEADER DIPISAH SENDIRI -->
             <div class="glass admin-panel" style="margin-bottom:0;">
-                <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="layout"></i> Header & Footer</h3>
-                <form action="/admin/setelan-web" method="POST" enctype="multipart/form-data">
+                <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="layout"></i> Setelan Header & Web</h3>
+                <form action="/admin/setelan-header" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
                         <label>Judul Web (Title Tab/Browser)</label>
                         <input type="text" name="webTitle" class="input-control" value="<%= siteSettings.webTitle %>">
@@ -247,11 +245,19 @@
                         <label>Logo Header & Favicon (Biarkan kosong jika tetap)</label>
                         <input type="file" name="headerLogo" class="input-control file-compress" accept="image/*">
                     </div>
+                    <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:5px;">Simpan Perubahan Header</button>
+                </form>
+            </div>
+
+            <!-- UPDATE BIG FIX: FORM FOOTER DIPISAH SENDIRI -->
+            <div class="glass admin-panel" style="margin-bottom:0; border-top: 4px solid #3b82f6;">
+                <h3 class="panel-title" style="margin-bottom:20px; color: #60a5fa;"><i data-lucide="align-bottom"></i> Setelan Footer</h3>
+                <form action="/admin/setelan-footer" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
                         <label>Logo Footer (Biarkan kosong jika tetap)</label>
                         <input type="file" name="footerLogo" class="input-control file-compress" accept="image/*">
                     </div>
-                    <div class="form-group" style="margin-top:30px; border-top:1px dashed rgba(255,255,255,0.2); padding-top:20px;">
+                    <div class="form-group">
                         <label>Teks Judul Footer</label>
                         <input type="text" name="footerTitle" class="input-control" value="<%= siteSettings.footerTitle %>">
                     </div>
@@ -267,20 +273,23 @@
                         <label>Teks Programmer / Watermark</label>
                         <input type="text" name="footerProgrammer" class="input-control" value="<%= siteSettings.footerProgrammer %>">
                     </div>
-                    
-                    <h4 style="margin:20px 0 10px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">Sosial Media Footer</h4>
-                    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
-                        <% socialMediaList.forEach(soc => { %>
-                            <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                                <span style="font-size:0.85rem;"><%= soc.name %>: <a href="<%= soc.url %>" target="_blank" style="color:#4ade80;">Link</a></span>
-                                <form action="/admin/hapus-sosmed/<%= soc.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" style="padding:4px;"><i data-lucide="trash-2" style="width:14px;"></i></button></form>
-                            </div>
-                        <% }) %>
-                        <button type="button" class="btn btn-secondary" onclick="openModal('modalSosmed')" style="font-size:0.8rem; padding:8px;">+ Tambah Sosial Media (Icon Upload)</button>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:15px;">Simpan Perubahan Web</button>
+                    <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:5px; background: #3b82f6; border-color: #3b82f6;">Simpan Perubahan Footer</button>
                 </form>
+
+                <!-- UPDATE BIG FIX: SOSMED BISA DI-EDIT SEKARANG -->
+                <h4 style="margin:30px 0 15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px; color: #60a5fa;">Daftar Sosial Media Footer</h4>
+                <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+                    <% socialMediaList.forEach(soc => { %>
+                        <div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:0.85rem; font-weight: bold;"><%= soc.name %></span>
+                            <div style="display: flex; gap: 5px;">
+                                <button type="button" class="action-btn edit" style="padding:4px;" onclick="openEditSosmedModal('<%= soc.id %>', '<%= soc.name.replace(/'/g, "\\'") %>', '<%= soc.url.replace(/'/g, "\\'") %>')"><i data-lucide="edit" style="width:14px;"></i></button>
+                                <form action="/admin/hapus-sosmed/<%= soc.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" style="padding:4px;" onclick="return confirm('Hapus Sosmed?')"><i data-lucide="trash-2" style="width:14px;"></i></button></form>
+                            </div>
+                        </div>
+                    <% }) %>
+                    <button type="button" class="btn btn-secondary" onclick="openModal('modalSosmed')" style="font-size:0.8rem; padding:8px;">+ Tambah Sosial Media Baru</button>
+                </div>
             </div>
 
             <!-- FORM TOGGLE KOHATI TERPISAH -->
@@ -443,14 +452,28 @@
     <div class="modal-content">
         <div class="modal-header"><h3>Tambah Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalSosmed')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-sosmed" method="POST" enctype="multipart/form-data">
-            <div class="form-group"><label>Nama Sosmed</label><input type="text" name="name" class="input-control" required placeholder="Contoh: Twitter"></div>
+            <div class="form-group"><label>Nama Sosmed (Misal: Instagram, Facebook)</label><input type="text" name="name" class="input-control" required placeholder="Contoh: Instagram"></div>
             <div class="form-group"><label>URL Profile</label><input type="url" name="url" class="input-control" required placeholder="https://..."></div>
-            <div class="form-group"><label>Upload Icon/Logo</label><input type="file" name="icon" class="input-control file-compress" accept="image/*" required></div>
+            <div class="form-group"><label>Upload Icon/Logo (Kosongkan untuk icon default otomatis)</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalSosmed')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan</button></div>
         </form>
     </div>
 </div>
 
+<!-- MODAL EDIT SOSMED BARU -->
+<div class="modal-overlay" id="modalEditSosmed">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Edit Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalEditSosmed')"><i data-lucide="x"></i></button></div>
+        <form id="formEditSosmed" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Nama Sosmed</label><input type="text" name="name" id="editSosmedName" class="input-control" required></div>
+            <div class="form-group"><label>URL Profile</label><input type="url" name="url" id="editSosmedUrl" class="input-control" required></div>
+            <div class="form-group"><label>Ganti Icon Baru (Opsional)</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditSosmed')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Update Sosmed</button></div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Lainnya Tetap Sama -->
 <div class="modal-overlay" id="modalShortlink">
     <div class="modal-content">
         <div class="modal-header"><h3>Tambah Shortlink</h3><button type="button" class="close-modal" onclick="closeModal('modalShortlink')"><i data-lucide="x"></i></button></div>
@@ -638,7 +661,6 @@
                 <input type="text" name="name" id="editAnggotaBidangName" class="input-control" required>
             </div>
             
-            <!-- UPDATE: FIELD JABATAN BARU DITAMBAHKAN DI SINI -->
             <div class="form-group">
                 <label>Jabatan (Opsional)</label>
                 <input type="text" name="role" id="editAnggotaBidangRole" class="input-control" placeholder="Contoh: Anggota / Ketua Bidang">
@@ -693,7 +715,6 @@
         var quillTambah = new Quill('#quill-tambah', qConfig);
         var quillEdit = new Quill('#quill-edit', qConfig);
         
-        // PISAHKAN EDITOR UNTUK TENTANG KAMI
         var quillProfil = new Quill('#quill-profil', qConfig);
         var quillWelcome = new Quill('#quill-welcome', qConfig);
         var quillVisi = new Quill('#quill-visi', qConfig);
@@ -703,12 +724,10 @@
         var quillKohatiMisi = new Quill('#quill-kohati-misi', qConfig);
         var quillAnnounce = new Quill('#quill-announce', qConfig);
 
-        // INISIALISASI KONTEN
         quillProfil.root.innerHTML = document.getElementById('raw-profil').innerHTML;
         quillWelcome.root.innerHTML = document.getElementById('raw-welcome').innerHTML;
         quillVisi.root.innerHTML = document.getElementById('raw-visi').innerHTML;
         quillMisi.root.innerHTML = document.getElementById('raw-misi').innerHTML;
-        
         quillKohatiProfil.root.innerHTML = document.getElementById('raw-kohati-profil').innerHTML;
         quillKohatiVisi.root.innerHTML = document.getElementById('raw-kohati-visi').innerHTML;
         quillKohatiMisi.root.innerHTML = document.getElementById('raw-kohati-misi').innerHTML;
@@ -737,6 +756,14 @@
 
     function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+
+    // FUNGSI BARU: Buka Modal Edit Sosmed
+    function openEditSosmedModal(id, name, url) {
+        document.getElementById('editSosmedName').value = name;
+        document.getElementById('editSosmedUrl').value = url;
+        document.getElementById('formEditSosmed').action = '/admin/edit-sosmed/' + id;
+        openModal('modalEditSosmed');
+    }
 
     function openEditDataAnggotaModal(id, title, date) { document.getElementById('editDataAnggotaTitle').value = title; document.getElementById('editDataAnggotaDate').value = date; document.getElementById('formEditDataAnggota').action = '/admin/edit-data-anggota/' + id; openModal('modalEditDataAnggota'); }
 
@@ -770,7 +797,6 @@
 
     function openEditBidangModal(id, name, actionPath) { document.getElementById('editBidangName').value = name; document.getElementById('formEditBidang').action = actionPath + id; openModal('modalEditBidang'); }
     
-    // UPDATE JS: Fungsi modal Tambah/Edit anggota sekarang menerima parameter Role (Jabatan)
     function openModalAnggotaBidang(bidangId, bidangName, actionPath) { 
         document.getElementById('anggotaBidangTitle').innerText = "Tambah Anggota: " + bidangName; 
         document.getElementById('editAnggotaBidangName').value = "";
