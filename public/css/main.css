@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
 
 /* RESET & BASE */
@@ -155,24 +156,25 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     color: #f472b6 !important; 
 }
 
+
 /* ==============================================================
-   DEARFLIP (3D FLIPBOOK) & INSTAGRAM WIDGET SUPPORT (RESPONSIVE FIX)
+   DEARFLIP (3D FLIPBOOK) & WIDGET SUPPORT (RESPONSIVE FIX)
 ============================================================== */
-/* Mencegah offside dan horizontal scroll pada Container Flipbook */
+/* Kunci absolut agar flipbook container tidak melebihi lebar layar HP */
 .flipbook-container, .flipbook-wrapper {
     width: 100% !important;
     max-width: 100% !important;
     border-radius: 12px;
-    overflow: hidden !important; 
+    overflow: hidden !important;
     position: relative;
     z-index: 10;
+    box-sizing: border-box;
 }
 
-/* Memaksa elemen core DearFlip agar patuh pada batas layar Mobile */
+/* Memaksa elemen DearFlip patuh pada ukuran Mobile */
 ._df_book {
     width: 100% !important;
     max-width: 100% !important;
-    height: 100% !important;
     overflow: hidden !important;
 }
 
@@ -181,7 +183,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     box-sizing: content-box !important;
 }
 
-/* Mencegah offside pada section Instagram Feed */
+/* Fix Khusus Instagram Feed Agar Tidak Offside */
 .instagram-feed-section {
     width: 100% !important;
     max-width: 100% !important;
@@ -190,7 +192,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     box-sizing: border-box;
 }
 
-/* Target khusus untuk wrapper dari Elfsight Widget */
+/* Target khusus untuk frame Elfsight Widget */
 [class*="elfsight-app"] {
     width: 100% !important;
     max-width: 100% !important;
@@ -198,7 +200,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     box-sizing: border-box;
 }
 
-/* Pengunci rasio proporsional untuk elemen Embed (Maps, Video, dll) */
+/* Pengunci rasio proporsional untuk Google Maps & Iframe Embed */
 .ratio { 
     position: relative; 
     width: 100%; 
