@@ -1,3 +1,4 @@
+
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
@@ -148,11 +149,10 @@ app.get('/favicon.ico', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'))
 app.get('/favicon.png', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 
 // --- API ENDPOINT KHUSUS UNTUK RENDER PDF DEARFLIP ---
-// Mengambil base64 dari DB, diconvert ke binary Buffer, lalu di-stream langsung ke browser
+// Digunakan hanya jika admin memaksa upload file PDF (bukan URL)
 app.get('/api/booklet.pdf', async (req, res) => {
     try {
-        const { siteSettings } = await getSiteData();
-        const b64Data = siteSettings.bookletPdf;
+        const b64Data = await kv.get('booklet_file_db'); // Ambil dari database terisolasi
         if (!b64Data || !b64Data.includes('base64,')) {
             return res.status(404).send('PDF not found');
         }
@@ -162,7 +162,7 @@ app.get('/api/booklet.pdf', async (req, res) => {
         res.setHeader('Content-Disposition', 'inline; filename="Buku_Pedoman.pdf"');
         res.send(pdfBuffer);
     } catch (err) {
-        res.status(500).send("Gagal memuat PDF");
+        res.status(500).send("Gagal memuat PDF dari database.");
     }
 });
 
@@ -363,26 +363,50 @@ app.post('/admin/setelan-kohati-toggle', requireAdmin, upload.any(), async (req,
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
+// --- BIG FIX: API TENTANG & PDF ---
 app.post('/admin/setelan-tentang', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
         if (req.body.profilText !== undefined) {
             siteSettings.profilText = req.body.profilText;
-            siteSettings.welcomeText = req.body.welcomeText || siteSettings.welcomeText;
-            siteSettings.visiText = req.body.visiText || siteSettings.visiText;
-            siteSettings.misiText = req.body.misiText || siteSettings.misiText;
-            
-            siteSettings.kohatiProfilText = req.body.kohatiProfilText || siteSettings.kohatiProfilText;
-            siteSettings.kohatiVisiText = req.body.kohatiVisiText || siteSettings.kohatiVisiText;
-            siteSettings.kohatiMisiText = req.body.kohatiMisiText || siteSettings.kohatiMisiText;
-            
+            siteSettings.welcomeText = req.body.welcomeText;
+            siteSettings.visiText = req.body.visiText;
+            siteSettings.misiText = req.body.misiText;
+            siteSettings.kohatiProfilText = req.body.kohatiProfilText;
+            siteSettings.kohatiVisiText = req.body.kohatiVisiText;
+            siteSettings.kohatiMisiText = req.body.kohatiMisiText;
             siteSettings.mapsEmbed = req.body.mapsEmbed !== undefined ? req.body.mapsEmbed : siteSettings.mapsEmbed;
 
-            const bPdf = fileHelper(req, 'bookletPdf_b64'); if (bPdf) siteSettings.bookletPdf = bPdf;
+            // LOGIKA DUAL INPUT PDF (Cegah Error 500 Vercel KV)
+            const bPdf = fileHelper(req, 'bookletPdf_b64'); // Input Upload Manual
+            const pdfUrl = req.body.bookletPdfUrl; // Input Link GDrive (Aman)
+
+            if (bPdf && bPdf.length > 50) { 
+                try {
+                    // Simpan di KV terpisah (booklet_file_db) agar tidak merusak siteSettings
+                    await kv.set('booklet_file_db', bPdf);
+                    siteSettings.bookletPdf = 'local'; // Flag untuk membaca dari /api/booklet.pdf
+                } catch (dbErr) {
+                    console.error("Gagal simpan PDF lokal (Ukuran Terlalu Besar untuk KV Free Tier):", dbErr.message);
+                }
+            } else if (pdfUrl && pdfUrl.length > 5) { 
+                // Auto-Convert Link Google Drive menjadi Direct Raw PDF Stream
+                let finalUrl = pdfUrl;
+                if(pdfUrl.includes('drive.google.com/file/d/')) {
+                    const match = pdfUrl.match(/\/d\/(.*?)\//);
+                    if(match && match[1]) {
+                        finalUrl = `https://drive.google.com/uc?export=download&id=${match[1]}`;
+                    }
+                }
+                siteSettings.bookletPdf = finalUrl;
+            }
         }
         await kv.set('siteSettings', siteSettings);
         res.redirect('/admin/dashboard');
-    } catch (err) { res.redirect('/admin/dashboard'); }
+    } catch (err) { 
+        console.error(err);
+        res.redirect('/admin/dashboard'); 
+    }
 });
 
 app.post('/admin/setelan-announcement', requireAdmin, upload.any(), async (req, res) => {
