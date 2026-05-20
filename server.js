@@ -147,6 +147,25 @@ const fileHelper = (req, fieldB64) => {
 app.get('/favicon.ico', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 app.get('/favicon.png', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 
+// --- API ENDPOINT KHUSUS UNTUK RENDER PDF DEARFLIP ---
+// Mengambil base64 dari DB, diconvert ke binary Buffer, lalu di-stream langsung ke browser
+app.get('/api/booklet.pdf', async (req, res) => {
+    try {
+        const { siteSettings } = await getSiteData();
+        const b64Data = siteSettings.bookletPdf;
+        if (!b64Data || !b64Data.includes('base64,')) {
+            return res.status(404).send('PDF not found');
+        }
+        const base64String = b64Data.split('base64,')[1];
+        const pdfBuffer = Buffer.from(base64String, 'base64');
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'inline; filename="Buku_Pedoman.pdf"');
+        res.send(pdfBuffer);
+    } catch (err) {
+        res.status(500).send("Gagal memuat PDF");
+    }
+});
+
 app.get('/', async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
@@ -216,7 +235,7 @@ app.get('/data-anggota', async (req, res) => {
 
 app.get('/:slug', async (req, res, next) => {
     const slug = req.params.slug.toLowerCase();
-    const reserved = ['admin', 'css', 'img', 'js', 'berita', 'galeri', 'tentang', 'data-anggota'];
+    const reserved = ['admin', 'css', 'img', 'js', 'berita', 'galeri', 'tentang', 'data-anggota', 'api'];
     if (reserved.includes(slug)) return next();
     try {
         const shortlinks = await kv.get('shortlinkList') || [];
@@ -303,24 +322,33 @@ app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req
     res.redirect('/admin/dashboard');
 });
 
-// --- API SETELAN WEB (AMAN DARI OVERWRITE) ---
-app.post('/admin/setelan-web', requireAdmin, upload.any(), async (req, res) => {
+// --- API SETELAN WEB YANG SUDAH DIPISAH (HEADER & FOOTER) ---
+app.post('/admin/setelan-header', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
-        if (req.body.webTitle !== undefined) {
-            siteSettings.webTitle = req.body.webTitle;
-            siteSettings.heroTitle = req.body.heroTitle || siteSettings.heroTitle;
-            siteSettings.headerTitle = req.body.headerTitle || siteSettings.headerTitle;
-            siteSettings.headerHighlight = req.body.headerHighlight || siteSettings.headerHighlight;
-            siteSettings.headerSubtitle = req.body.headerSubtitle || siteSettings.headerSubtitle;
-            siteSettings.footerTitle = req.body.footerTitle || siteSettings.footerTitle;
-            siteSettings.footerDesc = req.body.footerDesc || siteSettings.footerDesc;
-            siteSettings.footerCopyright = req.body.footerCopyright || siteSettings.footerCopyright;
-            siteSettings.footerProgrammer = req.body.footerProgrammer || siteSettings.footerProgrammer;
+        siteSettings.webTitle = req.body.webTitle || siteSettings.webTitle;
+        siteSettings.heroTitle = req.body.heroTitle || siteSettings.heroTitle;
+        siteSettings.headerTitle = req.body.headerTitle || siteSettings.headerTitle;
+        siteSettings.headerHighlight = req.body.headerHighlight || siteSettings.headerHighlight;
+        siteSettings.headerSubtitle = req.body.headerSubtitle || siteSettings.headerSubtitle;
+        
+        const hLogo = fileHelper(req, 'headerLogo_b64'); if (hLogo) siteSettings.headerLogo = hLogo;
+        
+        await kv.set('siteSettings', siteSettings);
+        res.redirect('/admin/dashboard');
+    } catch (err) { res.redirect('/admin/dashboard'); }
+});
 
-            const hLogo = fileHelper(req, 'headerLogo_b64'); if (hLogo) siteSettings.headerLogo = hLogo;
-            const fLogo = fileHelper(req, 'footerLogo_b64'); if (fLogo) siteSettings.footerLogo = fLogo;
-        } 
+app.post('/admin/setelan-footer', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        const { siteSettings } = await getSiteData();
+        siteSettings.footerTitle = req.body.footerTitle || siteSettings.footerTitle;
+        siteSettings.footerDesc = req.body.footerDesc || siteSettings.footerDesc;
+        siteSettings.footerCopyright = req.body.footerCopyright || siteSettings.footerCopyright;
+        siteSettings.footerProgrammer = req.body.footerProgrammer || siteSettings.footerProgrammer;
+        
+        const fLogo = fileHelper(req, 'footerLogo_b64'); if (fLogo) siteSettings.footerLogo = fLogo;
+        
         await kv.set('siteSettings', siteSettings);
         res.redirect('/admin/dashboard');
     } catch (err) { res.redirect('/admin/dashboard'); }
@@ -381,8 +409,18 @@ app.post('/admin/hapus-shortlink/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('shortlinkList') || []; await kv.set('shortlinkList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
 });
 
+// SOSMED EDIT UPDATE
 app.post('/admin/tambah-sosmed', requireAdmin, upload.any(), async (req, res) => {
     let list = await kv.get('socialMediaList') || []; list.push({ id: Date.now(), name: req.body.name, url: req.body.url, icon: fileHelper(req, 'icon_b64') }); await kv.set('socialMediaList', list); res.redirect('/admin/dashboard');
+});
+app.post('/admin/edit-sosmed/:id', requireAdmin, upload.any(), async (req, res) => {
+    let list = await kv.get('socialMediaList') || []; let i = list.findIndex(l => l.id == req.params.id);
+    if(i !== -1) { 
+        list[i].name = req.body.name; list[i].url = req.body.url; 
+        const newIcon = fileHelper(req, 'icon_b64'); if (newIcon) list[i].icon = newIcon; 
+        await kv.set('socialMediaList', list); 
+    } 
+    res.redirect('/admin/dashboard');
 });
 app.post('/admin/hapus-sosmed/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('socialMediaList') || []; await kv.set('socialMediaList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
