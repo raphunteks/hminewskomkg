@@ -9,7 +9,7 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Konfigurasi Multer (Limit besar untuk PDF Base64)
+// Konfigurasi Multer (Limit besar untuk PDF Base64 & Upload Gambar)
 const upload = multer({ 
     storage: multer.memoryStorage(),
     limits: { fileSize: 50 * 1024 * 1024 } 
@@ -148,8 +148,10 @@ const fileHelper = (req, fieldB64) => {
 app.get('/favicon.ico', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 app.get('/favicon.png', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 
-// --- API ENDPOINT KHUSUS UNTUK RENDER PDF DEARFLIP ---
-// Digunakan hanya jika admin memaksa upload file PDF (bukan URL)
+// =========================================================================
+// --- BIG FIX: API ENDPOINT KHUSUS UNTUK RENDER PDF DEARFLIP
+// --- Mengambil base64 dari DB Terisolasi dan dikonversi menjadi Buffer PDF
+// =========================================================================
 app.get('/api/booklet.pdf', async (req, res) => {
     try {
         const b64Data = await kv.get('booklet_file_db'); // Ambil dari database terisolasi
@@ -162,6 +164,7 @@ app.get('/api/booklet.pdf', async (req, res) => {
         res.setHeader('Content-Disposition', 'inline; filename="Buku_Pedoman.pdf"');
         res.send(pdfBuffer);
     } catch (err) {
+        console.error("API PDF Error:", err);
         res.status(500).send("Gagal memuat PDF dari database.");
     }
 });
@@ -322,7 +325,11 @@ app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req
     res.redirect('/admin/dashboard');
 });
 
-// --- API SETELAN WEB YANG SUDAH DIPISAH (HEADER & FOOTER) ---
+// =========================================================================
+// --- BIG FIX: API SETELAN WEB YANG SUDAH DIPISAH (HEADER, FOOTER, TENTANG)
+// =========================================================================
+
+// SETELAN HEADER
 app.post('/admin/setelan-header', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
@@ -339,6 +346,7 @@ app.post('/admin/setelan-header', requireAdmin, upload.any(), async (req, res) =
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
+// SETELAN FOOTER
 app.post('/admin/setelan-footer', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
@@ -354,6 +362,7 @@ app.post('/admin/setelan-footer', requireAdmin, upload.any(), async (req, res) =
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
+// SETELAN TOGGLE KOHATI
 app.post('/admin/setelan-kohati-toggle', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
@@ -363,7 +372,7 @@ app.post('/admin/setelan-kohati-toggle', requireAdmin, upload.any(), async (req,
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
-// --- BIG FIX: API TENTANG & PDF ---
+// SETELAN TENTANG & PDF DEARFLIP
 app.post('/admin/setelan-tentang', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
@@ -383,9 +392,9 @@ app.post('/admin/setelan-tentang', requireAdmin, upload.any(), async (req, res) 
 
             if (bPdf && bPdf.length > 50) { 
                 try {
-                    // Simpan di KV terpisah (booklet_file_db) agar tidak merusak siteSettings
+                    // Simpan di KV terpisah (booklet_file_db) agar tidak merusak siteSettings utama
                     await kv.set('booklet_file_db', bPdf);
-                    siteSettings.bookletPdf = 'local'; // Flag untuk membaca dari /api/booklet.pdf
+                    siteSettings.bookletPdf = '/api/booklet.pdf'; // Menunjuk langsung ke API kita
                 } catch (dbErr) {
                     console.error("Gagal simpan PDF lokal (Ukuran Terlalu Besar untuk KV Free Tier):", dbErr.message);
                 }
@@ -495,7 +504,7 @@ app.post('/admin/tambah-anggota-kohati-bidang/:bidangId', requireAdmin, upload.a
 app.post('/admin/edit-anggota-kohati-bidang/:bidangId/:memberId', requireAdmin, upload.any(), (req,res) => manageBidangMember(req,res,'kohatiBidangList','edit'));
 app.post('/admin/hapus-anggota-kohati-bidang/:bidangId/:memberId', requireAdmin, (req,res) => manageBidangMember(req,res,'kohatiBidangList','delete'));
 
-// GALERI & PDF
+// GALERI & PDF DATA ANGGOTA
 app.post('/admin/tambah-album', requireAdmin, upload.any(), async (req, res) => { try { let coverStr = fileHelper(req, 'cover_b64'); let albums = await kv.get('albumsList') || []; albums.unshift({ id: Date.now(), title: req.body.title, date: new Date().toLocaleDateString('id-ID'), cover: coverStr, photos: [] }); await kv.set('albumsList', albums); res.redirect('/admin/dashboard'); } catch(e){ res.redirect('/admin/dashboard'); }});
 app.post('/admin/edit-album/:id', requireAdmin, upload.any(), async (req, res) => { try { let albums = await kv.get('albumsList') || []; let index = albums.findIndex(a => a.id == req.params.id); if (index !== -1) { albums[index].title = req.body.title; if (req.body.date) albums[index].date = req.body.date; let coverStr = fileHelper(req, 'cover_b64'); if (coverStr) albums[index].cover = coverStr; await kv.set('albumsList', albums); } res.redirect('/admin/dashboard'); } catch(e){ res.redirect('/admin/dashboard'); }});
 app.post('/admin/hapus-album/:id', requireAdmin, async (req, res) => { let albums = await kv.get('albumsList') || []; await kv.set('albumsList', albums.filter(a => a.id != req.params.id)); res.redirect('/admin/dashboard'); });
