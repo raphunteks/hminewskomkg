@@ -158,24 +158,28 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 
 
 /* ==============================================================
-   DEARFLIP (3D FLIPBOOK) & WIDGET SUPPORT (RESPONSIVE FIX)
+   DEARFLIP (3D FLIPBOOK) SUPPORT - KUNCI AGAR TIDAK OFFSIDE HP
 ============================================================== */
-/* Kunci absolut agar flipbook container tidak melebihi lebar layar HP */
-.flipbook-container, .flipbook-wrapper {
+.flipbook-wrapper {
     width: 100% !important;
     max-width: 100% !important;
+    height: 500px; /* Kunci tinggi flipbook */
     border-radius: 12px;
-    overflow: hidden !important;
+    overflow: hidden !important; 
     position: relative;
     z-index: 10;
     box-sizing: border-box;
+    display: flex;
+    justify-content: center;
 }
 
-/* Memaksa elemen DearFlip patuh pada ukuran Mobile */
+/* Memaksa elemen core DearFlip agar patuh pada batas layar Mobile */
 ._df_book {
     width: 100% !important;
     max-width: 100% !important;
+    height: 100% !important;
     overflow: hidden !important;
+    margin: 0 !important;
 }
 
 /* Fix agar tombol UI DearFlip tidak meledak keluar/berantakan */
@@ -183,7 +187,9 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     box-sizing: content-box !important;
 }
 
-/* Fix Khusus Instagram Feed Agar Tidak Offside */
+/* ==============================================================
+   INSTAGRAM FEED WIDGET SUPPORT
+============================================================== */
 .instagram-feed-section {
     width: 100% !important;
     max-width: 100% !important;
@@ -192,7 +198,6 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     box-sizing: border-box;
 }
 
-/* Target khusus untuk frame Elfsight Widget */
 [class*="elfsight-app"] {
     width: 100% !important;
     max-width: 100% !important;
