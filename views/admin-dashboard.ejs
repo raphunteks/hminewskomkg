@@ -1,10 +1,5 @@
 <%- include('partials/header') %>
 
-<!-- Menambahkan Fallback CDN agar Quill & Lucide selalu terbaca di environment preview -->
-<script src="https://unpkg.com/lucide@latest"></script>
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-
 <div class="glass dashboard-header">
     <div class="admin-info">
         <div class="admin-icon"><img src="<%= siteSettings.headerLogo %>" alt="Admin HMI"></div>
@@ -219,6 +214,7 @@
      TAB 2: SETELAN WEB
 ============================================================== -->
 <div id="adm-setelan" class="admin-tab-pane">
+    <!-- Kode Tab 2 Tetap Sama Persis -->
     <div class="grid-2">
         <div style="display:flex; flex-direction:column; gap:30px;">
             <div class="glass admin-panel" style="margin-bottom:0;">
@@ -451,20 +447,9 @@
     </div>
 </div>
 
-<!-- PERBAIKAN: Memisahkan data EJS dari JSON injection inline untuk mencegah SyntaxError -->
-<script id="albumsDataJson" type="application/json"><%- typeof albums !== 'undefined' ? JSON.stringify(albums).replace(/</g, '\\u003c') : '[]' %></script>
-<script id="newsDataJson" type="application/json"><%- typeof news !== 'undefined' ? JSON.stringify(news).replace(/</g, '\\u003c') : '[]' %></script>
 <script>
-    let albumsData = [];
-    let newsData = [];
-    try {
-        const rawAlbums = document.getElementById('albumsDataJson').textContent;
-        const rawNews = document.getElementById('newsDataJson').textContent;
-        if (rawAlbums && !rawAlbums.includes('<%-')) albumsData = JSON.parse(rawAlbums);
-        if (rawNews && !rawNews.includes('<%-')) newsData = JSON.parse(rawNews);
-    } catch(e) {
-        console.warn('EJS data injection fallback used.', e);
-    }
+    const albumsData = <%- JSON.stringify(albums) %>;
+    const newsData = <%- JSON.stringify(news) %>;
 </script>
 
 <!-- ================= MODALS AREA DATA KELOLA ================= -->
@@ -823,117 +808,102 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Pengecekan aman untuk menghindari ReferenceError: Quill is not defined
-        if (typeof Quill !== 'undefined') {
-            var toolbarOptions = [['bold', 'italic', 'underline', 'strike'], ['blockquote'], [{ 'header': 1 }, { 'header': 2 }], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'color': [] }, { 'background': [] }], [{ 'align': [] }], ['clean']];
-            var qConfig = { theme: 'snow', modules: { toolbar: toolbarOptions } };
-            var qConfigMini = { theme: 'snow', modules: { toolbar: [['bold', 'italic', 'underline'], [{ 'color': [] }, { 'background': [] }], [{ 'font': [] }], [{ 'size': ['small', false, 'large', 'huge'] }], [{ 'align': [] }], ['clean']] } };
-            
-            var quillTambah = new Quill('#quill-tambah', qConfig);
-            var quillEdit = new Quill('#quill-edit', qConfig);
-            var quillProfil = new Quill('#quill-profil', qConfig);
-            var quillWelcome = new Quill('#quill-welcome', qConfig);
-            var quillVisi = new Quill('#quill-visi', qConfig);
-            var quillMisi = new Quill('#quill-misi', qConfig);
-            var quillKohatiProfil = new Quill('#quill-kohati-profil', qConfig);
-            var quillKohatiVisi = new Quill('#quill-kohati-visi', qConfig);
-            var quillKohatiMisi = new Quill('#quill-kohati-misi', qConfig);
-            var quillAnnounce = new Quill('#quill-announce', qConfig);
-
-            // QUILL UNTUK BIO LINK (RICH TEXT)
-            var qTambahBioTitle = new Quill('#quill-tambah-bio-title', qConfigMini);
-            var qEditBioTitle = new Quill('#quill-edit-bio-title', qConfigMini);
-            var qTambahLinkTitle = new Quill('#quill-tambah-link-title', qConfigMini);
-            var qEditLinkTitle = new Quill('#quill-edit-link-title', qConfigMini);
-
-            quillProfil.root.innerHTML = document.getElementById('raw-profil').innerHTML;
-            quillWelcome.root.innerHTML = document.getElementById('raw-welcome').innerHTML;
-            quillVisi.root.innerHTML = document.getElementById('raw-visi').innerHTML;
-            quillMisi.root.innerHTML = document.getElementById('raw-misi').innerHTML;
-            quillKohatiProfil.root.innerHTML = document.getElementById('raw-kohati-profil').innerHTML;
-            quillKohatiVisi.root.innerHTML = document.getElementById('raw-kohati-visi').innerHTML;
-            quillKohatiMisi.root.innerHTML = document.getElementById('raw-kohati-misi').innerHTML;
-            quillAnnounce.root.innerHTML = document.getElementById('raw-announce').innerHTML;
-
-            document.getElementById('formSetelanTentang').onsubmit = function() {
-                document.getElementById('hidden-profil').value = quillProfil.root.innerHTML;
-                document.getElementById('hidden-welcome').value = quillWelcome.root.innerHTML;
-                document.getElementById('hidden-visi').value = quillVisi.root.innerHTML;
-                document.getElementById('hidden-misi').value = quillMisi.root.innerHTML;
-                document.getElementById('hidden-kohati-profil').value = quillKohatiProfil.root.innerHTML;
-                document.getElementById('hidden-kohati-visi').value = quillKohatiVisi.root.innerHTML;
-                document.getElementById('hidden-kohati-misi').value = quillKohatiMisi.root.innerHTML;
-            };
-            
-            document.getElementById('formAnnounce').onsubmit = function() {
-                document.getElementById('hidden-announce').value = quillAnnounce.root.innerHTML;
-            };
-            document.getElementById('formTambahBerita').onsubmit = function() { 
-                document.getElementById('content-tambah').value = quillTambah.root.innerHTML; 
-            };
-            document.getElementById('formEditBerita').onsubmit = function() { 
-                document.getElementById('content-edit').value = quillEdit.root.innerHTML; 
-            };
-
-            // SUBMIT UNTUK BIO LINK
-            document.getElementById('formTambahBioPage').onsubmit = function() {
-                document.getElementById('hidden-tambah-bio-title').value = qTambahBioTitle.root.innerHTML;
-            };
-            document.getElementById('formEditBioPage').onsubmit = function() {
-                document.getElementById('hidden-edit-bio-title').value = qEditBioTitle.root.innerHTML;
-            };
-            document.getElementById('formTambahBioLink').onsubmit = function() {
-                document.getElementById('hidden-tambah-link-title').value = qTambahLinkTitle.root.innerHTML;
-            };
-            document.getElementById('formEditBioLink').onsubmit = function() {
-                document.getElementById('hidden-edit-link-title').value = qEditLinkTitle.root.innerHTML;
-            };
-            
-            // FUNGSI BUKA MODAL BIO PAGE & LINK yang membutuhkan Quill
-            window.openEditBioPageModal = function(id, path, bio, bgType, bgValue) {
-                document.getElementById('editBioPagePath').value = path;
-                document.getElementById('editBioPageBio').value = bio;
-                
-                qEditBioTitle.root.innerHTML = document.getElementById('raw-bio-title-' + id).innerHTML;
-
-                if(bgType === 'gradient') {
-                    document.getElementById('editBioPageBgGradient').value = bgValue;
-                } else {
-                    document.getElementById('editBioPageBgGradient').value = ""; // Clear jika image
-                }
-
-                document.getElementById('formEditBioPage').action = '/admin/edit-bio-page/' + id;
-                openModal('modalEditBioPage');
-            };
-
-            window.openEditBioLinkModal = function(id, bioPageId, url) {
-                document.getElementById('editBioLinkPageId').value = bioPageId;
-                document.getElementById('editBioLinkUrl').value = url;
-                
-                qEditLinkTitle.root.innerHTML = document.getElementById('raw-link-title-' + id).innerHTML;
-
-                document.getElementById('formEditBioLink').action = '/admin/edit-biolink/' + id;
-                openModal('modalEditBioLink');
-            };
-
-            window.openEditBeritaModal = function(id, title, category, date) {
-                document.getElementById('editBeritaTitle').value = title; 
-                document.getElementById('editBeritaCategory').value = category; 
-                document.getElementById('editBeritaDate').value = date;
-                qEdit.root.innerHTML = document.getElementById('raw-content-' + id).innerHTML;
-                document.getElementById('formEditBerita').action = '/admin/edit-berita/' + id; 
-                openModal('modalEditBerita');
-            };
-
-        } else {
-            console.error("Quill library tidak dapat dimuat.");
-        }
+        var toolbarOptions = [['bold', 'italic', 'underline', 'strike'], ['blockquote'], [{ 'header': 1 }, { 'header': 2 }], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'color': [] }, { 'background': [] }], [{ 'align': [] }], ['clean']];
+        var qConfig = { theme: 'snow', modules: { toolbar: toolbarOptions } };
+        var qConfigMini = { theme: 'snow', modules: { toolbar: [['bold', 'italic', 'underline'], [{ 'color': [] }, { 'background': [] }], [{ 'font': [] }], [{ 'size': ['small', false, 'large', 'huge'] }], [{ 'align': [] }], ['clean']] } };
         
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+        var quillTambah = new Quill('#quill-tambah', qConfig);
+        var quillEdit = new Quill('#quill-edit', qConfig);
+        var quillProfil = new Quill('#quill-profil', qConfig);
+        var quillWelcome = new Quill('#quill-welcome', qConfig);
+        var quillVisi = new Quill('#quill-visi', qConfig);
+        var quillMisi = new Quill('#quill-misi', qConfig);
+        var quillKohatiProfil = new Quill('#quill-kohati-profil', qConfig);
+        var quillKohatiVisi = new Quill('#quill-kohati-visi', qConfig);
+        var quillKohatiMisi = new Quill('#quill-kohati-misi', qConfig);
+        var quillAnnounce = new Quill('#quill-announce', qConfig);
+
+        // QUILL UNTUK BIO LINK (RICH TEXT)
+        var qTambahBioTitle = new Quill('#quill-tambah-bio-title', qConfigMini);
+        var qEditBioTitle = new Quill('#quill-edit-bio-title', qConfigMini);
+        var qTambahLinkTitle = new Quill('#quill-tambah-link-title', qConfigMini);
+        var qEditLinkTitle = new Quill('#quill-edit-link-title', qConfigMini);
+
+        quillProfil.root.innerHTML = document.getElementById('raw-profil').innerHTML;
+        quillWelcome.root.innerHTML = document.getElementById('raw-welcome').innerHTML;
+        quillVisi.root.innerHTML = document.getElementById('raw-visi').innerHTML;
+        quillMisi.root.innerHTML = document.getElementById('raw-misi').innerHTML;
+        quillKohatiProfil.root.innerHTML = document.getElementById('raw-kohati-profil').innerHTML;
+        quillKohatiVisi.root.innerHTML = document.getElementById('raw-kohati-visi').innerHTML;
+        quillKohatiMisi.root.innerHTML = document.getElementById('raw-kohati-misi').innerHTML;
+        quillAnnounce.root.innerHTML = document.getElementById('raw-announce').innerHTML;
+
+        document.getElementById('formSetelanTentang').onsubmit = function() {
+            document.getElementById('hidden-profil').value = quillProfil.root.innerHTML;
+            document.getElementById('hidden-welcome').value = quillWelcome.root.innerHTML;
+            document.getElementById('hidden-visi').value = quillVisi.root.innerHTML;
+            document.getElementById('hidden-misi').value = quillMisi.root.innerHTML;
+            document.getElementById('hidden-kohati-profil').value = quillKohatiProfil.root.innerHTML;
+            document.getElementById('hidden-kohati-visi').value = quillKohatiVisi.root.innerHTML;
+            document.getElementById('hidden-kohati-misi').value = quillKohatiMisi.root.innerHTML;
+        };
+        
+        document.getElementById('formAnnounce').onsubmit = function() {
+            document.getElementById('hidden-announce').value = quillAnnounce.root.innerHTML;
+        };
+        document.getElementById('formTambahBerita').onsubmit = function() { 
+            document.getElementById('content-tambah').value = quillTambah.root.innerHTML; 
+        };
+        document.getElementById('formEditBerita').onsubmit = function() { 
+            document.getElementById('content-edit').value = quillEdit.root.innerHTML; 
+        };
+
+        // SUBMIT UNTUK BIO LINK
+        document.getElementById('formTambahBioPage').onsubmit = function() {
+            document.getElementById('hidden-tambah-bio-title').value = qTambahBioTitle.root.innerHTML;
+        };
+        document.getElementById('formEditBioPage').onsubmit = function() {
+            document.getElementById('hidden-edit-bio-title').value = qEditBioTitle.root.innerHTML;
+        };
+        document.getElementById('formTambahBioLink').onsubmit = function() {
+            document.getElementById('hidden-tambah-link-title').value = qTambahLinkTitle.root.innerHTML;
+        };
+        document.getElementById('formEditBioLink').onsubmit = function() {
+            document.getElementById('hidden-edit-link-title').value = qEditLinkTitle.root.innerHTML;
+        };
     });
 
     function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+
+    // FUNGSI BUKA MODAL BIO PAGE & LINK
+    function openEditBioPageModal(id, path, bio, bgType, bgValue) {
+        document.getElementById('editBioPagePath').value = path;
+        document.getElementById('editBioPageBio').value = bio;
+        
+        var editEditor = Quill.find(document.getElementById('quill-edit-bio-title'));
+        editEditor.root.innerHTML = document.getElementById('raw-bio-title-' + id).innerHTML;
+
+        if(bgType === 'gradient') {
+            document.getElementById('editBioPageBgGradient').value = bgValue;
+        } else {
+            document.getElementById('editBioPageBgGradient').value = ""; // Clear jika image
+        }
+
+        document.getElementById('formEditBioPage').action = '/admin/edit-bio-page/' + id;
+        openModal('modalEditBioPage');
+    }
+
+    function openEditBioLinkModal(id, bioPageId, url) {
+        document.getElementById('editBioLinkPageId').value = bioPageId;
+        document.getElementById('editBioLinkUrl').value = url;
+        
+        var editEditor = Quill.find(document.getElementById('quill-edit-link-title'));
+        editEditor.root.innerHTML = document.getElementById('raw-link-title-' + id).innerHTML;
+
+        document.getElementById('formEditBioLink').action = '/admin/edit-biolink/' + id;
+        openModal('modalEditBioLink');
+    }
 
     // FUNGSI MODAL BAWAAN
     function openEditSosmedModal(id, name, url) {
@@ -945,6 +915,13 @@
 
     function openEditDataAnggotaModal(id, title, date) { document.getElementById('editDataAnggotaTitle').value = title; document.getElementById('editDataAnggotaDate').value = date; document.getElementById('formEditDataAnggota').action = '/admin/edit-data-anggota/' + id; openModal('modalEditDataAnggota'); }
 
+    function openEditBeritaModal(id, title, category, date) {
+        document.getElementById('editBeritaTitle').value = title; document.getElementById('editBeritaCategory').value = category; document.getElementById('editBeritaDate').value = date;
+        var editEditor = Quill.find(document.getElementById('quill-edit'));
+        editEditor.root.innerHTML = document.getElementById('raw-content-' + id).innerHTML;
+        document.getElementById('formEditBerita').action = '/admin/edit-berita/' + id; openModal('modalEditBerita');
+    }
+
     function openKelolaFotoBerita(id) {
         const berita = newsData.find(n => n.id == id); if(!berita) return;
         document.getElementById('kelolaFotoBeritaTitle').innerText = 'Kelola Foto: ' + berita.title;
@@ -954,7 +931,7 @@
             berita.photos.forEach(p => {
                 grid.innerHTML += `<div style="position:relative; background:rgba(255,255,255,0.05); padding:5px; border-radius:8px;"><img src="${p.url}" style="width:100%; height:80px; object-fit:cover; border-radius:4px;"><form action="/admin/hapus-foto-berita/${berita.id}/${p.id}" method="POST" style="position:absolute; top:8px; right:8px;"><button type="submit" style="background:rgba(239,68,68,0.8); color:#fff; border:none; border-radius:4px; padding:4px; cursor:pointer;" onclick="return confirm('Hapus foto ini?')"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></form></div>`;
             });
-            if (typeof lucide !== 'undefined') lucide.createIcons();
+            lucide.createIcons();
         } else { grid.innerHTML = '<p class="text-muted" style="grid-column: 1 / -1;">Belum ada foto.</p>'; }
         openModal('modalKelolaFotoBerita');
     }
@@ -995,7 +972,7 @@
             album.photos.forEach(p => {
                 grid.innerHTML += `<div style="position:relative; background:rgba(255,255,255,0.05); padding:5px; border-radius:8px;"><img src="${p.url}" style="width:100%; height:80px; object-fit:cover; border-radius:4px;"><form action="/admin/hapus-foto-album/${album.id}/${p.id}" method="POST" style="position:absolute; top:8px; right:8px;"><button type="submit" style="background:rgba(239,68,68,0.8); color:#fff; border:none; border-radius:4px; padding:4px; cursor:pointer;" onclick="return confirm('Hapus foto?')"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></form></div>`;
             });
-            if (typeof lucide !== 'undefined') lucide.createIcons();
+            lucide.createIcons();
         } else { grid.innerHTML = '<p class="text-muted" style="grid-column: 1 / -1;">Belum ada foto.</p>'; }
         openModal('modalKelolaFotoAlbum');
     }
