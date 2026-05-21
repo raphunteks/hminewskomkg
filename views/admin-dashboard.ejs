@@ -12,17 +12,16 @@
     <a href="/admin/logout" class="btn btn-danger"><i data-lucide="log-out" style="width:18px;"></i> Logout</a>
 </div>
 
-<!-- NAVIGASI TAB ADMIN -->
+<!-- NAVIGASI TAB ADMIN (DITAMBAHKAN TAB BARU LINK IN BIO) -->
 <div class="admin-tab-nav">
     <button class="admin-tab-btn active" onclick="openAdmTab('adm-kelola', this)"><i data-lucide="database"></i> Kelola Data</button>
     <button class="admin-tab-btn" onclick="openAdmTab('adm-setelan', this)"><i data-lucide="settings"></i> Header, Footer & Tentang</button>
+    <button class="admin-tab-btn" onclick="openAdmTab('adm-bio', this)"><i data-lucide="smartphone"></i> Link in Bio</button>
     <button class="admin-tab-btn" onclick="openAdmTab('adm-shortlink', this)"><i data-lucide="link"></i> Shortlink Custom</button>
     <button class="admin-tab-btn" onclick="openAdmTab('adm-announce', this)"><i data-lucide="bell"></i> Announcement Pop-up</button>
 </div>
 
-<!-- ==============================================================
-     TAB 1: KELOLA DATA UTAMA & KOHATI
-============================================================== -->
+<!-- TAB 1: KELOLA DATA UTAMA & KOHATI -->
 <div id="adm-kelola" class="admin-tab-pane active">
     <!-- Kode Tab 1 Tetap Sama -->
     <div class="admin-layout">
@@ -210,73 +209,34 @@
     </div>
 </div>
 
-<!-- ==============================================================
-     TAB 2: HEADER, FOOTER, & TENTANG (SETELAN WEB)
-============================================================== -->
+<!-- TAB 2: SETELAN WEB -->
 <div id="adm-setelan" class="admin-tab-pane">
     <div class="grid-2">
         <div style="display:flex; flex-direction:column; gap:30px;">
-            
-            <!-- UPDATE BIG FIX: FORM HEADER DIPISAH SENDIRI -->
             <div class="glass admin-panel" style="margin-bottom:0;">
                 <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="layout"></i> Setelan Header & Web</h3>
                 <form action="/admin/setelan-header" method="POST" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label>Judul Web (Title Tab/Browser)</label>
-                        <input type="text" name="webTitle" class="input-control" value="<%= siteSettings.webTitle %>">
-                    </div>
-                    <div class="form-group">
-                        <label>Judul Hero (Welcome Halaman Beranda)</label>
-                        <input type="text" name="heroTitle" class="input-control" value="<%= siteSettings.heroTitle %>">
-                    </div>
-                    <div class="form-group">
-                        <label>Teks Logo Kiri (Awal)</label>
-                        <input type="text" name="headerTitle" class="input-control" value="<%= siteSettings.headerTitle %>">
-                    </div>
-                    <div class="form-group">
-                        <label>Teks Logo Kanan (Warna Hijau)</label>
-                        <input type="text" name="headerHighlight" class="input-control" value="<%= siteSettings.headerHighlight %>">
-                    </div>
-                    <div class="form-group">
-                        <label>Teks Bawah Logo</label>
-                        <input type="text" name="headerSubtitle" class="input-control" value="<%= siteSettings.headerSubtitle %>">
-                    </div>
-                    <div class="form-group">
-                        <label>Logo Header & Favicon (Biarkan kosong jika tetap)</label>
-                        <input type="file" name="headerLogo" class="input-control file-compress" accept="image/*">
-                    </div>
+                    <div class="form-group"><label>Judul Web (Title Tab/Browser)</label><input type="text" name="webTitle" class="input-control" value="<%= siteSettings.webTitle %>"></div>
+                    <div class="form-group"><label>Judul Hero (Welcome Halaman Beranda)</label><input type="text" name="heroTitle" class="input-control" value="<%= siteSettings.heroTitle %>"></div>
+                    <div class="form-group"><label>Teks Logo Kiri (Awal)</label><input type="text" name="headerTitle" class="input-control" value="<%= siteSettings.headerTitle %>"></div>
+                    <div class="form-group"><label>Teks Logo Kanan (Warna Hijau)</label><input type="text" name="headerHighlight" class="input-control" value="<%= siteSettings.headerHighlight %>"></div>
+                    <div class="form-group"><label>Teks Bawah Logo</label><input type="text" name="headerSubtitle" class="input-control" value="<%= siteSettings.headerSubtitle %>"></div>
+                    <div class="form-group"><label>Logo Header & Favicon</label><input type="file" name="headerLogo" class="input-control file-compress" accept="image/*"></div>
                     <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:5px;">Simpan Perubahan Header</button>
                 </form>
             </div>
 
-            <!-- UPDATE BIG FIX: FORM FOOTER DIPISAH SENDIRI -->
             <div class="glass admin-panel" style="margin-bottom:0; border-top: 4px solid #3b82f6;">
                 <h3 class="panel-title" style="margin-bottom:20px; color: #60a5fa;"><i data-lucide="align-bottom"></i> Setelan Footer</h3>
                 <form action="/admin/setelan-footer" method="POST" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label>Logo Footer (Biarkan kosong jika tetap)</label>
-                        <input type="file" name="footerLogo" class="input-control file-compress" accept="image/*">
-                    </div>
-                    <div class="form-group">
-                        <label>Teks Judul Footer</label>
-                        <input type="text" name="footerTitle" class="input-control" value="<%= siteSettings.footerTitle %>">
-                    </div>
-                    <div class="form-group">
-                        <label>Deskripsi Footer</label>
-                        <textarea name="footerDesc" class="input-control" rows="3"><%= siteSettings.footerDesc %></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Teks Hak Cipta (Copyright)</label>
-                        <input type="text" name="footerCopyright" class="input-control" value="<%= siteSettings.footerCopyright %>">
-                    </div>
-                    <div class="form-group">
-                        <label>Teks Programmer / Watermark</label>
-                        <input type="text" name="footerProgrammer" class="input-control" value="<%= siteSettings.footerProgrammer %>">
-                    </div>
+                    <div class="form-group"><label>Logo Footer</label><input type="file" name="footerLogo" class="input-control file-compress" accept="image/*"></div>
+                    <div class="form-group"><label>Teks Judul Footer</label><input type="text" name="footerTitle" class="input-control" value="<%= siteSettings.footerTitle %>"></div>
+                    <div class="form-group"><label>Deskripsi Footer</label><textarea name="footerDesc" class="input-control" rows="3"><%= siteSettings.footerDesc %></textarea></div>
+                    <div class="form-group"><label>Teks Hak Cipta (Copyright)</label><input type="text" name="footerCopyright" class="input-control" value="<%= siteSettings.footerCopyright %>"></div>
+                    <div class="form-group"><label>Teks Programmer / Watermark</label><input type="text" name="footerProgrammer" class="input-control" value="<%= siteSettings.footerProgrammer %>"></div>
                     <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:5px; background: #3b82f6; border-color: #3b82f6;">Simpan Perubahan Footer</button>
                 </form>
 
-                <!-- UPDATE BIG FIX: SOSMED BISA DI-EDIT SEKARANG -->
                 <h4 style="margin:30px 0 15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px; color: #60a5fa;">Daftar Sosial Media Footer</h4>
                 <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
                     <% socialMediaList.forEach(soc => { %>
@@ -292,11 +252,10 @@
                 </div>
             </div>
 
-            <!-- FORM TOGGLE KOHATI TERPISAH -->
             <div class="glass admin-panel" style="margin-bottom:0; border-top: 4px solid #f472b6;">
                 <h3 class="panel-title" style="margin-bottom:20px; color:#f472b6;"><i data-lucide="heart"></i> Status Fitur KOHATI</h3>
                 <form action="/admin/setelan-kohati-toggle" method="POST">
-                    <p class="text-muted" style="font-size:0.85rem; margin-bottom:15px;">Aktifkan atau Nonaktifkan seluruh tab dan fitur KOHATI di halaman publik.</p>
+                    <p class="text-muted" style="font-size:0.85rem; margin-bottom:15px;">Aktifkan atau Nonaktifkan seluruh tab dan fitur KOHATI.</p>
                     <div class="form-group" style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px;">
                         <input type="checkbox" name="kohatiActive" id="kohatiActiveCheck" value="true" <%= siteSettings.kohatiActive === 'true' ? 'checked' : '' %> style="width:20px; height:20px;">
                         <label for="kohatiActiveCheck" style="margin:0; cursor:pointer;">Tampilkan Fitur KOHATI</label>
@@ -306,81 +265,38 @@
             </div>
         </div>
 
-        <!-- FORM HALAMAN TENTANG KAMI -->
         <div class="glass admin-panel" style="margin-bottom:0; align-self:start;">
             <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="file-text"></i> Halaman Tentang Kami</h3>
             <form action="/admin/setelan-tentang" method="POST" enctype="multipart/form-data" id="formSetelanTentang">
-                
                 <h4 style="color:#4ade80; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Bagian Profil Umum</h4>
-                <div class="form-group">
-                    <label>Teks Profil (Bagian Atas)</label>
-                    <div id="quill-profil" style="height:150px; color:white;"></div>
-                    <input type="hidden" name="profilText" id="hidden-profil">
-                </div>
-                <div class="form-group">
-                    <label>Teks Welcome (Sambutan)</label>
-                    <div id="quill-welcome" style="height:150px; color:white;"></div>
-                    <input type="hidden" name="welcomeText" id="hidden-welcome">
-                </div>
-                
+                <div class="form-group"><label>Teks Profil (Bagian Atas)</label><div id="quill-profil" style="height:150px; color:white;"></div><input type="hidden" name="profilText" id="hidden-profil"></div>
+                <div class="form-group"><label>Teks Welcome (Sambutan)</label><div id="quill-welcome" style="height:150px; color:white;"></div><input type="hidden" name="welcomeText" id="hidden-welcome"></div>
                 <h4 style="color:#4ade80; margin-top:30px; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Bagian Visi & Misi Umum</h4>
-                <div class="form-group">
-                    <label>Teks Visi Umum</label>
-                    <div id="quill-visi" style="height:150px; color:white;"></div>
-                    <input type="hidden" name="visiText" id="hidden-visi">
-                </div>
-                <div class="form-group">
-                    <label>Teks Misi Umum (Gunakan fitur urutan angka/bullet)</label>
-                    <div id="quill-misi" style="height:150px; color:white;"></div>
-                    <input type="hidden" name="misiText" id="hidden-misi">
-                </div>
-
-                <div class="form-group" style="margin-top:30px;">
-                    <label>Embed Code Google Maps (Iframe)</label>
-                    <textarea name="mapsEmbed" class="input-control" rows="3" placeholder='<iframe src="..."></iframe>'><%= siteSettings.mapsEmbed %></textarea>
-                </div>
-                
-                <!-- UPDATE BIG FIX: FORM INPUT PDF DUAL (URL / FILE) -->
+                <div class="form-group"><label>Teks Visi Umum</label><div id="quill-visi" style="height:150px; color:white;"></div><input type="hidden" name="visiText" id="hidden-visi"></div>
+                <div class="form-group"><label>Teks Misi Umum</label><div id="quill-misi" style="height:150px; color:white;"></div><input type="hidden" name="misiText" id="hidden-misi"></div>
+                <div class="form-group" style="margin-top:30px;"><label>Embed Code Google Maps (Iframe)</label><textarea name="mapsEmbed" class="input-control" rows="3"><%= siteSettings.mapsEmbed %></textarea></div>
                 <div class="form-group" style="margin-top:30px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px dashed rgba(255,255,255,0.2);">
                     <label style="color:#4ade80; font-size:1rem; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">Upload Booklet / Pedoman PDF</label>
-                    <p class="text-muted" style="font-size:0.8rem; margin-bottom: 15px;">Pilih salah satu metode di bawah. Disarankan menggunakan Link Google Drive agar tidak membebani server/Error 500.</p>
-                    
+                    <p class="text-muted" style="font-size:0.8rem; margin-bottom: 15px;">Pilih salah satu metode di bawah. Disarankan menggunakan Link Google Drive.</p>
                     <label style="font-size:0.85rem;">Metode 1: Link Google Drive (Sangat Disarankan)</label>
                     <input type="url" name="bookletPdfUrl" class="input-control" placeholder="Paste link Google Drive disini...">
-                    
                     <div style="text-align:center; color:#9ca3af; margin: 15px 0; font-size:0.8rem; font-weight:bold;">ATAU</div>
-                    
                     <label style="font-size:0.85rem;">Metode 2: Upload File Lokal (Maksimal 1 MB)</label>
                     <input type="file" name="bookletPdf" class="input-control file-to-b64" accept="application/pdf">
-                    
                     <% if(siteSettings.bookletPdf) { %><p class="form-hint" style="color:#4ade80; margin-top:10px;">✅ Status: File/Link Booklet sudah tersedia dan aktif.</p><% } %>
                 </div>
-
-                <!-- SEGMEN TENTANG KOHATI -->
                 <div class="form-group" style="margin-top:40px; border-top:1px solid rgba(244,114,182,0.3); padding-top:20px;">
                     <h4 style="color:#f472b6; margin-bottom:15px;"><i data-lucide="heart" style="width:16px;"></i> Konten Halaman Kohati</h4>
-                    
-                    <label style="margin-top:15px;">Teks Profil KOHATI</label>
-                    <div id="quill-kohati-profil" style="height:150px; color:white; margin-bottom:15px;"></div>
-                    <input type="hidden" name="kohatiProfilText" id="hidden-kohati-profil">
-                    
-                    <label style="margin-top:15px;">Teks Visi KOHATI</label>
-                    <div id="quill-kohati-visi" style="height:150px; color:white; margin-bottom:15px;"></div>
-                    <input type="hidden" name="kohatiVisiText" id="hidden-kohati-visi">
-
-                    <label style="margin-top:15px;">Teks Misi KOHATI</label>
-                    <div id="quill-kohati-misi" style="height:150px; color:white; margin-bottom:15px;"></div>
-                    <input type="hidden" name="kohatiMisiText" id="hidden-kohati-misi">
+                    <label style="margin-top:15px;">Teks Profil KOHATI</label><div id="quill-kohati-profil" style="height:150px; color:white; margin-bottom:15px;"></div><input type="hidden" name="kohatiProfilText" id="hidden-kohati-profil">
+                    <label style="margin-top:15px;">Teks Visi KOHATI</label><div id="quill-kohati-visi" style="height:150px; color:white; margin-bottom:15px;"></div><input type="hidden" name="kohatiVisiText" id="hidden-kohati-visi">
+                    <label style="margin-top:15px;">Teks Misi KOHATI</label><div id="quill-kohati-misi" style="height:150px; color:white; margin-bottom:15px;"></div><input type="hidden" name="kohatiMisiText" id="hidden-kohati-misi">
                 </div>
-
                 <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:20px;">Simpan Halaman Tentang & PDF</button>
             </form>
-            
             <div id="raw-profil" style="display:none;"><%- siteSettings.profilText %></div>
             <div id="raw-welcome" style="display:none;"><%- siteSettings.welcomeText %></div>
             <div id="raw-visi" style="display:none;"><%- siteSettings.visiText %></div>
             <div id="raw-misi" style="display:none;"><%- siteSettings.misiText %></div>
-            
             <div id="raw-kohati-profil" style="display:none;"><%- siteSettings.kohatiProfilText %></div>
             <div id="raw-kohati-visi" style="display:none;"><%- siteSettings.kohatiVisiText %></div>
             <div id="raw-kohati-misi" style="display:none;"><%- siteSettings.kohatiMisiText %></div>
@@ -389,7 +305,94 @@
 </div>
 
 <!-- ==============================================================
-     TAB 3: SHORTLINK CUSTOM
+     BIG UPGRADE: TAB 3: LINK IN BIO
+============================================================== -->
+<div id="adm-bio" class="admin-tab-pane">
+    <div class="admin-layout">
+        <!-- PENGATURAN PROFIL BIO -->
+        <div class="admin-main-content">
+            <div class="glass admin-panel" style="margin-bottom:0; border-top: 4px solid #8b5cf6;">
+                <div class="panel-header">
+                    <h3 class="panel-title" style="color:#8b5cf6;"><i data-lucide="smartphone"></i> Setelan Halaman Link in Bio</h3>
+                    <button class="btn btn-primary" style="background:#8b5cf6; border-color:#8b5cf6; color:white;" onclick="window.open('/<%= bioSettings.path %>', '_blank')">Lihat Halaman Bio</button>
+                </div>
+                
+                <form action="/admin/setelan-bio" method="POST" enctype="multipart/form-data">
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>URL Path (Misal: links) -> domain.com/links</label>
+                            <input type="text" name="path" class="input-control" value="<%= bioSettings.path %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Judul Profil / Nama Halaman</label>
+                            <input type="text" name="title" class="input-control" value="<%= bioSettings.title %>" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Deskripsi Singkat (Bio)</label>
+                        <textarea name="bio" class="input-control" rows="2" required><%= bioSettings.bio %></textarea>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Foto Profil (Opsional, kosongkan jika tetap)</label>
+                            <input type="file" name="profileImage" class="input-control file-compress" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label>Warna/Gradient Background (CSS Format)</label>
+                            <input type="text" name="bgGradient" class="input-control" value="<%= bioSettings.bgGradient %>" placeholder="Contoh: linear-gradient(...) atau #111827" required>
+                            <p class="form-hint" style="color:#8b5cf6;">Gunakan warna Hex (ex: #000) atau linear-gradient.</p>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary submit-btn" style="width:100%; background:#8b5cf6; border-color:#8b5cf6; color:white; margin-top: 10px;">Simpan Setelan Bio</button>
+                </form>
+            </div>
+
+            <!-- DAFTAR LINK / TOMBOL -->
+            <div class="glass admin-panel" style="margin-bottom:0;">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i data-lucide="list"></i> Kelola Tombol Link</h3>
+                    <button class="btn btn-primary" onclick="openModal('modalTambahBioLink')" style="padding:8px 15px; font-size:0.85rem;">+ Tambah Tombol Link</button>
+                </div>
+                <p class="text-muted" style="margin-bottom:20px; font-size:0.9rem;">Tombol-tombol ini akan muncul berjejer di halaman Link in Bio Anda.</p>
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead><tr><th>Icon</th><th>Judul Tombol</th><th>URL / Tujuan</th><th style="text-align:right;">Aksi</th></tr></thead>
+                        <tbody>
+                            <% bioLinks.forEach(l => { %>
+                            <tr>
+                                <td>
+                                    <% if(l.icon) { %> <img src="<%= l.icon %>" style="width:30px; height:30px; border-radius:6px; object-fit:cover;"> <% } else { %> <div style="width:30px; height:30px; background:rgba(255,255,255,0.1); border-radius:6px; display:flex; align-items:center; justify-content:center;"><i data-lucide="link" style="width:16px;"></i></div> <% } %>
+                                </td>
+                                <td class="fw-600"><%= l.title %></td>
+                                <td style="font-size:0.8rem; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><a href="<%= l.url %>" target="_blank" style="color:#60a5fa;"><%= l.url %></a></td>
+                                <td class="td-actions">
+                                    <button type="button" class="action-btn edit" onclick="openEditBioLinkModal('<%= l.id %>', '<%= l.title.replace(/'/g, "\\'") %>', '<%= l.url.replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-biolink/<%= l.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus tombol link ini?')"><i data-lucide="trash-2"></i></button></form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                            <% if(bioLinks.length === 0) { %>
+                                <tr><td colspan="4" style="text-align:center; color:#9ca3af;">Belum ada link yang dibuat.</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SIDEBAR TIPS -->
+        <div class="admin-sidebar">
+            <div class="glass admin-panel" style="margin-bottom:0;">
+                <h3 class="panel-title" style="margin-bottom:15px; color:#8b5cf6;"><i data-lucide="info"></i> Info Fitur</h3>
+                <p style="color:#d1d5db; font-size:0.9rem; line-height:1.6;">Fitur <strong>Link in Bio</strong> berfungsi seperti Linktree atau msh.ke. Anda dapat membagikan satu URL pendek (misal: <code>domainAnda.com/links</code>) ke bio Instagram, TikTok, atau Twitter.</p>
+                <p style="color:#d1d5db; font-size:0.9rem; line-height:1.6; margin-top:10px;">Halaman tersebut akan berisi daftar tombol yang mengarah ke berbagai tempat penting (Form pendaftaran, WhatsApp, dll).</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==============================================================
+     TAB 4: SHORTLINK CUSTOM
 ============================================================== -->
 <div id="adm-shortlink" class="admin-tab-pane">
     <div class="glass admin-panel" style="max-width:800px; margin:0 auto;">
@@ -397,7 +400,7 @@
             <h3 class="panel-title"><i data-lucide="link"></i> Shortlink Custom</h3>
             <button class="btn btn-primary" onclick="openModal('modalShortlink')" style="padding:8px 15px; font-size:0.85rem;">+ Buat Link</button>
         </div>
-        <p class="text-muted" style="margin-bottom:20px; font-size:0.9rem;">Buat URL kustom untuk website Anda, contoh: <code>domain.com/daftar</code> -> mengarah ke Google Form.</p>
+        <p class="text-muted" style="margin-bottom:20px; font-size:0.9rem;">Buat URL kustom langsung ke tujuan tertentu, contoh: <code>domain.com/daftar</code> -> mengarah ke Google Form.</p>
         <div class="table-wrapper">
             <table class="admin-table">
                 <thead><tr><th>Judul / Keterangan</th><th>Short Path</th><th>Tujuan Asli (Original URL)</th><th style="text-align:right;">Aksi</th></tr></thead>
@@ -421,32 +424,19 @@
 </div>
 
 <!-- ==============================================================
-     TAB 4: ANNOUNCEMENT
+     TAB 5: ANNOUNCEMENT
 ============================================================== -->
 <div id="adm-announce" class="admin-tab-pane">
     <div class="glass admin-panel" style="max-width:800px; margin:0 auto;">
         <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="bell"></i> Setelan Announcement Pop-up</h3>
-        <p class="text-muted" style="margin-bottom:30px; font-size:0.9rem;">Pengumuman akan muncul di beranda sebagai popup saat pengunjung membuka web.</p>
-        
         <form action="/admin/setelan-announcement" method="POST" enctype="multipart/form-data" id="formAnnounce">
             <div class="form-group" style="display:flex; align-items:center; gap:10px; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); padding:15px; border-radius:10px;">
                 <input type="checkbox" name="announceActive" id="announceActive" value="true" <%= String(siteSettings.announceActive) === 'true' ? 'checked' : '' %> style="width:20px; height:20px;">
                 <label for="announceActive" style="margin:0; color:#4ade80; cursor:pointer;">Aktifkan Pop-up Pengumuman di Beranda</label>
             </div>
-            <div class="form-group">
-                <label>Judul Pengumuman</label>
-                <input type="text" name="announceTitle" class="input-control" value="<%= siteSettings.announceTitle %>">
-            </div>
-            <div class="form-group">
-                <label>Upload Poster/Foto Pengumuman (Opsional)</label>
-                <input type="file" name="announceImage" class="input-control file-compress" accept="image/*">
-                <% if(siteSettings.announceImage) { %><img src="<%= siteSettings.announceImage %>" style="height:100px; border-radius:8px; margin-top:10px; border:1px solid rgba(255,255,255,0.2);"><% } %>
-            </div>
-            <div class="form-group">
-                <label>Isi Teks Pengumuman</label>
-                <div id="quill-announce" style="height:200px; color:white;"></div>
-                <input type="hidden" name="announceContent" id="hidden-announce">
-            </div>
+            <div class="form-group"><label>Judul Pengumuman</label><input type="text" name="announceTitle" class="input-control" value="<%= siteSettings.announceTitle %>"></div>
+            <div class="form-group"><label>Upload Poster/Foto Pengumuman (Opsional)</label><input type="file" name="announceImage" class="input-control file-compress" accept="image/*"><% if(siteSettings.announceImage) { %><img src="<%= siteSettings.announceImage %>" style="height:100px; border-radius:8px; margin-top:10px; border:1px solid rgba(255,255,255,0.2);"><% } %></div>
+            <div class="form-group"><label>Isi Teks Pengumuman</label><div id="quill-announce" style="height:200px; color:white;"></div><input type="hidden" name="announceContent" id="hidden-announce"></div>
             <div id="raw-announce" style="display:none;"><%- siteSettings.announceContent %></div>
             <button type="submit" class="btn btn-primary submit-btn" style="width:100%;">Simpan Setelan Pengumuman</button>
         </form>
@@ -459,6 +449,32 @@
 </script>
 
 <!-- ================= MODALS AREA DATA KELOLA ================= -->
+<!-- MODAL TAMBAH & EDIT BIO LINK -->
+<div class="modal-overlay" id="modalTambahBioLink">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Tambah Tombol Bio Link</h3><button type="button" class="close-modal" onclick="closeModal('modalTambahBioLink')"><i data-lucide="x"></i></button></div>
+        <form action="/admin/tambah-biolink" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Judul Tombol (Misal: Daftar LK 1)</label><input type="text" name="title" class="input-control" required></div>
+            <div class="form-group"><label>URL / Tautan Tujuan</label><input type="url" name="url" class="input-control" required placeholder="https://..."></div>
+            <div class="form-group"><label>Icon Tombol (Opsional)</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalTambahBioLink')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan Tombol</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEditBioLink">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Edit Tombol Bio Link</h3><button type="button" class="close-modal" onclick="closeModal('modalEditBioLink')"><i data-lucide="x"></i></button></div>
+        <form id="formEditBioLink" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Judul Tombol</label><input type="text" name="title" id="editBioTitle" class="input-control" required></div>
+            <div class="form-group"><label>URL / Tautan Tujuan</label><input type="url" name="url" id="editBioUrl" class="input-control" required></div>
+            <div class="form-group"><label>Ganti Icon Tombol (Opsional)</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditBioLink')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Update Tombol</button></div>
+        </form>
+    </div>
+</div>
+
+<!-- Semua Modal Lainnya (Sosmed, Shortlink, Pengurus, Bidang, dll) Tetap Ada dan Tidak Dirubah -->
 <div class="modal-overlay" id="modalSosmed">
     <div class="modal-content">
         <div class="modal-header"><h3>Tambah Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalSosmed')"><i data-lucide="x"></i></button></div>
@@ -471,7 +487,6 @@
     </div>
 </div>
 
-<!-- MODAL EDIT SOSMED BARU -->
 <div class="modal-overlay" id="modalEditSosmed">
     <div class="modal-content">
         <div class="modal-header"><h3>Edit Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalEditSosmed')"><i data-lucide="x"></i></button></div>
@@ -484,18 +499,12 @@
     </div>
 </div>
 
-<!-- Modal Lainnya Tetap Sama -->
 <div class="modal-overlay" id="modalShortlink">
     <div class="modal-content">
         <div class="modal-header"><h3>Tambah Shortlink</h3><button type="button" class="close-modal" onclick="closeModal('modalShortlink')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-shortlink" method="POST">
             <div class="form-group"><label>Judul / Keterangan</label><input type="text" name="title" class="input-control" required placeholder="Contoh: Form Pendaftaran LK 1"></div>
-            <div class="form-group"><label>Path (URL Pendek)</label>
-                <div style="display:flex; align-items:center;">
-                    <span style="background:rgba(255,255,255,0.1); padding:14px; border-radius:12px 0 0 12px; border:1px solid rgba(255,255,255,0.1); border-right:none;">domain.com/</span>
-                    <input type="text" name="path" class="input-control" style="border-radius:0 12px 12px 0;" required placeholder="daftar">
-                </div>
-            </div>
+            <div class="form-group"><label>Path (URL Pendek)</label><div style="display:flex; align-items:center;"><span style="background:rgba(255,255,255,0.1); padding:14px; border-radius:12px 0 0 12px; border:1px solid rgba(255,255,255,0.1); border-right:none;">domain.com/</span><input type="text" name="path" class="input-control" style="border-radius:0 12px 12px 0;" required placeholder="daftar"></div></div>
             <div class="form-group"><label>URL Asli (Tujuan)</label><input type="url" name="originalUrl" class="input-control" required placeholder="https://docs.google.com/forms/..."></div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalShortlink')">Batal</button><button type="submit" class="btn btn-primary">Simpan</button></div>
         </form>
@@ -507,12 +516,7 @@
         <div class="modal-header"><h3>Edit Shortlink</h3><button type="button" class="close-modal" onclick="closeModal('modalEditShortlink')"><i data-lucide="x"></i></button></div>
         <form id="formEditShortlink" method="POST">
             <div class="form-group"><label>Judul / Keterangan</label><input type="text" name="title" id="editShortlinkTitle" class="input-control" required></div>
-            <div class="form-group"><label>Path (URL Pendek)</label>
-                <div style="display:flex; align-items:center;">
-                    <span style="background:rgba(255,255,255,0.1); padding:14px; border-radius:12px 0 0 12px; border:1px solid rgba(255,255,255,0.1); border-right:none;">domain.com/</span>
-                    <input type="text" name="path" id="editShortlinkPath" class="input-control" style="border-radius:0 12px 12px 0;" required>
-                </div>
-            </div>
+            <div class="form-group"><label>Path (URL Pendek)</label><div style="display:flex; align-items:center;"><span style="background:rgba(255,255,255,0.1); padding:14px; border-radius:12px 0 0 12px; border:1px solid rgba(255,255,255,0.1); border-right:none;">domain.com/</span><input type="text" name="path" id="editShortlinkPath" class="input-control" style="border-radius:0 12px 12px 0;" required></div></div>
             <div class="form-group"><label>URL Asli (Tujuan)</label><input type="url" name="originalUrl" id="editShortlinkUrl" class="input-control" required></div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditShortlink')">Batal</button><button type="submit" class="btn btn-primary">Update</button></div>
         </form>
@@ -657,9 +661,6 @@
     </div>
 </div>
 
-<!-- ==========================================
-     MODAL ANGGOTA BIDANG (UPDATE JABATAN)
-=========================================== -->
 <div class="modal-overlay" id="modalAnggotaBidang">
     <div class="modal-content">
         <div class="modal-header">
@@ -689,7 +690,6 @@
     </div>
 </div>
 
-<!-- Modal KOHATI -->
 <div class="modal-overlay" id="modalKohatiPengurus">
     <div class="modal-content" style="border-color:#f472b6;"><div class="modal-header"><h3 style="color:#f472b6;">Tambah Pengurus Kohati</h3><button type="button" class="close-modal" onclick="closeModal('modalKohatiPengurus')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-kohati-pengurus" method="POST" enctype="multipart/form-data">
@@ -725,7 +725,6 @@
         
         var quillTambah = new Quill('#quill-tambah', qConfig);
         var quillEdit = new Quill('#quill-edit', qConfig);
-        
         var quillProfil = new Quill('#quill-profil', qConfig);
         var quillWelcome = new Quill('#quill-welcome', qConfig);
         var quillVisi = new Quill('#quill-visi', qConfig);
@@ -768,7 +767,14 @@
     function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
 
-    // FUNGSI BARU: Buka Modal Edit Sosmed
+    // Fungsi Modals Bio Link
+    function openEditBioLinkModal(id, title, url) {
+        document.getElementById('editBioTitle').value = title;
+        document.getElementById('editBioUrl').value = url;
+        document.getElementById('formEditBioLink').action = '/admin/edit-biolink/' + id;
+        openModal('modalEditBioLink');
+    }
+
     function openEditSosmedModal(id, name, url) {
         document.getElementById('editSosmedName').value = name;
         document.getElementById('editSosmedUrl').value = url;
