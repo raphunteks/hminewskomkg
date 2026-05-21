@@ -259,7 +259,7 @@ app.get('/:slug', async (req, res, next) => {
     try {
         // 1. Cek apakah slug adalah halaman Link in Bio
         let bioPages = await kv.get('bioPages') || [];
-        const bioPage = bioPages.find(p => p.path.toLowerCase() === slug);
+        const bioPage = bioPages.find(p => p.path && p.path.toLowerCase() === slug);
         
         if (bioPage) {
             let allBioLinks = await kv.get('bioLinks') || [];
@@ -270,7 +270,7 @@ app.get('/:slug', async (req, res, next) => {
 
         // 2. Jika bukan bio, cek Shortlink biasa
         const shortlinks = await kv.get('shortlinkList') || [];
-        const link = shortlinks.find(s => s.path.toLowerCase() === slug);
+        const link = shortlinks.find(s => s.path && s.path.toLowerCase() === slug);
         if (link) return res.redirect(link.originalUrl);
         
     } catch (e) {
@@ -307,25 +307,36 @@ const requireAdmin = (req, res, next) => {
 app.get('/admin/dashboard', requireAdmin, async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
-        const news = await kv.get('newsList') || [];
-        const albums = await kv.get('albumsList') || [];
-        const pengurus = await kv.get('pengurusList') || [];
-        const bidang = await kv.get('bidangList') || [];
-        const dataAnggota = await kv.get('dataAnggotaList') || [];
-        const kohatiPengurus = await kv.get('kohatiPengurusList') || [];
-        const kohatiBidang = await kv.get('kohatiBidangList') || [];
-        const shortlinks = await kv.get('shortlinkList') || [];
+        
+        // =========================================================================
+        // DATA SANITIZER & AUTO-HEALING (Pencegah Error 500 EJS Render)
+        // Menjamin seluruh data database terbaca aman meskipun format lama corrupt
+        // =========================================================================
+        const safeArr = (arr) => Array.isArray(arr) ? arr : [];
+        const safeStr = (val) => typeof val === 'string' ? val : '';
+
+        const news = safeArr(await kv.get('newsList')).map(x => ({...x, title: safeStr(x.title), category: safeStr(x.category), date: safeStr(x.date), content: safeStr(x.content)}));
+        const albums = safeArr(await kv.get('albumsList')).map(x => ({...x, title: safeStr(x.title), date: safeStr(x.date)}));
+        const pengurus = safeArr(await kv.get('pengurusList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role)}));
+        const bidang = safeArr(await kv.get('bidangList')).map(x => ({...x, name: safeStr(x.name)}));
+        const dataAnggota = safeArr(await kv.get('dataAnggotaList')).map(x => ({...x, title: safeStr(x.title), date: safeStr(x.date)}));
+        const kohatiPengurus = safeArr(await kv.get('kohatiPengurusList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role)}));
+        const kohatiBidang = safeArr(await kv.get('kohatiBidangList')).map(x => ({...x, name: safeStr(x.name)}));
+        const shortlinks = safeArr(await kv.get('shortlinkList')).map(x => ({...x, title: safeStr(x.title), path: safeStr(x.path), originalUrl: safeStr(x.originalUrl)}));
         
         // Panggil Data Link in Bio
-        let bioPages = await kv.get('bioPages') || [];
-        let bioLinks = await kv.get('bioLinks') || [];
+        let bioPages = safeArr(await kv.get('bioPages')).map(x => ({...x, path: safeStr(x.path), title: safeStr(x.title), bio: safeStr(x.bio), bgType: safeStr(x.bgType), bgValue: safeStr(x.bgValue)}));
+        let bioLinks = safeArr(await kv.get('bioLinks')).map(x => ({...x, title: safeStr(x.title), url: safeStr(x.url)}));
 
         res.render('admin-dashboard', { 
             page: 'admin', news, albums, pengurus, bidang, dataAnggota, 
             kohatiPengurus, kohatiBidang, shortlinks, siteSettings, socialMediaList,
             bioPages, bioLinks
         });
-    } catch (err) { res.status(500).send("Database Error Dashboard."); }
+    } catch (err) { 
+        console.error("Dashboard Render Error:", err);
+        res.status(500).send("Database Error Dashboard."); 
+    }
 });
 
 app.get('/admin/logout', (req, res) => {
@@ -489,9 +500,9 @@ app.post('/admin/tambah-bio-page', requireAdmin, upload.any(), async (req, res) 
 
         pages.push({
             id: Date.now(),
-            path: req.body.path.replace(/\s+/g, '-').toLowerCase(),
-            title: req.body.title, // HTML dari Quill
-            bio: req.body.bio,
+            path: (req.body.path || '').replace(/\s+/g, '-').toLowerCase(),
+            title: req.body.title || 'Untitled', // Diisi aman dari Quill
+            bio: req.body.bio || '',
             profileImage: fileHelper(req, 'profileImage_b64') || '/img/logo-hmikomkgumi.png',
             bgType: bgType,
             bgValue: bgValue
@@ -543,8 +554,8 @@ app.post('/admin/tambah-biolink', requireAdmin, upload.any(), async (req, res) =
         list.push({ 
             id: Date.now(), 
             bioPageId: req.body.bioPageId, // ID halaman induk
-            title: req.body.title, // HTML dari Quill
-            url: req.body.url, 
+            title: req.body.title || 'Link', // HTML dari Quill
+            url: req.body.url || '#', 
             icon: fileHelper(req, 'icon_b64') 
         });
         await kv.set('bioLinks', list);
