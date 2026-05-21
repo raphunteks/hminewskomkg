@@ -1,4 +1,3 @@
-
 <%- include('partials/header') %>
 
 <div class="glass dashboard-header">
@@ -12,7 +11,7 @@
     <a href="/admin/logout" class="btn btn-danger"><i data-lucide="log-out" style="width:18px;"></i> Logout</a>
 </div>
 
-<!-- NAVIGASI TAB ADMIN (DITAMBAHKAN TAB BARU LINK IN BIO) -->
+<!-- NAVIGASI TAB ADMIN -->
 <div class="admin-tab-nav">
     <button class="admin-tab-btn active" onclick="openAdmTab('adm-kelola', this)"><i data-lucide="database"></i> Kelola Data</button>
     <button class="admin-tab-btn" onclick="openAdmTab('adm-setelan', this)"><i data-lucide="settings"></i> Header, Footer & Tentang</button>
@@ -21,9 +20,11 @@
     <button class="admin-tab-btn" onclick="openAdmTab('adm-announce', this)"><i data-lucide="bell"></i> Announcement Pop-up</button>
 </div>
 
-<!-- TAB 1: KELOLA DATA UTAMA & KOHATI -->
+<!-- ==============================================================
+     TAB 1: KELOLA DATA UTAMA & KOHATI
+============================================================== -->
 <div id="adm-kelola" class="admin-tab-pane active">
-    <!-- Kode Tab 1 Tetap Sama -->
+    <!-- Kode Tab 1 Tetap Sama Persis -->
     <div class="admin-layout">
         <div class="admin-main-content">
             <div class="glass admin-panel" style="margin-bottom:0;">
@@ -209,8 +210,11 @@
     </div>
 </div>
 
-<!-- TAB 2: SETELAN WEB -->
+<!-- ==============================================================
+     TAB 2: SETELAN WEB
+============================================================== -->
 <div id="adm-setelan" class="admin-tab-pane">
+    <!-- Kode Tab 2 Tetap Sama Persis -->
     <div class="grid-2">
         <div style="display:flex; flex-direction:column; gap:30px;">
             <div class="glass admin-panel" style="margin-bottom:0;">
@@ -305,87 +309,87 @@
 </div>
 
 <!-- ==============================================================
-     BIG UPGRADE: TAB 3: LINK IN BIO
+     BIG UPGRADE: TAB 3: LINK IN BIO (MULTIPLE PAGES SUPPORT)
 ============================================================== -->
 <div id="adm-bio" class="admin-tab-pane">
     <div class="admin-layout">
-        <!-- PENGATURAN PROFIL BIO -->
         <div class="admin-main-content">
+            
+            <!-- CARD 1: DAFTAR HALAMAN BIO -->
             <div class="glass admin-panel" style="margin-bottom:0; border-top: 4px solid #8b5cf6;">
                 <div class="panel-header">
-                    <h3 class="panel-title" style="color:#8b5cf6;"><i data-lucide="smartphone"></i> Setelan Halaman Link in Bio</h3>
-                    <button class="btn btn-primary" style="background:#8b5cf6; border-color:#8b5cf6; color:white;" onclick="window.open('/<%= bioSettings.path %>', '_blank')">Lihat Halaman Bio</button>
+                    <h3 class="panel-title" style="color:#8b5cf6;"><i data-lucide="smartphone"></i> Kelola Halaman Link Bio</h3>
+                    <button class="btn btn-primary" style="background:#8b5cf6; border-color:#8b5cf6; color:white; padding:8px 15px; font-size:0.85rem;" onclick="openModal('modalTambahBioPage')">+ Buat Link Bio</button>
                 </div>
+                <p class="text-muted" style="margin-bottom:20px; font-size:0.9rem;">Buat halaman pendaratan untuk menaruh link penting. Anda bisa memiliki lebih dari satu halaman.</p>
                 
-                <form action="/admin/setelan-bio" method="POST" enctype="multipart/form-data">
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label>URL Path (Misal: links) -> domain.com/links</label>
-                            <input type="text" name="path" class="input-control" value="<%= bioSettings.path %>" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Judul Profil / Nama Halaman</label>
-                            <input type="text" name="title" class="input-control" value="<%= bioSettings.title %>" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Deskripsi Singkat (Bio)</label>
-                        <textarea name="bio" class="input-control" rows="2" required><%= bioSettings.bio %></textarea>
-                    </div>
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label>Foto Profil (Opsional, kosongkan jika tetap)</label>
-                            <input type="file" name="profileImage" class="input-control file-compress" accept="image/*">
-                        </div>
-                        <div class="form-group">
-                            <label>Warna/Gradient Background (CSS Format)</label>
-                            <input type="text" name="bgGradient" class="input-control" value="<%= bioSettings.bgGradient %>" placeholder="Contoh: linear-gradient(...) atau #111827" required>
-                            <p class="form-hint" style="color:#8b5cf6;">Gunakan warna Hex (ex: #000) atau linear-gradient.</p>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary submit-btn" style="width:100%; background:#8b5cf6; border-color:#8b5cf6; color:white; margin-top: 10px;">Simpan Setelan Bio</button>
-                </form>
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead><tr><th>Path/URL</th><th>Judul Halaman</th><th style="text-align:right;">Aksi</th></tr></thead>
+                        <tbody>
+                            <% bioPages.forEach(p => { %>
+                            <tr>
+                                <td style="color:#4ade80;">/<%= p.path %></td>
+                                <td class="fw-600"><%- p.title.replace(/<[^>]+>/g, '') %></td>
+                                <td class="td-actions">
+                                    <div id="raw-bio-title-<%= p.id %>" style="display:none;"><%- p.title %></div>
+                                    <button type="button" class="action-btn" style="color:#fff;" onclick="window.open('/<%= p.path %>', '_blank')" title="Lihat Halaman"><i data-lucide="eye"></i></button>
+                                    <button type="button" class="action-btn edit" onclick="openEditBioPageModal('<%= p.id %>', '<%= p.path %>', '<%= p.bio.replace(/'/g, "\\'") %>', '<%= p.bgType %>', '<%= p.bgValue.replace(/'/g, "\\'") %>')" title="Edit Setting"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-bio-page/<%= p.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus halaman bio beserta semua link di dalamnya?')"><i data-lucide="trash-2"></i></button></form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                            <% if(bioPages.length === 0) { %><tr><td colspan="3" style="text-align:center; color:#9ca3af;">Belum ada Halaman Bio yang dibuat.</td></tr><% } %>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <!-- DAFTAR LINK / TOMBOL -->
+            <!-- CARD 2: KELOLA TOMBOL LINK (BERDASARKAN HALAMAN) -->
             <div class="glass admin-panel" style="margin-bottom:0;">
                 <div class="panel-header">
                     <h3 class="panel-title"><i data-lucide="list"></i> Kelola Tombol Link</h3>
                     <button class="btn btn-primary" onclick="openModal('modalTambahBioLink')" style="padding:8px 15px; font-size:0.85rem;">+ Tambah Tombol Link</button>
                 </div>
-                <p class="text-muted" style="margin-bottom:20px; font-size:0.9rem;">Tombol-tombol ini akan muncul berjejer di halaman Link in Bio Anda.</p>
-                <div class="table-wrapper">
-                    <table class="admin-table">
-                        <thead><tr><th>Icon</th><th>Judul Tombol</th><th>URL / Tujuan</th><th style="text-align:right;">Aksi</th></tr></thead>
-                        <tbody>
-                            <% bioLinks.forEach(l => { %>
-                            <tr>
-                                <td>
-                                    <% if(l.icon) { %> <img src="<%= l.icon %>" style="width:30px; height:30px; border-radius:6px; object-fit:cover;"> <% } else { %> <div style="width:30px; height:30px; background:rgba(255,255,255,0.1); border-radius:6px; display:flex; align-items:center; justify-content:center;"><i data-lucide="link" style="width:16px;"></i></div> <% } %>
-                                </td>
-                                <td class="fw-600"><%= l.title %></td>
-                                <td style="font-size:0.8rem; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><a href="<%= l.url %>" target="_blank" style="color:#60a5fa;"><%= l.url %></a></td>
-                                <td class="td-actions">
-                                    <button type="button" class="action-btn edit" onclick="openEditBioLinkModal('<%= l.id %>', '<%= l.title.replace(/'/g, "\\'") %>', '<%= l.url.replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
-                                    <form action="/admin/hapus-biolink/<%= l.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus tombol link ini?')"><i data-lucide="trash-2"></i></button></form>
-                                </td>
-                            </tr>
-                            <% }) %>
-                            <% if(bioLinks.length === 0) { %>
-                                <tr><td colspan="4" style="text-align:center; color:#9ca3af;">Belum ada link yang dibuat.</td></tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
+                
+                <% if(bioPages.length === 0) { %>
+                    <p class="text-muted" style="text-align:center;">Silakan buat "Halaman Link Bio" terlebih dahulu di tabel atas.</p>
+                <% } else { %>
+                    <div class="table-wrapper">
+                        <table class="admin-table">
+                            <thead><tr><th>Icon</th><th>Halaman Bio</th><th>Judul Tombol</th><th style="text-align:right;">Aksi</th></tr></thead>
+                            <tbody>
+                                <% bioLinks.forEach(l => { 
+                                    let parentPage = bioPages.find(p => p.id == l.bioPageId);
+                                %>
+                                <tr>
+                                    <td>
+                                        <% if(l.icon) { %> <img src="<%= l.icon %>" style="width:30px; height:30px; border-radius:6px; object-fit:cover;"> <% } else { %> <div style="width:30px; height:30px; background:rgba(255,255,255,0.1); border-radius:6px; display:flex; align-items:center; justify-content:center;"><i data-lucide="link" style="width:16px;"></i></div> <% } %>
+                                    </td>
+                                    <td><span class="cat-badge" style="background:rgba(139,92,246,0.2); color:#c4b5fd;">/<%= parentPage ? parentPage.path : 'Unlinked' %></span></td>
+                                    <td class="fw-600"><%- l.title.replace(/<[^>]+>/g, '') %></td>
+                                    <td class="td-actions">
+                                        <div id="raw-link-title-<%= l.id %>" style="display:none;"><%- l.title %></div>
+                                        <button type="button" class="action-btn edit" onclick="openEditBioLinkModal('<%= l.id %>', '<%= l.bioPageId %>', '<%= l.url.replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
+                                        <form action="/admin/hapus-biolink/<%= l.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus tombol link ini?')"><i data-lucide="trash-2"></i></button></form>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                <% if(bioLinks.length === 0) { %><tr><td colspan="4" style="text-align:center; color:#9ca3af;">Belum ada link yang dibuat.</td></tr><% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } %>
             </div>
+            
         </div>
         
         <!-- SIDEBAR TIPS -->
         <div class="admin-sidebar">
             <div class="glass admin-panel" style="margin-bottom:0;">
                 <h3 class="panel-title" style="margin-bottom:15px; color:#8b5cf6;"><i data-lucide="info"></i> Info Fitur</h3>
-                <p style="color:#d1d5db; font-size:0.9rem; line-height:1.6;">Fitur <strong>Link in Bio</strong> berfungsi seperti Linktree atau msh.ke. Anda dapat membagikan satu URL pendek (misal: <code>domainAnda.com/links</code>) ke bio Instagram, TikTok, atau Twitter.</p>
-                <p style="color:#d1d5db; font-size:0.9rem; line-height:1.6; margin-top:10px;">Halaman tersebut akan berisi daftar tombol yang mengarah ke berbagai tempat penting (Form pendaftaran, WhatsApp, dll).</p>
+                <p style="color:#d1d5db; font-size:0.9rem; line-height:1.6;">Fitur <strong>Link in Bio</strong> berfungsi seperti Linktree atau msh.ke. Anda dapat membagikan URL pendek (misal: <code>domain.com/links</code>) ke bio Instagram atau TikTok.</p>
+                <p style="color:#d1d5db; font-size:0.9rem; line-height:1.6; margin-top:10px;">Anda bisa membuat <strong>Banyak Halaman</strong> dengan tampilan dan tombol yang berbeda-beda. Gunakan fitur edit teks untuk mengubah warna, ukuran, dan ketebalan tulisan.</p>
             </div>
         </div>
     </div>
@@ -449,12 +453,85 @@
 </script>
 
 <!-- ================= MODALS AREA DATA KELOLA ================= -->
-<!-- MODAL TAMBAH & EDIT BIO LINK -->
+
+<!-- MODAL TAMBAH HALAMAN BIO -->
+<div class="modal-overlay" id="modalTambahBioPage">
+    <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header"><h3>Buat Halaman Link Bio Baru</h3><button type="button" class="close-modal" onclick="closeModal('modalTambahBioPage')"><i data-lucide="x"></i></button></div>
+        <form action="/admin/tambah-bio-page" method="POST" enctype="multipart/form-data" id="formTambahBioPage">
+            <div class="grid-2">
+                <div class="form-group"><label>URL Path (Misal: links)</label><input type="text" name="path" class="input-control" required placeholder="domain.com/links"></div>
+                <div class="form-group"><label>Deskripsi Singkat (Bio)</label><input type="text" name="bio" class="input-control" required></div>
+            </div>
+            
+            <!-- Editor Rich Text Untuk Judul Profil -->
+            <div class="form-group">
+                <label>Judul Profil / Nama Halaman (Dukung Warna/Font)</label>
+                <div id="quill-tambah-bio-title" style="height: 100px; color: white;"></div>
+                <input type="hidden" name="title" id="hidden-tambah-bio-title" required>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group"><label>Upload Foto Profil</label><input type="file" name="profileImage" class="input-control file-compress" accept="image/*"></div>
+                <div class="form-group"><label>Warna Background (Gradient Hex)</label><input type="text" name="bgGradient" class="input-control" placeholder="linear-gradient(...)"></div>
+            </div>
+            <div class="form-group" style="margin-top:-10px;">
+                <p class="text-muted" style="text-align:center; font-size:0.8rem; margin:10px 0;">ATAU Ganti dengan Gambar Background</p>
+                <label>Upload Gambar Background Latar Belakang</label>
+                <input type="file" name="bgImage" class="input-control file-compress" accept="image/*">
+            </div>
+
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalTambahBioPage')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan Halaman</button></div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL EDIT HALAMAN BIO -->
+<div class="modal-overlay" id="modalEditBioPage">
+    <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header"><h3>Edit Halaman Link Bio</h3><button type="button" class="close-modal" onclick="closeModal('modalEditBioPage')"><i data-lucide="x"></i></button></div>
+        <form id="formEditBioPage" method="POST" enctype="multipart/form-data">
+            <div class="grid-2">
+                <div class="form-group"><label>URL Path</label><input type="text" name="path" id="editBioPagePath" class="input-control" required></div>
+                <div class="form-group"><label>Deskripsi Singkat (Bio)</label><input type="text" name="bio" id="editBioPageBio" class="input-control" required></div>
+            </div>
+            
+            <div class="form-group">
+                <label>Judul Profil / Nama Halaman</label>
+                <div id="quill-edit-bio-title" style="height: 100px; color: white;"></div>
+                <input type="hidden" name="title" id="hidden-edit-bio-title" required>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group"><label>Ganti Foto Profil</label><input type="file" name="profileImage" class="input-control file-compress" accept="image/*"></div>
+                <div class="form-group"><label>Ganti Warna Background Gradient</label><input type="text" name="bgGradient" id="editBioPageBgGradient" class="input-control"></div>
+            </div>
+            <div class="form-group" style="margin-top:-10px;">
+                <p class="text-muted" style="text-align:center; font-size:0.8rem; margin:10px 0;">ATAU Ganti dengan Gambar Background Baru</p>
+                <input type="file" name="bgImage" class="input-control file-compress" accept="image/*">
+            </div>
+
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditBioPage')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Update Halaman</button></div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL TAMBAH TOMBOL BIO LINK -->
 <div class="modal-overlay" id="modalTambahBioLink">
     <div class="modal-content">
-        <div class="modal-header"><h3>Tambah Tombol Bio Link</h3><button type="button" class="close-modal" onclick="closeModal('modalTambahBioLink')"><i data-lucide="x"></i></button></div>
-        <form action="/admin/tambah-biolink" method="POST" enctype="multipart/form-data">
-            <div class="form-group"><label>Judul Tombol (Misal: Daftar LK 1)</label><input type="text" name="title" class="input-control" required></div>
+        <div class="modal-header"><h3>Tambah Tombol Link</h3><button type="button" class="close-modal" onclick="closeModal('modalTambahBioLink')"><i data-lucide="x"></i></button></div>
+        <form action="/admin/tambah-biolink" method="POST" enctype="multipart/form-data" id="formTambahBioLink">
+            <div class="form-group">
+                <label>Pilih Halaman Bio</label>
+                <select name="bioPageId" class="input-control" required>
+                    <% bioPages.forEach(p => { %><option value="<%= p.id %>">/<%= p.path %> - <%= p.bio %></option><% }) %>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Judul Tombol (Bisa diwarna / italic)</label>
+                <div id="quill-tambah-link-title" style="height: 80px; color: white;"></div>
+                <input type="hidden" name="title" id="hidden-tambah-link-title" required>
+            </div>
             <div class="form-group"><label>URL / Tautan Tujuan</label><input type="url" name="url" class="input-control" required placeholder="https://..."></div>
             <div class="form-group"><label>Icon Tombol (Opsional)</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalTambahBioLink')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan Tombol</button></div>
@@ -462,12 +539,23 @@
     </div>
 </div>
 
+<!-- MODAL EDIT TOMBOL BIO LINK -->
 <div class="modal-overlay" id="modalEditBioLink">
     <div class="modal-content">
-        <div class="modal-header"><h3>Edit Tombol Bio Link</h3><button type="button" class="close-modal" onclick="closeModal('modalEditBioLink')"><i data-lucide="x"></i></button></div>
+        <div class="modal-header"><h3>Edit Tombol Link</h3><button type="button" class="close-modal" onclick="closeModal('modalEditBioLink')"><i data-lucide="x"></i></button></div>
         <form id="formEditBioLink" method="POST" enctype="multipart/form-data">
-            <div class="form-group"><label>Judul Tombol</label><input type="text" name="title" id="editBioTitle" class="input-control" required></div>
-            <div class="form-group"><label>URL / Tautan Tujuan</label><input type="url" name="url" id="editBioUrl" class="input-control" required></div>
+            <div class="form-group">
+                <label>Pindah ke Halaman Bio Lain?</label>
+                <select name="bioPageId" id="editBioLinkPageId" class="input-control" required>
+                    <% bioPages.forEach(p => { %><option value="<%= p.id %>">/<%= p.path %></option><% }) %>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Judul Tombol</label>
+                <div id="quill-edit-link-title" style="height: 80px; color: white;"></div>
+                <input type="hidden" name="title" id="hidden-edit-link-title" required>
+            </div>
+            <div class="form-group"><label>URL / Tautan Tujuan</label><input type="url" name="url" id="editBioLinkUrl" class="input-control" required></div>
             <div class="form-group"><label>Ganti Icon Tombol (Opsional)</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditBioLink')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Update Tombol</button></div>
         </form>
@@ -722,6 +810,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         var toolbarOptions = [['bold', 'italic', 'underline', 'strike'], ['blockquote'], [{ 'header': 1 }, { 'header': 2 }], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'color': [] }, { 'background': [] }], [{ 'align': [] }], ['clean']];
         var qConfig = { theme: 'snow', modules: { toolbar: toolbarOptions } };
+        var qConfigMini = { theme: 'snow', modules: { toolbar: [['bold', 'italic', 'underline'], [{ 'color': [] }, { 'background': [] }], [{ 'font': [] }], [{ 'size': ['small', false, 'large', 'huge'] }], [{ 'align': [] }], ['clean']] } };
         
         var quillTambah = new Quill('#quill-tambah', qConfig);
         var quillEdit = new Quill('#quill-edit', qConfig);
@@ -733,6 +822,12 @@
         var quillKohatiVisi = new Quill('#quill-kohati-visi', qConfig);
         var quillKohatiMisi = new Quill('#quill-kohati-misi', qConfig);
         var quillAnnounce = new Quill('#quill-announce', qConfig);
+
+        // QUILL UNTUK BIO LINK (RICH TEXT)
+        var qTambahBioTitle = new Quill('#quill-tambah-bio-title', qConfigMini);
+        var qEditBioTitle = new Quill('#quill-edit-bio-title', qConfigMini);
+        var qTambahLinkTitle = new Quill('#quill-tambah-link-title', qConfigMini);
+        var qEditLinkTitle = new Quill('#quill-edit-link-title', qConfigMini);
 
         quillProfil.root.innerHTML = document.getElementById('raw-profil').innerHTML;
         quillWelcome.root.innerHTML = document.getElementById('raw-welcome').innerHTML;
@@ -762,19 +857,55 @@
         document.getElementById('formEditBerita').onsubmit = function() { 
             document.getElementById('content-edit').value = quillEdit.root.innerHTML; 
         };
+
+        // SUBMIT UNTUK BIO LINK
+        document.getElementById('formTambahBioPage').onsubmit = function() {
+            document.getElementById('hidden-tambah-bio-title').value = qTambahBioTitle.root.innerHTML;
+        };
+        document.getElementById('formEditBioPage').onsubmit = function() {
+            document.getElementById('hidden-edit-bio-title').value = qEditBioTitle.root.innerHTML;
+        };
+        document.getElementById('formTambahBioLink').onsubmit = function() {
+            document.getElementById('hidden-tambah-link-title').value = qTambahLinkTitle.root.innerHTML;
+        };
+        document.getElementById('formEditBioLink').onsubmit = function() {
+            document.getElementById('hidden-edit-link-title').value = qEditLinkTitle.root.innerHTML;
+        };
     });
 
     function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
 
-    // Fungsi Modals Bio Link
-    function openEditBioLinkModal(id, title, url) {
-        document.getElementById('editBioTitle').value = title;
-        document.getElementById('editBioUrl').value = url;
+    // FUNGSI BUKA MODAL BIO PAGE & LINK
+    function openEditBioPageModal(id, path, bio, bgType, bgValue) {
+        document.getElementById('editBioPagePath').value = path;
+        document.getElementById('editBioPageBio').value = bio;
+        
+        var editEditor = Quill.find(document.getElementById('quill-edit-bio-title'));
+        editEditor.root.innerHTML = document.getElementById('raw-bio-title-' + id).innerHTML;
+
+        if(bgType === 'gradient') {
+            document.getElementById('editBioPageBgGradient').value = bgValue;
+        } else {
+            document.getElementById('editBioPageBgGradient').value = ""; // Clear jika image
+        }
+
+        document.getElementById('formEditBioPage').action = '/admin/edit-bio-page/' + id;
+        openModal('modalEditBioPage');
+    }
+
+    function openEditBioLinkModal(id, bioPageId, url) {
+        document.getElementById('editBioLinkPageId').value = bioPageId;
+        document.getElementById('editBioLinkUrl').value = url;
+        
+        var editEditor = Quill.find(document.getElementById('quill-edit-link-title'));
+        editEditor.root.innerHTML = document.getElementById('raw-link-title-' + id).innerHTML;
+
         document.getElementById('formEditBioLink').action = '/admin/edit-biolink/' + id;
         openModal('modalEditBioLink');
     }
 
+    // FUNGSI MODAL BAWAAN
     function openEditSosmedModal(id, name, url) {
         document.getElementById('editSosmedName').value = name;
         document.getElementById('editSosmedUrl').value = url;
@@ -817,7 +948,7 @@
     function openModalAnggotaBidang(bidangId, bidangName, actionPath) { 
         document.getElementById('anggotaBidangTitle').innerText = "Tambah Anggota: " + bidangName; 
         document.getElementById('editAnggotaBidangName').value = "";
-        document.getElementById('editAnggotaBidangRole').value = ""; // Kosongkan role
+        document.getElementById('editAnggotaBidangRole').value = ""; 
         document.getElementById('formAnggotaBidang').action = actionPath + bidangId; 
         openModal('modalAnggotaBidang'); 
     }
@@ -825,7 +956,7 @@
     function openEditAnggotaBidangModal(bidangId, memberId, name, role, actionPath) { 
         document.getElementById('anggotaBidangTitle').innerText = "Edit Anggota"; 
         document.getElementById('editAnggotaBidangName').value = name; 
-        document.getElementById('editAnggotaBidangRole').value = role; // Isi dengan role saat ini
+        document.getElementById('editAnggotaBidangRole').value = role; 
         document.getElementById('formAnggotaBidang').action = actionPath + bidangId + "/" + memberId; 
         openModal('modalAnggotaBidang'); 
     }
