@@ -62,6 +62,15 @@ const defaultSocialMedia = [
     { id: 2, name: 'Facebook', icon: '', url: 'https://www.facebook.com/hmi_komkgumi' }
 ];
 
+// DEAFULT LINK IN BIO SETTINGS
+const defaultBioSettings = {
+    path: "links",
+    title: "HMI KomKG-UMI",
+    bio: "Official Links Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI",
+    profileImage: "/img/logo-hmikomkgumi.png",
+    bgGradient: "linear-gradient(135deg, #064e3b 0%, #111827 100%)"
+};
+
 async function getSiteData() {
     try {
         let settings = await kv.get('siteSettings');
@@ -124,6 +133,12 @@ async function initDefaultData() {
     }
     if (!(await kv.get('dataAnggotaList'))) await kv.set('dataAnggotaList', []);
     if (!(await kv.get('shortlinkList'))) await kv.set('shortlinkList', []);
+    
+    // Inisialisasi Bio Links
+    let bioSet = await kv.get('bioSettings');
+    if (!bioSet) await kv.set('bioSettings', defaultBioSettings);
+    let bioLnk = await kv.get('bioLinks');
+    if (!bioLnk) await kv.set('bioLinks', []);
 }
 
 (async () => {
@@ -148,10 +163,7 @@ const fileHelper = (req, fieldB64) => {
 app.get('/favicon.ico', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 app.get('/favicon.png', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 
-// =========================================================================
-// --- BIG FIX: API ENDPOINT KHUSUS UNTUK RENDER PDF DEARFLIP
-// --- Mengambil base64 dari DB Terisolasi dan dikonversi menjadi Buffer PDF
-// =========================================================================
+// --- API ENDPOINT KHUSUS UNTUK RENDER PDF DEARFLIP ---
 app.get('/api/booklet.pdf', async (req, res) => {
     try {
         const b64Data = await kv.get('booklet_file_db'); // Ambil dari database terisolasi
@@ -236,15 +248,32 @@ app.get('/data-anggota', async (req, res) => {
     }
 });
 
+// ==============================================================
+// BIG UPGRADE: ROUTING CEK URL UNTUK SHORTLINK ATAU LINK-IN-BIO
+// ==============================================================
 app.get('/:slug', async (req, res, next) => {
     const slug = req.params.slug.toLowerCase();
     const reserved = ['admin', 'css', 'img', 'js', 'berita', 'galeri', 'tentang', 'data-anggota', 'api'];
     if (reserved.includes(slug)) return next();
+    
     try {
+        // 1. Cek apakah slug adalah halaman Link in Bio
+        let bioSet = await kv.get('bioSettings');
+        if (!bioSet) bioSet = defaultBioSettings;
+        
+        if (bioSet.path.toLowerCase() === slug) {
+            let bioLnk = await kv.get('bioLinks') || [];
+            return res.render('bio', { bioSettings: bioSet, bioLinks: bioLnk });
+        }
+
+        // 2. Jika bukan bio, cek Shortlink biasa
         const shortlinks = await kv.get('shortlinkList') || [];
         const link = shortlinks.find(s => s.path.toLowerCase() === slug);
         if (link) return res.redirect(link.originalUrl);
-    } catch (e) {}
+        
+    } catch (e) {
+        console.error("Slug Route Error:", e);
+    }
     next();
 });
 
@@ -284,7 +313,17 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
         const kohatiPengurus = await kv.get('kohatiPengurusList') || [];
         const kohatiBidang = await kv.get('kohatiBidangList') || [];
         const shortlinks = await kv.get('shortlinkList') || [];
-        res.render('admin-dashboard', { page: 'admin', news, albums, pengurus, bidang, dataAnggota, kohatiPengurus, kohatiBidang, shortlinks, siteSettings, socialMediaList });
+        
+        // Panggil Data Link in Bio
+        let bioSettings = await kv.get('bioSettings');
+        if (!bioSettings) bioSettings = defaultBioSettings;
+        let bioLinks = await kv.get('bioLinks') || [];
+
+        res.render('admin-dashboard', { 
+            page: 'admin', news, albums, pengurus, bidang, dataAnggota, 
+            kohatiPengurus, kohatiBidang, shortlinks, siteSettings, socialMediaList,
+            bioSettings, bioLinks // Kirim data bio ke frontend dashboard
+        });
     } catch (err) { res.status(500).send("Database Error Dashboard."); }
 });
 
@@ -324,10 +363,6 @@ app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req
     if (index !== -1 && news[index].photos) { news[index].photos = news[index].photos.filter(p => p.id != req.params.photoId); await kv.set('newsList', news); }
     res.redirect('/admin/dashboard');
 });
-
-// =========================================================================
-// --- BIG FIX: API SETELAN WEB YANG SUDAH DIPISAH (HEADER, FOOTER, TENTANG)
-// =========================================================================
 
 // SETELAN HEADER
 app.post('/admin/setelan-header', requireAdmin, upload.any(), async (req, res) => {
@@ -386,20 +421,17 @@ app.post('/admin/setelan-tentang', requireAdmin, upload.any(), async (req, res) 
             siteSettings.kohatiMisiText = req.body.kohatiMisiText;
             siteSettings.mapsEmbed = req.body.mapsEmbed !== undefined ? req.body.mapsEmbed : siteSettings.mapsEmbed;
 
-            // LOGIKA DUAL INPUT PDF (Cegah Error 500 Vercel KV)
             const bPdf = fileHelper(req, 'bookletPdf_b64'); // Input Upload Manual
             const pdfUrl = req.body.bookletPdfUrl; // Input Link GDrive (Aman)
 
             if (bPdf && bPdf.length > 50) { 
                 try {
-                    // Simpan di KV terpisah (booklet_file_db) agar tidak merusak siteSettings utama
                     await kv.set('booklet_file_db', bPdf);
-                    siteSettings.bookletPdf = '/api/booklet.pdf'; // Menunjuk langsung ke API kita
+                    siteSettings.bookletPdf = '/api/booklet.pdf';
                 } catch (dbErr) {
-                    console.error("Gagal simpan PDF lokal (Ukuran Terlalu Besar untuk KV Free Tier):", dbErr.message);
+                    console.error("Gagal simpan PDF lokal:", dbErr.message);
                 }
             } else if (pdfUrl && pdfUrl.length > 5) { 
-                // Auto-Convert Link Google Drive menjadi Direct Raw PDF Stream
                 let finalUrl = pdfUrl;
                 if(pdfUrl.includes('drive.google.com/file/d/')) {
                     const match = pdfUrl.match(/\/d\/(.*?)\//);
@@ -457,6 +489,55 @@ app.post('/admin/edit-sosmed/:id', requireAdmin, upload.any(), async (req, res) 
 });
 app.post('/admin/hapus-sosmed/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('socialMediaList') || []; await kv.set('socialMediaList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
+});
+
+// ==============================================================
+// BIG UPGRADE: API PENGELOLAAN LINK IN BIO
+// ==============================================================
+app.post('/admin/setelan-bio', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let bioSet = await kv.get('bioSettings') || defaultBioSettings;
+        bioSet.path = req.body.path.replace(/\s+/g, '-').toLowerCase() || bioSet.path;
+        bioSet.title = req.body.title || bioSet.title;
+        bioSet.bio = req.body.bio || bioSet.bio;
+        bioSet.bgGradient = req.body.bgGradient || bioSet.bgGradient;
+
+        const pImg = fileHelper(req, 'profileImage_b64');
+        if (pImg) bioSet.profileImage = pImg;
+
+        await kv.set('bioSettings', bioSet);
+        res.redirect('/admin/dashboard');
+    } catch (e) { res.redirect('/admin/dashboard'); }
+});
+
+app.post('/admin/tambah-biolink', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = await kv.get('bioLinks') || [];
+        list.push({ id: Date.now(), title: req.body.title, url: req.body.url, icon: fileHelper(req, 'icon_b64') });
+        await kv.set('bioLinks', list);
+        res.redirect('/admin/dashboard');
+    } catch(e) { res.redirect('/admin/dashboard'); }
+});
+
+app.post('/admin/edit-biolink/:id', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = await kv.get('bioLinks') || [];
+        let i = list.findIndex(l => l.id == req.params.id);
+        if (i !== -1) {
+            list[i].title = req.body.title;
+            list[i].url = req.body.url;
+            const newIcon = fileHelper(req, 'icon_b64');
+            if (newIcon) list[i].icon = newIcon;
+            await kv.set('bioLinks', list);
+        }
+        res.redirect('/admin/dashboard');
+    } catch(e) { res.redirect('/admin/dashboard'); }
+});
+
+app.post('/admin/hapus-biolink/:id', requireAdmin, async (req, res) => {
+    let list = await kv.get('bioLinks') || [];
+    await kv.set('bioLinks', list.filter(l => l.id != req.params.id));
+    res.redirect('/admin/dashboard');
 });
 
 // --- API DINAMIS PENGURUS & BIDANG ---
