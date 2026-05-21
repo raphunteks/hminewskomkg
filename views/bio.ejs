@@ -1,133 +1,26 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= bioSettings.title %></title>
+    <title>Link - <%= bioPage.bio %></title>
+    <link rel="icon" type="image/png" href="<%= bioPage.profileImage %>">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: <%= bioSettings.bgGradient %>; 
-            background-attachment: fixed; 
-            color: #ffffff; 
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px 20px;
-        }
-
-        .bio-container {
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-        }
-
-        .profile-img {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 20px;
-            border: 3px solid rgba(255,255,255,0.2);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            background: #fff;
-        }
-
-        .bio-title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            letter-spacing: -0.5px;
-        }
-
-        .bio-desc {
-            font-size: 0.95rem;
-            color: #d1d5db;
-            margin-bottom: 35px;
-            line-height: 1.6;
-        }
-
-        .link-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .link-btn {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            padding: 16px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            color: #ffffff;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        .link-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        }
-
-        .link-icon {
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.1);
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-
-        .link-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .link-text {
-            flex-grow: 1;
-            text-align: center;
-            padding-right: 35px; /* Offset the icon width to truly center the text */
-        }
-
-        .watermark {
-            margin-top: 50px;
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.5);
-            text-decoration: none;
-            transition: 0.3s;
-        }
-        .watermark:hover { color: #fff; }
-    </style>
+    <link rel="stylesheet" href="/css/bio.css">
 </head>
-<body>
+<!-- LOGIKA BACKGROUND: Membedakan tipe Image atau Gradient secara otomatis -->
+<body style="<% if(bioPage.bgType === 'image') { %> background-image: url('<%= bioPage.bgValue %>'); <% } else { %> background: <%= bioPage.bgValue %>; <% } %>">
 
     <div class="bio-container">
         <!-- PROFIL -->
-        <img src="<%= bioSettings.profileImage %>" alt="Profile" class="profile-img">
-        <h1 class="bio-title">@<%= bioSettings.title %></h1>
-        <p class="bio-desc"><%= bioSettings.bio %></p>
+        <img src="<%= bioPage.profileImage %>" alt="Profile" class="profile-img">
+        
+        <!-- TITLE MENGGUNAKAN RICH TEXT (DARI QUILL) -->
+        <div class="bio-title"><%- bioPage.title %></div>
+        
+        <p class="bio-desc"><%= bioPage.bio %></p>
 
-        <!-- TOMBOL LINK -->
+        <!-- TOMBOL LINK BERDASARKAN ID HALAMAN INI -->
         <div class="link-list">
             <% bioLinks.forEach(link => { %>
                 <a href="<%= link.url %>" class="link-btn" target="_blank" rel="noopener noreferrer">
@@ -135,17 +28,18 @@
                         <% if(link.icon) { %>
                             <img src="<%= link.icon %>" alt="Icon">
                         <% } else { %>
-                            <i data-lucide="link" style="width: 18px; color: #fff;"></i>
+                            <i data-lucide="link" style="width: 20px; color: #fff;"></i>
                         <% } %>
                     </div>
-                    <span class="link-text"><%= link.title %></span>
+                    <!-- TEXT MENGGUNAKAN RICH TEXT (DARI QUILL) -->
+                    <span class="link-text"><%- link.title %></span>
                 </a>
             <% }) %>
         </div>
 
-        <!-- WATERMARK -->
+        <!-- WATERMARK MENUJU BERANDA -->
         <a href="/" class="watermark">
-            <i data-lucide="home" style="width:14px; display:inline-block; vertical-align:middle;"></i> 
+            <i data-lucide="home" style="width:16px;"></i> 
             Powered by HMI KomKG-UMI
         </a>
     </div>
