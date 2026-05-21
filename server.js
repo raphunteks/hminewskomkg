@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
@@ -61,15 +60,6 @@ const defaultSocialMedia = [
     { id: 1, name: 'Instagram', icon: '', url: 'https://www.instagram.com/hmi_komkgumi' },
     { id: 2, name: 'Facebook', icon: '', url: 'https://www.facebook.com/hmi_komkgumi' }
 ];
-
-// DEAFULT LINK IN BIO SETTINGS
-const defaultBioSettings = {
-    path: "links",
-    title: "HMI KomKG-UMI",
-    bio: "Official Links Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI",
-    profileImage: "/img/logo-hmikomkgumi.png",
-    bgGradient: "linear-gradient(135deg, #064e3b 0%, #111827 100%)"
-};
 
 async function getSiteData() {
     try {
@@ -134,9 +124,19 @@ async function initDefaultData() {
     if (!(await kv.get('dataAnggotaList'))) await kv.set('dataAnggotaList', []);
     if (!(await kv.get('shortlinkList'))) await kv.set('shortlinkList', []);
     
-    // Inisialisasi Bio Links
-    let bioSet = await kv.get('bioSettings');
-    if (!bioSet) await kv.set('bioSettings', defaultBioSettings);
+    // BIG UPGRADE: Inisialisasi Bio Pages (Banyak Halaman) & Bio Links
+    let bioPages = await kv.get('bioPages');
+    if (!bioPages || bioPages.length === 0) {
+        await kv.set('bioPages', [{
+            id: 1, 
+            path: 'links', 
+            title: '<h2 style="color: #4ade80;">HMI KomKG-UMI</h2>', 
+            bio: 'Official Links Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI',
+            profileImage: '/img/logo-hmikomkgumi.png',
+            bgType: 'gradient',
+            bgValue: 'linear-gradient(135deg, #064e3b 0%, #111827 100%)'
+        }]);
+    }
     let bioLnk = await kv.get('bioLinks');
     if (!bioLnk) await kv.set('bioLinks', []);
 }
@@ -258,12 +258,14 @@ app.get('/:slug', async (req, res, next) => {
     
     try {
         // 1. Cek apakah slug adalah halaman Link in Bio
-        let bioSet = await kv.get('bioSettings');
-        if (!bioSet) bioSet = defaultBioSettings;
+        let bioPages = await kv.get('bioPages') || [];
+        const bioPage = bioPages.find(p => p.path.toLowerCase() === slug);
         
-        if (bioSet.path.toLowerCase() === slug) {
-            let bioLnk = await kv.get('bioLinks') || [];
-            return res.render('bio', { bioSettings: bioSet, bioLinks: bioLnk });
+        if (bioPage) {
+            let allBioLinks = await kv.get('bioLinks') || [];
+            // Filter link yang hanya milik bio page ini
+            let pageLinks = allBioLinks.filter(l => l.bioPageId == bioPage.id);
+            return res.render('bio', { bioPage, bioLinks: pageLinks });
         }
 
         // 2. Jika bukan bio, cek Shortlink biasa
@@ -315,14 +317,13 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
         const shortlinks = await kv.get('shortlinkList') || [];
         
         // Panggil Data Link in Bio
-        let bioSettings = await kv.get('bioSettings');
-        if (!bioSettings) bioSettings = defaultBioSettings;
+        let bioPages = await kv.get('bioPages') || [];
         let bioLinks = await kv.get('bioLinks') || [];
 
         res.render('admin-dashboard', { 
             page: 'admin', news, albums, pengurus, bidang, dataAnggota, 
             kohatiPengurus, kohatiBidang, shortlinks, siteSettings, socialMediaList,
-            bioSettings, bioLinks // Kirim data bio ke frontend dashboard
+            bioPages, bioLinks
         });
     } catch (err) { res.status(500).send("Database Error Dashboard."); }
 });
@@ -364,7 +365,7 @@ app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req
     res.redirect('/admin/dashboard');
 });
 
-// SETELAN HEADER
+// SETELAN HEADER & FOOTER & KOHATI
 app.post('/admin/setelan-header', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
@@ -373,15 +374,11 @@ app.post('/admin/setelan-header', requireAdmin, upload.any(), async (req, res) =
         siteSettings.headerTitle = req.body.headerTitle || siteSettings.headerTitle;
         siteSettings.headerHighlight = req.body.headerHighlight || siteSettings.headerHighlight;
         siteSettings.headerSubtitle = req.body.headerSubtitle || siteSettings.headerSubtitle;
-        
         const hLogo = fileHelper(req, 'headerLogo_b64'); if (hLogo) siteSettings.headerLogo = hLogo;
-        
-        await kv.set('siteSettings', siteSettings);
-        res.redirect('/admin/dashboard');
+        await kv.set('siteSettings', siteSettings); res.redirect('/admin/dashboard');
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
-// SETELAN FOOTER
 app.post('/admin/setelan-footer', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
@@ -389,21 +386,16 @@ app.post('/admin/setelan-footer', requireAdmin, upload.any(), async (req, res) =
         siteSettings.footerDesc = req.body.footerDesc || siteSettings.footerDesc;
         siteSettings.footerCopyright = req.body.footerCopyright || siteSettings.footerCopyright;
         siteSettings.footerProgrammer = req.body.footerProgrammer || siteSettings.footerProgrammer;
-        
         const fLogo = fileHelper(req, 'footerLogo_b64'); if (fLogo) siteSettings.footerLogo = fLogo;
-        
-        await kv.set('siteSettings', siteSettings);
-        res.redirect('/admin/dashboard');
+        await kv.set('siteSettings', siteSettings); res.redirect('/admin/dashboard');
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
-// SETELAN TOGGLE KOHATI
 app.post('/admin/setelan-kohati-toggle', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
         siteSettings.kohatiActive = req.body.kohatiActive ? 'true' : 'false';
-        await kv.set('siteSettings', siteSettings);
-        res.redirect('/admin/dashboard');
+        await kv.set('siteSettings', siteSettings); res.redirect('/admin/dashboard');
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
@@ -421,16 +413,14 @@ app.post('/admin/setelan-tentang', requireAdmin, upload.any(), async (req, res) 
             siteSettings.kohatiMisiText = req.body.kohatiMisiText;
             siteSettings.mapsEmbed = req.body.mapsEmbed !== undefined ? req.body.mapsEmbed : siteSettings.mapsEmbed;
 
-            const bPdf = fileHelper(req, 'bookletPdf_b64'); // Input Upload Manual
-            const pdfUrl = req.body.bookletPdfUrl; // Input Link GDrive (Aman)
+            const bPdf = fileHelper(req, 'bookletPdf_b64'); 
+            const pdfUrl = req.body.bookletPdfUrl; 
 
             if (bPdf && bPdf.length > 50) { 
                 try {
                     await kv.set('booklet_file_db', bPdf);
                     siteSettings.bookletPdf = '/api/booklet.pdf';
-                } catch (dbErr) {
-                    console.error("Gagal simpan PDF lokal:", dbErr.message);
-                }
+                } catch (dbErr) {}
             } else if (pdfUrl && pdfUrl.length > 5) { 
                 let finalUrl = pdfUrl;
                 if(pdfUrl.includes('drive.google.com/file/d/')) {
@@ -444,10 +434,7 @@ app.post('/admin/setelan-tentang', requireAdmin, upload.any(), async (req, res) 
         }
         await kv.set('siteSettings', siteSettings);
         res.redirect('/admin/dashboard');
-    } catch (err) { 
-        console.error(err);
-        res.redirect('/admin/dashboard'); 
-    }
+    } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
 app.post('/admin/setelan-announcement', requireAdmin, upload.any(), async (req, res) => {
@@ -457,8 +444,7 @@ app.post('/admin/setelan-announcement', requireAdmin, upload.any(), async (req, 
         siteSettings.announceTitle = req.body.announceTitle || siteSettings.announceTitle;
         siteSettings.announceContent = req.body.announceContent || siteSettings.announceContent;
         const img = fileHelper(req, 'announceImage_b64'); if (img) siteSettings.announceImage = img;
-        await kv.set('siteSettings', siteSettings);
-        res.redirect('/admin/dashboard');
+        await kv.set('siteSettings', siteSettings); res.redirect('/admin/dashboard');
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
@@ -480,40 +466,87 @@ app.post('/admin/tambah-sosmed', requireAdmin, upload.any(), async (req, res) =>
 });
 app.post('/admin/edit-sosmed/:id', requireAdmin, upload.any(), async (req, res) => {
     let list = await kv.get('socialMediaList') || []; let i = list.findIndex(l => l.id == req.params.id);
-    if(i !== -1) { 
-        list[i].name = req.body.name; list[i].url = req.body.url; 
-        const newIcon = fileHelper(req, 'icon_b64'); if (newIcon) list[i].icon = newIcon; 
-        await kv.set('socialMediaList', list); 
-    } 
-    res.redirect('/admin/dashboard');
+    if(i !== -1) { list[i].name = req.body.name; list[i].url = req.body.url; const newIcon = fileHelper(req, 'icon_b64'); if (newIcon) list[i].icon = newIcon; await kv.set('socialMediaList', list); } res.redirect('/admin/dashboard');
 });
 app.post('/admin/hapus-sosmed/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('socialMediaList') || []; await kv.set('socialMediaList', list.filter(l => l.id != req.params.id)); res.redirect('/admin/dashboard');
 });
 
 // ==============================================================
-// BIG UPGRADE: API PENGELOLAAN LINK IN BIO
+// BIG UPGRADE: API PENGELOLAAN LINK IN BIO (MULTIPLE PAGES)
 // ==============================================================
-app.post('/admin/setelan-bio', requireAdmin, upload.any(), async (req, res) => {
+app.post('/admin/tambah-bio-page', requireAdmin, upload.any(), async (req, res) => {
     try {
-        let bioSet = await kv.get('bioSettings') || defaultBioSettings;
-        bioSet.path = req.body.path.replace(/\s+/g, '-').toLowerCase() || bioSet.path;
-        bioSet.title = req.body.title || bioSet.title;
-        bioSet.bio = req.body.bio || bioSet.bio;
-        bioSet.bgGradient = req.body.bgGradient || bioSet.bgGradient;
+        let pages = await kv.get('bioPages') || [];
+        
+        let bgType = 'gradient';
+        let bgValue = req.body.bgGradient || 'linear-gradient(135deg, #000 0%, #333 100%)';
+        const bgImg = fileHelper(req, 'bgImage_b64');
+        if (bgImg) {
+            bgType = 'image';
+            bgValue = bgImg;
+        }
 
-        const pImg = fileHelper(req, 'profileImage_b64');
-        if (pImg) bioSet.profileImage = pImg;
-
-        await kv.set('bioSettings', bioSet);
+        pages.push({
+            id: Date.now(),
+            path: req.body.path.replace(/\s+/g, '-').toLowerCase(),
+            title: req.body.title, // HTML dari Quill
+            bio: req.body.bio,
+            profileImage: fileHelper(req, 'profileImage_b64') || '/img/logo-hmikomkgumi.png',
+            bgType: bgType,
+            bgValue: bgValue
+        });
+        await kv.set('bioPages', pages);
         res.redirect('/admin/dashboard');
     } catch (e) { res.redirect('/admin/dashboard'); }
 });
 
+app.post('/admin/edit-bio-page/:id', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let pages = await kv.get('bioPages') || [];
+        let i = pages.findIndex(p => p.id == req.params.id);
+        if (i !== -1) {
+            if (req.body.path) pages[i].path = req.body.path.replace(/\s+/g, '-').toLowerCase();
+            if (req.body.title) pages[i].title = req.body.title;
+            if (req.body.bio) pages[i].bio = req.body.bio;
+            
+            const pImg = fileHelper(req, 'profileImage_b64');
+            if (pImg) pages[i].profileImage = pImg;
+
+            const bgImg = fileHelper(req, 'bgImage_b64');
+            if (bgImg) {
+                pages[i].bgType = 'image';
+                pages[i].bgValue = bgImg;
+            } else if (req.body.bgGradient) {
+                pages[i].bgType = 'gradient';
+                pages[i].bgValue = req.body.bgGradient;
+            }
+            await kv.set('bioPages', pages);
+        }
+        res.redirect('/admin/dashboard');
+    } catch (e) { res.redirect('/admin/dashboard'); }
+});
+
+app.post('/admin/hapus-bio-page/:id', requireAdmin, async (req, res) => {
+    let pages = await kv.get('bioPages') || [];
+    let links = await kv.get('bioLinks') || [];
+    await kv.set('bioPages', pages.filter(p => p.id != req.params.id));
+    // Hapus juga semua link yang terkait dengan page ini
+    await kv.set('bioLinks', links.filter(l => l.bioPageId != req.params.id));
+    res.redirect('/admin/dashboard');
+});
+
+// KELOLA TOMBOL LINK BIO
 app.post('/admin/tambah-biolink', requireAdmin, upload.any(), async (req, res) => {
     try {
         let list = await kv.get('bioLinks') || [];
-        list.push({ id: Date.now(), title: req.body.title, url: req.body.url, icon: fileHelper(req, 'icon_b64') });
+        list.push({ 
+            id: Date.now(), 
+            bioPageId: req.body.bioPageId, // ID halaman induk
+            title: req.body.title, // HTML dari Quill
+            url: req.body.url, 
+            icon: fileHelper(req, 'icon_b64') 
+        });
         await kv.set('bioLinks', list);
         res.redirect('/admin/dashboard');
     } catch(e) { res.redirect('/admin/dashboard'); }
@@ -524,8 +557,9 @@ app.post('/admin/edit-biolink/:id', requireAdmin, upload.any(), async (req, res)
         let list = await kv.get('bioLinks') || [];
         let i = list.findIndex(l => l.id == req.params.id);
         if (i !== -1) {
-            list[i].title = req.body.title;
-            list[i].url = req.body.url;
+            if (req.body.title) list[i].title = req.body.title;
+            if (req.body.url) list[i].url = req.body.url;
+            if (req.body.bioPageId) list[i].bioPageId = req.body.bioPageId;
             const newIcon = fileHelper(req, 'icon_b64');
             if (newIcon) list[i].icon = newIcon;
             await kv.set('bioLinks', list);
@@ -539,6 +573,7 @@ app.post('/admin/hapus-biolink/:id', requireAdmin, async (req, res) => {
     await kv.set('bioLinks', list.filter(l => l.id != req.params.id));
     res.redirect('/admin/dashboard');
 });
+
 
 // --- API DINAMIS PENGURUS & BIDANG ---
 const manageTeam = async (req, res, dbKey, action) => {
