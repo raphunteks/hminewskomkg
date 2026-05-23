@@ -1,54 +1,8 @@
-
 <%- include('partials/header') %>
 
-<!-- POPUP PENGUMUMAN HORIZONTAL (DIEMBED LANGSUNG AGAR ANTI CRASH 500) -->
+<!-- POPUP PENGUMUMAN HORIZONTAL -->
 <% if (typeof siteSettings !== 'undefined' && (siteSettings.announceActive === 'true' || siteSettings.announceActive === true)) { %>
-<div class="modal-overlay announce-overlay" id="announceModal">
-    <div class="announce-horizontal">
-        
-        <button class="close-modal announce-close-btn" onclick="closeAnnounce()">
-            <i data-lucide="x"></i>
-        </button>
-
-        <% if (siteSettings.announceImage) { %>
-        <div class="announce-left">
-            <img src="<%= siteSettings.announceImage %>" alt="Announcement">
-        </div>
-        <% } %>
-
-        <div class="announce-right">
-            <h2 class="announce-title"><%= siteSettings.announceTitle %></h2>
-            <div class="announce-divider"></div>
-
-            <div class="rich-text-content announce-text">
-                <%- siteSettings.announceContent %>
-            </div>
-
-            <button class="btn announce-btn" onclick="readAnnounce()">Sudah Baca</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const titleKey = '<%= siteSettings.announceTitle.replace(/[^a-zA-Z0-9]/g, "_") %>';
-        const announceKey = 'announce_read_' + titleKey;
-        if (!localStorage.getItem(announceKey)) {
-            setTimeout(() => { document.getElementById('announceModal').classList.add('active'); }, 600);
-        }
-    });
-
-    function closeAnnounce() { 
-        document.getElementById('announceModal').classList.remove('active'); 
-    }
-
-    function readAnnounce() {
-        const titleKey = '<%= siteSettings.announceTitle.replace(/[^a-zA-Z0-9]/g, "_") %>';
-        const announceKey = 'announce_read_' + titleKey;
-        localStorage.setItem(announceKey, 'true');
-        closeAnnounce();
-    }
-</script>
+<%- include('partials/announce') %>
 <% } %>
 
 <div class="glass hero">
@@ -76,7 +30,9 @@
         <% news.forEach(item => { %>
         <a href="/berita/<%= item.id %>" class="glass news-card">
             <div class="card-img-wrap">
-                <img src="<%= item.image %>" alt="Cover Berita">
+                <!-- OPTIMASI 4: NATIVE LAZY LOADING & ASYNC DECODING -->
+                <!-- Mencegah gambar memblokir rendering dan hanya dimuat saat di-scroll -->
+                <img src="<%= item.image %>" alt="Cover Berita: <%= item.title %>" loading="lazy" decoding="async" width="400" height="200">
                 <div class="card-badge"><%= item.category %></div>
             </div>
             <div class="card-body">
@@ -99,7 +55,6 @@
     <% } %>
 </div>
 
-<!-- MENGINTEGRASIKAN INSTAGRAM FEED DI BERANDA BAWAH -->
 <%- include('partials/instagram-feed') %>
 
 <%- include('partials/footer') %>
