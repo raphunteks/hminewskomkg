@@ -6,10 +6,22 @@
     <title><%= siteSettings.webTitle %></title>
     <link rel="icon" type="image/png" href="<%= siteSettings.headerLogo %>">
     
+    <!-- OPTIMASI 1: PRECONNECT (Membangun koneksi awal ke server CDN untuk memangkas Latensi) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    
+    <!-- OPTIMASI 2: FONT ASYNC (Menggunakan swap agar teks langsung muncul sebelum font selesai diload) -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Memuat CSS Utama -->
     <link rel="stylesheet" href="/css/main.css">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <!-- OPTIMASI 3: DEFER SCRIPT (Pustaka Icon dimuat di latar belakang tanpa memblokir render HTML) -->
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    
+    <!-- CATATAN PERFORMA: Library Quill (Editor Teks) TELAH DIHAPUS dari header publik. 
+         Library tersebut sangat memberatkan PageSpeed dan kini HANYA dipanggil di dalam halaman admin-dashboard.ejs -->
 </head>
 <body>
     
@@ -18,13 +30,13 @@
 
     <nav class="glass-header">
         <div class="container navbar">
-            <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Buka Menu Mobile">
                 <i data-lucide="menu"></i>
             </button>
 
-            <a href="/" class="logo-area">
+            <a href="/" class="logo-area" aria-label="Ke Beranda">
                 <div class="logo-box">
-                    <img src="<%= siteSettings.headerLogo %>" alt="Logo" class="logo-img" style="width:100%; max-width:45px; object-fit:contain;">
+                    <img src="<%= siteSettings.headerLogo %>" alt="Logo" class="logo-img" width="45" height="45" style="width:100%; max-width:45px; object-fit:contain;">
                 </div>
                 <div class="logo-text">
                     <h1><%= siteSettings.headerTitle %><span class="text-primary"><%= siteSettings.headerHighlight %></span></h1>
@@ -40,7 +52,7 @@
             </ul>
             
             <div class="nav-actions">
-                <a href="/admin" class="btn-icon" title="Login Admin">
+                <a href="/admin" class="btn-icon" title="Login Admin" aria-label="Login Admin">
                     <i data-lucide="lock"></i>
                 </a>
             </div>
