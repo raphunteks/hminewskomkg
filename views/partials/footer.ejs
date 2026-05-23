@@ -1,4 +1,3 @@
-
 </div> <!-- Menutup div.container dari header -->
     </main> <!-- Menutup tag main dari header -->
     
@@ -9,7 +8,8 @@
                 <div style="grid-column: span 1;">
                     <div class="footer-logo-area">
                         <div class="logo-box" style="width:40px; height:40px;">
-                            <img src="<%= siteSettings.footerLogo %>" alt="Logo" class="logo-img" style="width:100%; max-width:40px; object-fit:contain;">
+                            <!-- Penambahan width dan height eksplisit untuk mencegah Layout Shift (CLS) -->
+                            <img src="<%= siteSettings.footerLogo %>" alt="Logo" class="logo-img" width="40" height="40" style="width:100%; max-width:40px; object-fit:contain;" loading="lazy">
                         </div>
                         <div class="logo-text">
                             <h2 style="font-size:1.1rem; margin:0;"><%= siteSettings.footerTitle %></h2>
@@ -31,10 +31,9 @@
                     <h3>Follow Kita!</h3>
                     <div class="social-links">
                         <% socialMediaList.forEach(soc => { %>
-                            <a href="<%= soc.url %>" target="_blank" class="social-btn" title="<%= soc.name %>">
-                                <!-- LOGIKA PINTAR: JIKA ADA GAMBAR PAKAI GAMBAR, JIKA TIDAK DETEKSI DARI NAMA -->
+                            <a href="<%= soc.url %>" target="_blank" class="social-btn" title="<%= soc.name %>" rel="noopener noreferrer">
                                 <% if(soc.icon && soc.icon.length > 0) { %>
-                                    <img src="<%= soc.icon %>" alt="<%= soc.name %>">
+                                    <img src="<%= soc.icon %>" alt="<%= soc.name %>" width="22" height="22" loading="lazy">
                                 <% } else { %>
                                     <% if (soc.name.toLowerCase().includes('instagram') || soc.name.toLowerCase().includes('ig')) { %>
                                         <i data-lucide="instagram"></i>
@@ -63,59 +62,20 @@
         </div>
     </footer>
 
-    <!-- POPUP PENGUMUMAN DIMASUKKAN DI SINI AGAR TIDAK TERTIMPA FOOTER -->
-    <% if (typeof page !== 'undefined' && page === 'beranda' && typeof siteSettings !== 'undefined' && (siteSettings.announceActive === 'true' || siteSettings.announceActive === true)) { %>
-    <div class="modal-overlay announce-overlay" id="announceModal" style="z-index: 9999999; padding: 20px;">
-        <div class="announce-horizontal">
-            
-            <button class="close-modal announce-close-btn" onclick="closeAnnounce()">
-                <i data-lucide="x" style="width: 18px; height: 18px;"></i>
-            </button>
-
-            <% if (siteSettings.announceImage) { %>
-            <div class="announce-left">
-                <img src="<%= siteSettings.announceImage %>" alt="Announcement">
-            </div>
-            <% } %>
-
-            <div class="announce-right">
-                <h2 class="announce-title"><%= siteSettings.announceTitle %></h2>
-                <div class="announce-divider"></div>
-
-                <div class="rich-text-content announce-text">
-                    <%- siteSettings.announceContent %>
-                </div>
-
-                <button class="btn announce-btn" onclick="readAnnounce()">Saya Sudah Membaca</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- OPTIMASI SCRIPT: Logika render Icon Lucide yang disesuaikan dengan atribut 'defer' di header -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const titleKey = '<%= siteSettings.announceTitle.replace(/[^a-zA-Z0-9]/g, "_") %>';
-            const announceKey = 'announce_read_' + titleKey;
-            if (!localStorage.getItem(announceKey)) {
-                setTimeout(() => { document.getElementById('announceModal').classList.add('active'); }, 600);
-            }
-        });
-
-        function closeAnnounce() { 
-            document.getElementById('announceModal').classList.remove('active'); 
-        }
-
-        function readAnnounce() {
-            const titleKey = '<%= siteSettings.announceTitle.replace(/[^a-zA-Z0-9]/g, "_") %>';
-            const announceKey = 'announce_read_' + titleKey;
-            localStorage.setItem(announceKey, 'true');
-            closeAnnounce();
-        }
-    </script>
-    <% } %>
-
-    <script>
+        // Gunakan requestAnimationFrame atau setTimeout untuk menjamin 
+        // eksekusi pembuatan icon dilakukan SETELAH semua aset utama selesai digambar oleh browser.
         document.addEventListener('DOMContentLoaded', function() {
-            if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+            const initIcons = () => {
+                if (typeof lucide !== 'undefined') { 
+                    lucide.createIcons(); 
+                } else {
+                    // Jika script defer sedikit telat, coba lagi dalam 100ms
+                    setTimeout(initIcons, 100);
+                }
+            };
+            initIcons();
         });
     </script>
 </body>
