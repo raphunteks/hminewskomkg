@@ -2,26 +2,31 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <!-- OPTIMASI 1: display=swap pada font untuk menghindari FOUT/FOIT -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= siteSettings.webTitle %></title>
+    <meta name="description" content="<%= siteSettings.heroTitle %>">
     <link rel="icon" type="image/png" href="<%= siteSettings.headerLogo %>">
     
-    <!-- OPTIMASI 1: PRECONNECT (Membangun koneksi awal ke server CDN untuk memangkas Latensi) -->
+    <!-- OPTIMASI 2: PRECONNECT CDN (Membangun jalur khusus ke server luar untuk memangkas Ping/Latensi) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com">
     
-    <!-- OPTIMASI 2: FONT ASYNC (Menggunakan swap agar teks langsung muncul sebelum font selesai diload) -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- OPTIMASI 3: ASYNC GOOGLE FONTS (Font dimuat di latar belakang agar teks langsung muncul) -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"></noscript>
     
-    <!-- Memuat CSS Utama -->
+    <!-- CSS UTAMA -->
+    <link rel="preload" as="style" href="/css/main.css">
     <link rel="stylesheet" href="/css/main.css">
 
-    <!-- OPTIMASI 3: DEFER SCRIPT (Pustaka Icon dimuat di latar belakang tanpa memblokir render HTML) -->
+    <!-- OPTIMASI 4: DEFER LUCIDE ICONS (Berjalan tanpa memblokir perenderan HTML) -->
     <script src="https://unpkg.com/lucide@latest" defer></script>
     
-    <!-- CATATAN PERFORMA: Library Quill (Editor Teks) TELAH DIHAPUS dari header publik. 
-         Library tersebut sangat memberatkan PageSpeed dan kini HANYA dipanggil di dalam halaman admin-dashboard.ejs -->
+    <!-- PENTING: PASTIKAN SCRIPT QUILL.JS & QUILL.CSS TELAH DIHAPUS DARI FILE HEADER INI! -->
+    <!-- (Library editor teks hanya dibutuhkan di admin-dashboard.ejs, jika ditaruh di sini akan menghancurkan skor PageSpeed pengunjung publik) -->
 </head>
 <body>
     
@@ -35,8 +40,9 @@
             </button>
 
             <a href="/" class="logo-area" aria-label="Ke Beranda">
-                <div class="logo-box">
-                    <img src="<%= siteSettings.headerLogo %>" alt="Logo" class="logo-img" width="45" height="45" style="width:100%; max-width:45px; object-fit:contain;">
+                <div class="logo-box" style="width:45px; height:45px;">
+                    <!-- OPTIMASI 5: Prioritas Fetch Tinggi pada Logo Utama -->
+                    <img src="<%= siteSettings.headerLogo %>" alt="Logo" class="logo-img" width="45" height="45" style="width:100%; max-width:45px; object-fit:contain;" fetchpriority="high">
                 </div>
                 <div class="logo-text">
                     <h1><%= siteSettings.headerTitle %><span class="text-primary"><%= siteSettings.headerHighlight %></span></h1>
@@ -45,10 +51,10 @@
             </a>
             
             <ul class="nav-links" id="nav-links">
-                <li><a href="/" class="nav-item <%= page === 'beranda' ? 'active' : '' %>"><i data-lucide="home"></i> Beranda</a></li>
-                <li><a href="/tentang" class="nav-item <%= page === 'tentang' ? 'active' : '' %>"><i data-lucide="info"></i> Tentang</a></li>
-                <li><a href="/galeri" class="nav-item <%= page === 'galeri' ? 'active' : '' %>"><i data-lucide="image"></i> Galeri</a></li>
-                <li><a href="/data-anggota" class="nav-item <%= page === 'data-anggota' ? 'active' : '' %>"><i data-lucide="users"></i> Data Anggota</a></li>
+                <li><a href="/" class="nav-item <%= typeof page !== 'undefined' && page === 'beranda' ? 'active' : '' %>"><i data-lucide="home"></i> Beranda</a></li>
+                <li><a href="/tentang" class="nav-item <%= typeof page !== 'undefined' && page === 'tentang' ? 'active' : '' %>"><i data-lucide="info"></i> Tentang</a></li>
+                <li><a href="/galeri" class="nav-item <%= typeof page !== 'undefined' && page === 'galeri' ? 'active' : '' %>"><i data-lucide="image"></i> Galeri</a></li>
+                <li><a href="/data-anggota" class="nav-item <%= typeof page !== 'undefined' && page === 'data-anggota' ? 'active' : '' %>"><i data-lucide="users"></i> Data Anggota</a></li>
             </ul>
             
             <div class="nav-actions">
