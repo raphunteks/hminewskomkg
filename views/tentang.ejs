@@ -10,24 +10,27 @@
 </div>
 
 <div id="tab-profil" class="tab-content active">
-    <div class="glass" style="padding: 40px; margin-bottom: 40px;">
+    <!-- UPGRADE DESAIN PROFIL: Menggunakan vm-card agar tampilan rapi, elegan, dan seragam -->
+    <div class="vm-card" style="max-width: 900px; margin: 0 auto 40px; border-left: none; padding: 40px;">
         <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size:1.8rem;">Profil</h2>
         
-        <!-- PENGGUNAAN WHITE-SPACE: PRE-LINE AGAR ENTER DARI TEXTAREA TERBACA OTOMATIS -->
-        <div class="rich-text-content" style="margin-bottom: 40px; font-size:1.05rem; line-height:1.7; white-space: pre-line;">
+        <div class="rich-text-content" style="margin-bottom: 40px; font-size:1.05rem; line-height:1.7; white-space: pre-line; color: #e5e7eb;">
             <%- siteSettings.profilText || '' %>
         </div>
 
         <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size:1.8rem;">Welcome</h2>
-        <div class="rich-text-content" style="font-size:1.05rem; line-height:1.7; white-space: pre-line;">
+        <div class="rich-text-content" style="font-size:1.05rem; line-height:1.7; white-space: pre-line; color: #e5e7eb;">
             <%- siteSettings.welcomeText || '' %>
         </div>
-        
-        <% if (siteSettings.bookletPdf || siteSettings.mapsEmbed) { %>
-            <div class="grid-2" style="margin-top: 50px; gap: 30px;">
+    </div>
+    
+    <% if (siteSettings.bookletPdf || siteSettings.mapsEmbed) { %>
+        <!-- Memisahkan Maps dan Flipbook ke container khusus agar Layout Utama Tidak Rusak -->
+        <div class="glass" style="padding: 40px; max-width: 900px; margin: 0 auto 40px;">
+            <div style="display:flex; flex-direction:column; gap: 40px;">
                 
                 <% if (siteSettings.bookletPdf && siteSettings.bookletPdf.length > 5) { %>
-                <div style="grid-column: 1 / -1; margin-bottom: 20px;">
+                <div style="width: 100%;">
                     <h3 style="margin-bottom: 20px; font-size:1.5rem; text-align:center; color:#4ade80;">Buku Pedoman / Profil</h3>
                     
                     <link href="https://cdn.jsdelivr.net/npm/dflip@2.2.23/css/dflip.min.css" rel="stylesheet" type="text/css">
@@ -55,7 +58,7 @@
                 <% } %>
                 
                 <% if (siteSettings.mapsEmbed) { %>
-                <div style="grid-column: 1 / -1; margin-top: 20px;">
+                <div style="width: 100%;">
                     <h3 style="margin-bottom: 15px; font-size:1.5rem; text-align:center; color:#4ade80;">Lokasi Sekretariat</h3>
                     <div class="ratio ratio-16x9 glass" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 5px;">
                         <div style="border-radius: 8px; overflow: hidden; height: 100%;">
@@ -66,8 +69,8 @@
                 <% } %>
                 
             </div>
-        <% } %>
-    </div>
+        </div>
+    <% } %>
     
     <%- include('partials/instagram-feed') %>
 
@@ -83,13 +86,13 @@
         <div class="vm-card">
             <div class="vm-icon">🚀</div>
             <h3 class="vm-title">Visi</h3>
-            <div class="rich-text-content" style="white-space: pre-line;"><%- siteSettings.visiText || '' %></div>
+            <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.visiText || '' %></div>
         </div>
 
         <div class="vm-card">
             <div class="vm-icon">📈</div>
             <h3 class="vm-title">Misi</h3>
-            <div class="rich-text-content" style="white-space: pre-line;"><%- siteSettings.misiText || '' %></div>
+            <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.misiText || '' %></div>
         </div>
     </div>
 </div>
@@ -138,32 +141,36 @@
 
 <% if (String(siteSettings.kohatiActive) === 'true') { %>
 <div id="tab-kohati" class="tab-content">
-    <div class="glass" style="padding: 40px; border-top: 5px solid #f472b6;">
-        
-        <div style="margin-bottom: 50px;">
-            <h2 style="color: #f472b6; margin-bottom: 20px; border-bottom: 1px solid rgba(244,114,182,0.3); padding-bottom: 10px; display: inline-block;"><i data-lucide="heart"></i> Profil KOHATI</h2>
-            <div class="rich-text-content" style="font-size:1.05rem; line-height:1.7; white-space: pre-line;">
+    <div style="margin-bottom: 40px;">
+        <!-- UPGRADE DESAIN KOHATI PROFIL -->
+        <div class="vm-card" style="max-width: 900px; margin: 0 auto 50px; border-left: none; background: rgba(244,114,182,0.05); border: 1px solid rgba(244,114,182,0.2); padding: 40px;">
+            <h2 style="color: #f472b6; margin-bottom: 20px; border-bottom: 1px solid rgba(244,114,182,0.3); padding-bottom: 10px; display: inline-block;">
+                <i data-lucide="heart" style="vertical-align: text-bottom;"></i> Profil KOHATI
+            </h2>
+            <div class="rich-text-content" style="font-size:1.05rem; line-height:1.7; white-space: pre-line; color: #e5e7eb;">
                 <%- siteSettings.kohatiProfilText || '' %>
             </div>
         </div>
 
-        <div style="margin-bottom: 50px;">
-            <h2 style="color: #f472b6; margin-bottom: 20px; border-bottom: 1px solid rgba(244,114,182,0.3); padding-bottom: 10px; display: inline-block; width:100%;"><i data-lucide="target"></i> Visi & Misi KOHATI</h2>
+        <div style="margin-bottom: 50px; max-width: 900px; margin-left: auto; margin-right: auto;">
+            <h2 style="color: #f472b6; margin-bottom: 20px; border-bottom: 1px solid rgba(244,114,182,0.3); padding-bottom: 10px; display: inline-block; width:100%;">
+                <i data-lucide="target" style="vertical-align: text-bottom;"></i> Visi & Misi KOHATI
+            </h2>
             
             <div class="vm-card" style="border-left-color: #f472b6; background: rgba(244,114,182,0.1);">
                 <div class="vm-icon" style="color: #f472b6;">🚀</div>
                 <h3 class="vm-title" style="color: #f472b6;">Visi KOHATI</h3>
-                <div class="rich-text-content" style="white-space: pre-line;"><%- siteSettings.kohatiVisiText || '' %></div>
+                <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.kohatiVisiText || '' %></div>
             </div>
 
             <div class="vm-card" style="border-left-color: #f472b6; background: rgba(244,114,182,0.1);">
                 <div class="vm-icon" style="color: #f472b6;">📈</div>
                 <h3 class="vm-title" style="color: #f472b6;">Misi KOHATI</h3>
-                <div class="rich-text-content" style="white-space: pre-line;"><%- siteSettings.kohatiMisiText || '' %></div>
+                <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.kohatiMisiText || '' %></div>
             </div>
         </div>
 
-        <div style="text-align: center;">
+        <div class="glass" style="padding: 40px; text-align: center; border-top: 5px solid #f472b6;">
             <h2 style="color: #f472b6; margin-bottom: 10px;"><i data-lucide="users"></i> Struktur Kepengurusan KOHATI</h2>
             <p class="text-muted" style="margin-bottom: 40px;">Pengurus Harian</p>
             
