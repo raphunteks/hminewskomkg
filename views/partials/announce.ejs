@@ -17,7 +17,8 @@
             <h2 style="color: #fff; margin-bottom: 10px; font-size: 2rem; font-weight: 800; line-height: 1.2;"><%= siteSettings.announceTitle %></h2>
             <div style="width: 40px; height: 4px; background: #4ade80; margin-bottom: 20px; border-radius: 2px;"></div>
 
-            <div class="rich-text-content announce-text" style="color: #d1d5db; margin-bottom: 30px; line-height: 1.6; font-size: 0.95rem; border-left: 3px solid rgba(74, 222, 128, 0.4); padding-left: 15px;">
+            <!-- DITAMBAHKAN WHITE-SPACE: PRE-LINE AGAR FORMAT ENTER DARI ADMIN TERBACA OTOMATIS -->
+            <div class="rich-text-content announce-text" style="color: #d1d5db; margin-bottom: 30px; line-height: 1.6; font-size: 0.95rem; border-left: 3px solid rgba(74, 222, 128, 0.4); padding-left: 15px; white-space: pre-line;">
                 <%- siteSettings.announceContent %>
             </div>
 
