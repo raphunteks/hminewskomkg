@@ -207,6 +207,9 @@
     </div>
 </div>
 
+<!-- ==============================================================
+     TAB 2: SETELAN WEB (DENGAN SMART TEXT CLEANER)
+============================================================== -->
 <div id="adm-setelan" class="admin-tab-pane">
     <div class="grid-2">
         <div style="display:flex; flex-direction:column; gap:30px;">
@@ -264,30 +267,48 @@
 
         <div class="glass admin-panel" style="margin-bottom:0; align-self:start;">
             <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="file-text"></i> Halaman Tentang Kami</h3>
+            
+            <% 
+            // FUNGSI AUTO-HEAL: Membersihkan tag HTML (Sisa dari Quill) menjadi teks rapi.
+            function cleanText(str) {
+                if(!str) return '';
+                let s = String(str);
+                s = s.replace(/<p[^>]*>/gi, '');
+                s = s.replace(/<\/p>/gi, '\n\n');
+                s = s.replace(/<li[^>]*>/gi, '• ');
+                s = s.replace(/<\/li>/gi, '\n');
+                s = s.replace(/<br\s*[\/]?>/gi, '\n');
+                s = s.replace(/<[^>]+>/g, ''); 
+                s = s.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&');
+                return s.replace(/\n\s*\n\s*\n/g, '\n\n').trim();
+            }
+            %>
+
             <form action="/admin/setelan-tentang" method="POST" enctype="multipart/form-data">
                 
                 <h4 style="color:#4ade80; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Bagian Profil Umum</h4>
                 <div class="form-group">
                     <label>Teks Profil (Bagian Atas)</label>
-                    <textarea name="profilText" class="input-control" rows="5" placeholder="Ketik profil di sini..."><%= siteSettings.profilText %></textarea>
+                    <textarea name="profilText" class="input-control" rows="5" placeholder="Ketik profil di sini..."><%= cleanText(siteSettings.profilText) %></textarea>
                 </div>
                 <div class="form-group">
                     <label>Teks Welcome (Sambutan)</label>
-                    <textarea name="welcomeText" class="input-control" rows="5" placeholder="Ketik sambutan di sini..."><%= siteSettings.welcomeText %></textarea>
+                    <textarea name="welcomeText" class="input-control" rows="5" placeholder="Ketik sambutan di sini..."><%= cleanText(siteSettings.welcomeText) %></textarea>
                 </div>
                 
                 <h4 style="color:#4ade80; margin-top:30px; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Bagian Visi & Misi Umum</h4>
                 <div class="form-group">
                     <label>Teks Visi Umum</label>
-                    <textarea name="visiText" class="input-control" rows="4" placeholder="Ketik visi di sini..."><%= siteSettings.visiText %></textarea>
+                    <textarea name="visiText" class="input-control" rows="4" placeholder="Ketik visi di sini..."><%= cleanText(siteSettings.visiText) %></textarea>
                 </div>
                 <div class="form-group">
                     <label>Teks Misi Umum</label>
-                    <textarea name="misiText" class="input-control" rows="5" placeholder="Ketik misi di sini..."><%= siteSettings.misiText %></textarea>
+                    <textarea name="misiText" class="input-control" rows="5" placeholder="Ketik misi di sini..."><%= cleanText(siteSettings.misiText) %></textarea>
                 </div>
                 
                 <div class="form-group" style="margin-top:30px;">
                     <label>Embed Code Google Maps (Iframe)</label>
+                    <!-- Jangan di cleanText karena ini membutuhkan tag iframe HTML -->
                     <textarea name="mapsEmbed" class="input-control" rows="3"><%= siteSettings.mapsEmbed %></textarea>
                 </div>
                 
@@ -306,13 +327,13 @@
                     <h4 style="color:#f472b6; margin-bottom:15px;"><i data-lucide="heart" style="width:16px;"></i> Konten Halaman Kohati</h4>
                     
                     <label style="margin-top:15px;">Teks Profil KOHATI</label>
-                    <textarea name="kohatiProfilText" class="input-control" rows="4" placeholder="Ketik profil kohati di sini..."><%= siteSettings.kohatiProfilText %></textarea>
+                    <textarea name="kohatiProfilText" class="input-control" rows="4" placeholder="Ketik profil kohati di sini..."><%= cleanText(siteSettings.kohatiProfilText) %></textarea>
                     
                     <label style="margin-top:15px;">Teks Visi KOHATI</label>
-                    <textarea name="kohatiVisiText" class="input-control" rows="3" placeholder="Ketik visi kohati di sini..."><%= siteSettings.kohatiVisiText %></textarea>
+                    <textarea name="kohatiVisiText" class="input-control" rows="3" placeholder="Ketik visi kohati di sini..."><%= cleanText(siteSettings.kohatiVisiText) %></textarea>
                     
                     <label style="margin-top:15px;">Teks Misi KOHATI</label>
-                    <textarea name="kohatiMisiText" class="input-control" rows="5" placeholder="Ketik misi kohati di sini..."><%= siteSettings.kohatiMisiText %></textarea>
+                    <textarea name="kohatiMisiText" class="input-control" rows="5" placeholder="Ketik misi kohati di sini..."><%= cleanText(siteSettings.kohatiMisiText) %></textarea>
                 </div>
                 
                 <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:20px;">Simpan Halaman Tentang & PDF</button>
@@ -444,7 +465,8 @@
             
             <div class="form-group">
                 <label>Isi Teks Pengumuman</label>
-                <textarea name="announceContent" class="input-control" rows="6" placeholder="Ketik pengumuman di sini..."><%= siteSettings.announceContent %></textarea>
+                <!-- Textarea pintar yang otomatis bersih tanpa tag HTML -->
+                <textarea name="announceContent" class="input-control" rows="6" placeholder="Ketik pengumuman di sini..."><%= cleanText(siteSettings.announceContent) %></textarea>
             </div>
             
             <button type="submit" class="btn btn-primary submit-btn" style="width:100%;">Simpan Setelan Pengumuman</button>
