@@ -452,6 +452,9 @@
     </div>
 </div>
 
+<!-- ==============================================================
+     FIXED DATA INJECTION
+============================================================== -->
 <script id="albumsDataJson" type="application/json"><%- typeof albums !== 'undefined' ? JSON.stringify(albums).replace(/</g, '\\u003c') : '[]' %></script>
 <script id="newsDataJson" type="application/json"><%- typeof news !== 'undefined' ? JSON.stringify(news).replace(/</g, '\\u003c') : '[]' %></script>
 <script>
@@ -460,9 +463,17 @@
     try {
         const rawAlbums = document.getElementById('albumsDataJson').textContent;
         const rawNews = document.getElementById('newsDataJson').textContent;
-        if (rawAlbums && !rawAlbums.includes('<%-')) albumsData = JSON.parse(rawAlbums);
-        if (rawNews && !rawNews.includes('<%-')) newsData = JSON.parse(rawNews);
-    } catch(e) {}
+        
+        // Pengecekan Aman: Pastikan string tidak kosong dan bukan tag EJS mentah
+        if (rawAlbums && rawAlbums.trim() !== '' && !rawAlbums.includes('<' + '%')) {
+            albumsData = JSON.parse(rawAlbums);
+        }
+        if (rawNews && rawNews.trim() !== '' && !rawNews.includes('<' + '%')) {
+            newsData = JSON.parse(rawNews);
+        }
+    } catch(e) {
+        console.warn('Parsing EJS data failed:', e);
+    }
 </script>
 
 <div class="modal-overlay" id="modalTambahBioPage">
