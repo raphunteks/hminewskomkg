@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
 
 /* RESET, BASE & PERFORMANCE OPTIMIZATIONS */
@@ -270,7 +271,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ==============================================================
-   ANNOUNCEMENT POP-UP (FULL UPGRADE: ELEGAN, COMPACT, & RESPONSIVE)
+   ANNOUNCEMENT POP-UP (FULL UPGRADE: COMPACT & ELEGANT FIX)
 ============================================================== */
 .announce-overlay {
     z-index: 9999999;
@@ -287,11 +288,19 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     overscroll-behavior: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-/* Glassmorphism khusus Announce agar blend dengan warna hijau utama */
+.announce-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Glassmorphism khusus Announce agar warnanya tidak bentrok */
 .glass-announce {
-    background: rgba(6, 78, 59, 0.85); /* Hijau tua transparan */
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.95) 0%, rgba(17, 24, 39, 0.95) 100%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(74, 222, 128, 0.25);
@@ -301,12 +310,18 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .announce-wrapper {
     display: flex; 
     flex-direction: row;
-    max-width: 750px; /* Ukuran Compact untuk Desktop (Tidak lagi kebesaran) */
+    max-width: 800px; /* Ukuran Compact untuk Desktop */
     width: 100%; 
     max-height: 80vh; 
-    border-radius: 20px; /* Lengkungan yang lebih smooth */
+    border-radius: 20px; 
     overflow: hidden; 
     position: relative;
+    transform: translateY(30px) scale(0.95);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.announce-overlay.active .announce-wrapper {
+    transform: translateY(0) scale(1);
 }
 
 .announce-close {
@@ -330,24 +345,25 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     transform: scale(1.1); 
     border-color: transparent;
 }
-.announce-close svg { width: 18px; height: 18px; }
+.announce-close svg { width: 18px; height: 18px; display: block; }
 
 .announce-left {
     flex: 0 0 45%; 
-    background: rgba(0,0,0,0.2); /* Gelap sedikit agar poster menonjol */
+    background: rgba(0,0,0,0.25); /* Gelap sedikit agar poster menonjol */
     display: flex; 
     align-items: center; 
     justify-content: center; 
     padding: 30px;
+    position: relative;
 }
 
 .announce-left img {
     width: 100%; 
     height: auto;
     max-height: 100%; 
-    object-fit: contain; /* Mengunci agar gambar tidak pernah terpotong (meluber) */
+    object-fit: contain; /* Mengunci agar gambar tidak pernah terpotong/meluber */
     border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .announce-right {
@@ -362,7 +378,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .announce-title { 
     color: #fff; 
     margin-bottom: 15px; 
-    font-size: clamp(1.4rem, 4vw, 2rem); /* Auto scaling font */
+    font-size: clamp(1.4rem, 4vw, 2rem); /* Auto scaling font menyesuaikan layar */
     font-weight: 800; 
     line-height: 1.3; 
     margin-top: 0;
@@ -372,7 +388,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 }
 
 .announce-divider { 
-    width: 40px; 
+    width: 50px; 
     height: 4px; 
     background: #4ade80; 
     margin-bottom: 25px; 
@@ -384,7 +400,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     color: #d1d5db; 
     margin-bottom: 30px; 
     line-height: 1.7; 
-    font-size: 0.95rem; 
+    font-size: 1rem; 
     border-left: 3px solid rgba(74, 222, 128, 0.4); 
     padding-left: 15px; 
     white-space: pre-line;
@@ -400,7 +416,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     border: 1px solid #4ade80;
     color: #4ade80;
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.3s ease;
     margin-top: auto; 
 }
 .announce-btn:hover { 
@@ -575,35 +591,38 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     .panel-header { flex-direction: column; gap: 15px; text-align: center; }
     .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
     
-    /* FIX ANNOUNCEMENT MOBILE: UI PROPORSIONAL */
+    /* FIX ANNOUNCEMENT MOBILE: UI LEBIH COMPACT DAN PROPORSIONAL */
     .announce-wrapper { 
         flex-direction: column !important; 
         max-height: 85vh; 
-        max-width: 100%; 
+        width: 100%; 
     }
     
     .announce-left { 
         flex: none;
         width: 100%;
-        max-width: 100% !important; 
-        height: 35vh; /* Fix tinggi agar proporsional dan tidak mencuat keluar */
+        height: auto; 
+        max-height: 40vh; /* Kunci ukuran gambar maksimal */
         min-height: 200px;
         padding: 20px; 
         padding-top: 50px; /* Menyediakan ruang untuk tombol close (X) */
         border-bottom: 1px solid rgba(255,255,255,0.1); 
+        border-right: none;
     }
     
     .announce-left img { 
-        max-height: 100%; 
+        max-height: 30vh; /* Memaksa agar gambar tidak pernah mencuat/meluap */
         width: auto; 
         max-width: 100%; 
     }
     
     .announce-right { 
         padding: 25px !important; 
+        overflow-y: auto;
     }
     
     .announce-title { 
+        font-size: 1.4rem;
         padding-right: 0; /* Di mobile tombol X ada di area gambar, tidak tabrakan dgn teks */
     }
 }
