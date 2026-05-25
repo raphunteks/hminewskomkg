@@ -1,93 +1,27 @@
+
 <% if (typeof siteSettings !== 'undefined' && (siteSettings.announceActive === 'true' || siteSettings.announceActive === true)) { %>
-<style>
-    /* CSS Isolasi Khusus untuk Memperbaiki UI Announcement Desktop & Mobile */
-    .announce-horizontal-fix {
-        display: flex; 
-        flex-direction: row;
-        max-width: 900px; /* Dibuat sedikit lebih lebar agar proporsional */
-        width: 100%; 
-        max-height: 85vh; 
-        background: #093824; 
-        border-radius: 16px; 
-        overflow: hidden; 
-        position: relative; 
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); 
-        border: 1px solid rgba(74,222,128,0.2);
-    }
-
-    .announce-left-fix {
-        flex: 1; 
-        max-width: 45%; 
-        background: rgba(0,0,0,0.15); /* Memberikan latar belakang sedikit gelap untuk menonjolkan poster */
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        padding: 30px;
-    }
-
-    .announce-left-fix img {
-        width: 100%; 
-        max-height: 100%; 
-        object-fit: contain; 
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3); /* Memberi efek kedalaman/melayang yang rapi pada poster */
-    }
-
-    .announce-right-fix {
-        flex: 1; 
-        padding: 40px 35px; 
-        display: flex; 
-        flex-direction: column; 
-        justify-content: flex-start; /* FIX: Diubah ke flex-start agar Judul TIDAK TERTELAN ke atas saat teks panjang */
-        overflow-y: auto; 
-    }
-
-    /* Penyesuaian Sempurna untuk Tampilan Layar HP (Mobile) */
-    @media (max-width: 768px) {
-        .announce-horizontal-fix {
-            flex-direction: column;
-            max-height: 90vh; 
-        }
-        .announce-left-fix {
-            max-width: 100%;
-            height: 35vh; 
-            min-height: 220px;
-            padding: 20px;
-            padding-top: 45px; /* Memberi ruang aman untuk tombol silang (X) */
-        }
-        .announce-right-fix {
-            padding: 25px;
-        }
-    }
-</style>
-
-<div class="modal-overlay announce-overlay" id="announceModal" style="z-index: 10000; padding: 20px;">
-    <div class="announce-horizontal-fix">
+<div class="modal-overlay announce-overlay" id="announceModal">
+    <div class="announce-wrapper glass-announce">
         
-        <button class="close-modal" style="position:absolute; top: 15px; right: 15px; z-index: 10; background:rgba(0,0,0,0.5); border-radius:50%; padding:8px; color:#fff; border: 1px solid rgba(255,255,255,0.2); cursor:pointer; transition:0.3s;" onmouseover="this.style.background='rgba(239,68,68,0.9)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'" onclick="closeAnnounce()">
-            <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        <button class="announce-close" onclick="closeAnnounce()" aria-label="Tutup">
+            <i data-lucide="x"></i>
         </button>
 
         <% if (siteSettings.announceImage) { %>
-        <div class="announce-left-fix">
-            <img src="<%= siteSettings.announceImage %>" alt="Announcement">
+        <div class="announce-left">
+            <img src="<%= siteSettings.announceImage %>" alt="Announcement Poster">
         </div>
         <% } %>
 
-        <div class="announce-right-fix">
+        <div class="announce-right">
+            <h2 class="announce-title"><%= siteSettings.announceTitle %></h2>
+            <div class="announce-divider"></div>
             
-            <h2 style="color: #fff; margin-bottom: 15px; font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 800; line-height: 1.3; word-wrap: break-word; overflow-wrap: break-word; margin-top: 0;">
-                <%= siteSettings.announceTitle %>
-            </h2>
-            
-            <div style="width: 40px; height: 4px; background: #4ade80; margin-bottom: 25px; border-radius: 2px; flex-shrink: 0;"></div>
-
-            <div class="rich-text-content announce-text" style="color: #d1d5db; margin-bottom: 30px; line-height: 1.7; font-size: 0.95rem; border-left: 3px solid rgba(74, 222, 128, 0.4); padding-left: 15px; white-space: pre-line;">
+            <div class="rich-text-content announce-text">
                 <%- siteSettings.announceContent %>
             </div>
 
-            <!-- FIX: margin-top: auto; untuk memastikan tombol tutup selalu berada di bagian bawah teks -->
-            <button class="btn" style="align-self: flex-start; padding: 10px 24px; font-size: 0.95rem; border-radius: 8px; font-weight: bold; background: transparent; border: 1px solid #4ade80; color: #4ade80; cursor:pointer; transition: 0.3s; margin-top: auto;" onmouseover="this.style.background='#4ade80'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='#4ade80';" onclick="readAnnounce()">Tutup Pengumuman</button>
+            <button class="btn announce-btn" onclick="readAnnounce()">Tutup Pengumuman</button>
         </div>
     </div>
 </div>
@@ -99,6 +33,7 @@
         if (!localStorage.getItem(announceKey)) {
             setTimeout(() => { document.getElementById('announceModal').classList.add('active'); }, 600);
         }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 
     function closeAnnounce() { 
