@@ -31,7 +31,6 @@
         <a href="/berita/<%= item.id %>" class="glass news-card">
             <div class="card-img-wrap">
                 <!-- OPTIMASI 4: NATIVE LAZY LOADING & ASYNC DECODING -->
-                <!-- Mencegah gambar memblokir rendering dan hanya dimuat saat di-scroll -->
                 <img src="<%= item.image %>" alt="Cover Berita: <%= item.title %>" loading="lazy" decoding="async" width="400" height="200">
                 <div class="card-badge"><%= item.category %></div>
             </div>
