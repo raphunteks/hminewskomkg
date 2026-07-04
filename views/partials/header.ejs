@@ -10,15 +10,15 @@
     <!-- Dinamis Title (Mendukung SEO per-halaman atau default Admin) -->
     <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' - ' + siteSettings.webTitle : siteSettings.webTitle %></title>
     
-    <!-- Terhubung ke Setelan SEO Description di Admin Dashboard -->
-    <meta name="description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : (siteSettings.seoDescription || siteSettings.heroTitle) %>">
+    <!-- Terhubung ke Setelan SEO Description di Admin Dashboard dengan Fallback Teks Custom -->
+    <meta name="description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : (siteSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI') %>">
     <link rel="icon" type="image/png" href="<%= siteSettings.headerLogo %>">
 
     <!-- Meta Dasar & Aturan Crawling Googlebot -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     
-    <!-- Terhubung ke Setelan SEO Keywords di Admin Dashboard -->
-    <meta name="keywords" content="<%= typeof pageKeywords !== 'undefined' ? pageKeywords : (siteSettings.seoKeywords || 'HMI, Komisariat Kedokteran Gigi, UMI, Himpunan Mahasiswa Islam, Makassar, Kedokteran Gigi UMI, Organisasi Mahasiswa, ' + siteSettings.webTitle) %>">
+    <!-- Terhubung ke Setelan SEO Keywords di Admin Dashboard dengan Fallback Teks Custom -->
+    <meta name="keywords" content="<%= typeof pageKeywords !== 'undefined' ? pageKeywords : (siteSettings.seoKeywords || 'hmi komkg umi, hmikomkgumi, hmi, hmi kom kg umi, hmicabmakassar, yakusa') %>">
     <meta name="author" content="<%= siteSettings.headerTitle || 'HMI KomKG UMI' %>">
     <link rel="canonical" href="<%= typeof currentUrl !== 'undefined' ? currentUrl : 'https://hmikomkgumi.xyz' %>" />
     <meta name="theme-color" content="#064e3b">
@@ -27,7 +27,7 @@
     <meta property="og:locale" content="id_ID">
     <meta property="og:type" content="<%= typeof pageType !== 'undefined' ? pageType : 'website' %>">
     <meta property="og:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle : siteSettings.webTitle %>">
-    <meta property="og:description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : (siteSettings.seoDescription || siteSettings.heroTitle) %>">
+    <meta property="og:description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : (siteSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI') %>">
     <meta property="og:url" content="<%= typeof currentUrl !== 'undefined' ? currentUrl : 'https://hmikomkgumi.xyz' %>">
     <meta property="og:site_name" content="<%= siteSettings.webTitle %>">
     
@@ -40,7 +40,7 @@
     <!-- Twitter Cards (SEO Twitter/X) -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle : siteSettings.webTitle %>">
-    <meta name="twitter:description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : (siteSettings.seoDescription || siteSettings.heroTitle) %>">
+    <meta name="twitter:description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : (siteSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI') %>">
     <meta name="twitter:image" content="<%= typeof pageImage !== 'undefined' ? pageImage : (siteSettings.seoImage || siteSettings.headerLogo) %>">
 
     <!-- Structured Data (JSON-LD) untuk Google Rich Snippets -->
@@ -51,7 +51,7 @@
       "name": "<%= siteSettings.webTitle %>",
       "url": "https://hmikomkgumi.xyz",
       "logo": "<%= siteSettings.headerLogo %>",
-      "description": "<%= siteSettings.seoDescription || siteSettings.heroTitle %>"
+      "description": "<%= siteSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI' %>"
     }
     </script>
     <!-- ==============================================================
