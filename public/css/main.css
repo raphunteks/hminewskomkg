@@ -95,8 +95,8 @@ h1, h2, h3, h4, h5 { color: #fff; margin-bottom: 0.5rem; line-height: 1.3; }
     backdrop-filter: blur(16px); 
     -webkit-backdrop-filter: blur(16px); 
     border: 1px solid rgba(255, 255, 255, 0.08); 
-    border-top: 1px solid rgba(255, 255, 255, 0.2); 
-    border-left: 1px solid rgba(255, 255, 255, 0.15); 
+    border-top: 1px solid rgba(255, 255, 255, 0.2); /* Shimmer effect at top */
+    border-left: 1px solid rgba(255, 255, 255, 0.15); /* Shimmer effect at left */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); 
     border-radius: 1.5rem; 
     transform: translateZ(0); 
@@ -223,7 +223,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .rich-text-content h1, .rich-text-content h2, .rich-text-content h3 { color: #fff; margin-top: 25px; margin-bottom: 15px; font-weight: bold; }
 .rich-text-content ul { list-style-type: disc; padding-left: 20px; margin-bottom: 15px; }
 .rich-text-content ol { list-style-type: decimal; padding-left: 20px; margin-bottom: 15px; }
-.rich-text-content a { color: #4ade80; text-decoration: underline; word-break: break-all; }
+.rich-text-content a { color: #4ade80; text-decoration: underline; }
 .rich-text-content a:hover { color: #22c55e; }
 .rich-text-content blockquote { border-left: 4px solid #22c55e; padding-left: 15px; margin-left: 0; font-style: italic; color: #9ca3af; background: rgba(255,255,255,0.05); padding:10px 15px; border-radius: 0 8px 8px 0; }
 
@@ -270,40 +270,11 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .vm-card .rich-text-content ol li::before { content: counter(misi-counter) "."; position: absolute; left: 0; color: #4ade80; font-weight: 800; font-size: 1.1rem; }
 .vm-card[style*="#f472b6"] .rich-text-content ol li::before { color: #f472b6 !important; }
 
-/* ==============================================================
-   UPGRADE FIX 1: PURE CSS 3D PDF VIEWER RESPONSIVE
-============================================================== */
-.css3d-pdf-wrapper { 
-    width: 100%; 
-    height: 70vh; /* Menggunakan rasio viewport agar fleksibel dan tidak terpotong */
-    min-height: 400px;
-    max-height: 800px;
-    position: relative; 
-    perspective: 1200px; 
-    margin: 20px auto; 
-    z-index: 10; 
-}
-.css3d-pdf-frame { 
-    width: 100%; 
-    height: 100%; 
-    background: #e5e7eb; 
-    border-radius: 12px; 
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 15px 0 30px rgba(0,0,0,0.1); 
-    overflow: hidden; 
-    position: relative; 
-    border: 1px solid rgba(255,255,255,0.2); 
-    border-left: 15px solid #22c55e; 
-    transform: rotateX(2deg) rotateY(-2deg); 
-    transition: transform 0.4s ease, box-shadow 0.4s ease; 
-}
+/* UPGRADE 3: PURE CSS 3D PDF VIEWER */
+.css3d-pdf-wrapper { width: 100%; height: 550px; position: relative; perspective: 1200px; margin: 20px auto; z-index: 10; }
+.css3d-pdf-frame { width: 100%; height: 100%; background: #e5e7eb; border-radius: 12px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 15px 0 30px rgba(0,0,0,0.1); overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.2); border-left: 15px solid #22c55e; transform: rotateX(2deg) rotateY(-2deg); transition: transform 0.4s ease, box-shadow 0.4s ease; }
 .css3d-pdf-frame:hover { transform: rotateX(0) rotateY(0) scale(1.01); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), inset 10px 0 20px rgba(0,0,0,0.1); }
-.native-pdf-viewer { 
-    width: 100%; 
-    height: 100%; 
-    border: none; 
-    background: #ffffff; /* Paksa putih untuk menimpa plugin default hitam browser */
-    display: block; 
-}
+.native-pdf-viewer { width: 100%; height: 100%; border: none; background: transparent; }
 
 /* INSTAGRAM FEED WIDGET SUPPORT */
 .instagram-feed-section { width: 100% !important; max-width: 100% !important; overflow: hidden !important; border-radius: 1.5rem; box-sizing: border-box; content-visibility: auto; contain-intrinsic-size: 0 400px; }
@@ -467,7 +438,6 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 
 /* MODALS */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); z-index: 999999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; padding: 20px; overscroll-behavior: none; }
-.modal-overlay.active { opacity: 1; visibility: visible; }
 .modal-content { background: #111827; border: 1px solid rgba(255,255,255,0.2); border-radius: 1.5rem; width: 100%; max-width: 600px; padding: 30px; transform: translateY(20px); transition: transform 0.3s ease; max-height: 90vh; overflow-y: auto; box-shadow: 0 15px 40px rgba(0,0,0,0.4); position: relative; will-change: transform; }
 .modal-overlay.active .modal-content { transform: translateY(0); }
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
@@ -478,20 +448,116 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .modal-actions { display: flex; gap: 15px; margin-top: 25px; }
 .modal-actions .btn { flex: 1; }
 
-/* ==============================================================
-   UI UPGRADE FIX 2: MENCEGAH PENUMPUKAN FOOTER & RESPONSIVE GRID
-============================================================== */
-.footer-logo-area { display: flex; align-items: center; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; }
-.footer-logo-area .logo-text { flex: 1; min-width: 200px; }
-/* Clamp font-size menjamin teks h2 di footer mengecil proporsional tanpa terpotong radikal */
-.footer-logo-area .logo-text h2 { font-size: clamp(1.2rem, 3vw, 1.6rem); line-height: 1.3; margin: 0; }
+.hero { padding: 60px 40px; margin-bottom: 50px; position: relative; overflow: hidden; }
+.hero p { font-size: 1.1rem; color: #d1d5db; max-width: 800px; margin-bottom: 30px; line-height: 1.6; }
+.section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;}
 
-/* Menjamin breakpoint Tablet dan Desktop Kecil tetap mulus tanpa squish */
+.filter-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+.filter-tag { padding: 6px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; font-size: 0.85rem; cursor: pointer; color: #d1d5db; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; text-decoration: none; }
+.filter-tag:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.filter-tag.active { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: #4ade80; box-shadow: 0 2px 10px rgba(0,0,0,0.2); font-weight: bold; }
+
+/* ==============================================================
+   UI UPGRADE V2: 1. CYBER-SCANLINE IMAGE EFFECT
+============================================================== */
+.news-card { 
+    overflow: hidden; 
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease; 
+    display: flex; 
+    flex-direction: column; 
+    height: 100%; 
+    text-decoration: none; 
+    will-change: transform;
+    content-visibility: auto; 
+    contain-intrinsic-size: 0 400px;
+    position: relative;
+}
+.news-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); border-color: rgba(34,197,94,0.5); }
+
+.card-img-wrap { position: relative; height: 200px; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
+.card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; will-change: transform; }
+
+/* Scanline Effect */
+.card-img-wrap::before {
+    content: ''; position: absolute; width: 100%; height: 2px;
+    background: rgba(74, 222, 128, 0.6); top: -10px; left: 0; z-index: 5;
+    transition: 0s; opacity: 0; box-shadow: 0 0 10px #4ade80;
+}
+.news-card:hover .card-img-wrap::before { top: 100%; transition: 1.5s linear; opacity: 1; }
+.news-card:hover .card-img-wrap img { transform: scale(1.1); }
+
+.card-badge { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.7); padding: 5px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(5px); color: #fff; z-index: 3; }
+.card-body { padding: 25px; display: flex; flex-direction: column; flex-grow: 1; position: relative; z-index: 3; }
+.card-meta { font-size: 0.8rem; color: #4ade80; display: flex; align-items: center; gap: 5px; margin-bottom: 10px; }
+.card-title { font-size: clamp(1.1rem, 2vw, 1.25rem); margin-bottom: 15px; color: #fff; transition: color 0.3s ease; }
+.news-card:hover .card-title { color: #4ade80; }
+.card-text { font-size: 0.85rem; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; color: #9ca3af; flex-grow: 1; line-height: 1.6; }
+.read-more { color: #4ade80; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 5px; margin-top: auto; transition: transform 0.3s ease; }
+.news-card:hover .read-more { transform: translateX(5px); }
+
+/* ==============================================================
+   UI UPGRADE V2: 6. HOLOGRAPHIC CARD TILT ILLUSION
+============================================================== */
+.team-card { 
+    text-align: center; padding: 25px; 
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; 
+    will-change: transform; position: relative; overflow: hidden; 
+}
+.team-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 35px rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.4); }
+.team-img { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 15px; border: 4px solid rgba(34,197,94,0.4); overflow: hidden; background: #ffffff; box-shadow: 0 6px 15px rgba(0,0,0,0.2); position: relative; z-index: 2; transition: border-color 0.3s ease;}
+.team-card:hover .team-img { border-color: #4ade80; }
+.team-img img { width: 100%; height: 100%; object-fit: cover; }
+.team-name { font-size: 1.1rem; margin-bottom: 5px; position: relative; z-index: 2; }
+.team-role { color: #4ade80; font-size: 0.85rem; font-weight: bold; position: relative; z-index: 2; }
+
+/* ==============================================================
+   UI UPGRADE V2: 10. FUTURISTIC IMAGE ZOOM-OUT INSIGHT
+============================================================== */
+.gallery-card { padding: 15px; text-align: left; display: block; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease; will-change: transform; content-visibility: auto; contain-intrinsic-size: 0 300px; }
+.gallery-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.3); border-color: rgba(34,197,94,0.3); }
+.gallery-img-box { height: 220px; border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+.gallery-img-box img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1) saturate(1); transition: transform 0.8s ease, filter 0.8s ease; will-change: transform, filter; }
+.gallery-card:hover .gallery-img-box img { transform: scale(1.08); filter: contrast(1.1) saturate(1.2); }
+/* Scanline on Gallery too */
+.gallery-img-box::before { content: ''; position: absolute; width: 100%; height: 2px; background: rgba(74, 222, 128, 0.6); top: -10px; left: 0; z-index: 5; transition: 0s; opacity: 0; box-shadow: 0 0 10px #4ade80; }
+.gallery-card:hover .gallery-img-box::before { top: 100%; transition: 1.2s linear; opacity: 1; }
+
+.photo-count { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; display: flex; align-items: center; gap: 5px; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); color:#fff; z-index: 3; }
+
+/* FOOTER */
+.site-footer { background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.1); padding: 60px 0 30px; position: relative; z-index: 1; margin-top: auto; box-shadow: 0 -5px 20px rgba(0,0,0,0.2); transform: translateZ(0); }
+.footer-top { margin-bottom: 40px; }
+
+.footer-logo-area { display: flex; align-items: center; gap: 20px; margin-bottom: 25px; }
+.footer-logo-box { width: 85px; height: 85px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 10px; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.3s ease; }
+.footer-logo-box:hover { transform: scale(1.05) rotate(-5deg); border-color: rgba(34,197,94,0.4); }
+.footer-logo-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
+
+.footer-desc { color: #9ca3af; font-size: 0.9rem; line-height: 1.6; max-width: 400px; }
+.footer-links h3 { color: #4ade80; margin-bottom: 20px; font-size: 1.1rem; text-shadow: 0 2px 5px rgba(34,197,94,0.3); }
+.footer-links ul li { margin-bottom: 12px; }
+.footer-links ul li a { color: #9ca3af; font-size: 0.9rem; transition: color 0.3s ease, text-shadow 0.3s ease; display: inline-block; padding: 4px 0; position: relative; }
+.footer-links ul li a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 1px; background: #fff; transition: width 0.3s ease; }
+.footer-links ul li a:hover { color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.5); }
+.footer-links ul li a:hover::after { width: 100%; }
+.social-links { display: flex; flex-wrap: wrap; gap: 15px; }
+.social-btn { width: 45px; height: 45px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.15); overflow:hidden; will-change: transform; }
+.social-btn img { width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0 0 2px rgba(255,255,255,0.5));}
+.social-btn:hover { background: #22c55e; box-shadow: 0 6px 15px rgba(34,197,94,0.4); transform: translateY(-4px); border-color: #22c55e; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; display: flex; justify-content: space-between; color: #6b7280; font-size: 0.85rem; flex-wrap: wrap; gap: 15px; }
+
+/* ==============================================================
+   UI UPGRADE V2: 8. SCROLLBAR DATA-STREAM
+============================================================== */
+::-webkit-scrollbar { width: 10px; height: 8px; }
+::-webkit-scrollbar-track { background: rgba(17, 24, 39, 0.9); border-left: 1px solid rgba(255,255,255,0.05); }
+::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #059669, #4ade80); border-radius: 10px; border: 2px solid rgba(17, 24, 39, 1); }
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(to bottom, #22c55e, #a7f3d0); box-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
+
+
+/* RESPONSIVE MOBILE & LAYOUT FIXES */
 @media (max-width: 992px) {
     .admin-layout { grid-template-columns: 1fr; }
-    
-    /* Mengubah grid-3 & 4 menjadi 2 kolom agar seimbang di Tablet */
-    .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
     
     .team-scroll-wrapper {
         display: flex;
@@ -522,19 +588,13 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     .section-header { flex-direction: column; align-items: flex-start; gap: 15px; }
     .dashboard-header { flex-direction: column; gap: 20px; text-align: center; }
     .panel-header { flex-direction: column; gap: 15px; text-align: center; }
-    
-    /* Perbaikan susunan Footer pada Mobile agar tidak berantakan */
-    .footer-top { display: flex; flex-direction: column; gap: 30px; }
-    .footer-logo-area { flex-direction: column; text-align: center; justify-content: center; gap: 15px; }
-    .footer-logo-area .logo-text { text-align: center; }
     .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
     
-    /* Mengubah seluruh grid utama menjadi 1 kolom penuh di Mobile */
     .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
     .card-img-wrap { height: 230px; }
 
-    .footer-logo-box { width: 70px; height: 70px; margin: 0 auto; }
-    .footer-logo-area .logo-text h2 { font-size: 1.3rem; }
+    .footer-logo-box { width: 70px; height: 70px; }
+    .footer-logo-area .logo-text h2 { font-size: 1.2rem; }
 
     .team-scroll-wrapper .team-card {
         flex: 0 0 calc(85% - 10px); 
