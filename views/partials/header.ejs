@@ -2,18 +2,63 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <!-- OPTIMASI 1: display=swap pada font untuk menghindari FOUT/FOIT -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= siteSettings.webTitle %></title>
-    <meta name="description" content="<%= siteSettings.heroTitle %>">
-    <link rel="icon" type="image/png" href="<%= siteSettings.headerLogo %>">
     
+    <!-- ==============================================================
+         SUPER BIG UPGRADE: 100% SEO META TAGS (LIKE WORDPRESS/BLOGGER)
+    ============================================================== -->
+    <!-- Dinamis Title & Deskripsi (Mendukung SEO per-halaman) -->
+    <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' - ' + siteSettings.webTitle : siteSettings.webTitle %></title>
+    <meta name="description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : siteSettings.heroTitle %>">
+    <link rel="icon" type="image/png" href="<%= siteSettings.headerLogo %>">
+
+    <!-- Meta Dasar & Aturan Crawling Googlebot -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="keywords" content="HMI, Komisariat Kedokteran Gigi, UMI, Himpunan Mahasiswa Islam, Makassar, Kedokteran Gigi UMI, Organisasi Mahasiswa, <%= siteSettings.webTitle %>">
+    <meta name="author" content="<%= siteSettings.headerTitle || 'HMI KomKG UMI' %>">
+    <link rel="canonical" href="<%= typeof currentUrl !== 'undefined' ? currentUrl : 'https://hmikomkgumi.xyz' %>" />
+    <meta name="theme-color" content="#064e3b">
+
+    <!-- Open Graph / Facebook / WhatsApp (SEO Social Media) -->
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:type" content="<%= typeof pageType !== 'undefined' ? pageType : 'website' %>">
+    <meta property="og:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle : siteSettings.webTitle %>">
+    <meta property="og:description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : siteSettings.heroTitle %>">
+    <meta property="og:url" content="<%= typeof currentUrl !== 'undefined' ? currentUrl : 'https://hmikomkgumi.xyz' %>">
+    <meta property="og:site_name" content="<%= siteSettings.webTitle %>">
+    <meta property="og:image" content="<%= typeof pageImage !== 'undefined' ? pageImage : siteSettings.headerLogo %>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Cover <%= siteSettings.webTitle %>">
+
+    <!-- Twitter Cards (SEO Twitter/X) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle : siteSettings.webTitle %>">
+    <meta name="twitter:description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : siteSettings.heroTitle %>">
+    <meta name="twitter:image" content="<%= typeof pageImage !== 'undefined' ? pageImage : siteSettings.headerLogo %>">
+
+    <!-- Structured Data (JSON-LD) untuk Google Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "<%= siteSettings.webTitle %>",
+      "url": "https://hmikomkgumi.xyz",
+      "logo": "<%= siteSettings.headerLogo %>",
+      "description": "<%= siteSettings.heroTitle %>"
+    }
+    </script>
+    <!-- ==============================================================
+         END OF SEO UPGRADE
+    ============================================================== -->
+
     <!-- OPTIMASI 2: PRECONNECT CDN (Membangun jalur khusus ke server luar untuk memangkas Ping/Latensi) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com">
     
     <!-- OPTIMASI 3: ASYNC GOOGLE FONTS (Font dimuat di latar belakang agar teks langsung muncul) -->
+    <!-- OPTIMASI: display=swap pada font untuk menghindari FOUT/FOIT -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"></noscript>
