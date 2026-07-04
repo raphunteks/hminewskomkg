@@ -278,6 +278,152 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 
 
 /* ==============================================================
+   TABS NAVIGATION UMUM (SUPER UPGRADE 1: UI FIX & CLICKABLE)
+============================================================== */
+.tab-nav { 
+    display: flex; 
+    overflow-x: auto; 
+    gap: 15px; 
+    margin-bottom: 40px; 
+    border-bottom: 1px solid rgba(255,255,255,0.1); 
+    padding-bottom: 15px; 
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+}
+.tab-nav::-webkit-scrollbar { display: none; } /* Hide scrollbar for cleaner look */
+.tab-btn { 
+    /* MERESET DEFAULT BROWSER BUTTON YG MEMBUAT WARNA PUTIH/HITAM */
+    appearance: none; 
+    -webkit-appearance: none; 
+    background: transparent; 
+    border: 1px solid transparent; 
+    outline: none;
+    
+    color: #9ca3af; 
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600; 
+    padding: 12px 24px; 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+    white-space: nowrap; 
+    border-radius: 12px; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px;
+}
+.tab-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.tab-btn.active { 
+    color: #4ade80; 
+    background: rgba(34,197,94,0.15); 
+    border: 1px solid rgba(34,197,94,0.4); 
+    box-shadow: 0 4px 20px rgba(34,197,94,0.2); 
+}
+.tab-content { display: none; animation: fadeIn 0.4s ease; }
+.tab-content.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+
+/* ==============================================================
+   ANNOUNCEMENT POP-UP (SUPER UPGRADE 2: STRICT LAYOUT BOUNDS)
+============================================================== */
+.announce-overlay { 
+    z-index: 9999999; 
+    padding: 20px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.85); 
+    backdrop-filter: blur(15px); 
+    -webkit-backdrop-filter: blur(15px); 
+    overscroll-behavior: none; 
+    opacity: 0; 
+    visibility: hidden; 
+    transition: opacity 0.3s ease, visibility 0.3s ease; 
+}
+.announce-overlay.active { opacity: 1; visibility: visible; }
+.glass-announce { 
+    background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(6, 78, 59, 0.95) 100%); 
+    border: 1px solid rgba(74, 222, 128, 0.3); 
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8); 
+}
+
+/* KUNCI UKURAN MODAL AGAR TIDAK BENGKAK */
+.announce-wrapper { 
+    display: flex; 
+    flex-direction: row; 
+    width: 100%; 
+    max-width: 850px; 
+    height: auto; 
+    max-height: 85vh; 
+    border-radius: 24px; 
+    overflow: hidden; 
+    position: relative; 
+    transform: translateY(30px) scale(0.95); 
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+}
+.announce-overlay.active .announce-wrapper { transform: translateY(0) scale(1); }
+
+.announce-close { 
+    position: absolute; 
+    top: 15px; 
+    right: 15px; 
+    z-index: 50; 
+    background: rgba(0,0,0,0.5); 
+    border-radius: 50%; 
+    padding: 10px; 
+    color: #fff; 
+    border: 1px solid rgba(255,255,255,0.2); 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    backdrop-filter: blur(5px); 
+}
+.announce-close:hover { background: #ef4444; transform: scale(1.1); border-color: transparent; }
+.announce-close svg { width: 20px; height: 20px; display: block; }
+
+/* KUNCI GAMBAR AGAR TETAP DALAM KOTAK (TIDAK MELEBAR KE SELURUH LAYAR) */
+.announce-left { 
+    width: 45%; 
+    flex: 0 0 45%; /* Paksa flex-basis 45% */
+    min-height: 400px; 
+    background: rgba(0,0,0,0.5); 
+    position: relative; 
+    overflow: hidden; /* Mencegah gambar meluap */
+}
+.announce-left img { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; /* Poster akan memenuhi kiri secara elegan */
+}
+
+.announce-right { 
+    width: 55%; 
+    flex: 0 0 55%; 
+    padding: 45px 40px; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    overflow-y: auto; 
+}
+.announce-title { color: #fff; margin-bottom: 15px; font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 800; line-height: 1.3; margin-top: 0; padding-right: 40px; word-wrap: break-word; overflow-wrap: break-word; }
+.announce-divider { width: 60px; height: 5px; background: #4ade80; margin-bottom: 25px; border-radius: 3px; flex-shrink: 0; }
+.announce-text { color: #d1d5db; margin-bottom: 35px; line-height: 1.8; font-size: 1.05rem; border-left: 3px solid rgba(74, 222, 128, 0.5); padding-left: 20px; white-space: pre-line; }
+.announce-btn { align-self: flex-start; padding: 12px 28px; font-size: 1rem; border-radius: 10px; font-weight: bold; background: transparent; border: 2px solid #4ade80; color: #4ade80; cursor: pointer; transition: all 0.3s ease; margin-top: auto; outline: none; }
+.announce-btn:hover { background: #4ade80; color: #000; box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4); transform: translateY(-2px); }
+
+
+/* ==============================================================
    ADMIN DASHBOARD UI (DIKEMBALIKAN UTUH 100%)
 ============================================================== */
 .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 25px; margin-bottom: 20px; }
@@ -347,7 +493,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .upload-icon-box { width: 60px; height: 60px; margin: 0 auto 15px; background: rgba(34,197,94,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 .upload-icon-box svg { color: #4ade80; width: 30px; height: 30px; }
 
-/* MODALS (DIKEMBALIKAN UTUH 100%) */
+/* MODALS */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); z-index: 999999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; padding: 20px; overscroll-behavior: none; }
 .modal-overlay.active { opacity: 1; visibility: visible; }
 .modal-content { background: #111827; border: 1px solid rgba(255,255,255,0.2); border-radius: 1.5rem; width: 100%; max-width: 600px; padding: 30px; transform: translateY(20px); transition: transform 0.3s ease; max-height: 90vh; overflow-y: auto; box-shadow: 0 15px 40px rgba(0,0,0,0.4); position: relative; will-change: transform; }
@@ -487,26 +633,34 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
         scroll-snap-align: center;
     }
     
-    /* FIX ANNOUNCEMENT MOBILE */
+    /* FIX ANNOUNCEMENT MOBILE (UPGRADE LAYOUT) */
     .announce-wrapper { 
         flex-direction: column !important; 
-        max-height: 85vh; 
-        width: 100%; 
+        max-height: 90vh; 
+        width: 95%; 
     }
     .announce-left { 
-        flex: none;
         width: 100%;
-        height: auto; 
-        max-height: 40vh;
+        height: 250px; 
         min-height: 200px;
-        padding: 20px; 
-        padding-top: 50px;
         border-bottom: 1px solid rgba(255,255,255,0.1); 
-        border-right: none;
     }
-    .announce-left img { max-height: 30vh; width: auto; max-width: 100%; }
-    .announce-right { padding: 25px !important; overflow-y: auto; }
-    .announce-title { font-size: 1.4rem; padding-right: 0; }
+    .announce-left img { 
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; 
+    }
+    .announce-right { 
+        width: 100%;
+        padding: 30px 25px !important; 
+    }
+    .announce-title { 
+        font-size: 1.5rem; 
+        padding-right: 0; 
+    }
 }
 
 ::-webkit-scrollbar { width: 8px; }
