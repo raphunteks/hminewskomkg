@@ -6,13 +6,13 @@
         <div class="container">
             <div class="grid-3 footer-top">
                 <div style="grid-column: span 1;">
+                    <!-- UPGRADE 1: Class footer-logo-box digunakan tanpa membatasi dengan inline max-width 40px -->
                     <div class="footer-logo-area">
-                        <div class="logo-box" style="width:40px; height:40px;">
-                            <!-- Penambahan width dan height eksplisit untuk mencegah Layout Shift (CLS) -->
-                            <img src="<%= siteSettings.footerLogo %>" alt="Logo" class="logo-img" width="40" height="40" style="width:100%; max-width:40px; object-fit:contain;" loading="lazy">
+                        <div class="footer-logo-box">
+                            <img src="<%= siteSettings.footerLogo %>" alt="Logo" class="footer-logo-img" loading="lazy">
                         </div>
                         <div class="logo-text">
-                            <h2 style="font-size:1.1rem; margin:0;"><%= siteSettings.footerTitle %></h2>
+                            <h2 style="font-size:1.4rem; margin:0;"><%= siteSettings.footerTitle %></h2>
                         </div>
                     </div>
                     <p class="footer-desc"><%= siteSettings.footerDesc %></p>
@@ -62,16 +62,12 @@
         </div>
     </footer>
 
-    <!-- OPTIMASI SCRIPT: Logika render Icon Lucide yang disesuaikan dengan atribut 'defer' di header -->
     <script>
-        // Gunakan requestAnimationFrame atau setTimeout untuk menjamin 
-        // eksekusi pembuatan icon dilakukan SETELAH semua aset utama selesai digambar oleh browser.
         document.addEventListener('DOMContentLoaded', function() {
             const initIcons = () => {
                 if (typeof lucide !== 'undefined') { 
                     lucide.createIcons(); 
                 } else {
-                    // Jika script defer sedikit telat, coba lagi dalam 100ms
                     setTimeout(initIcons, 100);
                 }
             };
