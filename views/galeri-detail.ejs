@@ -16,9 +16,9 @@
             <span style="display:flex; align-items:center; gap:5px;"><i data-lucide="user" style="width:16px;"></i> Admin HMI KomKGUMI</span>
         </div>
 
-        <!-- UPGRADE: Menggunakan class .detail-img-wrapper yang tersinkron dengan main.css -->
-        <div class="detail-img-wrapper">
-            <img src="<%= berita.image %>" alt="Cover Berita: <%= berita.title %>">
+        <!-- UPGRADE: Container gambar menggunakan lebar penuh dengan padding opsional. Aspek rasio gambar akan terjaga karena "object-fit: contain" di main.css -->
+        <div class="detail-img-wrapper" style="width: 100%; display: flex; justify-content: center; background: rgba(0,0,0,0.2); border-radius: 16px; margin-bottom: 30px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <img src="<%= berita.image %>" alt="Cover Berita: <%= berita.title %>" style="max-width: 100%; height: auto; display: block; object-fit: contain;">
         </div>
 
         <!-- Rendering Penuh HTML yang diformat dari Word Editor (Quill) -->
