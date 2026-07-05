@@ -298,7 +298,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .vm-card[style*="#f472b6"] .rich-text-content ol li::before { color: #f472b6 !important; }
 
 /* ==============================================================
-   UPGRADE FIX 1: PURE CSS 3D PDF VIEWER RESPONSIVE
+   UPGRADE FIX 1: PURE CSS 3D PDF VIEWER RESPONSIVE & SCROLLABLE
 ============================================================== */
 .css3d-pdf-wrapper { 
     width: 100%; 
@@ -316,7 +316,8 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     background: #e5e7eb; 
     border-radius: 12px; 
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 15px 0 30px rgba(0,0,0,0.1); 
-    overflow: hidden; 
+    overflow: auto; /* FIX BUG: Mengizinkan scrolling jika konten PDF iframe melebih batas */
+    -webkit-overflow-scrolling: touch; /* FIX BUG: Smooth scrolling di perangkat iOS/Apple */
     position: relative; 
     border: 1px solid rgba(255,255,255,0.2); 
     border-left: 15px solid #22c55e; 
@@ -964,6 +965,21 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     .lightbox-nav.prev { left: 10px; }
     .lightbox-nav.next { right: 10px; }
     .lightbox-img-wrapper { padding: 40px 10px; }
+
+    /* ==============================================================
+       SUPER BIG UPGRADE: FIX PDF SCROLLING & TOUCH RESPONSIVENESS MOBILE
+    ============================================================== */
+    .css3d-pdf-wrapper {
+        height: 70vh !important; /* Proporsi lebih pas di layar HP */
+        min-height: 450px !important;
+    }
+    .css3d-pdf-frame {
+        transform: none !important; /* KUNCI: Matikan 3D tilt di HP agar area sentuh iframe (scrolling) 100% akurat */
+        overflow-y: auto !important; 
+    }
+    .native-pdf-viewer {
+        min-height: 100%; /* Memastikan dokumen panjang bisa digeser */
+    }
 
     /* ==============================================================
        SUPER BIG UPGRADE: ANNOUNCEMENT POPUP MOBILE FIX
