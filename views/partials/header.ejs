@@ -6,13 +6,23 @@
     
     <!-- ==============================================================
          SUPER BIG UPGRADE: SMART SEO LOGIC ENGINE (BERITA & GALERI)
+         (Dilengkapi Auto-Absolute URL untuk Preview WhatsApp/FB/Twitter)
     ============================================================== -->
     <% 
+    // BASE URL: Wajib untuk memastikan OG Image terbaca oleh sistem Social Media
+    const baseUrl = 'https://hmikomkgumi.xyz';
+    
     // Default SEO Fallback (Dari Setelan Admin Dashboard)
     let finalTitle = siteSettings.webTitle;
     let finalDesc = siteSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI';
     let finalImage = siteSettings.seoImage || siteSettings.headerLogo;
     let finalType = 'website';
+    let finalUrl = typeof currentUrl !== 'undefined' ? currentUrl : baseUrl;
+
+    // Pastikan URL Halaman adalah Absolute URL
+    if (finalUrl.startsWith('/')) {
+        finalUrl = baseUrl + finalUrl;
+    }
 
     // AUTO-DETEKSI: Jika halaman sedang membuka DETAIL BERITA
     if (typeof berita !== 'undefined' && berita) {
@@ -29,12 +39,19 @@
         if (album.cover) finalImage = album.cover;
         finalType = 'article';
     } 
-    // DETEKSI VARIABEL MANUAL (Jika di-set dari backend)
+    // DETEKSI VARIABEL MANUAL (Jika di-set secara spesifik dari backend)
     else if (typeof pageTitle !== 'undefined') {
         finalTitle = pageTitle + ' - ' + siteSettings.webTitle;
         if (typeof pageDescription !== 'undefined') finalDesc = pageDescription;
         if (typeof pageImage !== 'undefined') finalImage = pageImage;
         if (typeof pageType !== 'undefined') finalType = pageType;
+    }
+
+    // KONVERSI GAMBAR KE ABSOLUTE URL (VITAL UNTUK PREVIEW SOSMED BESAR)
+    // Jika path gambar tidak memiliki http/https, otomatis tambahkan domain
+    if (finalImage && !finalImage.startsWith('http')) {
+        if (!finalImage.startsWith('/')) finalImage = '/' + finalImage;
+        finalImage = baseUrl + finalImage;
     }
     %>
 
@@ -51,25 +68,28 @@
     <!-- Terhubung ke Setelan SEO Keywords di Admin Dashboard dengan Fallback Teks Custom -->
     <meta name="keywords" content="<%= typeof pageKeywords !== 'undefined' ? pageKeywords : (siteSettings.seoKeywords || 'hmi komkg umi, hmikomkgumi, hmi, hmi kom kg umi, hmicabmakassar, yakusa') %>">
     <meta name="author" content="<%= siteSettings.headerTitle || 'HMI KomKG UMI' %>">
-    <link rel="canonical" href="<%= typeof currentUrl !== 'undefined' ? currentUrl : 'https://hmikomkgumi.xyz' %>" />
+    <link rel="canonical" href="<%= finalUrl %>" />
     <meta name="theme-color" content="#064e3b">
 
-    <!-- Open Graph / Facebook / WhatsApp (SEO Social Media) -->
+    <!-- Open Graph / Facebook / WhatsApp / Telegram (SEO Social Media) -->
     <meta property="og:locale" content="id_ID">
     <meta property="og:type" content="<%= finalType %>">
     <meta property="og:title" content="<%= finalTitle %>">
     <meta property="og:description" content="<%= finalDesc %>">
-    <meta property="og:url" content="<%= typeof currentUrl !== 'undefined' ? currentUrl : 'https://hmikomkgumi.xyz' %>">
+    <meta property="og:url" content="<%= finalUrl %>">
     <meta property="og:site_name" content="<%= siteSettings.webTitle %>">
     
     <!-- Terhubung ke Thumbnail Berita / Galeri / Setting Dashboard -->
     <meta property="og:image" content="<%= finalImage %>">
+    <meta property="og:image:secure_url" content="<%= finalImage %>">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Cover <%= finalTitle %>">
 
-    <!-- Twitter Cards (SEO Twitter/X) -->
+    <!-- Twitter Cards (Pemicu Gambar Preview Besar di Sosmed) -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:domain" content="hmikomkgumi.xyz">
+    <meta name="twitter:url" content="<%= finalUrl %>">
     <meta name="twitter:title" content="<%= finalTitle %>">
     <meta name="twitter:description" content="<%= finalDesc %>">
     <meta name="twitter:image" content="<%= finalImage %>">
@@ -81,7 +101,7 @@
       "@type": "<%= finalType === 'article' ? 'NewsArticle' : 'Organization' %>",
       "headline": "<%= finalTitle %>",
       "name": "<%= siteSettings.webTitle %>",
-      "url": "<%= typeof currentUrl !== 'undefined' ? currentUrl : 'https://hmikomkgumi.xyz' %>",
+      "url": "<%= finalUrl %>",
       "image": "<%= finalImage %>",
       "description": "<%= finalDesc %>"
     }
