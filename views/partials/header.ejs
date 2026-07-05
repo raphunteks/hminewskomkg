@@ -5,13 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- ==============================================================
-         SUPER BIG UPGRADE: 100% SEO META TAGS (TERINTEGRASI DENGAN ADMIN)
+         SUPER BIG UPGRADE: SMART SEO LOGIC ENGINE (BERITA & GALERI)
     ============================================================== -->
-    <!-- Dinamis Title (Mendukung SEO per-halaman atau default Admin) -->
-    <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' - ' + siteSettings.webTitle : siteSettings.webTitle %></title>
+    <% 
+    // Default SEO Fallback (Dari Setelan Admin Dashboard)
+    let finalTitle = siteSettings.webTitle;
+    let finalDesc = siteSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI';
+    let finalImage = siteSettings.seoImage || siteSettings.headerLogo;
+    let finalType = 'website';
+
+    // AUTO-DETEKSI: Jika halaman sedang membuka DETAIL BERITA
+    if (typeof berita !== 'undefined' && berita) {
+        finalTitle = berita.title + ' - ' + siteSettings.webTitle;
+        // Membersihkan tag HTML dari isi berita dan mengambil 160 karakter pertama untuk Google/WhatsApp
+        finalDesc = berita.content.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').substring(0, 160) + '...';
+        if (berita.image) finalImage = berita.image;
+        finalType = 'article';
+    } 
+    // AUTO-DETEKSI: Jika halaman sedang membuka DETAIL GALERI
+    else if (typeof album !== 'undefined' && album) {
+        finalTitle = 'Galeri: ' + album.title + ' - ' + siteSettings.webTitle;
+        finalDesc = 'Dokumentasi kegiatan ' + album.title + ' HMI Komisariat Kedokteran Gigi UMI pada ' + album.date + '.';
+        if (album.cover) finalImage = album.cover;
+        finalType = 'article';
+    } 
+    // DETEKSI VARIABEL MANUAL (Jika di-set dari backend)
+    else if (typeof pageTitle !== 'undefined') {
+        finalTitle = pageTitle + ' - ' + siteSettings.webTitle;
+        if (typeof pageDescription !== 'undefined') finalDesc = pageDescription;
+        if (typeof pageImage !== 'undefined') finalImage = pageImage;
+        if (typeof pageType !== 'undefined') finalType = pageType;
+    }
+    %>
+
+    <!-- Dinamis Title (Otomatis menyesuaikan dengan konten berita/galeri/halaman utama) -->
+    <title><%= finalTitle %></title>
     
-    <!-- Terhubung ke Setelan SEO Description di Admin Dashboard dengan Fallback Teks Custom -->
-    <meta name="description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : (siteSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI') %>">
+    <!-- Terhubung ke Smart Logic Deskripsi -->
+    <meta name="description" content="<%= finalDesc %>">
     <link rel="icon" type="image/png" href="<%= siteSettings.headerLogo %>">
 
     <!-- Meta Dasar & Aturan Crawling Googlebot -->
@@ -25,33 +56,34 @@
 
     <!-- Open Graph / Facebook / WhatsApp (SEO Social Media) -->
     <meta property="og:locale" content="id_ID">
-    <meta property="og:type" content="<%= typeof pageType !== 'undefined' ? pageType : 'website' %>">
-    <meta property="og:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle : siteSettings.webTitle %>">
-    <meta property="og:description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : (siteSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI') %>">
+    <meta property="og:type" content="<%= finalType %>">
+    <meta property="og:title" content="<%= finalTitle %>">
+    <meta property="og:description" content="<%= finalDesc %>">
     <meta property="og:url" content="<%= typeof currentUrl !== 'undefined' ? currentUrl : 'https://hmikomkgumi.xyz' %>">
     <meta property="og:site_name" content="<%= siteSettings.webTitle %>">
     
-    <!-- Terhubung ke Setelan Thumbnail (OG Image) di Admin Dashboard -->
-    <meta property="og:image" content="<%= typeof pageImage !== 'undefined' ? pageImage : (siteSettings.seoImage || siteSettings.headerLogo) %>">
+    <!-- Terhubung ke Thumbnail Berita / Galeri / Setting Dashboard -->
+    <meta property="og:image" content="<%= finalImage %>">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Cover <%= siteSettings.webTitle %>">
+    <meta property="og:image:alt" content="Cover <%= finalTitle %>">
 
     <!-- Twitter Cards (SEO Twitter/X) -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle : siteSettings.webTitle %>">
-    <meta name="twitter:description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : (siteSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI') %>">
-    <meta name="twitter:image" content="<%= typeof pageImage !== 'undefined' ? pageImage : (siteSettings.seoImage || siteSettings.headerLogo) %>">
+    <meta name="twitter:title" content="<%= finalTitle %>">
+    <meta name="twitter:description" content="<%= finalDesc %>">
+    <meta name="twitter:image" content="<%= finalImage %>">
 
     <!-- Structured Data (JSON-LD) untuk Google Rich Snippets -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Organization",
+      "@type": "<%= finalType === 'article' ? 'NewsArticle' : 'Organization' %>",
+      "headline": "<%= finalTitle %>",
       "name": "<%= siteSettings.webTitle %>",
-      "url": "https://hmikomkgumi.xyz",
-      "logo": "<%= siteSettings.headerLogo %>",
-      "description": "<%= siteSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI' %>"
+      "url": "<%= typeof currentUrl !== 'undefined' ? currentUrl : 'https://hmikomkgumi.xyz' %>",
+      "image": "<%= finalImage %>",
+      "description": "<%= finalDesc %>"
     }
     </script>
     <!-- ==============================================================
