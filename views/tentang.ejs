@@ -31,15 +31,17 @@
                 <div style="width: 100%;">
                     <h3 style="margin-bottom: 20px; font-size:1.5rem; text-align:center; color:#4ade80;">Buku Pedoman / Profil</h3>
                     
-                    <!-- UPGRADE 3: PURE CSS 3D PDF VIEWER TANPA DFLIP/JQUERY -->
+                    <!-- UPGRADE 3: PURE CSS 3D PDF VIEWER -->
                     <div class="css3d-pdf-wrapper">
                         <div class="css3d-pdf-frame">
-                            <!-- Menampilkan file native bawaan HTML5 -->
+                            <!-- UPGRADE PDF: Menambahkan parameter view=FitH untuk memaksa tampilan vertikal -->
                             <iframe 
-                                src="<%= siteSettings.bookletPdf %>#toolbar=0&navpanes=0&scrollbar=0" 
+                                src="<%= siteSettings.bookletPdf %>#toolbar=0&navpanes=0&view=FitH" 
                                 type="application/pdf" 
                                 title="Buku Pedoman / Profil Komisariat"
-                                class="native-pdf-viewer">
+                                class="native-pdf-viewer"
+                                scrolling="yes"
+                                style="width: 100%; height: 100%; border: none;">
                             </iframe>
                         </div>
                     </div>
@@ -110,7 +112,6 @@
         <h2>Struktur Kepengurusan</h2>
         <p class="text-muted" style="margin-bottom: 40px;">Pengurus Harian</p>
         
-        <!-- UPGRADE 2: Mengubah .grid-4 menjadi .team-scroll-wrapper -->
         <div class="team-scroll-wrapper">
             <% pengurus.forEach(person => { %>
             <div class="glass team-card">
@@ -128,7 +129,6 @@
                     <div>
                         <h4 style="color:#4ade80; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:10px; margin-bottom:20px; text-align:center;"><%= b.name %></h4>
                         <% if(b.members && b.members.length > 0) { %>
-                            <!-- UPGRADE 2: Mengubah sub-grid ke team-scroll-wrapper juga agar konsisten mobile friendly -->
                             <div class="team-scroll-wrapper">
                                 <% b.members.forEach(m => { %>
                                     <div class="glass team-card" style="padding:15px;">
@@ -184,7 +184,6 @@
             <h2 style="color: #f472b6; margin-bottom: 10px;"><i data-lucide="users"></i> Struktur Kepengurusan KOHATI</h2>
             <p class="text-muted" style="margin-bottom: 40px;">Pengurus Harian</p>
             
-            <!-- UPGRADE 2: Mengubah .grid-4 menjadi .team-scroll-wrapper -->
             <div class="team-scroll-wrapper">
                 <% kohatiPengurus.forEach(person => { %>
                 <div class="glass team-card" style="border-color: rgba(244,114,182,0.2);">
