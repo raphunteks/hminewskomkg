@@ -1,39 +1,49 @@
 <%- include('partials/header') %>
 
 <div style="max-width: 900px; margin: 0 auto; text-align: center; margin-bottom: 50px;">
-    <h2>Data Anggota HMI KomKG-UMI</h2>
-    <p class="text-muted" style="margin-bottom: 30px;">Database keanggotaan terupdate. Pilih dan preview file PDF dibawah ini yang telah di-upload oleh admin.</p>
+    <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size:2rem;">Data Anggota HMI KomKG-UMI</h2>
+    <p class="text-muted" style="margin-bottom: 40px;">Database keanggotaan terupdate. Pilih dan preview file PDF dibawah ini.</p>
     
-    <% if(dataAnggota && dataAnggota.length > 0) { %>
-        <!-- Tab navigation for multiple PDFs -->
-        <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom: 20px;">
-            <% dataAnggota.forEach((item, index) => { %>
-                <button class="btn <%= index === 0 ? 'btn-primary' : 'btn-secondary' %>" onclick="changePdf('<%= item.file %>', this)" style="padding: 8px 16px; font-size: 0.85rem;">
-                    <i data-lucide="file-text" style="width:16px;"></i> <%= item.title %>
-                </button>
-            <% }) %>
-        </div>
+    <% 
+    // UPGRADE LOGIC (SMART FALLBACK): 
+    // Jika data dari Admin/Database kosong, sistem otomatis memanggil file manual dari Github (/data-anggota.pdf)
+    let pdfList = (typeof dataAnggota !== 'undefined' && dataAnggota && dataAnggota.length > 0) 
+                  ? dataAnggota 
+                  : [{ title: "Data Anggota Komisariat (Default)", file: "/data-anggota.pdf" }];
+    %>
 
-        <div class="glass" style="padding: 15px; height: 75vh;">
-            <iframe id="pdf-viewer" src="<%= dataAnggota[0].file %>" style="width:100%; height:100%; border-radius:10px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);" frameborder="0">
+    <!-- Tab navigation for multiple PDFs -->
+    <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom: 30px;">
+        <% pdfList.forEach((item, index) => { %>
+            <button class="btn <%= index === 0 ? 'btn-primary' : 'btn-secondary' %> tab-pdf-btn" onclick="changePdf('<%= item.file %>', this)" style="padding: 10px 20px; font-size: 0.9rem; border-radius: 12px; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+                <i data-lucide="file-text" style="width:18px;"></i> <%= item.title %>
+            </button>
+        <% }) %>
+    </div>
+
+    <!-- UPGRADE DESAIN: PURE CSS 3D PDF VIEWER (Sistematis & Konsisten dengan halaman Tentang) -->
+    <!-- Dijamin 100% Responsif dan Presisi di Mobile/Desktop -->
+    <div class="css3d-pdf-wrapper" style="margin-top: 0;">
+        <div class="css3d-pdf-frame">
+            <!-- Tambahan parameter #toolbar=0&navpanes=0 agar tampilan PDF bersih dari menu bawaan browser -->
+            <iframe id="pdf-viewer" src="<%= pdfList[0].file %>#toolbar=0&navpanes=0&scrollbar=0" class="native-pdf-viewer" title="Data Anggota Viewer">
                 Browser Anda tidak mendukung iframe PDF. Silakan download PDF ini.
             </iframe>
         </div>
-    <% } else { %>
-        <div class="glass" style="padding: 50px; text-align:center;">
-            <i data-lucide="file-x" style="width:60px; height:60px; color:#9ca3af; margin:bottom:15px; display:inline-block;"></i>
-            <h3 style="color:#fff;">Belum ada Data Anggota</h3>
-            <p class="text-muted">Admin belum mengunggah file data anggota.</p>
-        </div>
-    <% } %>
+    </div>
+    
+    <p class="text-muted" style="text-align:center; margin-top:20px; font-size:0.9rem;">
+        <i data-lucide="mouse-pointer-click" style="width:16px; display:inline; margin-bottom:-2px;"></i> Scroll ke bawah pada area dokumen untuk membaca atau buka dalam mode layar penuh.
+    </p>
 </div>
 
 <script>
     function changePdf(src, btn) {
-        document.getElementById('pdf-viewer').src = src;
+        // Update iframe src (Mempertahankan parameter agar tampilan tetap bersih)
+        document.getElementById('pdf-viewer').src = src + '#toolbar=0&navpanes=0&scrollbar=0';
         
-        // Update active button styling
-        document.querySelectorAll('button[onclick^="changePdf"]').forEach(b => {
+        // Animasi perpindahan warna tombol Tab
+        document.querySelectorAll('.tab-pdf-btn').forEach(b => {
             b.classList.remove('btn-primary');
             b.classList.add('btn-secondary');
         });
