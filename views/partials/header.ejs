@@ -58,10 +58,12 @@
          END OF SEO UPGRADE
     ============================================================== -->
 
-    <!-- OPTIMASI 2: PRECONNECT CDN (Membangun jalur khusus ke server luar untuk memangkas Ping/Latensi) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- OPTIMASI 2: PRECONNECT & DNS-PREFETCH (Super Cepat untuk Resource Luar) -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
     
     <!-- OPTIMASI 3: ASYNC GOOGLE FONTS (Font dimuat di latar belakang agar teks langsung muncul) -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
