@@ -556,18 +556,20 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     width: 100%;
     border-radius: 16px;
     overflow: hidden;
-    background: transparent; /* Dibuat transparan agar menyatu dengan background utama */
+    background: rgba(0, 0, 0, 0.2); /* Memberi latar gelap elegan jika gambar square/transparan */
     margin-bottom: 25px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 20px; /* Ruang bernapas */
 }
 .detail-img-wrapper img,
 .detail-content-img {
-    width: 100%;
-    height: auto !important; /* KUNCI UTAMA: Biarkan tinggi menyesuaikan otomatis (Original Aspect Ratio) */
-    max-height: 80vh !important; /* Fleksibel mengikuti tinggi layar, tidak terpotong kaku */
-    object-fit: contain !important; /* Menjamin seluruh bagian gambar terlihat utuh */
+    width: auto;
+    height: auto !important; 
+    max-width: 100% !important; /* Mencegah gambar meluap secara horizontal */
+    max-height: 80vh !important; /* Fleksibel mengikuti tinggi layar */
+    object-fit: contain !important; /* Menjamin gambar utuh 100% tanpa terpotong/zoom */
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3); /* Tambahkan bayangan agar stand-out */
 }
