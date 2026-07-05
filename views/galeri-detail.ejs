@@ -72,11 +72,24 @@
 </div>
 
 <!-- ==============================================================
-     LOGIKA LIGHTBOX ANTI-CRASH (Bebas Error 500)
+     LOGIKA LIGHTBOX ANTI-CRASH (Bebas Error 500 & Syntax Error)
 ============================================================== -->
+<!-- INJEKSI DATA AMAN: Memisahkan EJS dari Javascript Parser -->
+<script id="albumDataJson" type="application/json"><%- typeof album !== 'undefined' && album ? JSON.stringify(album).replace(/</g, '\\u003c') : '{}' %></script>
+
 <script>
-    // Memindahkan parsing data ke Client-Side agar Server tidak crash
-    const albumData = <%- JSON.stringify(album || {}) %>;
+    // Memindahkan parsing data ke Client-Side secara aman
+    let albumData = {};
+    try {
+        const rawAlbum = document.getElementById('albumDataJson').textContent;
+        // Pengecekan Aman: Pastikan string tidak kosong dan bukan tag EJS mentah
+        if (rawAlbum && rawAlbum.trim() !== '' && !rawAlbum.includes('<' + '%')) {
+            albumData = JSON.parse(rawAlbum);
+        }
+    } catch(e) {
+        console.warn('Parsing EJS data failed:', e);
+    }
+
     const lightboxImages = [];
 
     // Filter array gambar secara aman
@@ -133,7 +146,7 @@
 
         counterEl.innerText = (currentLightboxIndex + 1) + " / " + lightboxImages.length;
         
-        // Manipulasi nama download dilakukan di frontend (Mencegah Error 500 Server)
+        // Manipulasi nama download dilakukan di frontend
         const safeTitle = (albumData.title || "Galeri").toString().replace(/[^a-zA-Z0-9]/g, '_');
         downloadEl.href = imageUrl;
         downloadEl.download = "Galeri_HMI_" + safeTitle + "_" + (currentLightboxIndex + 1);
