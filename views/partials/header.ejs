@@ -6,18 +6,21 @@
     
     <!-- ==============================================================
          SUPER BIG UPGRADE: EXPERT SEO LOGIC ENGINE (100% GOOGLE READY)
-         (Dilengkapi Auto-Absolute URL, Article Meta, & Breadcrumbs)
+         (Dilengkapi Auto-Absolute URL, Article Meta, Breadcrumbs & ANTI-CRASH)
     ============================================================== -->
     <% 
     // BASE URL: Wajib untuk memastikan OG Image terbaca oleh sistem Social Media
     const baseUrl = 'https://hmikomkgumi.xyz';
     
+    // SAFE OBJECT DESTRUCTURING: Mencegah crash jika siteSettings tidak termuat
+    const safeSettings = typeof siteSettings !== 'undefined' && siteSettings ? siteSettings : {};
+    
     // Default SEO Fallback (Dari Setelan Admin Dashboard)
-    let finalTitle = siteSettings.webTitle;
-    let finalDesc = siteSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI';
-    let finalImage = siteSettings.seoImage || siteSettings.headerLogo;
+    let finalTitle = safeSettings.webTitle || 'HMI KomKG UMI';
+    let finalDesc = safeSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI';
+    let finalImage = safeSettings.seoImage || safeSettings.headerLogo || '';
     let finalType = 'website';
-    let finalUrl = typeof currentUrl !== 'undefined' ? currentUrl : baseUrl;
+    let finalUrl = typeof currentUrl !== 'undefined' && currentUrl ? currentUrl : baseUrl;
     let finalDate = new Date().toISOString(); // Default date
     let finalCategory = 'Organisasi';
 
@@ -28,40 +31,41 @@
 
     // AUTO-DETEKSI: Jika halaman sedang membuka DETAIL BERITA
     if (typeof berita !== 'undefined' && berita) {
-        finalTitle = berita.title + ' - ' + siteSettings.webTitle;
-        // Membersihkan tag HTML dari isi berita dan mengambil 160 karakter pertama untuk Google/WhatsApp
-        finalDesc = berita.content.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').substring(0, 160) + '...';
+        finalTitle = (berita.title || 'Berita') + ' - ' + (safeSettings.webTitle || 'HMI');
+        // Membersihkan tag HTML secara aman
+        if (berita.content) {
+            finalDesc = berita.content.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').substring(0, 160) + '...';
+        }
         if (berita.image) finalImage = berita.image;
         finalType = 'article';
-        finalDate = berita.date;
+        finalDate = berita.date || finalDate;
         finalCategory = berita.category || 'Berita';
     } 
     // AUTO-DETEKSI: Jika halaman sedang membuka DETAIL GALERI
     else if (typeof album !== 'undefined' && album) {
-        finalTitle = 'Galeri: ' + album.title + ' - ' + siteSettings.webTitle;
-        finalDesc = 'Dokumentasi kegiatan ' + album.title + ' HMI Komisariat Kedokteran Gigi UMI pada ' + album.date + '.';
+        finalTitle = 'Galeri: ' + (album.title || '') + ' - ' + (safeSettings.webTitle || 'HMI');
+        finalDesc = 'Dokumentasi kegiatan ' + (album.title || '') + ' HMI Komisariat Kedokteran Gigi UMI pada ' + (album.date || '') + '.';
         if (album.cover) finalImage = album.cover;
         finalType = 'article';
-        finalDate = album.date;
+        finalDate = album.date || finalDate;
         finalCategory = 'Galeri Kegiatan';
     } 
     // DETEKSI VARIABEL MANUAL (Jika di-set secara spesifik dari backend)
-    else if (typeof pageTitle !== 'undefined') {
-        finalTitle = pageTitle + ' - ' + siteSettings.webTitle;
-        if (typeof pageDescription !== 'undefined') finalDesc = pageDescription;
-        if (typeof pageImage !== 'undefined') finalImage = pageImage;
-        if (typeof pageType !== 'undefined') finalType = pageType;
+    else if (typeof pageTitle !== 'undefined' && pageTitle) {
+        finalTitle = pageTitle + ' - ' + (safeSettings.webTitle || 'HMI');
+        if (typeof pageDescription !== 'undefined' && pageDescription) finalDesc = pageDescription;
+        if (typeof pageImage !== 'undefined' && pageImage) finalImage = pageImage;
+        if (typeof pageType !== 'undefined' && pageType) finalType = pageType;
     }
 
     // KONVERSI GAMBAR KE ABSOLUTE URL (VITAL UNTUK PREVIEW SOSMED BESAR)
-    // Jika path gambar tidak memiliki http/https, otomatis tambahkan domain
     if (finalImage && !finalImage.startsWith('http')) {
         if (!finalImage.startsWith('/')) finalImage = '/' + finalImage;
         finalImage = baseUrl + finalImage;
     }
     
     // Logo Absolute untuk Schema Publisher
-    let absoluteLogo = siteSettings.headerLogo;
+    let absoluteLogo = safeSettings.headerLogo || '';
     if (absoluteLogo && !absoluteLogo.startsWith('http')) {
         if (!absoluteLogo.startsWith('/')) absoluteLogo = '/' + absoluteLogo;
         absoluteLogo = baseUrl + absoluteLogo;
@@ -73,15 +77,15 @@
     
     <!-- Terhubung ke Smart Logic Deskripsi -->
     <meta name="description" content="<%= finalDesc %>">
-    <link rel="icon" type="image/png" href="<%= siteSettings.headerLogo %>">
+    <link rel="icon" type="image/png" href="<%= safeSettings.headerLogo || '/favicon.ico' %>">
 
     <!-- Meta Dasar & Aturan Crawling Googlebot -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     
     <!-- Terhubung ke Setelan SEO Keywords di Admin Dashboard dengan Fallback Teks Custom -->
-    <meta name="keywords" content="<%= typeof pageKeywords !== 'undefined' ? pageKeywords : (siteSettings.seoKeywords || 'hmi komkg umi, hmikomkgumi, hmi, hmi kom kg umi, hmicabmakassar, yakusa') %>">
-    <meta name="author" content="<%= siteSettings.headerTitle || 'HMI KomKG UMI' %>">
+    <meta name="keywords" content="<%= typeof pageKeywords !== 'undefined' && pageKeywords ? pageKeywords : (safeSettings.seoKeywords || 'hmi komkg umi, hmikomkgumi, hmi, hmi kom kg umi, hmicabmakassar, yakusa') %>">
+    <meta name="author" content="<%= safeSettings.headerTitle || 'HMI KomKG UMI' %>">
     <link rel="canonical" href="<%= finalUrl %>" />
     <meta name="theme-color" content="#064e3b">
 
@@ -91,7 +95,7 @@
     <meta property="og:title" content="<%= finalTitle %>">
     <meta property="og:description" content="<%= finalDesc %>">
     <meta property="og:url" content="<%= finalUrl %>">
-    <meta property="og:site_name" content="<%= siteSettings.webTitle %>">
+    <meta property="og:site_name" content="<%= safeSettings.webTitle || 'HMI KomKG UMI' %>">
     
     <!-- Meta Khusus Artikel (Memicu Kategori & Tanggal di Social Media) -->
     <% if (finalType === 'article') { %>
@@ -127,7 +131,7 @@
         "@type": "WebPage",
         "@id": "<%= finalUrl %>"
       },
-      "headline": "<%= finalTitle %>",
+      "headline": "<%= finalTitle.replace(/"/g, '\\"') %>",
       "image": [
         "<%= finalImage %>"
       ],
@@ -142,13 +146,13 @@
       <% } %>
       "publisher": {
         "@type": "Organization",
-        "name": "<%= siteSettings.webTitle %>",
+        "name": "<%= (safeSettings.webTitle || 'HMI').replace(/"/g, '\\"') %>",
         "logo": {
           "@type": "ImageObject",
           "url": "<%= absoluteLogo %>"
         }
       },
-      "description": "<%= finalDesc %>"
+      "description": "<%= finalDesc.replace(/"/g, '\\"') %>"
     }
     </script>
 
@@ -173,7 +177,7 @@
         },{
           "@type": "ListItem",
           "position": 3,
-          "name": "<%= berita.title.replace(/"/g, '\\"') %>",
+          "name": "<%= (berita.title || '').replace(/"/g, '\\"') %>",
           "item": "<%= finalUrl %>"
         }
         <% } else if (typeof album !== 'undefined' && album) { %>
@@ -185,14 +189,14 @@
         },{
           "@type": "ListItem",
           "position": 3,
-          "name": "<%= album.title.replace(/"/g, '\\"') %>",
+          "name": "<%= (album.title || '').replace(/"/g, '\\"') %>",
           "item": "<%= finalUrl %>"
         }
         <% } else if (typeof page !== 'undefined' && page !== 'beranda') { %>
         ,{
           "@type": "ListItem",
           "position": 2,
-          "name": "<%= pageTitle || page %>",
+          "name": "<%= typeof pageTitle !== 'undefined' && pageTitle ? pageTitle.replace(/"/g, '\\"') : (page.charAt(0).toUpperCase() + page.slice(1)) %>",
           "item": "<%= finalUrl %>"
         }
         <% } %>
@@ -247,11 +251,11 @@
             <a href="/" class="logo-area" aria-label="Ke Beranda">
                 <div class="logo-box" style="width:45px; height:45px;">
                     <!-- OPTIMASI 5: Prioritas Fetch Tinggi pada Logo Utama -->
-                    <img src="<%= siteSettings.headerLogo %>" alt="Logo" class="logo-img" width="45" height="45" style="width:100%; max-width:45px; object-fit:contain;" fetchpriority="high">
+                    <img src="<%= safeSettings.headerLogo %>" alt="Logo" class="logo-img" width="45" height="45" style="width:100%; max-width:45px; object-fit:contain;" fetchpriority="high">
                 </div>
                 <div class="logo-text">
-                    <h1><%= siteSettings.headerTitle %><span class="text-primary"><%= siteSettings.headerHighlight %></span></h1>
-                    <p><%= siteSettings.headerSubtitle %></p>
+                    <h1><%= safeSettings.headerTitle || 'HMI' %><span class="text-primary"><%= safeSettings.headerHighlight || '' %></span></h1>
+                    <p><%= safeSettings.headerSubtitle || '' %></p>
                 </div>
             </a>
             
