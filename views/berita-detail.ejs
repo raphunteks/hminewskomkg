@@ -2,42 +2,60 @@
 
 <div class="container" style="max-width: 800px; margin-bottom: 50px;">
     
+    <!-- Tombol Kembali -->
     <a href="/" style="color:#4ade80; display:inline-flex; align-items:center; gap:5px; margin-bottom:20px; font-weight:600; transition:0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#4ade80'">
         <i data-lucide="arrow-left" style="width:16px;"></i> Kembali ke Beranda
     </a>
 
-    <div class="glass" style="padding: 40px; border-top: 5px solid #22c55e;">
-        <span class="badge" style="margin-bottom: 15px;"><%= berita.category %></span>
+    <!-- ==============================================================
+         SUPER BIG UPGRADE: EXPERT SEO MICRODATA (SCHEMA.ORG)
+         Mengubah <div> menjadi <article> agar dikenali Google sebagai Artikel
+    ============================================================== -->
+    <article class="glass" itemscope itemtype="https://schema.org/NewsArticle" style="padding: 40px; border-top: 5px solid #22c55e;">
         
-        <h1 style="font-size: 2.2rem; margin-bottom: 15px; color: #fff; line-height: 1.3;"><%= berita.title %></h1>
+        <!-- Kategori -->
+        <span class="badge" itemprop="articleSection" style="margin-bottom: 15px;"><%= berita.category %></span>
         
-        <div style="display:flex; align-items:center; gap:15px; color:#9ca3af; font-size:0.9rem; margin-bottom:30px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:20px;">
-            <span style="display:flex; align-items:center; gap:5px;"><i data-lucide="calendar" style="width:16px;"></i> <%= berita.date %></span>
-            <span style="display:flex; align-items:center; gap:5px;"><i data-lucide="user" style="width:16px;"></i> Admin HMI KomKGUMI</span>
-        </div>
+        <!-- Header Artikel (Judul & Meta) -->
+        <header>
+            <h1 itemprop="headline" style="font-size: 2.2rem; margin-bottom: 15px; color: #fff; line-height: 1.3;"><%= berita.title %></h1>
+            
+            <div style="display:flex; align-items:center; gap:15px; color:#9ca3af; font-size:0.9rem; margin-bottom:30px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:20px;">
+                <span style="display:flex; align-items:center; gap:5px;">
+                    <i data-lucide="calendar" style="width:16px;"></i> 
+                    <time itemprop="datePublished" datetime="<%= berita.date %>"><%= berita.date %></time>
+                </span>
+                <span itemprop="author" itemscope itemtype="https://schema.org/Organization" style="display:flex; align-items:center; gap:5px;">
+                    <i data-lucide="user" style="width:16px;"></i> 
+                    <span itemprop="name">Admin HMI KomKGUMI</span>
+                </span>
+            </div>
+        </header>
 
-        <!-- UPGRADE: Menggunakan class .detail-img-wrapper yang tersinkron dengan main.css -->
+        <!-- Gambar Utama Artikel -->
         <div class="detail-img-wrapper">
-            <img src="<%= berita.image %>" alt="Cover Berita: <%= berita.title %>">
+            <img itemprop="image" src="<%= berita.image %>" alt="Cover Berita: <%= berita.title %>">
         </div>
 
-        <!-- Rendering Penuh HTML yang diformat dari Word Editor (Quill) -->
-        <div class="rich-text-content">
+        <!-- Isi/Konten Utama Artikel -->
+        <div class="rich-text-content" itemprop="articleBody">
             <%- berita.content %>
         </div>
 
+        <!-- Dokumentasi Tambahan -->
         <% if(berita.photos && berita.photos.length > 0) { %>
             <h3 style="margin-bottom: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px;">Dokumentasi Tambahan</h3>
             <div class="grid-2" style="gap: 15px;">
                 <% berita.photos.forEach(photo => { %>
                     <div style="width: 100%; height: 200px; overflow: hidden; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
-                        <img src="<%= photo.url %>" style="width: 100%; height: 100%; object-fit: cover; transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        <!-- itemprop="image" membantu Google Images mendeteksi lebih banyak foto -->
+                        <img itemprop="image" src="<%= photo.url %>" alt="Dokumentasi Tambahan: <%= berita.title %>" style="width: 100%; height: 100%; object-fit: cover; transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                     </div>
                 <% }) %>
             </div>
         <% } %>
 
-    </div>
+    </article>
 </div>
 
 <%- include('partials/footer') %>
