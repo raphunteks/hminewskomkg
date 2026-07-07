@@ -14,11 +14,13 @@
     <p class="text-muted" style="margin-bottom: 40px;">Database keanggotaan terupdate. Pilih dan preview file PDF dibawah ini.</p>
     
     <% 
-    // UPGRADE LOGIC (SMART FALLBACK): 
-    // Jika data dari Admin/Database kosong, sistem otomatis memanggil file manual dari Github (/data-anggota.pdf)
+    // ==============================================================
+    // UPGRADE LOGIC (SMART FALLBACK & CRUD INTEGRATION): 
+    // ==============================================================
+    // Jika data dari Admin/Database kosong, otomatis pakai file default
     let pdfList = (typeof dataAnggota !== 'undefined' && dataAnggota && dataAnggota.length > 0) 
                   ? dataAnggota 
-                  : [{ title: "Data Anggota Komisariat (Default)", file: "/data-anggota.pdf" }];
+                  : [{ title: "Data Anggota Komisariat (Default)", file: "/data-anggota.pdf", date: "Default" }];
     %>
 
     <!-- Tab navigation for multiple PDFs -->
@@ -30,11 +32,10 @@
         <% }) %>
     </div>
 
-    <!-- UPGRADE DESAIN: PURE CSS 3D PDF VIEWER (Sistematis & Konsisten dengan halaman Tentang) -->
-    <!-- Dijamin 100% Responsif dan Presisi di Mobile/Desktop -->
+    <!-- PURE CSS 3D PDF VIEWER -->
+    <!-- Menggunakan parameter view=FitH agar otomatis presisi & bisa di-scroll vertikal -->
     <div class="css3d-pdf-wrapper" style="margin-top: 0;">
         <div class="css3d-pdf-frame">
-            <!-- UPGRADE PDF: Menambahkan parameter view=FitH agar dokumen memanjang vertikal ke bawah layaknya web page -->
             <iframe 
                 id="pdf-viewer" 
                 src="<%= pdfList[0].file %>#toolbar=0&navpanes=0&view=FitH" 
