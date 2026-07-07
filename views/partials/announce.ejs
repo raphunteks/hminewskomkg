@@ -1,24 +1,34 @@
-
-<% if (typeof siteSettings !== 'undefined' && (siteSettings.announceActive === 'true' || siteSettings.announceActive === true)) { %>
-<div class="modal-overlay announce-overlay" id="announceModal">
+<% if (typeof siteSettings !== 'undefined' && siteSettings && (String(siteSettings.announceActive) === 'true')) { %>
+<!-- ==============================================================
+     EXPERT SEO & ACCESSIBILITY UPGRADE: 
+     Menggunakan role="dialog", aria-modal, dan aria-labelledby 
+     agar Googlebot tidak menganggap pop-up ini sebagai spam/intrusif.
+============================================================== -->
+<div class="modal-overlay announce-overlay" id="announceModal" role="dialog" aria-modal="true" aria-labelledby="announceTitle">
     <div class="announce-wrapper glass-announce">
         
-        <button class="announce-close" onclick="closeAnnounce()" aria-label="Tutup">
+        <button class="announce-close" onclick="closeAnnounce()" aria-label="Tutup Pengumuman">
             <i data-lucide="x"></i>
         </button>
 
         <% if (siteSettings.announceImage) { %>
         <div class="announce-left">
-            <img src="<%= siteSettings.announceImage %>" alt="Announcement Poster">
+            <!-- SEO UPGRADE: Atribut alt deskriptif dinamis untuk Google Images -->
+            <img src="<%= siteSettings.announceImage %>" alt="Pengumuman: <%= siteSettings.announceTitle || 'HMI KomKG UMI' %>">
         </div>
         <% } %>
 
         <div class="announce-right">
-            <h2 class="announce-title"><%= siteSettings.announceTitle %></h2>
+            <!-- ID ini dihubungkan dengan aria-labelledby di atas -->
+            <h2 class="announce-title" id="announceTitle"><%= siteSettings.announceTitle || 'Pengumuman' %></h2>
             <div class="announce-divider"></div>
             
-            <div class="rich-text-content announce-text">
-                <%- siteSettings.announceContent %>
+            <!-- ==============================================================
+                 FIX UI PRESISI: Menghilangkan border-left & padding-left 
+                 bawaan main.css agar teks rata kiri dengan rapi dan presisi.
+            ============================================================== -->
+            <div class="rich-text-content announce-text" style="border-left: none !important; padding-left: 0 !important;">
+                <%- siteSettings.announceContent || '' %>
             </div>
 
             <button class="btn announce-btn" onclick="readAnnounce()">Tutup Pengumuman</button>
@@ -26,22 +36,31 @@
     </div>
 </div>
 
+<!-- ==============================================================
+     SMART GUARD SCRIPT: Mencegah Error Reference jika title kosong
+============================================================== -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const titleKey = '<%= siteSettings.announceTitle.replace(/[^a-zA-Z0-9]/g, "_") %>';
+        // Mengamankan replace() agar tidak crash jika announceTitle undefined dari backend
+        const titleKey = '<%= (siteSettings.announceTitle || "pengumuman").replace(/[^a-zA-Z0-9]/g, "_") %>';
         const announceKey = 'announce_read_' + titleKey;
+        
         if (!localStorage.getItem(announceKey)) {
-            setTimeout(() => { document.getElementById('announceModal').classList.add('active'); }, 600);
+            setTimeout(() => { 
+                const modal = document.getElementById('announceModal');
+                if (modal) modal.classList.add('active'); 
+            }, 600);
         }
         if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 
     function closeAnnounce() { 
-        document.getElementById('announceModal').classList.remove('active'); 
+        const modal = document.getElementById('announceModal');
+        if (modal) modal.classList.remove('active'); 
     }
 
     function readAnnounce() {
-        const titleKey = '<%= siteSettings.announceTitle.replace(/[^a-zA-Z0-9]/g, "_") %>';
+        const titleKey = '<%= (siteSettings.announceTitle || "pengumuman").replace(/[^a-zA-Z0-9]/g, "_") %>';
         const announceKey = 'announce_read_' + titleKey;
         localStorage.setItem(announceKey, 'true');
         closeAnnounce();
