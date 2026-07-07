@@ -1,284 +1,181 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- ==============================================================
-         SUPER BIG UPGRADE: EXPERT SEO LOGIC ENGINE (100% GOOGLE READY)
-         (Dilengkapi Auto-Absolute URL, Article Meta, & Breadcrumbs)
-    ============================================================== -->
-    <% 
-    // BASE URL: Wajib untuk memastikan OG Image terbaca oleh sistem Social Media
-    const baseUrl = 'https://hmikomkgumi.xyz';
-    
-    // Default SEO Fallback (Dari Setelan Admin Dashboard)
-    let finalTitle = siteSettings.webTitle;
-    let finalDesc = siteSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI';
-    let finalImage = siteSettings.seoImage || siteSettings.headerLogo;
-    let finalType = 'website';
-    let finalUrl = typeof currentUrl !== 'undefined' ? currentUrl : baseUrl;
-    let finalDate = new Date().toISOString(); // Default date
-    let finalCategory = 'Organisasi';
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ==============================================================
+         SUPER BIG UPGRADE: SMART SEO LOGIC ENGINE (BERITA & GALERI)
+         (Dilengkapi Auto-Absolute URL untuk Preview WhatsApp/FB/Twitter)
+    ============================================================== -->
+    <% 
+    // BASE URL: Wajib untuk memastikan OG Image terbaca oleh sistem Social Media
+    const baseUrl = 'https://hmikomkgumi.xyz';
+    
+    // Default SEO Fallback (Dari Setelan Admin Dashboard)
+    let finalTitle = siteSettings.webTitle;
+    let finalDesc = siteSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI';
+    let finalImage = siteSettings.seoImage || siteSettings.headerLogo;
+    let finalType = 'website';
+    let finalUrl = typeof currentUrl !== 'undefined' ? currentUrl : baseUrl;
 
-    // Pastikan URL Halaman adalah Absolute URL
-    if (finalUrl.startsWith('/')) {
-        finalUrl = baseUrl + finalUrl;
-    }
+    // Pastikan URL Halaman adalah Absolute URL
+    if (finalUrl.startsWith('/')) {
+        finalUrl = baseUrl + finalUrl;
+    }
 
-    // AUTO-DETEKSI: Jika halaman sedang membuka DETAIL BERITA
-    if (typeof berita !== 'undefined' && berita) {
-        finalTitle = berita.title + ' - ' + siteSettings.webTitle;
-        // Membersihkan tag HTML dari isi berita dan mengambil 160 karakter pertama untuk Google/WhatsApp
-        finalDesc = berita.content.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').substring(0, 160) + '...';
-        if (berita.image) finalImage = berita.image;
-        finalType = 'article';
-        finalDate = berita.date;
-        finalCategory = berita.category || 'Berita';
-    } 
-    // AUTO-DETEKSI: Jika halaman sedang membuka DETAIL GALERI
-    else if (typeof album !== 'undefined' && album) {
-        finalTitle = 'Galeri: ' + album.title + ' - ' + siteSettings.webTitle;
-        finalDesc = 'Dokumentasi kegiatan ' + album.title + ' HMI Komisariat Kedokteran Gigi UMI pada ' + album.date + '.';
-        if (album.cover) finalImage = album.cover;
-        finalType = 'article';
-        finalDate = album.date;
-        finalCategory = 'Galeri Kegiatan';
-    } 
-    // DETEKSI VARIABEL MANUAL (Jika di-set secara spesifik dari backend)
-    else if (typeof pageTitle !== 'undefined') {
-        finalTitle = pageTitle + ' - ' + siteSettings.webTitle;
-        if (typeof pageDescription !== 'undefined') finalDesc = pageDescription;
-        if (typeof pageImage !== 'undefined') finalImage = pageImage;
-        if (typeof pageType !== 'undefined') finalType = pageType;
-    }
+    // AUTO-DETEKSI: Jika halaman sedang membuka DETAIL BERITA
+    if (typeof berita !== 'undefined' && berita) {
+        finalTitle = berita.title + ' - ' + siteSettings.webTitle;
+        // Membersihkan tag HTML dari isi berita dan mengambil 160 karakter pertama untuk Google/WhatsApp
+        finalDesc = berita.content.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').substring(0, 160) + '...';
+        if (berita.image) finalImage = berita.image;
+        finalType = 'article';
+    } 
+    // AUTO-DETEKSI: Jika halaman sedang membuka DETAIL GALERI
+    else if (typeof album !== 'undefined' && album) {
+        finalTitle = 'Galeri: ' + album.title + ' - ' + siteSettings.webTitle;
+        finalDesc = 'Dokumentasi kegiatan ' + album.title + ' HMI Komisariat Kedokteran Gigi UMI pada ' + album.date + '.';
+        if (album.cover) finalImage = album.cover;
+        finalType = 'article';
+    } 
+    // DETEKSI VARIABEL MANUAL (Jika di-set secara spesifik dari backend)
+    else if (typeof pageTitle !== 'undefined') {
+        finalTitle = pageTitle + ' - ' + siteSettings.webTitle;
+        if (typeof pageDescription !== 'undefined') finalDesc = pageDescription;
+        if (typeof pageImage !== 'undefined') finalImage = pageImage;
+        if (typeof pageType !== 'undefined') finalType = pageType;
+    }
 
-    // KONVERSI GAMBAR KE ABSOLUTE URL (VITAL UNTUK PREVIEW SOSMED BESAR)
-    // Jika path gambar tidak memiliki http/https, otomatis tambahkan domain
-    if (finalImage && !finalImage.startsWith('http')) {
-        if (!finalImage.startsWith('/')) finalImage = '/' + finalImage;
-        finalImage = baseUrl + finalImage;
-    }
-    
-    // Logo Absolute untuk Schema Publisher
-    let absoluteLogo = siteSettings.headerLogo;
-    if (absoluteLogo && !absoluteLogo.startsWith('http')) {
-        if (!absoluteLogo.startsWith('/')) absoluteLogo = '/' + absoluteLogo;
-        absoluteLogo = baseUrl + absoluteLogo;
-    }
-    %>
+    // KONVERSI GAMBAR KE ABSOLUTE URL (VITAL UNTUK PREVIEW SOSMED BESAR)
+    // Jika path gambar tidak memiliki http/https, otomatis tambahkan domain
+    if (finalImage && !finalImage.startsWith('http')) {
+        if (!finalImage.startsWith('/')) finalImage = '/' + finalImage;
+        finalImage = baseUrl + finalImage;
+    }
+    %>
 
-    <!-- Dinamis Title (Otomatis menyesuaikan dengan konten berita/galeri/halaman utama) -->
-    <title><%= finalTitle %></title>
-    
-    <!-- Terhubung ke Smart Logic Deskripsi -->
-    <meta name="description" content="<%= finalDesc %>">
-    <link rel="icon" type="image/png" href="<%= siteSettings.headerLogo %>">
+    <!-- Dinamis Title (Otomatis menyesuaikan dengan konten berita/galeri/halaman utama) -->
+    <title><%= finalTitle %></title>
+    
+    <!-- Terhubung ke Smart Logic Deskripsi -->
+    <meta name="description" content="<%= finalDesc %>">
+    <link rel="icon" type="image/png" href="<%= siteSettings.headerLogo %>">
 
-    <!-- Meta Dasar & Aturan Crawling Googlebot -->
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-    
-    <!-- Terhubung ke Setelan SEO Keywords di Admin Dashboard dengan Fallback Teks Custom -->
-    <meta name="keywords" content="<%= typeof pageKeywords !== 'undefined' ? pageKeywords : (siteSettings.seoKeywords || 'hmi komkg umi, hmikomkgumi, hmi, hmi kom kg umi, hmicabmakassar, yakusa') %>">
-    <meta name="author" content="<%= siteSettings.headerTitle || 'HMI KomKG UMI' %>">
-    <link rel="canonical" href="<%= finalUrl %>" />
-    <meta name="theme-color" content="#064e3b">
+    <!-- Meta Dasar & Aturan Crawling Googlebot -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    
+    <!-- Terhubung ke Setelan SEO Keywords di Admin Dashboard dengan Fallback Teks Custom -->
+    <meta name="keywords" content="<%= typeof pageKeywords !== 'undefined' ? pageKeywords : (siteSettings.seoKeywords || 'hmi komkg umi, hmikomkgumi, hmi, hmi kom kg umi, hmicabmakassar, yakusa') %>">
+    <meta name="author" content="<%= siteSettings.headerTitle || 'HMI KomKG UMI' %>">
+    <link rel="canonical" href="<%= finalUrl %>" />
+    <meta name="theme-color" content="#064e3b">
 
-    <!-- Open Graph / Facebook / WhatsApp / Telegram (SEO Social Media) -->
-    <meta property="og:locale" content="id_ID">
-    <meta property="og:type" content="<%= finalType %>">
-    <meta property="og:title" content="<%= finalTitle %>">
-    <meta property="og:description" content="<%= finalDesc %>">
-    <meta property="og:url" content="<%= finalUrl %>">
-    <meta property="og:site_name" content="<%= siteSettings.webTitle %>">
-    
-    <!-- Meta Khusus Artikel (Memicu Kategori & Tanggal di Social Media) -->
-    <% if (finalType === 'article') { %>
-        <meta property="article:published_time" content="<%= finalDate %>">
-        <meta property="article:author" content="Admin HMI KomKG UMI">
-        <meta property="article:section" content="<%= finalCategory %>">
-    <% } %>
+    <!-- Open Graph / Facebook / WhatsApp / Telegram (SEO Social Media) -->
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:type" content="<%= finalType %>">
+    <meta property="og:title" content="<%= finalTitle %>">
+    <meta property="og:description" content="<%= finalDesc %>">
+    <meta property="og:url" content="<%= finalUrl %>">
+    <meta property="og:site_name" content="<%= siteSettings.webTitle %>">
+    
+    <!-- Terhubung ke Thumbnail Berita / Galeri / Setting Dashboard -->
+    <meta property="og:image" content="<%= finalImage %>">
+    <meta property="og:image:secure_url" content="<%= finalImage %>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Cover <%= finalTitle %>">
 
-    <!-- Terhubung ke Thumbnail Berita / Galeri / Setting Dashboard -->
-    <meta property="og:image" content="<%= finalImage %>">
-    <meta property="og:image:secure_url" content="<%= finalImage %>">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Cover <%= finalTitle %>">
+    <!-- Twitter Cards (Pemicu Gambar Preview Besar di Sosmed) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:domain" content="hmikomkgumi.xyz">
+    <meta name="twitter:url" content="<%= finalUrl %>">
+    <meta name="twitter:title" content="<%= finalTitle %>">
+    <meta name="twitter:description" content="<%= finalDesc %>">
+    <meta name="twitter:image" content="<%= finalImage %>">
 
-    <!-- Twitter Cards (Pemicu Gambar Preview Besar di Sosmed) -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:domain" content="hmikomkgumi.xyz">
-    <meta name="twitter:url" content="<%= finalUrl %>">
-    <meta name="twitter:title" content="<%= finalTitle %>">
-    <meta name="twitter:description" content="<%= finalDesc %>">
-    <meta name="twitter:image" content="<%= finalImage %>">
+    <!-- Structured Data (JSON-LD) untuk Google Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "<%= finalType === 'article' ? 'NewsArticle' : 'Organization' %>",
+      "headline": "<%= finalTitle %>",
+      "name": "<%= siteSettings.webTitle %>",
+      "url": "<%= finalUrl %>",
+      "image": "<%= finalImage %>",
+      "description": "<%= finalDesc %>"
+    }
+    </script>
+    <!-- ==============================================================
+         END OF SEO UPGRADE
+    ============================================================== -->
 
-    <!-- ==============================================================
-         STRUCTURED DATA (JSON-LD) GOOGLE RICH SNIPPETS EXPERT
-    ============================================================== -->
-    <!-- 1. Schema Halaman / Artikel Berita -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "<%= finalType === 'article' ? 'NewsArticle' : 'WebSite' %>",
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "<%= finalUrl %>"
-      },
-      "headline": "<%= finalTitle %>",
-      "image": [
-        "<%= finalImage %>"
-      ],
-      <% if (finalType === 'article') { %>
-      "datePublished": "<%= finalDate %>",
-      "dateModified": "<%= finalDate %>",
-      "author": {
-        "@type": "Organization",
-        "name": "HMI KomKG UMI",
-        "url": "<%= baseUrl %>"
-      },
-      <% } %>
-      "publisher": {
-        "@type": "Organization",
-        "name": "<%= siteSettings.webTitle %>",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "<%= absoluteLogo %>"
-        }
-      },
-      "description": "<%= finalDesc %>"
-    }
-    </script>
+    <!-- OPTIMASI 2: PRECONNECT & DNS-PREFETCH (Super Cepat untuk Resource Luar) -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    
+    <!-- OPTIMASI 3: ASYNC GOOGLE FONTS (Font dimuat di latar belakang agar teks langsung muncul) -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"></noscript>
+    
+    <!-- CSS UTAMA -->
+    <link rel="preload" as="style" href="/css/main.css">
+    <link rel="stylesheet" href="/css/main.css">
 
-    <!-- 2. Schema Breadcrumb (Menampilkan Hierarki Navigasi di Google Search) -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Beranda",
-          "item": "<%= baseUrl %>"
-        }
-        <% if (typeof berita !== 'undefined' && berita) { %>
-        ,{
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Berita",
-          "item": "<%= baseUrl %>/"
-        },{
-          "@type": "ListItem",
-          "position": 3,
-          "name": "<%= berita.title.replace(/"/g, '\\"') %>",
-          "item": "<%= finalUrl %>"
-        }
-        <% } else if (typeof album !== 'undefined' && album) { %>
-        ,{
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Galeri",
-          "item": "<%= baseUrl %>/galeri"
-        },{
-          "@type": "ListItem",
-          "position": 3,
-          "name": "<%= album.title.replace(/"/g, '\\"') %>",
-          "item": "<%= finalUrl %>"
-        }
-        <% } else if (typeof page !== 'undefined' && page !== 'beranda') { %>
-        ,{
-          "@type": "ListItem",
-          "position": 2,
-          "name": "<%= pageTitle || page %>",
-          "item": "<%= finalUrl %>"
-        }
-        <% } %>
-      ]
-    }
-    </script>
-    <!-- ==============================================================
-         END OF SEO UPGRADE
-    ============================================================== -->
-
-    <!-- OPTIMASI 2: PRECONNECT & DNS-PREFETCH (Super Cepat untuk Resource Luar) -->
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://unpkg.com" crossorigin>
-    
-    <!-- OPTIMASI 3: ASYNC GOOGLE FONTS (Font dimuat di latar belakang agar teks langsung muncul) -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"></noscript>
-    
-    <!-- CSS UTAMA -->
-    <link rel="preload" as="style" href="/css/main.css">
-    <link rel="stylesheet" href="/css/main.css">
-
-    <!-- OPTIMASI 4: DEFER LUCIDE ICONS (Berjalan tanpa memblokir perenderan HTML) -->
-    <script src="https://unpkg.com/lucide@latest" defer></script>
-
-    <!-- ==============================================================
-         SUPER BIG UPGRADE: VERCEL SPEED INSIGHTS (NATIVE HTML)
-         (Secara otomatis berkomunikasi dengan server Vercel)
-    ============================================================== -->
-    <script>
-        window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
-    </script>
-    <script src="/_vercel/speed-insights/script.js" defer></script>
-    <!-- ============================================================== -->
+    <!-- OPTIMASI 4: DEFER LUCIDE ICONS (Berjalan tanpa memblokir perenderan HTML) -->
+    <script src="https://unpkg.com/lucide@latest" defer></script>
 </head>
 <body>
-    
-    <!-- EFEK BACKGROUND ANIMASI BLOB -->
-    <div class="bg-blob blob-1"></div>
-    <div class="bg-blob blob-2"></div>
+    
+    <!-- EFEK BACKGROUND ANIMASI BLOB -->
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
 
-    <nav class="glass-header">
-        <div class="container navbar">
-            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Buka Menu Mobile">
-                <i data-lucide="menu"></i>
-            </button>
+    <nav class="glass-header">
+        <div class="container navbar">
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Buka Menu Mobile">
+                <i data-lucide="menu"></i>
+            </button>
 
-            <a href="/" class="logo-area" aria-label="Ke Beranda">
-                <div class="logo-box" style="width:45px; height:45px;">
-                    <!-- OPTIMASI 5: Prioritas Fetch Tinggi pada Logo Utama -->
-                    <img src="<%= siteSettings.headerLogo %>" alt="Logo" class="logo-img" width="45" height="45" style="width:100%; max-width:45px; object-fit:contain;" fetchpriority="high">
-                </div>
-                <div class="logo-text">
-                    <h1><%= siteSettings.headerTitle %><span class="text-primary"><%= siteSettings.headerHighlight %></span></h1>
-                    <p><%= siteSettings.headerSubtitle %></p>
-                </div>
-            </a>
-            
-            <ul class="nav-links" id="nav-links">
-                <li><a href="/" class="nav-item <%= typeof page !== 'undefined' && page === 'beranda' ? 'active' : '' %>"><i data-lucide="home"></i> Beranda</a></li>
-                <li><a href="/tentang" class="nav-item <%= typeof page !== 'undefined' && page === 'tentang' ? 'active' : '' %>"><i data-lucide="info"></i> Tentang</a></li>
-                <li><a href="/galeri" class="nav-item <%= typeof page !== 'undefined' && page === 'galeri' ? 'active' : '' %>"><i data-lucide="image"></i> Galeri</a></li>
-                <li><a href="/data-anggota" class="nav-item <%= typeof page !== 'undefined' && page === 'data-anggota' ? 'active' : '' %>"><i data-lucide="users"></i> Data Anggota</a></li>
-            </ul>
-            
-            <div class="nav-actions">
-                <a href="/admin" class="btn-icon" title="Login Admin" aria-label="Login Admin">
-                    <i data-lucide="lock"></i>
-                </a>
-            </div>
-        </div>
-    </nav>
-    
-    <main>
-        <div class="container">
+            <a href="/" class="logo-area" aria-label="Ke Beranda">
+                <div class="logo-box" style="width:45px; height:45px;">
+                    <!-- OPTIMASI 5: Prioritas Fetch Tinggi pada Logo Utama -->
+                    <img src="<%= siteSettings.headerLogo %>" alt="Logo" class="logo-img" width="45" height="45" style="width:100%; max-width:45px; object-fit:contain;" fetchpriority="high">
+                </div>
+                <div class="logo-text">
+                    <h1><%= siteSettings.headerTitle %><span class="text-primary"><%= siteSettings.headerHighlight %></span></h1>
+                    <p><%= siteSettings.headerSubtitle %></p>
+                </div>
+            </a>
+            
+            <ul class="nav-links" id="nav-links">
+                <li><a href="/" class="nav-item <%= typeof page !== 'undefined' && page === 'beranda' ? 'active' : '' %>"><i data-lucide="home"></i> Beranda</a></li>
+                <li><a href="/tentang" class="nav-item <%= typeof page !== 'undefined' && page === 'tentang' ? 'active' : '' %>"><i data-lucide="info"></i> Tentang</a></li>
+                <li><a href="/galeri" class="nav-item <%= typeof page !== 'undefined' && page === 'galeri' ? 'active' : '' %>"><i data-lucide="image"></i> Galeri</a></li>
+                <li><a href="/data-anggota" class="nav-item <%= typeof page !== 'undefined' && page === 'data-anggota' ? 'active' : '' %>"><i data-lucide="users"></i> Data Anggota</a></li>
+            </ul>
+            
+            <div class="nav-actions">
+                <a href="/admin" class="btn-icon" title="Login Admin" aria-label="Login Admin">
+                    <i data-lucide="lock"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <main>
+        <div class="container">
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-            const navLinks = document.getElementById('nav-links');
-            if (mobileMenuBtn && navLinks) {
-                mobileMenuBtn.addEventListener('click', function() { navLinks.classList.toggle('active'); });
-            }
-        });
-    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const navLinks = document.getElementById('nav-links');
+            if (mobileMenuBtn && navLinks) {
+                mobileMenuBtn.addEventListener('click', function() { navLinks.classList.toggle('active'); });
+            }
+        });
+    </script>
