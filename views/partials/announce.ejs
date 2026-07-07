@@ -24,11 +24,12 @@
             <div class="announce-divider"></div>
             
             <!-- ==============================================================
-                 FIX UI PRESISI: Menghilangkan border-left & padding-left 
-                 bawaan main.css agar teks rata kiri dengan rapi dan presisi.
+                 FIX UI PRESISI: Menggunakan .trim() pada EJS agar tidak ada
+                 ruang kosong (newline) berlebihan di atas/bawah teks yang 
+                 membuat garis border memanjang ke atas tidak proporsional.
             ============================================================== -->
-            <div class="rich-text-content announce-text" style="border-left: none !important; padding-left: 0 !important;">
-                <%- siteSettings.announceContent || '' %>
+            <div class="rich-text-content announce-text">
+                <%- (siteSettings.announceContent || '').trim() %>
             </div>
 
             <button class="btn announce-btn" onclick="readAnnounce()">Tutup Pengumuman</button>
