@@ -27,7 +27,7 @@
     <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom: 30px;">
         <% pdfList.forEach((item, index) => { %>
             <button class="btn <%= index === 0 ? 'btn-primary' : 'btn-secondary' %> tab-pdf-btn" onclick="changePdf('<%= item.file %>', this)" style="padding: 10px 20px; font-size: 0.9rem; border-radius: 12px; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-                <i data-lucide="file-text" style="width:18px;"></i> <%= item.title %>
+                <i data-lucide="external-link" style="width:18px;"></i> <%= item.title %>
             </button>
         <% }) %>
     </div>
@@ -49,7 +49,7 @@
     </div>
     
     <p class="text-muted" style="text-align:center; margin-top:20px; font-size:0.9rem;">
-        <i data-lucide="mouse-pointer-click" style="width:16px; display:inline; margin-bottom:-2px;"></i> Scroll ke bawah pada area dokumen untuk membaca atau buka dalam mode layar penuh.
+        <i data-lucide="mouse-pointer-click" style="width:16px; display:inline; margin-bottom:-2px;"></i> Klik tombol di atas untuk membuka PDF di tab baru, atau scroll pada area dokumen untuk membaca.
     </p>
 </div>
 
@@ -65,6 +65,9 @@
         });
         btn.classList.remove('btn-secondary');
         btn.classList.add('btn-primary');
+
+        // UPGRADE: Buka file PDF langsung di tab baru secara otomatis saat di-klik
+        window.open(src, '_blank');
     }
 </script>
 
