@@ -187,22 +187,54 @@
                 </div>
             </div>
 
+            <!-- ==============================================================
+                 SUPER BIG UPGRADE: KENDALI FITUR CRUD "DATA ANGGOTA (DEFAULT)"
+            ============================================================== -->
             <div class="glass admin-panel" style="margin-bottom:0;">
                 <h3 class="panel-title" style="margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="folder-open"></i> Data Anggota (PDF)</h3>
-                <button class="btn btn-add-album" onclick="openModal('modalDataAnggota')">+ Data Anggota Baru</button>
+                
+                <% if(dataAnggota.length === 0) { %>
+                    <div style="background: rgba(34,197,94,0.1); border: 1px dashed rgba(34,197,94,0.4); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                        <p style="color:#4ade80; font-size:0.85rem; margin-bottom:10px;"><i data-lucide="info" style="width:16px; display:inline-block; vertical-align:middle;"></i> <strong>Sistem Otomatis:</strong> Saat ini web menggunakan File PDF Bawaan.</p>
+                        <p style="color:#d1d5db; font-size:0.8rem; margin-bottom:15px;">Untuk mengubah atau menimpa file default tersebut, Anda cukup membuat data baru. File default lama akan otomatis tergantikan!</p>
+                        <button class="btn btn-primary" onclick="openModal('modalDataAnggota')" style="width:100%; box-shadow: 0 4px 15px rgba(34,197,94,0.3);"><i data-lucide="upload"></i> Upload & Ubah File Default</button>
+                    </div>
+                <% } else { %>
+                    <button class="btn btn-add-album" onclick="openModal('modalDataAnggota')" style="margin-bottom: 20px;">+ Upload PDF Anggota Baru</button>
+                <% } %>
+
                 <div class="album-list">
-                    <% dataAnggota.forEach(item => { %>
-                    <div class="list-item-album">
-                        <span class="list-item-title"><strong><%= item.title %></strong><br><small style="color:#4ade80;"><%= item.date %></small></span>
+                    <% dataAnggota.forEach((item, index) => { %>
+                    <div class="list-item-album" style="<%= index === 0 ? 'border-left: 4px solid #4ade80;' : '' %>">
+                        <span class="list-item-title">
+                            <strong><%= item.title %></strong>
+                            <% if(index === 0) { %><span class="badge" style="font-size:0.6rem; padding:2px 6px; margin-left:5px;">Aktif di Web</span><% } %>
+                            <br><small style="color:#4ade80;"><%= item.date %></small>
+                        </span>
                         <div style="display:flex; gap:5px;">
-                            <button type="button" class="action-btn" style="color:#fff;" onclick="window.open('<%= item.file %>', '_blank')"><i data-lucide="eye"></i></button>
-                            <button type="button" class="action-btn edit" onclick="openEditDataAnggotaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.date %>')"><i data-lucide="edit"></i></button>
-                            <form action="/admin/hapus-data-anggota/<%= item.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus PDF?')"><i data-lucide="trash-2"></i></button></form>
+                            <button type="button" class="action-btn" style="color:#fff;" onclick="window.open('<%= item.file %>', '_blank')" title="Lihat PDF"><i data-lucide="eye"></i></button>
+                            <button type="button" class="action-btn edit" onclick="openEditDataAnggotaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.date %>')" title="Edit Data"><i data-lucide="edit"></i></button>
+                            <form action="/admin/hapus-data-anggota/<%= item.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus PDF ini? Jika ini satu-satunya data, web akan kembali ke file default bawaan.')" title="Hapus Data"><i data-lucide="trash-2"></i></button></form>
                         </div>
                     </div>
                     <% }) %>
+                    
+                    <% if(dataAnggota.length === 0) { %>
+                        <!-- Visualisasi Baris Virtual untuk File Default -->
+                        <div class="list-item-album" style="opacity: 0.6; border: 1px dashed rgba(255,255,255,0.2);">
+                            <span class="list-item-title"><strong>Data Anggota Komisariat (Default)</strong><br><small style="color:#9ca3af;">/data-anggota.pdf</small></span>
+                            <div style="display:flex; gap:5px;">
+                                <button type="button" class="action-btn" style="color:#fff;" onclick="window.open('/data-anggota.pdf', '_blank')" title="Lihat PDF"><i data-lucide="eye"></i></button>
+                                <button type="button" class="action-btn edit" disabled style="opacity:0.5; cursor:not-allowed;" title="Tidak bisa diedit langsung, buat data baru untuk menimpa"><i data-lucide="edit"></i></button>
+                                <button type="button" class="action-btn delete" disabled style="opacity:0.5; cursor:not-allowed;" title="Tidak bisa dihapus, buat data baru untuk menimpa"><i data-lucide="trash-2"></i></button>
+                            </div>
+                        </div>
+                    <% } %>
                 </div>
             </div>
+            <!-- ==============================================================
+                 END OF UPGRADE
+            ============================================================== -->
         </div>
     </div>
 </div>
