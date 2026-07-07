@@ -1,213 +1,167 @@
-<%- include('partials/header') %>
+<% 
+    // ==============================================================
+    // FIX ERROR 500 & SEO BREADCRUMB: 
+    // Injeksi variabel SEO secara eksplisit sebelum memanggil header
+    // ==============================================================
+    let pageTitle = "Tentang Kami";
+    let pageDescription = "Profil, Visi Misi, dan Struktur Kepengurusan HMI Komisariat Kedokteran Gigi UMI.";
+%>
+<%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
 
-<div class="tab-nav">
-    <button class="tab-btn active" onclick="openTab('tab-profil')"><i data-lucide="user"></i> Profil</button>
-    <button class="tab-btn" onclick="openTab('tab-visimisi')"><i data-lucide="target"></i> Visi & Misi</button>
-    <button class="tab-btn" onclick="openTab('tab-struktur')"><i data-lucide="users"></i> Kepengurusan</button>
-    <% if (String(siteSettings.kohatiActive) === 'true') { %>
-        <button class="tab-btn" onclick="openTab('tab-kohati')" style="color: #f472b6;"><i data-lucide="heart"></i> Kohati</button>
-    <% } %>
-</div>
-
-<div id="tab-profil" class="tab-content active">
-    <div class="vm-card" style="max-width: 900px; margin: 0 auto 40px; border-left: none; padding: 40px;">
-        <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size:1.8rem;">Profil</h2>
-        
-        <div class="rich-text-content" style="margin-bottom: 40px; font-size:1.05rem; line-height:1.7; white-space: pre-line; color: #e5e7eb;">
-            <%- siteSettings.profilText || '' %>
-        </div>
-
-        <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size:1.8rem;">Welcome</h2>
-        <div class="rich-text-content" style="font-size:1.05rem; line-height:1.7; white-space: pre-line; color: #e5e7eb;">
-            <%- siteSettings.welcomeText || '' %>
-        </div>
-    </div>
+<!-- ==============================================================
+     SUPER BIG UPGRADE: EXPERT SEO MICRODATA (SCHEMA.ORG)
+     Mendeklarasikan seluruh halaman ini sebagai Entitas "Organization"
+============================================================== -->
+<article itemscope itemtype="https://schema.org/Organization">
     
-    <% if (siteSettings.bookletPdf || siteSettings.mapsEmbed) { %>
-        <div class="glass" style="padding: 40px; max-width: 900px; margin: 0 auto 40px;">
-            <div style="display:flex; flex-direction:column; gap: 40px;">
-                
-                <% if (siteSettings.bookletPdf && siteSettings.bookletPdf.length > 5) { %>
-                <div style="width: 100%;">
-                    <h3 style="margin-bottom: 20px; font-size:1.5rem; text-align:center; color:#4ade80;">Buku Pedoman / Profil</h3>
-                    
-                    <!-- UPGRADE 3: PURE CSS 3D PDF VIEWER -->
-                    <div class="css3d-pdf-wrapper">
-                        <div class="css3d-pdf-frame">
-                            <!-- UPGRADE PDF: Menambahkan parameter view=FitH untuk memaksa tampilan vertikal -->
-                            <iframe 
-                                src="<%= siteSettings.bookletPdf %>#toolbar=0&navpanes=0&view=FitH" 
-                                type="application/pdf" 
-                                title="Buku Pedoman / Profil Komisariat"
-                                class="native-pdf-viewer"
-                                scrolling="yes"
-                                style="width: 100%; height: 100%; border: none;">
-                            </iframe>
-                        </div>
-                    </div>
-                    
-                    <p class="text-muted" style="text-align:center; margin-top:15px; font-size:0.9rem;">
-                        <i data-lucide="mouse-pointer-click" style="width:16px; display:inline; margin-bottom:-2px;"></i> Scroll ke bawah untuk membaca atau buka dalam mode layar penuh (tergantung browser).
-                    </p>
-                </div>
-                <% } %>
-                
-                <% if (siteSettings.mapsEmbed) { %>
-                <div style="width: 100%;">
-                    <h3 style="margin-bottom: 15px; font-size:1.5rem; text-align:center; color:#4ade80;">Lokasi Sekretariat</h3>
-                    <div class="ratio ratio-16x9 glass" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 5px;">
-                        
-                        <!-- UPGRADE SOLUSI MAPS: Penambahan class "map-responsive-container" -->
-                        <div class="map-responsive-container" style="border-radius: 8px; overflow: hidden; width: 100%; height: 100%; position: relative;">
-                            <%- siteSettings.mapsEmbed %>
-                        </div>
-                        
-                        <!-- Inline CSS Eksklusif untuk memaksa Google Maps iframe menjadi 100% presisi -->
-                        <style>
-                            .map-responsive-container iframe {
-                                position: absolute !important;
-                                top: 0 !important;
-                                left: 0 !important;
-                                width: 100% !important;
-                                height: 100% !important;
-                                border: 0 !important;
-                            }
-                        </style>
+    <!-- Meta tersembunyi agar Google langsung mengenali nama organisasi -->
+    <meta itemprop="name" content="<%= typeof siteSettings !== 'undefined' ? (siteSettings.headerTitle + ' ' + (siteSettings.headerHighlight || '')) : 'HMI KomKG UMI' %>">
 
-                    </div>
-                </div>
-                <% } %>
-                
-            </div>
-        </div>
-    <% } %>
-    
-    <%- include('partials/instagram-feed') %>
+    <nav class="tab-nav" aria-label="Navigasi Profil Organisasi">
+        <button class="tab-btn active" onclick="openTab('tab-profil')"><i data-lucide="user"></i> Profil</button>
+        <button class="tab-btn" onclick="openTab('tab-visimisi')"><i data-lucide="target"></i> Visi & Misi</button>
+        <button class="tab-btn" onclick="openTab('tab-struktur')"><i data-lucide="users"></i> Kepengurusan</button>
+        <% if (String(siteSettings.kohatiActive) === 'true') { %>
+            <button class="tab-btn" onclick="openTab('tab-kohati')" style="color: #f472b6;"><i data-lucide="heart"></i> Kohati</button>
+        <% } %>
+    </nav>
 
-</div>
-
-<div id="tab-visimisi" class="tab-content">
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h2 style="font-size:2rem; margin-bottom:10px;">Visi dan Misi</h2>
-        <p class="text-muted" style="font-size:1.05rem;">Panduan bagi HMI Komisariat Kedokteran Gigi UMI untuk merencanakan kegiatan organisasi.</p>
-    </div>
-    
-    <div style="max-width: 900px; margin: 0 auto; margin-bottom: 50px;">
-        <div class="vm-card">
-            <div class="vm-icon">🚀</div>
-            <h3 class="vm-title">Visi</h3>
-            <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.visiText || '' %></div>
-        </div>
-
-        <div class="vm-card">
-            <div class="vm-icon">📈</div>
-            <h3 class="vm-title">Misi</h3>
-            <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.misiText || '' %></div>
-        </div>
-    </div>
-</div>
-
-<div id="tab-struktur" class="tab-content">
-    <div class="glass" style="padding: 40px; text-align: center;">
-        <h2>Struktur Kepengurusan</h2>
-        <p class="text-muted" style="margin-bottom: 40px;">Pengurus Harian</p>
-        
-        <div class="team-scroll-wrapper">
-            <% pengurus.forEach(person => { %>
-            <div class="glass team-card">
-                <div class="team-img"><img src="<%= person.image %>" alt="<%= person.name %>"></div>
-                <h4 class="team-name"><%= person.name %></h4>
-                <p class="team-role"><%= person.role %></p>
-            </div>
-            <% }) %>
-        </div>
-        
-        <div style="margin-top: 50px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1);">
-            <h3 style="margin-bottom:30px; text-align:center;">Bidang-Bidang</h3>
-            <div style="display:flex; flex-direction:column; gap:40px;">
-                <% bidang.forEach(b => { %>
-                    <div>
-                        <h4 style="color:#4ade80; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:10px; margin-bottom:20px; text-align:center;"><%= b.name %></h4>
-                        <% if(b.members && b.members.length > 0) { %>
-                            <div class="team-scroll-wrapper">
-                                <% b.members.forEach(m => { %>
-                                    <div class="glass team-card" style="padding:15px;">
-                                        <div class="team-img" style="width:80px; height:80px;"><img src="<%= m.image %>" alt="<%= m.name %>"></div>
-                                        <h4 class="team-name" style="font-size:0.95rem;"><%= m.name %></h4>
-                                        <% if(m.role) { %>
-                                            <p style="color:#4ade80; font-size:0.8rem; font-weight:bold; margin-top:2px;"><%= m.role %></p>
-                                        <% } %>
-                                    </div>
-                                <% }) %>
-                            </div>
-                        <% } else { %>
-                            <p style="text-align:center; color:#9ca3af; font-size:0.9rem;">Belum ada anggota.</p>
-                        <% } %>
-                    </div>
-                <% }) %>
-            </div>
-        </div>
-    </div>
-</div>
-
-<% if (String(siteSettings.kohatiActive) === 'true') { %>
-<div id="tab-kohati" class="tab-content">
-    <div style="margin-bottom: 40px;">
-        <div class="vm-card" style="max-width: 900px; margin: 0 auto 50px; border-left: none; background: rgba(244,114,182,0.05); border: 1px solid rgba(244,114,182,0.2); padding: 40px;">
-            <h2 style="color: #f472b6; margin-bottom: 20px; border-bottom: 1px solid rgba(244,114,182,0.3); padding-bottom: 10px; display: inline-block;">
-                <i data-lucide="heart" style="vertical-align: text-bottom;"></i> Profil KOHATI
-            </h2>
-            <div class="rich-text-content" style="font-size:1.05rem; line-height:1.7; white-space: pre-line; color: #e5e7eb;">
-                <%- siteSettings.kohatiProfilText || '' %>
-            </div>
-        </div>
-
-        <div style="margin-bottom: 50px; max-width: 900px; margin-left: auto; margin-right: auto;">
-            <h2 style="color: #f472b6; margin-bottom: 20px; border-bottom: 1px solid rgba(244,114,182,0.3); padding-bottom: 10px; display: inline-block; width:100%;">
-                <i data-lucide="target" style="vertical-align: text-bottom;"></i> Visi & Misi KOHATI
-            </h2>
+    <!-- Mengubah div menjadi <section> Semantic -->
+    <section id="tab-profil" class="tab-content active">
+        <div class="vm-card" style="max-width: 900px; margin: 0 auto 40px; border-left: none; padding: 40px;">
+            <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size:1.8rem;">Profil</h2>
             
-            <div class="vm-card" style="border-left-color: #f472b6; background: rgba(244,114,182,0.1);">
-                <div class="vm-icon" style="color: #f472b6;">🚀</div>
-                <h3 class="vm-title" style="color: #f472b6;">Visi KOHATI</h3>
-                <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.kohatiVisiText || '' %></div>
+            <!-- itemprop="description" mendikte Google bahwa ini adalah profil resmi -->
+            <div class="rich-text-content" itemprop="description" style="margin-bottom: 40px; font-size:1.05rem; line-height:1.7; white-space: pre-line; color: #e5e7eb;">
+                <%- siteSettings.profilText || '' %>
             </div>
 
-            <div class="vm-card" style="border-left-color: #f472b6; background: rgba(244,114,182,0.1);">
-                <div class="vm-icon" style="color: #f472b6;">📈</div>
-                <h3 class="vm-title" style="color: #f472b6;">Misi KOHATI</h3>
-                <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.kohatiMisiText || '' %></div>
+            <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size:1.8rem;">Welcome</h2>
+            <div class="rich-text-content" style="font-size:1.05rem; line-height:1.7; white-space: pre-line; color: #e5e7eb;">
+                <%- siteSettings.welcomeText || '' %>
             </div>
         </div>
+        
+        <% if (siteSettings.bookletPdf || siteSettings.mapsEmbed) { %>
+            <div class="glass" style="padding: 40px; max-width: 900px; margin: 0 auto 40px;">
+                <div style="display:flex; flex-direction:column; gap: 40px;">
+                    
+                    <% if (siteSettings.bookletPdf && siteSettings.bookletPdf.length > 5) { %>
+                    <div style="width: 100%;">
+                        <h3 style="margin-bottom: 20px; font-size:1.5rem; text-align:center; color:#4ade80;">Buku Pedoman / Profil</h3>
+                        
+                        <!-- UPGRADE 3: PURE CSS 3D PDF VIEWER -->
+                        <div class="css3d-pdf-wrapper">
+                            <div class="css3d-pdf-frame">
+                                <!-- UPGRADE PDF: Menambahkan parameter view=FitH untuk memaksa tampilan vertikal -->
+                                <iframe 
+                                    src="<%= siteSettings.bookletPdf %>#toolbar=0&navpanes=0&view=FitH" 
+                                    type="application/pdf" 
+                                    title="Buku Pedoman / Profil Komisariat"
+                                    class="native-pdf-viewer"
+                                    scrolling="yes"
+                                    style="width: 100%; height: 100%; border: none;">
+                                </iframe>
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted" style="text-align:center; margin-top:15px; font-size:0.9rem;">
+                            <i data-lucide="mouse-pointer-click" style="width:16px; display:inline; margin-bottom:-2px;"></i> Scroll ke bawah untuk membaca atau buka dalam mode layar penuh (tergantung browser).
+                        </p>
+                    </div>
+                    <% } %>
+                    
+                    <% if (siteSettings.mapsEmbed) { %>
+                    <!-- itemprop="location" mendikte Google bahwa ini adalah lokasi fisik sekretariat -->
+                    <div style="width: 100%;" itemprop="location" itemscope itemtype="https://schema.org/Place">
+                        <h3 style="margin-bottom: 15px; font-size:1.5rem; text-align:center; color:#4ade80;">Lokasi Sekretariat</h3>
+                        <div class="ratio ratio-16x9 glass" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 5px;">
+                            
+                            <!-- UPGRADE SOLUSI MAPS: Penambahan class "map-responsive-container" -->
+                            <div class="map-responsive-container" style="border-radius: 8px; overflow: hidden; width: 100%; height: 100%; position: relative;">
+                                <%- siteSettings.mapsEmbed %>
+                            </div>
+                            
+                            <!-- Inline CSS Eksklusif untuk memaksa Google Maps iframe menjadi 100% presisi -->
+                            <style>
+                                .map-responsive-container iframe {
+                                    position: absolute !important;
+                                    top: 0 !important;
+                                    left: 0 !important;
+                                    width: 100% !important;
+                                    height: 100% !important;
+                                    border: 0 !important;
+                                }
+                            </style>
 
-        <div class="glass" style="padding: 40px; text-align: center; border-top: 5px solid #f472b6;">
-            <h2 style="color: #f472b6; margin-bottom: 10px;"><i data-lucide="users"></i> Struktur Kepengurusan KOHATI</h2>
+                        </div>
+                    </div>
+                    <% } %>
+                    
+                </div>
+            </div>
+        <% } %>
+        
+        <%- include('partials/instagram-feed') %>
+
+    </section>
+
+    <section id="tab-visimisi" class="tab-content">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="font-size:2rem; margin-bottom:10px;">Visi dan Misi</h2>
+            <p class="text-muted" style="font-size:1.05rem;">Panduan bagi HMI Komisariat Kedokteran Gigi UMI untuk merencanakan kegiatan organisasi.</p>
+        </div>
+        
+        <div style="max-width: 900px; margin: 0 auto; margin-bottom: 50px;">
+            <div class="vm-card">
+                <div class="vm-icon">🚀</div>
+                <h3 class="vm-title">Visi</h3>
+                <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.visiText || '' %></div>
+            </div>
+
+            <div class="vm-card">
+                <div class="vm-icon">📈</div>
+                <h3 class="vm-title">Misi</h3>
+                <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.misiText || '' %></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tab-struktur" class="tab-content">
+        <div class="glass" style="padding: 40px; text-align: center;">
+            <h2>Struktur Kepengurusan</h2>
             <p class="text-muted" style="margin-bottom: 40px;">Pengurus Harian</p>
             
             <div class="team-scroll-wrapper">
-                <% kohatiPengurus.forEach(person => { %>
-                <div class="glass team-card" style="border-color: rgba(244,114,182,0.2);">
-                    <div class="team-img" style="border-color: rgba(244,114,182,0.5);"><img src="<%= person.image %>"></div>
-                    <h4 class="team-name"><%= person.name %></h4>
-                    <p style="color:#f472b6; font-size:0.85rem; font-weight:bold;"><%= person.role %></p>
+                <% pengurus.forEach(person => { %>
+                <!-- EXPERT SEO: Mendeklarasikan Anggota Pengurus (Person Schema) -->
+                <div class="glass team-card" itemprop="member" itemscope itemtype="https://schema.org/Person">
+                    <div class="team-img">
+                        <img itemprop="image" src="<%= person.image %>" alt="<%= person.name %>">
+                    </div>
+                    <h4 class="team-name" itemprop="name"><%= person.name %></h4>
+                    <p class="team-role" itemprop="jobTitle"><%= person.role %></p>
                 </div>
                 <% }) %>
             </div>
             
-            <div style="margin-top: 50px; padding-top: 40px; border-top: 1px solid rgba(244,114,182,0.2);">
-                <h3 style="margin-bottom:30px; text-align:center; color:#f472b6;">Bidang-Bidang Kohati</h3>
+            <div style="margin-top: 50px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <h3 style="margin-bottom:30px; text-align:center;">Bidang-Bidang</h3>
                 <div style="display:flex; flex-direction:column; gap:40px;">
-                    <% kohatiBidang.forEach(b => { %>
+                    <% bidang.forEach(b => { %>
                         <div>
-                            <h4 style="color:#f472b6; border-bottom:1px dashed rgba(244,114,182,0.3); padding-bottom:10px; margin-bottom:20px; text-align:center;"><%= b.name %></h4>
+                            <h4 style="color:#4ade80; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:10px; margin-bottom:20px; text-align:center;"><%= b.name %></h4>
                             <% if(b.members && b.members.length > 0) { %>
                                 <div class="team-scroll-wrapper">
                                     <% b.members.forEach(m => { %>
-                                        <div class="glass team-card" style="padding:15px; border-color: rgba(244,114,182,0.2);">
-                                            <div class="team-img" style="width:80px; height:80px; border-color: rgba(244,114,182,0.5);"><img src="<%= m.image %>"></div>
-                                            <h4 class="team-name" style="font-size:0.95rem;"><%= m.name %></h4>
+                                        <!-- EXPERT SEO: Mendeklarasikan Anggota Bidang (Person Schema) -->
+                                        <div class="glass team-card" style="padding:15px;" itemprop="member" itemscope itemtype="https://schema.org/Person">
+                                            <div class="team-img" style="width:80px; height:80px;">
+                                                <img itemprop="image" src="<%= m.image %>" alt="<%= m.name %>">
+                                            </div>
+                                            <h4 class="team-name" itemprop="name" style="font-size:0.95rem;"><%= m.name %></h4>
                                             <% if(m.role) { %>
-                                                <p style="color:#f472b6; font-size:0.8rem; font-weight:bold; margin-top:2px;"><%= m.role %></p>
+                                                <p itemprop="jobTitle" style="color:#4ade80; font-size:0.8rem; font-weight:bold; margin-top:2px;"><%= m.role %></p>
                                             <% } %>
                                         </div>
                                     <% }) %>
@@ -220,9 +174,89 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<% } %>
+    </section>
+
+    <% if (String(siteSettings.kohatiActive) === 'true') { %>
+    <section id="tab-kohati" class="tab-content">
+        <div style="margin-bottom: 40px;">
+            <div class="vm-card" style="max-width: 900px; margin: 0 auto 50px; border-left: none; background: rgba(244,114,182,0.05); border: 1px solid rgba(244,114,182,0.2); padding: 40px;">
+                <h2 style="color: #f472b6; margin-bottom: 20px; border-bottom: 1px solid rgba(244,114,182,0.3); padding-bottom: 10px; display: inline-block;">
+                    <i data-lucide="heart" style="vertical-align: text-bottom;"></i> Profil KOHATI
+                </h2>
+                <div class="rich-text-content" style="font-size:1.05rem; line-height:1.7; white-space: pre-line; color: #e5e7eb;">
+                    <%- siteSettings.kohatiProfilText || '' %>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 50px; max-width: 900px; margin-left: auto; margin-right: auto;">
+                <h2 style="color: #f472b6; margin-bottom: 20px; border-bottom: 1px solid rgba(244,114,182,0.3); padding-bottom: 10px; display: inline-block; width:100%;">
+                    <i data-lucide="target" style="vertical-align: text-bottom;"></i> Visi & Misi KOHATI
+                </h2>
+                
+                <div class="vm-card" style="border-left-color: #f472b6; background: rgba(244,114,182,0.1);">
+                    <div class="vm-icon" style="color: #f472b6;">🚀</div>
+                    <h3 class="vm-title" style="color: #f472b6;">Visi KOHATI</h3>
+                    <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.kohatiVisiText || '' %></div>
+                </div>
+
+                <div class="vm-card" style="border-left-color: #f472b6; background: rgba(244,114,182,0.1);">
+                    <div class="vm-icon" style="color: #f472b6;">📈</div>
+                    <h3 class="vm-title" style="color: #f472b6;">Misi KOHATI</h3>
+                    <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.kohatiMisiText || '' %></div>
+                </div>
+            </div>
+
+            <div class="glass" style="padding: 40px; text-align: center; border-top: 5px solid #f472b6;">
+                <h2 style="color: #f472b6; margin-bottom: 10px;"><i data-lucide="users"></i> Struktur Kepengurusan KOHATI</h2>
+                <p class="text-muted" style="margin-bottom: 40px;">Pengurus Harian</p>
+                
+                <div class="team-scroll-wrapper">
+                    <% kohatiPengurus.forEach(person => { %>
+                    <!-- EXPERT SEO KOHATI: Mendeklarasikan Anggota Pengurus Kohati -->
+                    <div class="glass team-card" style="border-color: rgba(244,114,182,0.2);" itemprop="member" itemscope itemtype="https://schema.org/Person">
+                        <div class="team-img" style="border-color: rgba(244,114,182,0.5);">
+                            <img itemprop="image" src="<%= person.image %>" alt="<%= person.name %>">
+                        </div>
+                        <h4 class="team-name" itemprop="name"><%= person.name %></h4>
+                        <p itemprop="jobTitle" style="color:#f472b6; font-size:0.85rem; font-weight:bold;"><%= person.role %></p>
+                    </div>
+                    <% }) %>
+                </div>
+                
+                <div style="margin-top: 50px; padding-top: 40px; border-top: 1px solid rgba(244,114,182,0.2);">
+                    <h3 style="margin-bottom:30px; text-align:center; color:#f472b6;">Bidang-Bidang Kohati</h3>
+                    <div style="display:flex; flex-direction:column; gap:40px;">
+                        <% kohatiBidang.forEach(b => { %>
+                            <div>
+                                <h4 style="color:#f472b6; border-bottom:1px dashed rgba(244,114,182,0.3); padding-bottom:10px; margin-bottom:20px; text-align:center;"><%= b.name %></h4>
+                                <% if(b.members && b.members.length > 0) { %>
+                                    <div class="team-scroll-wrapper">
+                                        <% b.members.forEach(m => { %>
+                                            <!-- EXPERT SEO KOHATI: Mendeklarasikan Anggota Bidang Kohati -->
+                                            <div class="glass team-card" style="padding:15px; border-color: rgba(244,114,182,0.2);" itemprop="member" itemscope itemtype="https://schema.org/Person">
+                                                <div class="team-img" style="width:80px; height:80px; border-color: rgba(244,114,182,0.5);">
+                                                    <img itemprop="image" src="<%= m.image %>" alt="<%= m.name %>">
+                                                </div>
+                                                <h4 class="team-name" itemprop="name" style="font-size:0.95rem;"><%= m.name %></h4>
+                                                <% if(m.role) { %>
+                                                    <p itemprop="jobTitle" style="color:#f472b6; font-size:0.8rem; font-weight:bold; margin-top:2px;"><%= m.role %></p>
+                                                <% } %>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+                                <% } else { %>
+                                    <p style="text-align:center; color:#9ca3af; font-size:0.9rem;">Belum ada anggota.</p>
+                                <% } %>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <% } %>
+
+</article> <!-- MENGAKHIRI TAG SCHEMA ORGANIZATION -->
 
 <script>
     function openTab(tabId) {
