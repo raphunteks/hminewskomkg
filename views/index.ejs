@@ -1,58 +1,91 @@
-<%- include('partials/header') %>
+<% 
+    // ==============================================================
+    // FIX ERROR 500 & SEO BREADCRUMB: 
+    // Injeksi variabel SEO secara eksplisit untuk Halaman Beranda
+    // ==============================================================
+    let page = 'beranda';
+    let pageTitle = 'Beranda';
+%>
+<%- include('partials/header', { page: page, pageTitle: pageTitle }) %>
 
 <!-- POPUP PENGUMUMAN HORIZONTAL -->
 <% if (typeof siteSettings !== 'undefined' && (siteSettings.announceActive === 'true' || siteSettings.announceActive === true)) { %>
 <%- include('partials/announce') %>
 <% } %>
 
-<div class="glass hero">
+<!-- ==============================================================
+     EXPERT SEO UPGRADE: Semantic WebSite Header
+============================================================== -->
+<header class="glass hero" itemscope itemtype="https://schema.org/WebSite">
+    <link itemprop="url" href="https://hmikomkgumi.xyz"/>
     <span class="badge">Yakusa! Yakin Usaha Sampai</span>
-    <h1>Selamat datang di website resmi <br><span class="text-gradient"><%= siteSettings.heroTitle || siteSettings.webTitle %></span></h1>
-    <p>Kami adalah sebuah organisasi mahasiswa yang terdiri dari para mahasiswa kedokteran gigi yang memiliki komitmen untuk meningkatkan kualitas diri dan mengembangkan potensi dalam bidang akademik, keislaman, sosial, dan kemanusiaan.</p>
-    <a href="/tentang" class="btn btn-primary">Kenali Kami Lebih Dekat</a>
-</div>
+    <h1 itemprop="name">Selamat datang di website resmi <br><span class="text-gradient"><%= siteSettings.heroTitle || siteSettings.webTitle %></span></h1>
+    <p itemprop="description">Kami adalah sebuah organisasi mahasiswa yang terdiri dari para mahasiswa kedokteran gigi yang memiliki komitmen untuk meningkatkan kualitas diri dan mengembangkan potensi dalam bidang akademik, keislaman, sosial, dan kemanusiaan.</p>
+    <a href="/tentang" class="btn btn-primary" aria-label="Kenali Kami Lebih Dekat">Kenali Kami Lebih Dekat</a>
+</header>
 
-<div class="section-header">
-    <div>
-        <h2>Berita & Informasi</h2>
-        <p class="text-muted">Update terbaru dari kegiatan komisariat</p>
+<!-- ==============================================================
+     EXPERT SEO UPGRADE: Semantic Section & Navigation
+============================================================== -->
+<section>
+    <div class="section-header">
+        <div>
+            <h2>Berita & Informasi</h2>
+            <p class="text-muted">Update terbaru dari kegiatan komisariat</p>
+        </div>
+        <div class="filter-tags" role="navigation" aria-label="Filter Kategori Berita">
+            <a href="/" class="filter-tag <%= currentFilter === 'Semua' ? 'active' : '' %>" aria-label="Tampilkan Semua Berita">Semua</a>
+            <a href="/?filter=Terbaru" class="filter-tag <%= currentFilter === 'Terbaru' ? 'active' : '' %>" aria-label="Filter Berita Terbaru">Terbaru</a>
+            <a href="/?filter=Pin" class="filter-tag <%= currentFilter === 'Pin' ? 'active' : '' %>" aria-label="Filter Berita Disematkan">Pin</a>
+            <a href="/?filter=Populer" class="filter-tag <%= currentFilter === 'Populer' ? 'active' : '' %>" aria-label="Filter Berita Populer">Populer</a>
+        </div>
     </div>
-    <div class="filter-tags">
-        <a href="/" class="filter-tag <%= currentFilter === 'Semua' ? 'active' : '' %>">Semua</a>
-        <a href="/?filter=Terbaru" class="filter-tag <%= currentFilter === 'Terbaru' ? 'active' : '' %>">Terbaru</a>
-        <a href="/?filter=Pin" class="filter-tag <%= currentFilter === 'Pin' ? 'active' : '' %>">Pin</a>
-        <a href="/?filter=Populer" class="filter-tag <%= currentFilter === 'Populer' ? 'active' : '' %>">Populer</a>
-    </div>
-</div>
 
-<div class="grid-3">
-    <% if(news.length > 0) { %>
-        <% news.forEach(item => { %>
-        <a href="/berita/<%= item.id %>" class="glass news-card">
-            <div class="card-img-wrap">
-                <!-- OPTIMASI 4: NATIVE LAZY LOADING & ASYNC DECODING -->
-                <img src="<%= item.image %>" alt="Cover Berita: <%= item.title %>" loading="lazy" decoding="async" width="400" height="200">
-                <div class="card-badge"><%= item.category %></div>
-            </div>
-            <div class="card-body">
-                <div class="card-meta">
-                    <i data-lucide="calendar" style="width:14px;"></i> <%= item.date %>
-                    <% if(item.photos && item.photos.length > 0) { %>
-                        <span style="margin-left:auto; color:#9ca3af; display:flex; align-items:center; gap:3px;">
-                            <i data-lucide="image" style="width:12px;"></i> +<%= item.photos.length %>
-                        </span>
-                    <% } %>
-                </div>
-                <h3 class="card-title"><%= item.title %></h3>
-                <p class="card-text"><%- item.content.replace(/<[^>]+>/g, '').substring(0, 100) %>...</p>
-                <div class="read-more">Baca Selengkapnya <i data-lucide="chevron-right" style="width:16px;"></i></div>
-            </div>
-        </a>
-        <% }) %>
-    <% } else { %>
-        <p class="text-muted" style="grid-column: 1 / -1; text-align: center; padding: 40px 0;">Belum ada berita dalam kategori ini.</p>
-    <% } %>
-</div>
+    <!-- ==============================================================
+         EXPERT SEO UPGRADE: ItemList & NewsArticle Microdata
+         (Didesain dengan display:contents agar layout Grid tidak rusak)
+    ============================================================== -->
+    <div class="grid-3" itemscope itemtype="https://schema.org/ItemList">
+        <meta itemprop="itemListOrder" content="https://schema.org/ItemListOrderDescending" />
+        
+        <% if(news.length > 0) { %>
+            <% news.forEach((item, index) => { %>
+            
+            <article itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" style="display:contents;">
+                <meta itemprop="position" content="<%= index + 1 %>" />
+                
+                <a href="/berita/<%= item.id %>" class="glass news-card" itemprop="item" itemscope itemtype="https://schema.org/NewsArticle">
+                    <meta itemprop="url" content="https://hmikomkgumi.xyz/berita/<%= item.id %>">
+                    <meta itemprop="author" content="Admin HMI KomKG UMI">
+                    
+                    <div class="card-img-wrap">
+                        <!-- OPTIMASI 4: NATIVE LAZY LOADING & ASYNC DECODING (Dengan itemprop Image) -->
+                        <img itemprop="image" src="<%= item.image %>" alt="Cover Berita: <%= item.title %>" loading="lazy" decoding="async" width="400" height="200">
+                        <div class="card-badge" itemprop="articleSection"><%= item.category %></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-meta">
+                            <i data-lucide="calendar" style="width:14px;"></i> 
+                            <time itemprop="datePublished" datetime="<%= item.date %>"><%= item.date %></time>
+                            <% if(item.photos && item.photos.length > 0) { %>
+                                <span style="margin-left:auto; color:#9ca3af; display:flex; align-items:center; gap:3px;" aria-label="<%= item.photos.length %> Foto Tambahan">
+                                    <i data-lucide="image" style="width:12px;"></i> +<%= item.photos.length %>
+                                </span>
+                            <% } %>
+                        </div>
+                        <h3 class="card-title" itemprop="headline"><%= item.title %></h3>
+                        <p class="card-text" itemprop="description"><%- item.content.replace(/<[^>]+>/g, '').substring(0, 100) %>...</p>
+                        <div class="read-more">Baca Selengkapnya <i data-lucide="chevron-right" style="width:16px;"></i></div>
+                    </div>
+                </a>
+            </article>
+
+            <% }) %>
+        <% } else { %>
+            <p class="text-muted" style="grid-column: 1 / -1; text-align: center; padding: 40px 0;">Belum ada berita dalam kategori ini.</p>
+        <% } %>
+    </div>
+</section>
 
 <%- include('partials/instagram-feed') %>
 
