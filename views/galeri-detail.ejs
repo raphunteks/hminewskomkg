@@ -1,41 +1,59 @@
-<%- include('partials/header') %>
+<% 
+    // ==============================================================
+    // FIX ERROR 500 & SEO BREADCRUMB: 
+    // Injeksi variabel SEO secara eksplisit sebelum memanggil header
+    // ==============================================================
+    let pageTitle = typeof album !== 'undefined' && album ? 'Galeri: ' + album.title : 'Detail Galeri';
+%>
+<%- include('partials/header', { pageTitle: pageTitle }) %>
 
 <!-- ==============================================================
      SMART GUARD: Mencegah Error 500 jika Album tidak ditemukan
 ============================================================== -->
 <% if (typeof album !== 'undefined' && album) { %>
 
-<div class="container" style="text-align:center; margin-bottom:40px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:30px;">
-    <a href="/galeri" style="color:#4ade80; display:inline-flex; align-items:center; gap:5px; margin-bottom:20px; font-weight:600; transition:0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#4ade80'">
-        <i data-lucide="arrow-left" style="width:16px;"></i> Kembali ke Galeri
-    </a>
-    
-    <h2 style="font-size: 2.5rem; margin-bottom: 10px;"><%= album.title || 'Detail Galeri' %></h2>
-    <p class="text-muted" style="display:inline-flex; align-items:center; gap:5px; font-size: 1rem;">
-        <i data-lucide="calendar" style="width:16px;"></i> <%= album.date || '-' %>
-    </p>
-</div>
-
 <!-- ==============================================================
-     UPGRADE UI: Menggunakan Grid Presisi dari main.css
+     EXPERT SEO MICRODATA (SCHEMA.ORG)
+     Mendeklarasikan halaman ini sebagai Entitas Album/Galeri Gambar
 ============================================================== -->
-<div class="gallery-detail-grid container">
-    <!-- Foto Cover Utama -->
-    <% if (album.cover) { %>
-    <div class="gallery-detail-item gallery-clickable" onclick="openLightbox(0)">
-        <img src="<%= album.cover %>" alt="Cover: <%= album.title %>">
+<article itemscope itemtype="https://schema.org/ImageGallery">
+
+    <header class="container" style="text-align:center; margin-bottom:40px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:30px;">
+        <a href="/galeri" style="color:#4ade80; display:inline-flex; align-items:center; gap:5px; margin-bottom:20px; font-weight:600; transition:0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#4ade80'">
+            <i data-lucide="arrow-left" style="width:16px;"></i> Kembali ke Galeri
+        </a>
+        
+        <h1 itemprop="headline" style="font-size: 2.5rem; margin-bottom: 10px;"><%= album.title || 'Detail Galeri' %></h1>
+        <p class="text-muted" style="display:inline-flex; align-items:center; gap:5px; font-size: 1rem;">
+            <i data-lucide="calendar" style="width:16px;"></i> 
+            <time itemprop="datePublished" datetime="<%= album.date || '' %>"><%= album.date || '-' %></time>
+        </p>
+    </header>
+
+    <!-- ==============================================================
+         UPGRADE UI & SEO: ImageObject Microdata pada setiap gambar
+    ============================================================== -->
+    <div class="gallery-detail-grid container">
+        <!-- Foto Cover Utama -->
+        <% if (album.cover) { %>
+        <figure class="gallery-detail-item gallery-clickable" onclick="openLightbox(0)" itemprop="image" itemscope itemtype="https://schema.org/ImageObject" style="margin:0;">
+            <img itemprop="contentUrl" src="<%= album.cover %>" alt="Cover: <%= album.title %>">
+            <meta itemprop="name" content="Cover: <%= album.title %>">
+        </figure>
+        <% } %>
+        
+        <!-- Render Foto-Foto Tambahan -->
+        <% if(album.photos && album.photos.length > 0) { %>
+            <% album.photos.forEach((photo, index) => { %>
+                <figure class="gallery-detail-item gallery-clickable" onclick="openLightbox(<%= album.cover ? index + 1 : index %>)" itemprop="image" itemscope itemtype="https://schema.org/ImageObject" style="margin:0;">
+                    <img itemprop="contentUrl" src="<%= photo.url %>" alt="Dokumentasi <%= album.title %> - <%= index + 1 %>">
+                    <meta itemprop="name" content="Dokumentasi <%= index + 1 %>">
+                </figure>
+            <% }) %>
+        <% } %>
     </div>
-    <% } %>
-    
-    <!-- Render Foto-Foto Tambahan -->
-    <% if(album.photos && album.photos.length > 0) { %>
-        <% album.photos.forEach((photo, index) => { %>
-            <div class="gallery-detail-item gallery-clickable" onclick="openLightbox(<%= album.cover ? index + 1 : index %>)">
-                <img src="<%= photo.url %>" alt="Photo <%= index + 1 %>">
-            </div>
-        <% }) %>
-    <% } %>
-</div>
+
+</article> <!-- MENGAKHIRI TAG SCHEMA IMAGE GALLERY -->
 
 <!-- =======================================================
      LIGHTBOX FULLSCREEN OVERLAY (UI di main.css)
