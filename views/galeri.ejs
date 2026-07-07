@@ -1,22 +1,61 @@
-<%- include('partials/header') %>
+<% 
+    // ==============================================================
+    // FIX ERROR 500 & SEO BREADCRUMB: 
+    // Injeksi variabel SEO secara eksplisit untuk Halaman Galeri Utama
+    // ==============================================================
+    let pageTitle = "Galeri Kegiatan";
+    let pageDescription = "Dokumentasi kegiatan dan momen inspiratif kader HMI Komisariat Kedokteran Gigi UMI.";
+%>
+<%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
 
-<div style="text-align: center; margin-bottom: 40px;">
-    <h2>Galeri Kegiatan</h2>
-    <p class="text-muted">Dokumentasi kegiatan dan momen inspiratif kader HMI KomKG-UMI</p>
-</div>
+<!-- ==============================================================
+     EXPERT SEO UPGRADE: Semantic CollectionPage Header
+============================================================== -->
+<header style="text-align: center; margin-bottom: 40px;" itemscope itemtype="https://schema.org/CollectionPage">
+    <h1 itemprop="name" style="font-size:2rem; margin-bottom:10px;">Galeri Kegiatan</h1>
+    <p class="text-muted" itemprop="description">Dokumentasi kegiatan dan momen inspiratif kader HMI KomKG-UMI</p>
+</header>
 
-<div class="grid-3">
-    <% albums.forEach(album => { %>
-    <!-- SEKARANG BISA DI-KLIK UNTUK MENUJU HALAMAN DETAIL -->
-    <a href="/galeri/<%= album.id %>" class="glass gallery-card" style="display:block; cursor:pointer;">
-        <div class="gallery-img-box">
-            <img src="<%= album.cover %>" alt="<%= album.title %>">
-            <div class="photo-count"><i data-lucide="image" style="width:14px;"></i> <% if(album.photos && album.photos.length > 0){ %><%= album.photos.length + 1 %><% } else { %>1<% } %> Foto</div>
-        </div>
-        <h3 style="font-size:1.2rem; transition:0.3s;"><%= album.title %></h3>
-        <p class="text-muted" style="font-size:0.85rem; display:flex; align-items:center; gap:5px; margin-top:5px;"><i data-lucide="calendar" style="width:14px;"></i> <%= album.date %></p>
-    </a>
+<!-- ==============================================================
+     EXPERT SEO UPGRADE: ItemList Microdata
+     (Didesain dengan display:contents agar layout Grid tidak rusak)
+============================================================== -->
+<section class="grid-3" itemscope itemtype="https://schema.org/ItemList">
+    <meta itemprop="itemListOrder" content="https://schema.org/ItemListOrderDescending" />
+    
+    <% albums.forEach((album, index) => { %>
+    
+    <article itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" style="display:contents;">
+        <meta itemprop="position" content="<%= index + 1 %>" />
+        
+        <!-- SEKARANG BISA DI-KLIK UNTUK MENUJU HALAMAN DETAIL -->
+        <a href="/galeri/<%= album.id %>" class="glass gallery-card" style="display:block; cursor:pointer;" itemprop="item" itemscope itemtype="https://schema.org/ImageGallery">
+            <meta itemprop="url" content="https://hmikomkgumi.xyz/galeri/<%= album.id %>">
+            <meta itemprop="author" content="Admin HMI KomKG UMI">
+            <meta itemprop="datePublished" content="<%= album.date %>">
+            
+            <div class="gallery-img-box">
+                <!-- OPTIMASI SEO: Lazy Loading, Async Decoding & Itemprop Image -->
+                <img itemprop="image" src="<%= album.cover %>" alt="Cover Galeri: <%= album.title %>" loading="lazy" decoding="async">
+                <div class="photo-count">
+                    <i data-lucide="image" style="width:14px;"></i> 
+                    <% if(album.photos && album.photos.length > 0){ %><%= album.photos.length + 1 %><% } else { %>1<% } %> Foto
+                </div>
+            </div>
+            
+            <h3 itemprop="headline" style="font-size:1.2rem; transition:0.3s;"><%= album.title %></h3>
+            
+            <p class="text-muted" style="font-size:0.85rem; display:flex; align-items:center; gap:5px; margin-top:5px;">
+                <i data-lucide="calendar" style="width:14px;"></i> <%= album.date %>
+            </p>
+        </a>
+    </article>
+    
     <% }) %>
-</div>
+    
+    <% if(albums.length === 0) { %>
+        <p class="text-muted" style="grid-column: 1 / -1; text-align: center; padding: 40px 0;">Belum ada album galeri.</p>
+    <% } %>
+</section>
 
 <%- include('partials/footer') %>
