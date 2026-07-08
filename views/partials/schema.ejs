@@ -1,0 +1,50 @@
+<%
+    // Mengambil Base URL dan Logo secara dinamis dari setelan website Anda
+    const schemaBaseUrl = 'https://hmikomkgumi.xyz';
+    const schemaSafeSettings = typeof siteSettings !== 'undefined' && siteSettings ? siteSettings : {};
+    let schemaLogo = schemaSafeSettings.headerLogo || schemaBaseUrl + '/favicon.ico';
+    
+    // Pastikan Logo menggunakan Absolute URL agar valid di mata Google
+    if (schemaLogo && !schemaLogo.startsWith('http')) {
+        if (!schemaLogo.startsWith('/')) schemaLogo = '/' + schemaLogo;
+        schemaLogo = schemaBaseUrl + schemaLogo;
+    }
+%>
+
+<!-- EXPERT SEO: Organization Schema (Memperkuat Identitas di Google) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "HMI KomKG UMI",
+  "alternateName": "Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI",
+  "url": "<%= schemaBaseUrl %>/",
+  "logo": "<%= schemaLogo %>",
+  "sameAs": [
+    "https://www.instagram.com/hmi_komkgumi"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service",
+    "url": "<%= schemaBaseUrl %>/"
+  }
+}
+</script>
+
+<!-- EXPERT SEO: WebSite & Sitelinks Search Box Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "HMI KomKG UMI",
+  "url": "<%= schemaBaseUrl %>/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "<%= schemaBaseUrl %>/?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
