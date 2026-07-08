@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentStats = { today: -1, week: -1, total: -1 };
 
     function animateValue(obj, start, end, duration) {
-        if (start === end) return; // Jangan animasi jika angkanya sama
+        if (start === end) return; 
         let startTimestamp = null;
         const step = (timestamp) => {
             if (!startTimestamp) startTimestamp = timestamp;
@@ -154,14 +154,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // TAHAP 1: FAST FETCH (Instan memuat data begitu web dibuka menggunakan metode GET)
+    // TAHAP 1: FAST FETCH (Memuat data dalam milidetik)
     async function fastFetchData() {
         try {
-            const response = await fetch(GAS_URL);
-            const textResponse = await response.text(); // Ambil sebagai teks dulu untuk inspeksi keamanan
+            // Parameter ?t= mencegah HP melakukan Cache angka lama
+            const response = await fetch(GAS_URL + "?t=" + new Date().getTime());
+            const textResponse = await response.text(); 
             
             try {
-                // Parsing aman, jika memuat kode HTML <!DOCTYPE> (Error CORS Google), akan loncat ke catch bawah
                 const data = JSON.parse(textResponse);
                 updateUI(data, 1000);
             } catch (jsonErr) {
@@ -176,12 +176,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // TAHAP 2: SILENT POST (Merekam IP Pengunjung di Latar Belakang)
     async function recordVisitPost() {
         try {
-            // Ambil IP Publik
             const ipResponse = await fetch('https://api.ipify.org?format=json');
             const ipData = await ipResponse.json();
             const clientIP = ipData.ip || 'Unknown';
 
-            // Kirim POST (Silent/Diam-diam)
             const response = await fetch(GAS_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -192,15 +190,14 @@ document.addEventListener('DOMContentLoaded', () => {
             
             try {
                 const data = JSON.parse(textResponse);
-                // Jika sukses terekam & angkanya berubah, update lagi secara halus (500ms)
                 if(data.status === "success") {
-                    updateUI(data, 500);
+                    updateUI(data, 500); // Update halus jika angka bertambah
                 }
             } catch (jsonErr) {
                 // Abaikan error HTML karena UI sudah terisi oleh GET sebelumnya
             }
         } catch (error) {
-            // Berjalan secara silent, jika diblokir AdBlocker biarkan saja
+            // Berjalan secara silent
         }
     }
 
@@ -212,13 +209,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // EKSEKUSI TAHAP 1: Langsung muat data (Super Cepat)
+    // EKSEKUSI TAHAP 1: Langsung muat data agar pengunjung instan melihat angka!
     fastFetchData();
 
-    // EKSEKUSI TAHAP 2: Rekam IP di belakang layar setelah 2.5 detik (Tidak Mengganggu PageSpeed)
+    // EKSEKUSI TAHAP 2: Rekam IP pengunjung di belakang layar setelah 2 detik
     setTimeout(() => { 
         recordVisitPost(); 
-    }, 2500);
+    }, 2000);
 
 });
 </script>
