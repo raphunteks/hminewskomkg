@@ -6,6 +6,9 @@
     // ==============================================================
     let pageTitle = "Data Anggota";
     let pageDescription = "Database keanggotaan terupdate HMI Komisariat Kedokteran Gigi UMI.";
+    
+    // Konstanta Base URL untuk Expert SEO PDF Indexing
+    const seoBaseUrl = 'https://www.hmikomkgumi.xyz';
 %>
 <%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
 
@@ -23,12 +26,55 @@
                   : [{ title: "Data Anggota Komisariat (Default)", file: "/data-anggota.pdf", date: "Default" }];
     %>
 
+    <!-- ==============================================================
+         SUPER BIG UPGRADE: EXPERT SEO JSON-LD UNTUK DOKUMEN PDF
+         Mendikte Google agar meng-index konten di dalam file PDF ini
+    ============================================================== -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Dataset",
+      "name": "Database Anggota HMI KomKG UMI",
+      "description": "Kumpulan data anggota, kader, dan pengurus Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI.",
+      "creator": {
+        "@type": "Organization",
+        "name": "HMI KomKG UMI",
+        "url": "<%= seoBaseUrl %>"
+      },
+      "distribution": [
+        <% pdfList.forEach((item, index) => { 
+            let absolutePdfUrl = item.file.startsWith('http') ? item.file : seoBaseUrl + (item.file.startsWith('/') ? '' : '/') + item.file;
+        %>
+        {
+          "@type": "DataDownload",
+          "name": "<%= item.title.replace(/"/g, '\\"') %>",
+          "encodingFormat": "application/pdf",
+          "contentUrl": "<%= absolutePdfUrl %>"
+        }<%= index < pdfList.length - 1 ? ',' : '' %>
+        <% }) %>
+      ]
+    }
+    </script>
+
     <!-- Tab navigation for multiple PDFs -->
-    <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom: 30px;">
-        <% pdfList.forEach((item, index) => { %>
-            <button class="btn <%= index === 0 ? 'btn-primary' : 'btn-secondary' %> tab-pdf-btn" onclick="changePdf('<%= item.file %>', this)" style="padding: 10px 20px; font-size: 0.9rem; border-radius: 12px; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-                <i data-lucide="external-link" style="width:18px;"></i> <%= item.title %>
-            </button>
+    <!-- UPGRADE SEO: Mengubah <button> menjadi <a> tag dengan href valid agar Googlebot bisa merayapi PDF-nya -->
+    <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom: 30px;" itemscope itemtype="https://schema.org/ItemList">
+        <meta itemprop="name" content="Daftar Dokumen PDF Data Anggota" />
+        
+        <% pdfList.forEach((item, index) => { 
+            let absolutePdfUrl = item.file.startsWith('http') ? item.file : seoBaseUrl + (item.file.startsWith('/') ? '' : '/') + item.file;
+        %>
+            <article itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" style="display: contents;">
+                <meta itemprop="position" content="<%= index + 1 %>" />
+                <a href="<%= absolutePdfUrl %>" 
+                   onclick="event.preventDefault(); changePdf('<%= item.file %>', this)" 
+                   class="btn <%= index === 0 ? 'btn-primary' : 'btn-secondary' %> tab-pdf-btn" 
+                   style="padding: 10px 20px; font-size: 0.9rem; border-radius: 12px; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.15);"
+                   itemprop="item">
+                    <i data-lucide="external-link" style="width:18px;"></i> 
+                    <span itemprop="name"><%= item.title %></span>
+                </a>
+            </article>
         <% }) %>
     </div>
 
@@ -43,7 +89,7 @@
                 title="Data Anggota Viewer"
                 scrolling="yes"
                 style="width: 100%; height: 100%; border: none;">
-                Browser Anda tidak mendukung iframe PDF. Silakan download PDF ini.
+                Browser Anda tidak mendukung iframe PDF. Silakan <a href="<%= pdfList[0].file.startsWith('http') ? pdfList[0].file : seoBaseUrl + (pdfList[0].file.startsWith('/') ? '' : '/') + pdfList[0].file %>" target="_blank" style="color:#4ade80; text-decoration:underline;">download PDF ini</a>.
             </iframe>
         </div>
     </div>
@@ -66,8 +112,13 @@
         btn.classList.remove('btn-secondary');
         btn.classList.add('btn-primary');
 
-        // UPGRADE: Buka file PDF langsung di tab baru secara otomatis saat di-klik
-        window.open(src, '_blank');
+        // Buka file PDF langsung di tab baru secara otomatis saat di-klik
+        // Menggunakan Absolute URL agar path-nya tidak rusak di tab baru
+        let absoluteSrc = src;
+        if (!src.startsWith('http')) {
+            absoluteSrc = 'https://www.hmikomkgumi.xyz' + (src.startsWith('/') ? '' : '/') + src;
+        }
+        window.open(absoluteSrc, '_blank');
     }
 </script>
 
