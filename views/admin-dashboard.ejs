@@ -70,8 +70,8 @@
                                 <td class="fw-600"><%= person.name %></td>
                                 <td style="color:#4ade80; font-size:0.85rem;"><%= person.role %></td>
                                 <td class="td-actions">
-                                    <!-- UPGRADE PARAMETER: Menyertakan link sosmed -->
-                                    <button type="button" class="action-btn edit" onclick="openEditDynamic('<%= person.id %>', '<%= person.name.replace(/'/g, "\\'") %>', '<%= person.role.replace(/'/g, "\\'") %>', '/admin/edit-pengurus/', '<%= person.ig ? person.ig.replace(/'/g, "\\'") : '' %>', '<%= person.fb ? person.fb.replace(/'/g, "\\'") : '' %>', '<%= person.twitter ? person.twitter.replace(/'/g, "\\'") : '' %>', '<%= person.linkedin ? person.linkedin.replace(/'/g, "\\'") : '' %>')"><i data-lucide="edit"></i></button>
+                                    <!-- UPGRADE PARAMETER: Menyertakan link sosmed termasuk TikTok -->
+                                    <button type="button" class="action-btn edit" onclick="openEditDynamic('<%= person.id %>', '<%= person.name.replace(/'/g, "\\'") %>', '<%= person.role.replace(/'/g, "\\'") %>', '/admin/edit-pengurus/', '<%= person.ig ? person.ig.replace(/'/g, "\\'") : '' %>', '<%= person.fb ? person.fb.replace(/'/g, "\\'") : '' %>', '<%= person.twitter ? person.twitter.replace(/'/g, "\\'") : '' %>', '<%= person.linkedin ? person.linkedin.replace(/'/g, "\\'") : '' %>', '<%= person.tiktok ? person.tiktok.replace(/'/g, "\\'") : '' %>')"><i data-lucide="edit"></i></button>
                                     <form action="/admin/hapus-pengurus/<%= person.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Yakin?')"><i data-lucide="trash-2"></i></button></form>
                                 </td>
                             </tr>
@@ -100,8 +100,8 @@
                                             <img src="<%= m.image %>" class="member-avatar">
                                             <p class="member-name"><%= m.name %></p>
                                             <p style="font-size:0.75rem; color:#4ade80; margin-top:3px; font-weight:bold;"><%= m.role || '' %></p>
-                                            <!-- UPGRADE PARAMETER: Menyertakan link sosmed -->
-                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '<%= (m.role || '').replace(/'/g, "\\'") %>', '/admin/edit-anggota-bidang/', '<%= m.ig ? m.ig.replace(/'/g, "\\'") : '' %>', '<%= m.fb ? m.fb.replace(/'/g, "\\'") : '' %>', '<%= m.twitter ? m.twitter.replace(/'/g, "\\'") : '' %>', '<%= m.linkedin ? m.linkedin.replace(/'/g, "\\'") : '' %>')"><i data-lucide="edit" style="width:12px;"></i></button>
+                                            <!-- UPGRADE PARAMETER: Menyertakan link sosmed termasuk TikTok -->
+                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '<%= (m.role || '').replace(/'/g, "\\'") %>', '/admin/edit-anggota-bidang/', '<%= m.ig ? m.ig.replace(/'/g, "\\'") : '' %>', '<%= m.fb ? m.fb.replace(/'/g, "\\'") : '' %>', '<%= m.twitter ? m.twitter.replace(/'/g, "\\'") : '' %>', '<%= m.linkedin ? m.linkedin.replace(/'/g, "\\'") : '' %>', '<%= m.tiktok ? m.tiktok.replace(/'/g, "\\'") : '' %>')"><i data-lucide="edit" style="width:12px;"></i></button>
                                             <form action="/admin/hapus-anggota-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota?')"><i data-lucide="x"></i></button></form>
                                         </div>
                                     <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
@@ -130,7 +130,7 @@
                                 <td class="fw-600"><%= person.name %></td>
                                 <td style="color:#f472b6; font-size:0.85rem;"><%= person.role %></td>
                                 <td class="td-actions">
-                                    <button type="button" class="action-btn edit" onclick="openEditDynamic('<%= person.id %>', '<%= person.name.replace(/'/g, "\\'") %>', '<%= person.role.replace(/'/g, "\\'") %>', '/admin/edit-kohati-pengurus/', '<%= person.ig ? person.ig.replace(/'/g, "\\'") : '' %>', '<%= person.fb ? person.fb.replace(/'/g, "\\'") : '' %>', '<%= person.twitter ? person.twitter.replace(/'/g, "\\'") : '' %>', '<%= person.linkedin ? person.linkedin.replace(/'/g, "\\'") : '' %>')"><i data-lucide="edit"></i></button>
+                                    <button type="button" class="action-btn edit" onclick="openEditDynamic('<%= person.id %>', '<%= person.name.replace(/'/g, "\\'") %>', '<%= person.role.replace(/'/g, "\\'") %>', '/admin/edit-kohati-pengurus/', '<%= person.ig ? person.ig.replace(/'/g, "\\'") : '' %>', '<%= person.fb ? person.fb.replace(/'/g, "\\'") : '' %>', '<%= person.twitter ? person.twitter.replace(/'/g, "\\'") : '' %>', '<%= person.linkedin ? person.linkedin.replace(/'/g, "\\'") : '' %>', '<%= person.tiktok ? person.tiktok.replace(/'/g, "\\'") : '' %>')"><i data-lucide="edit"></i></button>
                                     <form action="/admin/hapus-kohati-pengurus/<%= person.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus pengurus kohati?')"><i data-lucide="trash-2"></i></button></form>
                                 </td>
                             </tr>
@@ -159,7 +159,7 @@
                                             <img src="<%= m.image %>" class="member-avatar" style="border-color:rgba(244,114,182,0.5);">
                                             <p class="member-name"><%= m.name %></p>
                                             <p style="font-size:0.75rem; color:#f472b6; margin-top:3px; font-weight:bold;"><%= m.role || '' %></p>
-                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '<%= (m.role || '').replace(/'/g, "\\'") %>', '/admin/edit-anggota-kohati-bidang/', '<%= m.ig ? m.ig.replace(/'/g, "\\'") : '' %>', '<%= m.fb ? m.fb.replace(/'/g, "\\'") : '' %>', '<%= m.twitter ? m.twitter.replace(/'/g, "\\'") : '' %>', '<%= m.linkedin ? m.linkedin.replace(/'/g, "\\'") : '' %>')"><i data-lucide="edit" style="width:12px;"></i></button>
+                                            <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '<%= (m.role || '').replace(/'/g, "\\'") %>', '/admin/edit-anggota-kohati-bidang/', '<%= m.ig ? m.ig.replace(/'/g, "\\'") : '' %>', '<%= m.fb ? m.fb.replace(/'/g, "\\'") : '' %>', '<%= m.twitter ? m.twitter.replace(/'/g, "\\'") : '' %>', '<%= m.linkedin ? m.linkedin.replace(/'/g, "\\'") : '' %>', '<%= m.tiktok ? m.tiktok.replace(/'/g, "\\'") : '' %>')"><i data-lucide="edit" style="width:12px;"></i></button>
                                             <form action="/admin/hapus-anggota-kohati-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota kohati?')"><i data-lucide="x"></i></button></form>
                                         </div>
                                     <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
@@ -509,14 +509,15 @@
             <div class="form-group"><label>Jabatan</label><input type="text" name="role" class="input-control" required></div>
             <div class="form-group"><label>Upload Foto</label><input type="file" name="image" class="input-control file-compress" accept="image/*" required></div>
             
-            <!-- UPGRADE MODAL: Input Sosial Media -->
+            <!-- UPGRADE MODAL: Input Sosial Media dengan tambahan TikTok -->
             <div style="margin-top:20px; padding-top:15px; border-top:1px solid rgba(255,255,255,0.1);">
                 <p style="font-size:0.85rem; color:#4ade80; margin-bottom:10px;">Link Sosial Media (Opsional)</p>
                 <div class="grid-2">
                     <div class="form-group"><input type="url" name="ig" class="input-control" placeholder="URL Instagram..."></div>
+                    <div class="form-group"><input type="url" name="tiktok" class="input-control" placeholder="URL TikTok..."></div>
                     <div class="form-group"><input type="url" name="fb" class="input-control" placeholder="URL Facebook..."></div>
                     <div class="form-group"><input type="url" name="twitter" class="input-control" placeholder="URL Twitter/X..."></div>
-                    <div class="form-group"><input type="url" name="linkedin" class="input-control" placeholder="URL LinkedIn..."></div>
+                    <div class="form-group" style="grid-column: span 2;"><input type="url" name="linkedin" class="input-control" placeholder="URL LinkedIn..."></div>
                 </div>
             </div>
 
@@ -533,14 +534,15 @@
             <div class="form-group"><label>Jabatan</label><input type="text" name="role" id="editDynamicRole" class="input-control"></div>
             <div class="form-group"><label>Upload Foto Baru (Opsional)</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
             
-            <!-- UPGRADE MODAL: Input Sosial Media -->
+            <!-- UPGRADE MODAL: Input Sosial Media dengan tambahan TikTok -->
             <div style="margin-top:20px; padding-top:15px; border-top:1px solid rgba(255,255,255,0.1);">
                 <p style="font-size:0.85rem; color:#4ade80; margin-bottom:10px;">Link Sosial Media (Opsional)</p>
                 <div class="grid-2">
                     <div class="form-group"><input type="url" name="ig" id="editDynamicIg" class="input-control" placeholder="URL Instagram..."></div>
+                    <div class="form-group"><input type="url" name="tiktok" id="editDynamicTiktok" class="input-control" placeholder="URL TikTok..."></div>
                     <div class="form-group"><input type="url" name="fb" id="editDynamicFb" class="input-control" placeholder="URL Facebook..."></div>
                     <div class="form-group"><input type="url" name="twitter" id="editDynamicTwitter" class="input-control" placeholder="URL Twitter/X..."></div>
-                    <div class="form-group"><input type="url" name="linkedin" id="editDynamicLinkedin" class="input-control" placeholder="URL LinkedIn..."></div>
+                    <div class="form-group" style="grid-column: span 2;"><input type="url" name="linkedin" id="editDynamicLinkedin" class="input-control" placeholder="URL LinkedIn..."></div>
                 </div>
             </div>
 
@@ -557,14 +559,15 @@
             <div class="form-group"><label>Jabatan (Opsional)</label><input type="text" name="role" id="editAnggotaBidangRole" class="input-control"></div>
             <div class="form-group"><label>Upload Foto</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
             
-            <!-- UPGRADE MODAL: Input Sosial Media -->
+            <!-- UPGRADE MODAL: Input Sosial Media dengan tambahan TikTok -->
             <div style="margin-top:20px; padding-top:15px; border-top:1px solid rgba(255,255,255,0.1);">
                 <p style="font-size:0.85rem; color:#4ade80; margin-bottom:10px;">Link Sosial Media (Opsional)</p>
                 <div class="grid-2">
                     <div class="form-group"><input type="url" name="ig" id="editAnggotaBidangIg" class="input-control" placeholder="URL Instagram..."></div>
+                    <div class="form-group"><input type="url" name="tiktok" id="editAnggotaBidangTiktok" class="input-control" placeholder="URL TikTok..."></div>
                     <div class="form-group"><input type="url" name="fb" id="editAnggotaBidangFb" class="input-control" placeholder="URL Facebook..."></div>
                     <div class="form-group"><input type="url" name="twitter" id="editAnggotaBidangTwitter" class="input-control" placeholder="URL Twitter/X..."></div>
-                    <div class="form-group"><input type="url" name="linkedin" id="editAnggotaBidangLinkedin" class="input-control" placeholder="URL LinkedIn..."></div>
+                    <div class="form-group" style="grid-column: span 2;"><input type="url" name="linkedin" id="editAnggotaBidangLinkedin" class="input-control" placeholder="URL LinkedIn..."></div>
                 </div>
             </div>
 
@@ -581,14 +584,15 @@
             <div class="form-group"><label>Jabatan Kohati</label><input type="text" name="role" class="input-control" required></div>
             <div class="form-group"><label>Upload Foto</label><input type="file" name="image" class="input-control file-compress" accept="image/*" required></div>
             
-            <!-- UPGRADE MODAL: Input Sosial Media Kohati -->
+            <!-- UPGRADE MODAL: Input Sosial Media Kohati dengan tambahan TikTok -->
             <div style="margin-top:20px; padding-top:15px; border-top:1px solid rgba(244,114,182,0.3);">
                 <p style="font-size:0.85rem; color:#f472b6; margin-bottom:10px;">Link Sosial Media (Opsional)</p>
                 <div class="grid-2">
                     <div class="form-group"><input type="url" name="ig" class="input-control" placeholder="URL Instagram..."></div>
+                    <div class="form-group"><input type="url" name="tiktok" class="input-control" placeholder="URL TikTok..."></div>
                     <div class="form-group"><input type="url" name="fb" class="input-control" placeholder="URL Facebook..."></div>
                     <div class="form-group"><input type="url" name="twitter" class="input-control" placeholder="URL Twitter/X..."></div>
-                    <div class="form-group"><input type="url" name="linkedin" class="input-control" placeholder="URL LinkedIn..."></div>
+                    <div class="form-group" style="grid-column: span 2;"><input type="url" name="linkedin" class="input-control" placeholder="URL LinkedIn..."></div>
                 </div>
             </div>
 
@@ -606,7 +610,6 @@
 <div class="modal-overlay" id="modalEditBidang"><div class="modal-content"><div class="modal-header"><h3>Edit Nama Bidang</h3><button type="button" class="close-modal" onclick="closeModal('modalEditBidang')"><i data-lucide="x"></i></button></div><form id="formEditBidang" method="POST"><div class="form-group"><label>Nama Bidang Baru</label><input type="text" name="bidang_name" id="editBidangName" class="input-control" required></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditBidang')">Batal</button><button type="submit" class="btn btn-primary">Update Bidang</button></div></form></div></div>
 <div class="modal-overlay" id="modalSosmed"><div class="modal-content"><div class="modal-header"><h3>Tambah Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalSosmed')"><i data-lucide="x"></i></button></div><form action="/admin/tambah-sosmed" method="POST" enctype="multipart/form-data"><div class="form-group"><label>Nama Sosmed</label><input type="text" name="name" class="input-control" required></div><div class="form-group"><label>URL Profile</label><input type="url" name="url" class="input-control" required></div><div class="form-group"><label>Upload Icon/Logo</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalSosmed')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan</button></div></form></div></div>
 <div class="modal-overlay" id="modalEditSosmed"><div class="modal-content"><div class="modal-header"><h3>Edit Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalEditSosmed')"><i data-lucide="x"></i></button></div><form id="formEditSosmed" method="POST" enctype="multipart/form-data"><div class="form-group"><label>Nama Sosmed</label><input type="text" name="name" id="editSosmedName" class="input-control" required></div><div class="form-group"><label>URL Profile</label><input type="url" name="url" id="editSosmedUrl" class="input-control" required></div><div class="form-group"><label>Ganti Icon Baru</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditSosmed')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Update Sosmed</button></div></form></div></div>
-<!-- (Modal Berita & Bio tetap sama fungsinya terhubung dengan Quill JS di bawah) -->
 
 <script>
     function openAdmTab(tabId, btn) {
@@ -632,8 +635,8 @@
         openModal('modalEditSosmed');
     }
 
-    // UPGRADE: Fungsi Edit Dynamic sekarang menerima parameter Social Media
-    function openEditDynamic(id, name, role, actionPath, ig='', fb='', twitter='', linkedin='') {
+    // UPGRADE: Fungsi Edit Dynamic sekarang menerima parameter TikTok
+    function openEditDynamic(id, name, role, actionPath, ig='', fb='', twitter='', linkedin='', tiktok='') {
         document.getElementById('editDynamicName').value = name;
         document.getElementById('editDynamicRole').value = role;
         
@@ -641,6 +644,7 @@
         document.getElementById('editDynamicFb').value = fb;
         document.getElementById('editDynamicTwitter').value = twitter;
         document.getElementById('editDynamicLinkedin').value = linkedin;
+        document.getElementById('editDynamicTiktok').value = tiktok;
 
         document.getElementById('formEditDynamic').action = actionPath + id;
         openModal('modalEditDynamic');
@@ -652,7 +656,7 @@
         openModal('modalEditBidang'); 
     }
     
-    // UPGRADE: Fungsi Tambah Anggota Bidang sekarang mengosongkan input sosmed
+    // UPGRADE: Fungsi Tambah Anggota Bidang sekarang mengosongkan input tiktok
     function openModalAnggotaBidang(bidangId, bidangName, actionPath) { 
         document.getElementById('anggotaBidangTitle').innerText = "Tambah Anggota: " + bidangName; 
         document.getElementById('editAnggotaBidangName').value = "";
@@ -662,13 +666,14 @@
         document.getElementById('editAnggotaBidangFb').value = "";
         document.getElementById('editAnggotaBidangTwitter').value = "";
         document.getElementById('editAnggotaBidangLinkedin').value = "";
+        document.getElementById('editAnggotaBidangTiktok').value = "";
 
         document.getElementById('formAnggotaBidang').action = actionPath + bidangId; 
         openModal('modalAnggotaBidang'); 
     }
     
-    // UPGRADE: Fungsi Edit Anggota Bidang sekarang memuat link sosmed
-    function openEditAnggotaBidangModal(bidangId, memberId, name, role, actionPath, ig='', fb='', twitter='', linkedin='') { 
+    // UPGRADE: Fungsi Edit Anggota Bidang sekarang memuat link tiktok
+    function openEditAnggotaBidangModal(bidangId, memberId, name, role, actionPath, ig='', fb='', twitter='', linkedin='', tiktok='') { 
         document.getElementById('anggotaBidangTitle').innerText = "Edit Anggota"; 
         document.getElementById('editAnggotaBidangName').value = name; 
         document.getElementById('editAnggotaBidangRole').value = role; 
@@ -677,6 +682,7 @@
         document.getElementById('editAnggotaBidangFb').value = fb;
         document.getElementById('editAnggotaBidangTwitter').value = twitter;
         document.getElementById('editAnggotaBidangLinkedin').value = linkedin;
+        document.getElementById('editAnggotaBidangTiktok').value = tiktok;
 
         document.getElementById('formAnggotaBidang').action = actionPath + bidangId + "/" + memberId; 
         openModal('modalAnggotaBidang'); 
