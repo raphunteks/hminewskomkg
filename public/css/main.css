@@ -1119,3 +1119,68 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
         margin-bottom: 10px;
     }
 }
+
+/* ==============================================================
+   SUPER BIG UPGRADE: SOCIAL MEDIA BUTTONS PADA KARTU KEPENGURUSAN
+   Didesain persis seperti ikon SVG (Bulat putih dengan ikon gelap)
+============================================================== */
+.team-socials {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+    position: relative;
+    z-index: 2;
+}
+
+.team-social-btn {
+    width: 34px;
+    height: 34px;
+    background: #ffffff;
+    color: #064e3b; /* Warna icon mengikuti tema hijau HMI */
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    text-decoration: none;
+}
+
+.team-social-btn:hover {
+    background: #4ade80; /* Menjadi hijau menyala saat disentuh */
+    color: #000000;
+    transform: translateY(-4px);
+    box-shadow: 0 6px 15px rgba(34,197,94,0.4);
+}
+
+.team-social-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.2px; /* Dibuat sedikit tebal agar tegas (persis SVG) */
+}
+
+/* ==============================================================
+   VARIAN KHUSUS UNTUK KOHATI (TEMA MERAH MUDA/PINK)
+============================================================== */
+.kohati-social-btn {
+    color: #831843; /* Ikon warna pink sangat gelap/maroon */
+}
+
+.kohati-social-btn:hover {
+    background: #f472b6; /* Menjadi pink menyala saat disentuh */
+    color: #ffffff;
+    box-shadow: 0 6px 15px rgba(244,114,182,0.4);
+}
+
+/* Penyesuaian Responsif di Layar HP (Mobile Friendly) */
+@media (max-width: 768px) {
+    .team-social-btn {
+        width: 32px;
+        height: 32px;
+    }
+    .team-social-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+}
