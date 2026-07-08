@@ -90,8 +90,8 @@
 <%- include('partials/instagram-feed') %>
 
 <!-- ==============================================================
-     SUPER BIG UPGRADE: DASHBOARD ANALYTICS WIDGET (FUTURISTIC & COMPACT)
-     Posisi dipindahkan ke bagian bawah agar rapi dan tidak mengganggu konten utama
+     SUPER BIG UPGRADE: DASHBOARD ANALYTICS WIDGET
+     Versi Anti-Error CORS & Fast Response
 ============================================================== -->
 <section class="analytics-section" aria-label="Statistik Kunjungan Website">
     <div class="analytics-grid">
@@ -119,10 +119,14 @@
 <!-- SCRIPT PENGGERAK API GOOGLE APPS SCRIPT -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Pastikan URL API Google Script Anda benar
+    // --- GANTI DENGAN URL DEPLOYMENT GOOGLE SCRIPT YANG BARU ---
     const GAS_URL = "https://script.google.com/macros/s/AKfycbw8MA9YGFK3SIAXhIZAF9m1J4eOGf9LGQD-j4xXjvVSaQ826JrqeEKApPcKJWfJxw/exec";
 
+    // Variabel state untuk mencegah update animasi berulang
+    let currentStats = { today: -1, week: -1, total: -1 };
+
     function animateValue(obj, start, end, duration) {
+        if (start === end) return; // Jangan animasi jika angkanya sama
         let startTimestamp = null;
         const step = (timestamp) => {
             if (!startTimestamp) startTimestamp = timestamp;
@@ -135,49 +139,87 @@ document.addEventListener('DOMContentLoaded', () => {
         window.requestAnimationFrame(step);
     }
 
-    async function recordVisit() {
+    function updateUI(data, speed) {
+        if(data.today !== undefined && data.today !== currentStats.today) {
+            animateValue(document.getElementById('val-today'), Math.max(0, currentStats.today), data.today, speed);
+            currentStats.today = data.today;
+        }
+        if(data.week !== undefined && data.week !== currentStats.week) {
+            animateValue(document.getElementById('val-week'), Math.max(0, currentStats.week), data.week, speed);
+            currentStats.week = data.week;
+        }
+        if(data.total !== undefined && data.total !== currentStats.total) {
+            animateValue(document.getElementById('val-total'), Math.max(0, currentStats.total), data.total, speed);
+            currentStats.total = data.total;
+        }
+    }
+
+    // TAHAP 1: FAST FETCH (Instan memuat data begitu web dibuka menggunakan metode GET)
+    async function fastFetchData() {
         try {
+            const response = await fetch(GAS_URL);
+            const textResponse = await response.text(); // Ambil sebagai teks dulu untuk inspeksi keamanan
+            
+            try {
+                // Parsing aman, jika memuat kode HTML <!DOCTYPE> (Error CORS Google), akan loncat ke catch bawah
+                const data = JSON.parse(textResponse);
+                updateUI(data, 1000);
+            } catch (jsonErr) {
+                console.warn("GAS Redirect/CORS Error, menggunakan fallback UI.");
+                setFallbackUI();
+            }
+        } catch (err) {
+            console.warn("Koneksi ke GAS lambat/gagal.", err);
+        }
+    }
+
+    // TAHAP 2: SILENT POST (Merekam IP Pengunjung di Latar Belakang)
+    async function recordVisitPost() {
+        try {
+            // Ambil IP Publik
             const ipResponse = await fetch('https://api.ipify.org?format=json');
             const ipData = await ipResponse.json();
             const clientIP = ipData.ip || 'Unknown';
 
-            const payload = { ip: clientIP };
-            
+            // Kirim POST (Silent/Diam-diam)
             const response = await fetch(GAS_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ ip: clientIP })
             });
 
-            const data = await response.json();
+            const textResponse = await response.text();
             
-            if(data.today !== undefined && data.week !== undefined && data.total !== undefined) {
-                animateValue(document.getElementById('val-today'), 0, data.today, 1500);
-                animateValue(document.getElementById('val-week'), 0, data.week, 1500);
-                animateValue(document.getElementById('val-total'), 0, data.total, 2000);
+            try {
+                const data = JSON.parse(textResponse);
+                // Jika sukses terekam & angkanya berubah, update lagi secara halus (500ms)
+                if(data.status === "success") {
+                    updateUI(data, 500);
+                }
+            } catch (jsonErr) {
+                // Abaikan error HTML karena UI sudah terisi oleh GET sebelumnya
             }
         } catch (error) {
-            console.error("Gagal merekam analytics:", error);
-            fallbackFetchData();
+            // Berjalan secara silent, jika diblokir AdBlocker biarkan saja
         }
     }
 
-    async function fallbackFetchData() {
-        try {
-            const response = await fetch(GAS_URL);
-            const data = await response.json();
-            document.getElementById('val-today').innerHTML = data.Views_Today.toLocaleString('id-ID');
-            document.getElementById('val-week').innerHTML = data.Views_Week.toLocaleString('id-ID');
-            document.getElementById('val-total').innerHTML = data.Views_Total.toLocaleString('id-ID');
-        } catch (err) {
+    function setFallbackUI() {
+        if(currentStats.today === -1) {
             document.getElementById('val-today').innerHTML = "-";
             document.getElementById('val-week').innerHTML = "-";
             document.getElementById('val-total').innerHTML = "-";
         }
     }
 
-    // Lazy load agar tidak memperlambat website
-    setTimeout(() => { recordVisit(); }, 2000);
+    // EKSEKUSI TAHAP 1: Langsung muat data (Super Cepat)
+    fastFetchData();
+
+    // EKSEKUSI TAHAP 2: Rekam IP di belakang layar setelah 2.5 detik (Tidak Mengganggu PageSpeed)
+    setTimeout(() => { 
+        recordVisitPost(); 
+    }, 2500);
+
 });
 </script>
 
