@@ -141,6 +141,18 @@
                     </div>
                     <h4 class="team-name" itemprop="name"><%= person.name %></h4>
                     <p class="team-role" itemprop="jobTitle"><%= person.role %></p>
+                    
+                    <!-- ==============================================================
+                         SUPER BIG UPGRADE: SOCIAL MEDIA BUTTONS (HMI UMUM)
+                    ============================================================== -->
+                    <% if(person.ig || person.fb || person.twitter || person.linkedin) { %>
+                    <div class="team-socials">
+                        <% if(person.ig) { %><a href="<%= person.ig %>" target="_blank" class="team-social-btn" aria-label="Instagram"><i data-lucide="instagram"></i></a><% } %>
+                        <% if(person.fb) { %><a href="<%= person.fb %>" target="_blank" class="team-social-btn" aria-label="Facebook"><i data-lucide="facebook"></i></a><% } %>
+                        <% if(person.twitter) { %><a href="<%= person.twitter %>" target="_blank" class="team-social-btn" aria-label="Twitter/X"><i data-lucide="twitter"></i></a><% } %>
+                        <% if(person.linkedin) { %><a href="<%= person.linkedin %>" target="_blank" class="team-social-btn" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a><% } %>
+                    </div>
+                    <% } %>
                 </div>
                 <% }) %>
             </div>
@@ -162,6 +174,16 @@
                                             <h4 class="team-name" itemprop="name" style="font-size:0.95rem;"><%= m.name %></h4>
                                             <% if(m.role) { %>
                                                 <p itemprop="jobTitle" style="color:#4ade80; font-size:0.8rem; font-weight:bold; margin-top:2px;"><%= m.role %></p>
+                                            <% } %>
+                                            
+                                            <!-- ANGGOTA BIDANG SOCIAL MEDIA -->
+                                            <% if(m.ig || m.fb || m.twitter || m.linkedin) { %>
+                                            <div class="team-socials" style="margin-top:10px;">
+                                                <% if(m.ig) { %><a href="<%= m.ig %>" target="_blank" class="team-social-btn" style="width:28px; height:28px;"><i data-lucide="instagram" style="width:14px;"></i></a><% } %>
+                                                <% if(m.fb) { %><a href="<%= m.fb %>" target="_blank" class="team-social-btn" style="width:28px; height:28px;"><i data-lucide="facebook" style="width:14px;"></i></a><% } %>
+                                                <% if(m.twitter) { %><a href="<%= m.twitter %>" target="_blank" class="team-social-btn" style="width:28px; height:28px;"><i data-lucide="twitter" style="width:14px;"></i></a><% } %>
+                                                <% if(m.linkedin) { %><a href="<%= m.linkedin %>" target="_blank" class="team-social-btn" style="width:28px; height:28px;"><i data-lucide="linkedin" style="width:14px;"></i></a><% } %>
+                                            </div>
                                             <% } %>
                                         </div>
                                     <% }) %>
@@ -219,6 +241,16 @@
                         </div>
                         <h4 class="team-name" itemprop="name"><%= person.name %></h4>
                         <p itemprop="jobTitle" style="color:#f472b6; font-size:0.85rem; font-weight:bold;"><%= person.role %></p>
+                        
+                        <!-- PENGURUS KOHATI SOCIAL MEDIA -->
+                        <% if(person.ig || person.fb || person.twitter || person.linkedin) { %>
+                        <div class="team-socials">
+                            <% if(person.ig) { %><a href="<%= person.ig %>" target="_blank" class="team-social-btn kohati-social-btn" aria-label="Instagram"><i data-lucide="instagram"></i></a><% } %>
+                            <% if(person.fb) { %><a href="<%= person.fb %>" target="_blank" class="team-social-btn kohati-social-btn" aria-label="Facebook"><i data-lucide="facebook"></i></a><% } %>
+                            <% if(person.twitter) { %><a href="<%= person.twitter %>" target="_blank" class="team-social-btn kohati-social-btn" aria-label="Twitter/X"><i data-lucide="twitter"></i></a><% } %>
+                            <% if(person.linkedin) { %><a href="<%= person.linkedin %>" target="_blank" class="team-social-btn kohati-social-btn" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a><% } %>
+                        </div>
+                        <% } %>
                     </div>
                     <% }) %>
                 </div>
@@ -240,6 +272,16 @@
                                                 <h4 class="team-name" itemprop="name" style="font-size:0.95rem;"><%= m.name %></h4>
                                                 <% if(m.role) { %>
                                                     <p itemprop="jobTitle" style="color:#f472b6; font-size:0.8rem; font-weight:bold; margin-top:2px;"><%= m.role %></p>
+                                                <% } %>
+                                                
+                                                <!-- ANGGOTA BIDANG KOHATI SOCIAL MEDIA -->
+                                                <% if(m.ig || m.fb || m.twitter || m.linkedin) { %>
+                                                <div class="team-socials" style="margin-top:10px;">
+                                                    <% if(m.ig) { %><a href="<%= m.ig %>" target="_blank" class="team-social-btn kohati-social-btn" style="width:28px; height:28px;"><i data-lucide="instagram" style="width:14px;"></i></a><% } %>
+                                                    <% if(m.fb) { %><a href="<%= m.fb %>" target="_blank" class="team-social-btn kohati-social-btn" style="width:28px; height:28px;"><i data-lucide="facebook" style="width:14px;"></i></a><% } %>
+                                                    <% if(m.twitter) { %><a href="<%= m.twitter %>" target="_blank" class="team-social-btn kohati-social-btn" style="width:28px; height:28px;"><i data-lucide="twitter" style="width:14px;"></i></a><% } %>
+                                                    <% if(m.linkedin) { %><a href="<%= m.linkedin %>" target="_blank" class="team-social-btn kohati-social-btn" style="width:28px; height:28px;"><i data-lucide="linkedin" style="width:14px;"></i></a><% } %>
+                                                </div>
                                                 <% } %>
                                             </div>
                                         <% }) %>
