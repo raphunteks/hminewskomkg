@@ -317,11 +317,14 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
 
         const news = safeArr(await kv.get('newsList')).map(x => ({...x, title: safeStr(x.title), category: safeStr(x.category), date: safeStr(x.date), content: safeStr(x.content)}));
         const albums = safeArr(await kv.get('albumsList')).map(x => ({...x, title: safeStr(x.title), date: safeStr(x.date)}));
-        const pengurus = safeArr(await kv.get('pengurusList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role)}));
-        const bidang = safeArr(await kv.get('bidangList')).map(x => ({...x, name: safeStr(x.name)}));
+        
+        // UPGRADE SANITIZER: Menambahkan proteksi ke properti Social Media
+        const pengurus = safeArr(await kv.get('pengurusList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role), ig: safeStr(x.ig), fb: safeStr(x.fb), twitter: safeStr(x.twitter), linkedin: safeStr(x.linkedin)}));
+        const bidang = safeArr(await kv.get('bidangList')).map(x => ({...x, name: safeStr(x.name), members: safeArr(x.members).map(m => ({...m, name: safeStr(m.name), role: safeStr(m.role), ig: safeStr(m.ig), fb: safeStr(m.fb), twitter: safeStr(m.twitter), linkedin: safeStr(m.linkedin)}))}));
+        const kohatiPengurus = safeArr(await kv.get('kohatiPengurusList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role), ig: safeStr(x.ig), fb: safeStr(x.fb), twitter: safeStr(x.twitter), linkedin: safeStr(x.linkedin)}));
+        const kohatiBidang = safeArr(await kv.get('kohatiBidangList')).map(x => ({...x, name: safeStr(x.name), members: safeArr(x.members).map(m => ({...m, name: safeStr(m.name), role: safeStr(m.role), ig: safeStr(m.ig), fb: safeStr(m.fb), twitter: safeStr(m.twitter), linkedin: safeStr(m.linkedin)}))}));
+        
         const dataAnggota = safeArr(await kv.get('dataAnggotaList')).map(x => ({...x, title: safeStr(x.title), date: safeStr(x.date)}));
-        const kohatiPengurus = safeArr(await kv.get('kohatiPengurusList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role)}));
-        const kohatiBidang = safeArr(await kv.get('kohatiBidangList')).map(x => ({...x, name: safeStr(x.name)}));
         const shortlinks = safeArr(await kv.get('shortlinkList')).map(x => ({...x, title: safeStr(x.title), path: safeStr(x.path), originalUrl: safeStr(x.originalUrl)}));
         
         // Panggil Data Link in Bio
@@ -586,12 +589,37 @@ app.post('/admin/hapus-biolink/:id', requireAdmin, async (req, res) => {
 });
 
 
-// --- API DINAMIS PENGURUS & BIDANG ---
+// ==============================================================
+// SUPER BIG UPGRADE: API DINAMIS PENGURUS & BIDANG + SOCIAL MEDIA
+// ==============================================================
 const manageTeam = async (req, res, dbKey, action) => {
     try {
         let list = await kv.get(dbKey) || [];
-        if (action === 'add') { list.push({ id: Date.now(), name: req.body.name, role: req.body.role || '', image: fileHelper(req, 'image_b64') }); }
-        else if (action === 'edit') { let i = list.findIndex(x => x.id == req.params.id); if (i !== -1) { if(req.body.name) list[i].name = req.body.name; if(req.body.role) list[i].role = req.body.role; let img = fileHelper(req, 'image_b64'); if (img) list[i].image = img; if(req.body.bidang_name) list[i].name = req.body.bidang_name; } }
+        if (action === 'add') { 
+            list.push({ 
+                id: Date.now(), 
+                name: req.body.name, 
+                role: req.body.role || '', 
+                image: fileHelper(req, 'image_b64'),
+                ig: req.body.ig || '',
+                fb: req.body.fb || '',
+                twitter: req.body.twitter || '',
+                linkedin: req.body.linkedin || ''
+            }); 
+        }
+        else if (action === 'edit') { 
+            let i = list.findIndex(x => x.id == req.params.id); 
+            if (i !== -1) { 
+                if(req.body.name) list[i].name = req.body.name; 
+                if(req.body.role !== undefined) list[i].role = req.body.role; 
+                let img = fileHelper(req, 'image_b64'); if (img) list[i].image = img; 
+                if(req.body.bidang_name) list[i].name = req.body.bidang_name; 
+                if(req.body.ig !== undefined) list[i].ig = req.body.ig;
+                if(req.body.fb !== undefined) list[i].fb = req.body.fb;
+                if(req.body.twitter !== undefined) list[i].twitter = req.body.twitter;
+                if(req.body.linkedin !== undefined) list[i].linkedin = req.body.linkedin;
+            } 
+        }
         else if (action === 'delete') { list = list.filter(x => x.id != req.params.id); }
         await kv.set(dbKey, list); res.redirect('/admin/dashboard');
     } catch (e) { res.redirect('/admin/dashboard'); }
@@ -602,8 +630,30 @@ const manageBidangMember = async (req, res, dbKey, action) => {
         let list = await kv.get(dbKey) || []; let bIndex = list.findIndex(b => b.id == req.params.bidangId);
         if (bIndex !== -1) {
             if (!list[bIndex].members) list[bIndex].members = [];
-            if (action === 'add') { list[bIndex].members.push({ id: Date.now(), name: req.body.name, role: req.body.role || '', image: fileHelper(req, 'image_b64') }); }
-            else if (action === 'edit') { let mIndex = list[bIndex].members.findIndex(m => m.id == req.params.memberId); if (mIndex !== -1) { list[bIndex].members[mIndex].name = req.body.name; list[bIndex].members[mIndex].role = req.body.role || ''; let img = fileHelper(req, 'image_b64'); if (img) list[bIndex].members[mIndex].image = img; } }
+            if (action === 'add') { 
+                list[bIndex].members.push({ 
+                    id: Date.now(), 
+                    name: req.body.name, 
+                    role: req.body.role || '', 
+                    image: fileHelper(req, 'image_b64'),
+                    ig: req.body.ig || '',
+                    fb: req.body.fb || '',
+                    twitter: req.body.twitter || '',
+                    linkedin: req.body.linkedin || ''
+                }); 
+            }
+            else if (action === 'edit') { 
+                let mIndex = list[bIndex].members.findIndex(m => m.id == req.params.memberId); 
+                if (mIndex !== -1) { 
+                    if(req.body.name) list[bIndex].members[mIndex].name = req.body.name; 
+                    if(req.body.role !== undefined) list[bIndex].members[mIndex].role = req.body.role; 
+                    let img = fileHelper(req, 'image_b64'); if (img) list[bIndex].members[mIndex].image = img; 
+                    if(req.body.ig !== undefined) list[bIndex].members[mIndex].ig = req.body.ig;
+                    if(req.body.fb !== undefined) list[bIndex].members[mIndex].fb = req.body.fb;
+                    if(req.body.twitter !== undefined) list[bIndex].members[mIndex].twitter = req.body.twitter;
+                    if(req.body.linkedin !== undefined) list[bIndex].members[mIndex].linkedin = req.body.linkedin;
+                } 
+            }
             else if (action === 'delete') { list[bIndex].members = list[bIndex].members.filter(m => m.id != req.params.memberId); }
             await kv.set(dbKey, list);
         }
