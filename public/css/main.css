@@ -1158,6 +1158,11 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
     width: 18px;
     height: 18px;
     stroke-width: 2.2px; /* Dibuat sedikit tebal agar tegas (persis SVG) */
+    
+    /* FIX BUNDARAN PUTIH KOSONG: Menjamin ikon selalu berwarna dan terlihat */
+    stroke: currentColor;
+    fill: none;
+    display: block;
 }
 
 /* ==============================================================
