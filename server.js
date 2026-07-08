@@ -318,11 +318,11 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
         const news = safeArr(await kv.get('newsList')).map(x => ({...x, title: safeStr(x.title), category: safeStr(x.category), date: safeStr(x.date), content: safeStr(x.content)}));
         const albums = safeArr(await kv.get('albumsList')).map(x => ({...x, title: safeStr(x.title), date: safeStr(x.date)}));
         
-        // UPGRADE SANITIZER: Menambahkan proteksi ke properti Social Media
-        const pengurus = safeArr(await kv.get('pengurusList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role), ig: safeStr(x.ig), fb: safeStr(x.fb), twitter: safeStr(x.twitter), linkedin: safeStr(x.linkedin)}));
-        const bidang = safeArr(await kv.get('bidangList')).map(x => ({...x, name: safeStr(x.name), members: safeArr(x.members).map(m => ({...m, name: safeStr(m.name), role: safeStr(m.role), ig: safeStr(m.ig), fb: safeStr(m.fb), twitter: safeStr(m.twitter), linkedin: safeStr(m.linkedin)}))}));
-        const kohatiPengurus = safeArr(await kv.get('kohatiPengurusList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role), ig: safeStr(x.ig), fb: safeStr(x.fb), twitter: safeStr(x.twitter), linkedin: safeStr(x.linkedin)}));
-        const kohatiBidang = safeArr(await kv.get('kohatiBidangList')).map(x => ({...x, name: safeStr(x.name), members: safeArr(x.members).map(m => ({...m, name: safeStr(m.name), role: safeStr(m.role), ig: safeStr(m.ig), fb: safeStr(m.fb), twitter: safeStr(m.twitter), linkedin: safeStr(m.linkedin)}))}));
+        // UPGRADE SANITIZER: Menambahkan proteksi ke properti Social Media (termasuk TikTok)
+        const pengurus = safeArr(await kv.get('pengurusList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role), ig: safeStr(x.ig), fb: safeStr(x.fb), twitter: safeStr(x.twitter), linkedin: safeStr(x.linkedin), tiktok: safeStr(x.tiktok)}));
+        const bidang = safeArr(await kv.get('bidangList')).map(x => ({...x, name: safeStr(x.name), members: safeArr(x.members).map(m => ({...m, name: safeStr(m.name), role: safeStr(m.role), ig: safeStr(m.ig), fb: safeStr(m.fb), twitter: safeStr(m.twitter), linkedin: safeStr(m.linkedin), tiktok: safeStr(m.tiktok)}))}));
+        const kohatiPengurus = safeArr(await kv.get('kohatiPengurusList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role), ig: safeStr(x.ig), fb: safeStr(x.fb), twitter: safeStr(x.twitter), linkedin: safeStr(x.linkedin), tiktok: safeStr(x.tiktok)}));
+        const kohatiBidang = safeArr(await kv.get('kohatiBidangList')).map(x => ({...x, name: safeStr(x.name), members: safeArr(x.members).map(m => ({...m, name: safeStr(m.name), role: safeStr(m.role), ig: safeStr(m.ig), fb: safeStr(m.fb), twitter: safeStr(m.twitter), linkedin: safeStr(m.linkedin), tiktok: safeStr(m.tiktok)}))}));
         
         const dataAnggota = safeArr(await kv.get('dataAnggotaList')).map(x => ({...x, title: safeStr(x.title), date: safeStr(x.date)}));
         const shortlinks = safeArr(await kv.get('shortlinkList')).map(x => ({...x, title: safeStr(x.title), path: safeStr(x.path), originalUrl: safeStr(x.originalUrl)}));
@@ -590,7 +590,7 @@ app.post('/admin/hapus-biolink/:id', requireAdmin, async (req, res) => {
 
 
 // ==============================================================
-// SUPER BIG UPGRADE: API DINAMIS PENGURUS & BIDANG + SOCIAL MEDIA
+// SUPER BIG UPGRADE: API DINAMIS PENGURUS & BIDANG + SOCIAL MEDIA (TIKTOK)
 // ==============================================================
 const manageTeam = async (req, res, dbKey, action) => {
     try {
@@ -604,7 +604,8 @@ const manageTeam = async (req, res, dbKey, action) => {
                 ig: req.body.ig || '',
                 fb: req.body.fb || '',
                 twitter: req.body.twitter || '',
-                linkedin: req.body.linkedin || ''
+                linkedin: req.body.linkedin || '',
+                tiktok: req.body.tiktok || ''
             }); 
         }
         else if (action === 'edit') { 
@@ -618,6 +619,7 @@ const manageTeam = async (req, res, dbKey, action) => {
                 if(req.body.fb !== undefined) list[i].fb = req.body.fb;
                 if(req.body.twitter !== undefined) list[i].twitter = req.body.twitter;
                 if(req.body.linkedin !== undefined) list[i].linkedin = req.body.linkedin;
+                if(req.body.tiktok !== undefined) list[i].tiktok = req.body.tiktok;
             } 
         }
         else if (action === 'delete') { list = list.filter(x => x.id != req.params.id); }
@@ -639,7 +641,8 @@ const manageBidangMember = async (req, res, dbKey, action) => {
                     ig: req.body.ig || '',
                     fb: req.body.fb || '',
                     twitter: req.body.twitter || '',
-                    linkedin: req.body.linkedin || ''
+                    linkedin: req.body.linkedin || '',
+                    tiktok: req.body.tiktok || ''
                 }); 
             }
             else if (action === 'edit') { 
@@ -652,6 +655,7 @@ const manageBidangMember = async (req, res, dbKey, action) => {
                     if(req.body.fb !== undefined) list[bIndex].members[mIndex].fb = req.body.fb;
                     if(req.body.twitter !== undefined) list[bIndex].members[mIndex].twitter = req.body.twitter;
                     if(req.body.linkedin !== undefined) list[bIndex].members[mIndex].linkedin = req.body.linkedin;
+                    if(req.body.tiktok !== undefined) list[bIndex].members[mIndex].tiktok = req.body.tiktok;
                 } 
             }
             else if (action === 'delete') { list[bIndex].members = list[bIndex].members.filter(m => m.id != req.params.memberId); }
