@@ -28,6 +28,15 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
 
+// ==============================================================
+// EXPERT SEO: GOOGLE SEARCH CONSOLE FILE VERIFICATION ROUTE
+// (Otomatis meloloskan metode verifikasi File HTML di Google)
+// ==============================================================
+app.get('/googlee9821896ca0e6ace.html', (req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+    res.send('google-site-verification: googlee9821896ca0e6ace.html');
+});
+
 const defaultSettings = {
     webTitle: "HMI KomKG-UMI",
     headerLogo: "/img/logo-hmikomkgumi.png",
