@@ -1,27 +1,34 @@
 <%
-    // Mengambil Base URL dan Logo secara dinamis dari setelan website Anda
-    const schemaBaseUrl = 'https://hmikomkgumi.xyz';
+    // ==============================================================
+    // EXPERT SEO: GOOGLE SITE NAME & KNOWLEDGE PANEL FORCER
+    // ==============================================================
+    // Wajib menggunakan www jika canonical website Anda menggunakan www (Sesuai Gbr 1)
+    const schemaBaseUrl = 'https://www.hmikomkgumi.xyz';
     const schemaSafeSettings = typeof siteSettings !== 'undefined' && siteSettings ? siteSettings : {};
     let schemaLogo = schemaSafeSettings.headerLogo || schemaBaseUrl + '/favicon.ico';
     
-    // Pastikan Logo menggunakan Absolute URL agar valid di mata Google
+    // Pastikan Logo menggunakan Absolute URL
     if (schemaLogo && !schemaLogo.startsWith('http')) {
         if (!schemaLogo.startsWith('/')) schemaLogo = '/' + schemaLogo;
         schemaLogo = schemaBaseUrl + schemaLogo;
     }
 %>
 
-<!-- EXPERT SEO: Organization Schema (Memperkuat Identitas di Google) -->
+<!-- 1. EXPERT SEO: Organization Schema (Untuk Panel Samping Google) -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "HMI KomKG UMI",
-  "alternateName": "Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI",
+  "name": "HMI KOMKG UMI",
+  "alternateName": [
+    "Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI",
+    "HMI KomKG-UMI"
+  ],
   "url": "<%= schemaBaseUrl %>/",
   "logo": "<%= schemaLogo %>",
   "sameAs": [
-    "https://www.instagram.com/hmi_komkgumi"
+    "https://www.instagram.com/hmi_komkgumi",
+    "https://www.tiktok.com/@hmi_komkgumi"
   ],
   "contactPoint": {
     "@type": "ContactPoint",
@@ -31,12 +38,13 @@
 }
 </script>
 
-<!-- EXPERT SEO: WebSite & Sitelinks Search Box Schema -->
+<!-- 2. EXPERT SEO: WebSite Schema (KUNCI UTAMA UNTUK MENGUBAH NAMA SITUS DI GBR 1) -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "HMI KomKG UMI",
+  "name": "HMI KOMKG UMI",
+  "alternateName": "HMI KomKG-UMI",
   "url": "<%= schemaBaseUrl %>/",
   "potentialAction": {
     "@type": "SearchAction",
