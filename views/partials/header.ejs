@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- ==============================================================
-         SUPER BIG UPGRADE: EXPERT SEO LOGIC ENGINE (100% GOOGLE READY)
-         (Dilengkapi Auto-Absolute URL, Article Meta, Breadcrumbs & ANTI-CRASH)
-    ============================================================== -->
+    <meta name="google-site-verification" content="lV4veWnfsXOsnHBVIUxj7uQUA_jdJIQ6Guk4bPGFGHc" />
+
     <% 
     // BASE URL: Wajib untuk memastikan OG Image terbaca oleh sistem Social Media
     const baseUrl = 'https://hmikomkgumi.xyz';
@@ -72,24 +70,19 @@
     }
     %>
 
-    <!-- Dinamis Title (Otomatis menyesuaikan dengan konten berita/galeri/halaman utama) -->
     <title><%= finalTitle %></title>
     
-    <!-- Terhubung ke Smart Logic Deskripsi -->
     <meta name="description" content="<%= finalDesc %>">
     <link rel="icon" type="image/png" href="<%= safeSettings.headerLogo || '/favicon.ico' %>">
 
-    <!-- Meta Dasar & Aturan Crawling Googlebot -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     
-    <!-- Terhubung ke Setelan SEO Keywords di Admin Dashboard dengan Fallback Teks Custom -->
     <meta name="keywords" content="<%= typeof pageKeywords !== 'undefined' && pageKeywords ? pageKeywords : (safeSettings.seoKeywords || 'hmi komkg umi, hmikomkgumi, hmi, hmi kom kg umi, hmicabmakassar, yakusa') %>">
     <meta name="author" content="<%= safeSettings.headerTitle || 'HMI KomKG UMI' %>">
     <link rel="canonical" href="<%= finalUrl %>" />
     <meta name="theme-color" content="#064e3b">
 
-    <!-- Open Graph / Facebook / WhatsApp / Telegram (SEO Social Media) -->
     <meta property="og:locale" content="id_ID">
     <meta property="og:type" content="<%= finalType %>">
     <meta property="og:title" content="<%= finalTitle %>">
@@ -97,21 +90,18 @@
     <meta property="og:url" content="<%= finalUrl %>">
     <meta property="og:site_name" content="<%= safeSettings.webTitle || 'HMI KomKG UMI' %>">
     
-    <!-- Meta Khusus Artikel (Memicu Kategori & Tanggal di Social Media) -->
     <% if (finalType === 'article') { %>
         <meta property="article:published_time" content="<%= finalDate %>">
         <meta property="article:author" content="Admin HMI KomKG UMI">
         <meta property="article:section" content="<%= finalCategory %>">
     <% } %>
 
-    <!-- Terhubung ke Thumbnail Berita / Galeri / Setting Dashboard -->
     <meta property="og:image" content="<%= finalImage %>">
     <meta property="og:image:secure_url" content="<%= finalImage %>">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Cover <%= finalTitle %>">
 
-    <!-- Twitter Cards (Pemicu Gambar Preview Besar di Sosmed) -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:domain" content="hmikomkgumi.xyz">
     <meta name="twitter:url" content="<%= finalUrl %>">
@@ -119,10 +109,6 @@
     <meta name="twitter:description" content="<%= finalDesc %>">
     <meta name="twitter:image" content="<%= finalImage %>">
 
-    <!-- ==============================================================
-         STRUCTURED DATA (JSON-LD) GOOGLE RICH SNIPPETS EXPERT
-    ============================================================== -->
-    <!-- 1. Schema Halaman / Artikel Berita -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -156,7 +142,6 @@
     }
     </script>
 
-    <!-- 2. Schema Breadcrumb (Menampilkan Hierarki Navigasi di Google Search) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -203,45 +188,29 @@
       ]
     }
     </script>
-    <!-- ==============================================================
-         END OF SEO UPGRADE
-    ============================================================== -->
-
-    <!-- OPTIMASI 2: PRECONNECT & DNS-PREFETCH (Super Cepat untuk Resource Luar) -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     
-    <!-- OPTIMASI 3: ASYNC GOOGLE FONTS (Font dimuat di latar belakang agar teks langsung muncul) -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"></noscript>
     
-    <!-- CSS UTAMA -->
     <link rel="preload" as="style" href="/css/main.css">
     <link rel="stylesheet" href="/css/main.css">
 
-    <!-- OPTIMASI 4: DEFER LUCIDE ICONS (Berjalan tanpa memblokir perenderan HTML) -->
     <script src="https://unpkg.com/lucide@latest" defer></script>
 
-    <!-- ==============================================================
-         SUPER BIG UPGRADE: VERCEL SPEED INSIGHTS (NATIVE HTML)
-         (Secara otomatis berkomunikasi dengan server Vercel)
-    ============================================================== -->
     <script>
         window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
     </script>
     <script src="/_vercel/speed-insights/script.js" defer></script>
-    <!-- ============================================================== -->
-    
-    <!-- INJEKSI SEO SITELINKS & ORGANIZATION SCHEMA -->
     <%- include('schema') %>
 </head>
 <body>
     
-    <!-- EFEK BACKGROUND ANIMASI BLOB -->
     <div class="bg-blob blob-1"></div>
     <div class="bg-blob blob-2"></div>
 
@@ -253,7 +222,6 @@
 
             <a href="/" class="logo-area" aria-label="Ke Beranda">
                 <div class="logo-box" style="width:45px; height:45px;">
-                    <!-- OPTIMASI 5: Prioritas Fetch Tinggi pada Logo Utama -->
                     <img src="<%= safeSettings.headerLogo %>" alt="Logo" class="logo-img" width="45" height="45" style="width:100%; max-width:45px; object-fit:contain;" fetchpriority="high">
                 </div>
                 <div class="logo-text">
