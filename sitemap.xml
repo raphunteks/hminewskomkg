@@ -24,8 +24,7 @@
         <changefreq>daily</changefreq>
         <priority>0.8</priority>
     </url>
-</urlset>
-    </url>
+    <url>
         <loc>https://www.hmikomkgumi.xyz/berita/1779086636921</loc>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
