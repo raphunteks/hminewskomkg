@@ -190,45 +190,6 @@ app.get('/api/booklet.pdf', async (req, res) => {
     }
 });
 
-// ==============================================================
-// SUPER BIG UPGRADE: EXPERT SEO DYNAMIC SITEMAP.XML GENERATOR
-// (Otomatis mendaftarkan Beranda, Tentang, Galeri, dan seluruh Berita ke Google)
-// ==============================================================
-app.get('/sitemap.xml', async (req, res) => {
-    try {
-        const baseUrl = 'https://www.hmikomkgumi.xyz';
-        const newsList = await kv.get('newsList') || [];
-        const albumsList = await kv.get('albumsList') || [];
-
-        let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-        xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
-        
-        // 1. Daftarkan Halaman Utama (Statis)
-        const staticPages = ['', '/tentang', '/galeri', '/data-anggota'];
-        staticPages.forEach(page => {
-            xml += `  <url>\n    <loc>${baseUrl}${page}</loc>\n    <changefreq>daily</changefreq>\n    <priority>${page === '' ? '1.0' : '0.8'}</priority>\n  </url>\n`;
-        });
-
-        // 2. Daftarkan Halaman Detail Berita (Dinamis)
-        newsList.forEach(news => {
-            xml += `  <url>\n    <loc>${baseUrl}/berita/${news.id}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
-        });
-
-        // 3. Daftarkan Halaman Detail Galeri (Dinamis)
-        albumsList.forEach(album => {
-            xml += `  <url>\n    <loc>${baseUrl}/galeri/${album.id}</loc>\n    <changefreq>monthly</changefreq>\n    <priority>0.6</priority>\n  </url>\n`;
-        });
-
-        xml += `</urlset>`;
-
-        res.header('Content-Type', 'application/xml');
-        res.send(xml);
-    } catch (err) {
-        console.error("Sitemap Error:", err);
-        res.status(500).end();
-    }
-});
-
 app.get('/', async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
