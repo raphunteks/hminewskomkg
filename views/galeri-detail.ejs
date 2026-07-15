@@ -4,8 +4,43 @@
     // Injeksi variabel SEO secara eksplisit sebelum memanggil header
     // ==============================================================
     let pageTitle = typeof album !== 'undefined' && album ? 'Galeri: ' + album.title : 'Detail Galeri';
+    
+    // ==============================================================
+    // SUPER BIG UPGRADE: DYNAMIC META & BILINGUAL SEO
+    // Otomatis men-generate deskripsi dan gambar OpenGraph untuk GSC & Sosmed
+    // ==============================================================
+    let albumTitleClean = typeof album !== 'undefined' && album ? album.title : 'Galeri Kegiatan';
+    let pageDescription = `Dokumentasi dan foto kegiatan ${albumTitleClean} HMI Komisariat Kedokteran Gigi UMI. Explore the photo gallery and event documentation for ${albumTitleClean}.`;
+    let pageImage = typeof album !== 'undefined' && album && album.cover ? album.cover : '/img/default.png';
+    let baseUrl = "https://hmikomkgumi.com"; // Bisa disesuaikan dengan domain asli Anda
+
+    // ==============================================================
+    // DYNAMIC SEO SCHEMA GENERATOR (ENTERPRISE LEVEL)
+    // Men-generate Schema SEO "ImageObject" secara otomatis untuk setiap foto
+    // ==============================================================
+    let imageNodes = [];
+    if (typeof album !== 'undefined' && album) {
+        if (album.cover) {
+            imageNodes.push({
+                "@type": "ImageObject",
+                "url": album.cover.startsWith('http') ? album.cover : baseUrl + album.cover,
+                "name": "Cover: " + album.title
+            });
+        }
+        if (album.photos && album.photos.length > 0) {
+            album.photos.forEach((p, index) => {
+                if(p && p.url) {
+                    imageNodes.push({
+                        "@type": "ImageObject",
+                        "url": p.url.startsWith('http') ? p.url : baseUrl + p.url,
+                        "name": album.title + " - Dokumentasi " + (index + 1)
+                    });
+                }
+            });
+        }
+    }
 %>
-<%- include('partials/header', { pageTitle: pageTitle }) %>
+<%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription, pageImage: pageImage }) %>
 
 <!-- ==============================================================
      SMART GUARD: Mencegah Error 500 jika Album tidak ditemukan
@@ -13,10 +48,63 @@
 <% if (typeof album !== 'undefined' && album) { %>
 
 <!-- ==============================================================
+     ADVANCED JSON-LD SCHEMA.ORG (@graph) - SERVER SIDE RENDERED
+     Mendikte Google bahwa halaman ini adalah "ImageGallery" utuh.
+============================================================== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "ImageGallery",
+      "@id": "<%= baseUrl %>/galeri/<%= album.id || '' %>/#webpage",
+      "url": "<%= baseUrl %>/galeri/<%= album.id || '' %>",
+      "name": "<%= pageTitle %>",
+      "description": "<%= pageDescription %>",
+      "inLanguage": ["id-ID", "en-US"],
+      "publisher": { "@id": "<%= baseUrl %>/#organization" },
+      "datePublished": "<%= album.date || '' %>",
+      "image": <%- JSON.stringify(imageNodes) %>
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "<%= baseUrl %>/galeri/<%= album.id || '' %>/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Beranda",
+          "item": "<%= baseUrl %>/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Galeri",
+          "item": "<%= baseUrl %>/galeri"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "<%= albumTitleClean %>",
+          "item": "<%= baseUrl %>/galeri/<%= album.id || '' %>"
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<!-- ==============================================================
      EXPERT SEO MICRODATA (SCHEMA.ORG)
-     Mendeklarasikan halaman ini sebagai Entitas Album/Galeri Gambar
+     Fallback & Deklarasi Inline untuk Robot Crawler Lama
 ============================================================== -->
 <article itemscope itemtype="https://schema.org/ImageGallery">
+
+    <!-- Meta tersembunyi bilingual untuk bot SEO (Invisible to Users) -->
+    <div style="display: none;" aria-hidden="true">
+        <h2>Photo Gallery: <%= album.title %></h2>
+        <p>Explore the photo gallery and event documentation for <%= album.title %>. Capturing moments of HMI Dentistry Commissariat UMI.</p>
+    </div>
 
     <header class="container" style="text-align:center; margin-bottom:40px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:30px;">
         <a href="/galeri" style="color:#4ade80; display:inline-flex; align-items:center; gap:5px; margin-bottom:20px; font-weight:600; transition:0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#4ade80'">
