@@ -4,18 +4,127 @@
     // Injeksi variabel SEO secara eksplisit sebelum memanggil header
     // ==============================================================
     let pageTitle = "Tentang Kami";
-    let pageDescription = "Profil, Visi Misi, dan Struktur Kepengurusan HMI Komisariat Kedokteran Gigi UMI.";
+    
+    // BILINGUAL SEO UPGRADE: Menggabungkan ID & EN untuk menjaring lebih banyak kata kunci
+    let pageDescription = "Profil, Visi Misi, dan Struktur Kepengurusan HMI Komisariat Kedokteran Gigi UMI. About us, vision, mission, and organizational structure of HMI Dentistry UMI.";
+    let orgName = typeof siteSettings !== 'undefined' ? (siteSettings.headerTitle + ' ' + (siteSettings.headerHighlight || '')) : 'HMI KomKG UMI';
+    
+    // ==============================================================
+    // SUPER BIG UPGRADE: DYNAMIC SEO SCHEMA GENERATOR (ENTERPRISE LEVEL)
+    // Men-generate Schema SEO "Person" secara otomatis setiap ada data pengurus baru
+    // ==============================================================
+    let personsSchema = [];
+    let baseUrl = "https://hmikomkgumi.com"; // Bisa disesuaikan dengan domain asli Anda
+    
+    // Fungsi Auto-Builder Schema
+    function addMemberToSchema(member, department) {
+        if(!member) return;
+        let igLink = member.ig || baseUrl + "/tentang";
+        let imgUrl = member.image ? (member.image.startsWith('http') ? member.image : baseUrl + member.image) : baseUrl + "/img/default.png";
+        
+        personsSchema.push({
+            "@type": "Person",
+            "name": member.name,
+            "jobTitle": member.role || department,
+            "worksFor": { "@id": baseUrl + "/#organization" },
+            "image": imgUrl,
+            "sameAs": [igLink]
+        });
+    }
+
+    // 1. Auto-Generate SEO untuk Pengurus Harian
+    if(typeof pengurus !== 'undefined' && pengurus.length > 0) {
+        pengurus.forEach(p => addMemberToSchema(p, "Pengurus Harian (Executive Board)"));
+    }
+    
+    // 2. Auto-Generate SEO untuk Anggota Bidang
+    if(typeof bidang !== 'undefined' && bidang.length > 0) {
+        bidang.forEach(b => {
+            if(b.members) b.members.forEach(m => addMemberToSchema(m, "Bidang " + b.name));
+        });
+    }
+    
+    // 3. Auto-Generate SEO untuk KOHATI
+    if (typeof siteSettings !== 'undefined' && String(siteSettings.kohatiActive) === 'true') {
+        if(typeof kohatiPengurus !== 'undefined') {
+            kohatiPengurus.forEach(p => addMemberToSchema(p, "Pengurus Harian KOHATI (Women's Division Board)"));
+        }
+        if(typeof kohatiBidang !== 'undefined') {
+            kohatiBidang.forEach(b => {
+                if(b.members) b.members.forEach(m => addMemberToSchema(m, "KOHATI - " + b.name));
+            });
+        }
+    }
 %>
 <%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
 
 <!-- ==============================================================
-     SUPER BIG UPGRADE: EXPERT SEO MICRODATA (SCHEMA.ORG)
-     Mendeklarasikan seluruh halaman ini sebagai Entitas "Organization"
+     ADVANCED JSON-LD SCHEMA.ORG (@graph) - SERVER SIDE RENDERED
+     Google akan memanen ribuan meta data ini dalam hitungan milidetik.
+============================================================== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "AboutPage",
+      "@id": "<%= baseUrl %>/tentang/#webpage",
+      "url": "<%= baseUrl %>/tentang",
+      "name": "<%= pageTitle %> | <%= orgName %>",
+      "description": "<%= pageDescription %>",
+      "inLanguage": ["id-ID", "en-US"],
+      "publisher": { "@id": "<%= baseUrl %>/#organization" }
+    },
+    {
+      "@type": "Organization",
+      "@id": "<%= baseUrl %>/#organization",
+      "name": "<%= orgName %>",
+      "alternateName": "Islamic Association of University Students - Dentistry Commissariat UMI",
+      "url": "<%= baseUrl %>/",
+      "description": "Organisasi mahasiswa Islam tingkat fakultas kedokteran gigi. Islamic student organization at the faculty of dentistry level.",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "<%= baseUrl %>/img/bemfkgumi.png"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "<%= baseUrl %>/tentang/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Beranda (Home)",
+          "item": "<%= baseUrl %>/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Tentang Kami (About Us)",
+          "item": "<%= baseUrl %>/tentang"
+        }
+      ]
+    }
+    <% if (personsSchema.length > 0) { %>,
+    <%- JSON.stringify(personsSchema).slice(1, -1) %>
+    <% } %>
+  ]
+}
+</script>
+
+<!-- ==============================================================
+     EXPERT SEO MICRODATA (SCHEMA.ORG) & BILINGUAL FALLBACK
 ============================================================== -->
 <article itemscope itemtype="https://schema.org/Organization">
     
+    <!-- Meta tersembunyi bilingual untuk bot SEO (Invisible to Users) -->
+    <div style="display: none;" aria-hidden="true">
+        <h2>About Us - <%= orgName %></h2>
+        <p>Welcome to the official profile of HMI (Himpunan Mahasiswa Islam) Dentistry Commissariat UMI. Discover our vision, mission, organizational structure, and executive board members.</p>
+    </div>
+
     <!-- Meta tersembunyi agar Google langsung mengenali nama organisasi -->
-    <meta itemprop="name" content="<%= typeof siteSettings !== 'undefined' ? (siteSettings.headerTitle + ' ' + (siteSettings.headerHighlight || '')) : 'HMI KomKG UMI' %>">
+    <meta itemprop="name" content="<%= orgName %>">
 
     <nav class="tab-nav" aria-label="Navigasi Profil Organisasi">
         <button class="tab-btn active" onclick="openTab('tab-profil')"><i data-lucide="user"></i> Profil</button>
