@@ -29,39 +29,63 @@
 <%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
 
 <!-- ==============================================================
-     SUPER BIG UPGRADE SEO: DYNAMIC META TAGS INJECTION
-     Memastikan Judul, Deskripsi, Gambar Artikel Tampil Sempurna di WA/IG/FB
+     SUPER BIG UPGRADE SEO & ANTI-ERROR PRATINJAU (PREVIEW-SAFE)
+     Mengubah cara injeksi variabel EJS agar tidak bertabrakan dengan JS Parser.
+     Semua data server-side (EJS) ditampung di dalam HTML DOM terlebih dahulu.
 ============================================================== -->
+<div id="seo-server-data" 
+     style="display:none;" 
+     data-title="<%= pageTitle %>" 
+     data-desc="<%= pageDescription %>" 
+     data-url="<%= articleUrl %>" 
+     data-img="<%= absoluteImage %>" 
+     data-cat="<%= safeBerita.category %>" 
+     data-date="<%= safeBerita.date %>"
+     data-baseurl="<%= seoBaseUrl %>">
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. MENGAMBIL DATA DARI DOM (Sangat Aman untuk fitur Pratinjau tanpa memicu SyntaxError)
+    const seoDataEl = document.getElementById('seo-server-data');
+    if(!seoDataEl) return;
+    
+    const d_title = seoDataEl.getAttribute('data-title');
+    const d_desc = seoDataEl.getAttribute('data-desc');
+    const d_url = seoDataEl.getAttribute('data-url');
+    const d_img = seoDataEl.getAttribute('data-img');
+    const d_cat = seoDataEl.getAttribute('data-cat');
+    const d_date = seoDataEl.getAttribute('data-date');
+    const d_baseurl = seoDataEl.getAttribute('data-baseurl');
+
     const metaTags = [
-        { name: "description", content: <%- JSON.stringify(pageDescription) %> },
-        { name: "keywords", content: "<%= safeBerita.category %>, Berita HMI, Proker HMI KomKG UMI, Kedokteran Gigi UMI, Organisasi FKG UMI" },
+        { name: "description", content: d_desc },
+        { name: "keywords", content: `${d_cat}, Berita HMI, Proker HMI KomKG UMI, Kedokteran Gigi UMI, Organisasi FKG UMI` },
         { name: "author", content: "Admin HMI KomKG UMI" },
         { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
         
         // Open Graph (WhatsApp, FB, IG)
-        { property: "og:title", content: <%- JSON.stringify(pageTitle + " | HMI KomKG UMI") %> },
-        { property: "og:description", content: <%- JSON.stringify(pageDescription) %> },
-        { property: "og:type", content: "article" }, // Menandakan bahwa ini adalah Artikel, bukan halaman biasa
-        { property: "og:url", content: "<%= articleUrl %>" },
-        { property: "og:image", content: "<%= absoluteImage %>" },
+        { property: "og:title", content: d_title + " | HMI KomKG UMI" },
+        { property: "og:description", content: d_desc },
+        { property: "og:type", content: "article" }, 
+        { property: "og:url", content: d_url },
+        { property: "og:image", content: d_img },
         { property: "og:site_name", content: "HMI KomKG UMI" },
         
         // Twitter Cards
         { property: "twitter:card", content: "summary_large_image" },
-        { property: "twitter:title", content: <%- JSON.stringify(pageTitle + " | HMI KomKG UMI") %> },
-        { property: "twitter:description", content: <%- JSON.stringify(pageDescription) %> },
-        { property: "twitter:image", content: "<%= absoluteImage %>" }
+        { property: "twitter:title", content: d_title + " | HMI KomKG UMI" },
+        { property: "twitter:description", content: d_desc },
+        { property: "twitter:image", content: d_img }
     ];
 
-    // Injeksi Link Canonical ke Google Search Console untuk Halaman Berita Spesifik
+    // Injeksi Link Canonical untuk Google Search Console
     let canonical = document.createElement('link');
     canonical.rel = 'canonical';
-    canonical.href = "<%= articleUrl %>";
+    canonical.href = d_url;
     document.head.appendChild(canonical);
 
-    // Injeksi Meta Tags ke dalam Head secara pintar
+    // Injeksi Meta Tags ke tag <head>
     metaTags.forEach(tag => {
         let selector = tag.name ? `meta[name="${tag.name}"]` : `meta[property="${tag.property}"]`;
         let existingTag = document.head.querySelector(selector);
@@ -72,82 +96,60 @@ document.addEventListener('DOMContentLoaded', () => {
             el.content = tag.content;
             document.head.appendChild(el);
         } else {
-            // Timpa jika tag sudah ada (override header default)
             existingTag.content = tag.content;
         }
     });
-});
-</script>
 
-<!-- ==============================================================
-     SUPER BIG UPGRADE SEO: ADVANCED @GRAPH JSON-LD (ARTICLE)
-     Mendikte Google tentang Hierarki Halaman, Breadcrumb, dan Spesifikasi Artikel
-============================================================== -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebPage",
-      "@id": "<%= articleUrl %>/#webpage",
-      "url": "<%= articleUrl %>",
-      "name": <%- JSON.stringify(pageTitle + " | HMI KomKG UMI") %>,
-      "description": <%- JSON.stringify(pageDescription) %>,
-      "inLanguage": "id-ID",
-      "isPartOf": { "@id": "<%= seoBaseUrl %>/#website" }
-    },
-    {
-      "@type": "BreadcrumbList",
-      "@id": "<%= articleUrl %>/#breadcrumb",
-      "itemListElement": [
+    // ==============================================================
+    // 2. INJEKSI JSON-LD (ARTICLE) SECARA DINAMIS (PREVIEW-SAFE)
+    // Dibuat via Javascript agar struktur EJS murni tersembunyi dari parser
+    // ==============================================================
+    const jsonLdData = {
+      "@context": "https://schema.org",
+      "@graph": [
         {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Beranda",
-          "item": "<%= seoBaseUrl %>/"
+          "@type": "WebPage",
+          "@id": `${d_url}/#webpage`,
+          "url": d_url,
+          "name": `${d_title} | HMI KomKG UMI`,
+          "description": d_desc,
+          "inLanguage": "id-ID",
+          "isPartOf": { "@id": `${d_baseurl}/#website` }
         },
         {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Berita & Informasi",
-          "item": "<%= seoBaseUrl %>/#news-list"
+          "@type": "BreadcrumbList",
+          "@id": `${d_url}/#breadcrumb`,
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Beranda", "item": `${d_baseurl}/` },
+            { "@type": "ListItem", "position": 2, "name": "Berita & Informasi", "item": `${d_baseurl}/#news-list` },
+            { "@type": "ListItem", "position": 3, "name": d_title, "item": d_url }
+          ]
         },
         {
-          "@type": "ListItem",
-          "position": 3,
-          "name": <%- JSON.stringify(pageTitle) %>,
-          "item": "<%= articleUrl %>"
+          "@type": "NewsArticle",
+          "@id": `${d_url}/#article`,
+          "headline": d_title,
+          "description": d_desc,
+          "image": d_img,
+          "datePublished": d_date,
+          "author": { "@type": "Organization", "name": "Admin HMI KomKG UMI", "url": d_baseurl },
+          "publisher": { 
+              "@type": "Organization", 
+              "name": "HMI KomKG UMI", 
+              "logo": { "@type": "ImageObject", "url": `${d_baseurl}/img/logo.png` } 
+          },
+          "mainEntityOfPage": { "@type": "WebPage", "@id": `${d_url}/#webpage` },
+          "articleSection": d_cat
         }
       ]
-    },
-    {
-      "@type": "NewsArticle",
-      "@id": "<%= articleUrl %>/#article",
-      "headline": <%- JSON.stringify(pageTitle) %>,
-      "description": <%- JSON.stringify(pageDescription) %>,
-      "image": "<%= absoluteImage %>",
-      "datePublished": "<%= safeBerita.date %>",
-      "author": {
-        "@type": "Organization",
-        "name": "Admin HMI KomKG UMI",
-        "url": "<%= seoBaseUrl %>"
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "HMI KomKG UMI",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "<%= seoBaseUrl %>/img/logo.png"
-        }
-      },
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "<%= articleUrl %>/#webpage"
-      },
-      "articleSection": "<%= safeBerita.category %>"
-    }
-  ]
-}
+    };
+
+    // Eksekusi skrip JSON-LD ke dalam DOM
+    const jsonLdScript = document.createElement('script');
+    jsonLdScript.type = 'application/ld+json';
+    jsonLdScript.textContent = JSON.stringify(jsonLdData);
+    document.head.appendChild(jsonLdScript);
+});
 </script>
 
 <div class="container" style="max-width: 800px; margin-bottom: 50px;">
