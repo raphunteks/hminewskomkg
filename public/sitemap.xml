@@ -1,3 +1,11 @@
+<!-- Halaman Utama (Prioritas Tertinggi) -->
+<url>
+    <loc>https://www.hmikomkgumi.xyz</loc>
+    <lastmod>2026-07-15T08:00:00+08:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+</url>
+
 <!-- Halaman Inti (Prioritas Tinggi 0.8) -->
 <url>
     <loc>https://www.hmikomkgumi.xyz/tentang</loc>
