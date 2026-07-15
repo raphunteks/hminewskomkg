@@ -1,47 +1,61 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-    <!-- Halaman Utama (Prioritas Tertinggi) -->
-    <url>
-        <loc>https://www.hmikomkgumi.xyz</loc>
-        <changefreq>daily</changefreq>
-        <priority>1.0</priority>
-    </url>
-    <url>
-        <loc>https://www.hmikomkgumi.xyz/tentang</loc>
-        <changefreq>daily</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>https://www.hmikomkgumi.xyz/galeri</loc>
-        <changefreq>daily</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>https://www.hmikomkgumi.xyz/data-anggota</loc>
-        <changefreq>daily</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>https://www.hmikomkgumi.xyz/berita/1779086636921</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    <url>
-        <loc>https://www.hmikomkgumi.xyz/galeri/1779112445779</loc>
-        <changefreq>monthly</changefreq>
-        <priority>0.6</priority>
-    </url>
-    <url>
-        <loc>https://www.hmikomkgumi.xyz/galeri/1779112371109</loc>
-        <changefreq>monthly</changefreq>
-        <priority>0.6</priority>
-    </url>
-    <url>
-        <loc>https://www.hmikomkgumi.xyz/galeri/1</loc>
-        <changefreq>monthly</changefreq>
-        <priority>0.6</priority>
-    </url>
-</urlset>
+<!-- ==============================================================
+     SUPER BIG UPGRADE SEO: ADDED <lastmod> TAGS
+     Memberi tahu Googlebot kapan website terakhir kali diperbarui,
+     sehingga proses indexing (perayapan) akan jauh lebih cepat!
+============================================================== -->
+
+<!-- Halaman Utama (Prioritas Tertinggi 1.0) -->
+<url>
+    <loc>https://www.hmikomkgumi.xyz/</loc>
+    <lastmod>2026-07-15T08:00:00+08:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+</url>
+
+<!-- Halaman Inti (Prioritas Tinggi 0.8) -->
+<url>
+    <loc>https://www.hmikomkgumi.xyz/tentang</loc>
+    <lastmod>2026-07-15T08:00:00+08:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+</url>
+<url>
+    <loc>https://www.hmikomkgumi.xyz/galeri</loc>
+    <lastmod>2026-07-15T08:00:00+08:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+</url>
+<url>
+    <loc>https://www.hmikomkgumi.xyz/data-anggota</loc>
+    <lastmod>2026-07-15T08:00:00+08:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+</url>
+
+<!-- Halaman Artikel & Berita (Prioritas Menengah 0.7) -->
+<url>
+    <loc>https://www.hmikomkgumi.xyz/berita/1779086636921</loc>
+    <lastmod>2026-07-15T08:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+</url>
+
+<!-- Halaman Item Galeri Spesifik (Prioritas Standar 0.6) -->
+<url>
+    <loc>https://www.hmikomkgumi.xyz/galeri/1779112445779</loc>
+    <lastmod>2026-07-15T08:00:00+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+</url>
+<url>
+    <loc>https://www.hmikomkgumi.xyz/galeri/1779112371109</loc>
+    <lastmod>2026-07-15T08:00:00+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+</url>
+<url>
+    <loc>https://www.hmikomkgumi.xyz/galeri/1</loc>
+    <lastmod>2026-07-15T08:00:00+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+</url>
