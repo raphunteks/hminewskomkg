@@ -1,4 +1,154 @@
-<%- include('partials/header') %>
+<% 
+    // ==============================================================
+    // SUPER BIG UPGRADE: ERROR 500 PREVENTION (BULLETPROOF EJS)
+    // Mencegah server Node.js crash jika ID Berita tidak ditemukan/dihapus
+    // ==============================================================
+    let safeBerita = (typeof berita !== 'undefined' && berita) ? berita : {
+        id: '404',
+        title: 'Berita Tidak Ditemukan',
+        content: '<p>Mohon maaf, konten berita telah dihapus atau tidak tersedia.</p>',
+        image: '/img/logo.png',
+        category: 'Umum',
+        date: new Date().toLocaleDateString('id-ID'),
+        photos: []
+    };
+
+    let pageTitle = safeBerita.title;
+    
+    // SMART UPGRADE: Membersihkan tag HTML dari konten untuk meta description (max 150 chars)
+    let rawContent = safeBerita.content || "";
+    let cleanDesc = rawContent.replace(/<[^>]+>/g, '').replace(/\n/g, ' ').trim();
+    let pageDescription = cleanDesc.length > 150 ? cleanDesc.substring(0, 150) + "..." : (cleanDesc || "Baca informasi terbaru dari HMI KomKG UMI.");
+    
+    // Standarisasi Base URL dan URL Gambar Absolute
+    const seoBaseUrl = 'https://www.hmikomkgumi.xyz';
+    let rawImage = safeBerita.image || '/img/logo.png';
+    let absoluteImage = rawImage.startsWith('http') ? rawImage : seoBaseUrl + (rawImage.startsWith('/') ? '' : '/') + rawImage;
+    let articleUrl = seoBaseUrl + "/berita/" + safeBerita.id;
+%>
+<%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
+
+<!-- ==============================================================
+     SUPER BIG UPGRADE SEO: DYNAMIC META TAGS INJECTION
+     Memastikan Judul, Deskripsi, Gambar Artikel Tampil Sempurna di WA/IG/FB
+============================================================== -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const metaTags = [
+        { name: "description", content: <%- JSON.stringify(pageDescription) %> },
+        { name: "keywords", content: "<%= safeBerita.category %>, Berita HMI, Proker HMI KomKG UMI, Kedokteran Gigi UMI, Organisasi FKG UMI" },
+        { name: "author", content: "Admin HMI KomKG UMI" },
+        { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
+        
+        // Open Graph (WhatsApp, FB, IG)
+        { property: "og:title", content: <%- JSON.stringify(pageTitle + " | HMI KomKG UMI") %> },
+        { property: "og:description", content: <%- JSON.stringify(pageDescription) %> },
+        { property: "og:type", content: "article" }, // Menandakan bahwa ini adalah Artikel, bukan halaman biasa
+        { property: "og:url", content: "<%= articleUrl %>" },
+        { property: "og:image", content: "<%= absoluteImage %>" },
+        { property: "og:site_name", content: "HMI KomKG UMI" },
+        
+        // Twitter Cards
+        { property: "twitter:card", content: "summary_large_image" },
+        { property: "twitter:title", content: <%- JSON.stringify(pageTitle + " | HMI KomKG UMI") %> },
+        { property: "twitter:description", content: <%- JSON.stringify(pageDescription) %> },
+        { property: "twitter:image", content: "<%= absoluteImage %>" }
+    ];
+
+    // Injeksi Link Canonical ke Google Search Console untuk Halaman Berita Spesifik
+    let canonical = document.createElement('link');
+    canonical.rel = 'canonical';
+    canonical.href = "<%= articleUrl %>";
+    document.head.appendChild(canonical);
+
+    // Injeksi Meta Tags ke dalam Head secara pintar
+    metaTags.forEach(tag => {
+        let selector = tag.name ? `meta[name="${tag.name}"]` : `meta[property="${tag.property}"]`;
+        let existingTag = document.head.querySelector(selector);
+        if (!existingTag) {
+            let el = document.createElement('meta');
+            if(tag.name) el.name = tag.name;
+            if(tag.property) el.setAttribute('property', tag.property);
+            el.content = tag.content;
+            document.head.appendChild(el);
+        } else {
+            // Timpa jika tag sudah ada (override header default)
+            existingTag.content = tag.content;
+        }
+    });
+});
+</script>
+
+<!-- ==============================================================
+     SUPER BIG UPGRADE SEO: ADVANCED @GRAPH JSON-LD (ARTICLE)
+     Mendikte Google tentang Hierarki Halaman, Breadcrumb, dan Spesifikasi Artikel
+============================================================== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "<%= articleUrl %>/#webpage",
+      "url": "<%= articleUrl %>",
+      "name": <%- JSON.stringify(pageTitle + " | HMI KomKG UMI") %>,
+      "description": <%- JSON.stringify(pageDescription) %>,
+      "inLanguage": "id-ID",
+      "isPartOf": { "@id": "<%= seoBaseUrl %>/#website" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "<%= articleUrl %>/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Beranda",
+          "item": "<%= seoBaseUrl %>/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Berita & Informasi",
+          "item": "<%= seoBaseUrl %>/#news-list"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": <%- JSON.stringify(pageTitle) %>,
+          "item": "<%= articleUrl %>"
+        }
+      ]
+    },
+    {
+      "@type": "NewsArticle",
+      "@id": "<%= articleUrl %>/#article",
+      "headline": <%- JSON.stringify(pageTitle) %>,
+      "description": <%- JSON.stringify(pageDescription) %>,
+      "image": "<%= absoluteImage %>",
+      "datePublished": "<%= safeBerita.date %>",
+      "author": {
+        "@type": "Organization",
+        "name": "Admin HMI KomKG UMI",
+        "url": "<%= seoBaseUrl %>"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "HMI KomKG UMI",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "<%= seoBaseUrl %>/img/logo.png"
+        }
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "<%= articleUrl %>/#webpage"
+      },
+      "articleSection": "<%= safeBerita.category %>"
+    }
+  ]
+}
+</script>
 
 <div class="container" style="max-width: 800px; margin-bottom: 50px;">
     
@@ -14,16 +164,16 @@
     <article class="glass" itemscope itemtype="https://schema.org/NewsArticle" style="padding: 40px; border-top: 5px solid #22c55e;">
         
         <!-- Kategori -->
-        <span class="badge" itemprop="articleSection" style="margin-bottom: 15px;"><%= berita.category %></span>
+        <span class="badge" itemprop="articleSection" style="margin-bottom: 15px;"><%= safeBerita.category %></span>
         
         <!-- Header Artikel (Judul & Meta) -->
         <header>
-            <h1 itemprop="headline" style="font-size: 2.2rem; margin-bottom: 15px; color: #fff; line-height: 1.3;"><%= berita.title %></h1>
+            <h1 itemprop="headline" style="font-size: 2.2rem; margin-bottom: 15px; color: #fff; line-height: 1.3;"><%= safeBerita.title %></h1>
             
             <div style="display:flex; align-items:center; gap:15px; color:#9ca3af; font-size:0.9rem; margin-bottom:30px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:20px;">
                 <span style="display:flex; align-items:center; gap:5px;">
                     <i data-lucide="calendar" style="width:16px;"></i> 
-                    <time itemprop="datePublished" datetime="<%= berita.date %>"><%= berita.date %></time>
+                    <time itemprop="datePublished" datetime="<%= safeBerita.date %>"><%= safeBerita.date %></time>
                 </span>
                 <span itemprop="author" itemscope itemtype="https://schema.org/Organization" style="display:flex; align-items:center; gap:5px;">
                     <i data-lucide="user" style="width:16px;"></i> 
@@ -34,22 +184,22 @@
 
         <!-- Gambar Utama Artikel -->
         <div class="detail-img-wrapper">
-            <img itemprop="image" src="<%= berita.image %>" alt="Cover Berita: <%= berita.title %>">
+            <img itemprop="image" src="<%= safeBerita.image %>" alt="Cover Berita: <%= safeBerita.title %>">
         </div>
 
         <!-- Isi/Konten Utama Artikel -->
         <div class="rich-text-content" itemprop="articleBody">
-            <%- berita.content %>
+            <%- safeBerita.content %>
         </div>
 
         <!-- Dokumentasi Tambahan -->
-        <% if(berita.photos && berita.photos.length > 0) { %>
+        <% if(safeBerita.photos && safeBerita.photos.length > 0) { %>
             <h3 style="margin-bottom: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px;">Dokumentasi Tambahan</h3>
             <div class="grid-2" style="gap: 15px;">
-                <% berita.photos.forEach(photo => { %>
+                <% safeBerita.photos.forEach(photo => { %>
                     <div style="width: 100%; height: 200px; overflow: hidden; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
                         <!-- itemprop="image" membantu Google Images mendeteksi lebih banyak foto -->
-                        <img itemprop="image" src="<%= photo.url %>" alt="Dokumentasi Tambahan: <%= berita.title %>" style="width: 100%; height: 100%; object-fit: cover; transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        <img itemprop="image" src="<%= photo.url %>" alt="Dokumentasi Tambahan: <%= safeBerita.title %>" style="width: 100%; height: 100%; object-fit: cover; transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                     </div>
                 <% }) %>
             </div>
