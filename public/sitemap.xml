@@ -1,17 +1,3 @@
-<!-- ==============================================================
-     SUPER BIG UPGRADE SEO: ADDED <lastmod> TAGS
-     Memberi tahu Googlebot kapan website terakhir kali diperbarui,
-     sehingga proses indexing (perayapan) akan jauh lebih cepat!
-============================================================== -->
-
-<!-- Halaman Utama (Prioritas Tertinggi 1.0) -->
-<url>
-    <loc>https://www.hmikomkgumi.xyz/</loc>
-    <lastmod>2026-07-15T08:00:00+08:00</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-</url>
-
 <!-- Halaman Inti (Prioritas Tinggi 0.8) -->
 <url>
     <loc>https://www.hmikomkgumi.xyz/tentang</loc>
