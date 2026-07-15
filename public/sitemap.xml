@@ -1,55 +1,72 @@
-<!-- Halaman Utama (Prioritas Tertinggi) -->
+<!-- ========================================= -->
+<!-- HALAMAN UTAMA & PRIORITAS TINGGI          -->
+<!-- ========================================= -->
 <url>
-    <loc>https://www.hmikomkgumi.xyz</loc>
+    <loc>https://www.hmikomkgumi.xyz/</loc>
     <lastmod>2026-07-15T08:00:00+08:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+        <image:loc>https://www.hmikomkgumi.xyz/img/logo.png</image:loc>
+        <image:title>Logo Resmi HMI KomKG UMI</image:title>
+        <image:caption>Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI</image:caption>
+    </image:image>
 </url>
 
-<!-- Halaman Inti (Prioritas Tinggi 0.8) -->
+<!-- ========================================= -->
+<!-- PUSAT INFORMASI & MENU UTAMA              -->
+<!-- ========================================= -->
 <url>
     <loc>https://www.hmikomkgumi.xyz/tentang</loc>
     <lastmod>2026-07-15T08:00:00+08:00</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
 </url>
 <url>
     <loc>https://www.hmikomkgumi.xyz/galeri</loc>
     <lastmod>2026-07-15T08:00:00+08:00</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
 </url>
 <url>
     <loc>https://www.hmikomkgumi.xyz/data-anggota</loc>
     <lastmod>2026-07-15T08:00:00+08:00</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
 </url>
 
-<!-- Halaman Artikel & Berita (Prioritas Menengah 0.7) -->
+<!-- ========================================= -->
+<!-- ARTIKEL BERITA & INFORMASI (AUTO-INDEX)   -->
+<!-- ========================================= -->
 <url>
     <loc>https://www.hmikomkgumi.xyz/berita/1779086636921</loc>
     <lastmod>2026-07-15T08:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
+    <image:image>
+        <image:loc>https://www.hmikomkgumi.xyz/img/logo.png</image:loc>
+        <image:title>Berita &amp; Informasi HMI KomKG UMI</image:title>
+    </image:image>
 </url>
 
-<!-- Halaman Item Galeri Spesifik (Prioritas Standar 0.6) -->
+<!-- ========================================= -->
+<!-- DETAIL GALERI DOKUMENTASI (AUTO-INDEX)    -->
+<!-- ========================================= -->
 <url>
     <loc>https://www.hmikomkgumi.xyz/galeri/1779112445779</loc>
     <lastmod>2026-07-15T08:00:00+08:00</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
 </url>
 <url>
     <loc>https://www.hmikomkgumi.xyz/galeri/1779112371109</loc>
     <lastmod>2026-07-15T08:00:00+08:00</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
 </url>
 <url>
     <loc>https://www.hmikomkgumi.xyz/galeri/1</loc>
     <lastmod>2026-07-15T08:00:00+08:00</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
 </url>
