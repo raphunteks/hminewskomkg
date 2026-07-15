@@ -8,6 +8,93 @@
 %>
 <%- include('partials/header', { page: page, pageTitle: pageTitle }) %>
 
+<!-- ==============================================================
+     SUPER BIG UPGRADE: ADVANCED SEO & DYNAMIC SCHEMA.ORG INJECTION
+     Otomatis mendeteksi dan mengindeks Berita/Proker Baru ke Google
+============================================================== -->
+<script type="application/ld+json" id="dynamic-seo-schema">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://hmikomkgumi.xyz/#website",
+      "url": "https://hmikomkgumi.xyz/",
+      "name": "<%= typeof siteSettings !== 'undefined' ? (siteSettings.heroTitle || siteSettings.webTitle || 'HMI KomKG UMI') : 'HMI KomKG UMI' %>",
+      "description": "Website Resmi Himpunan Mahasiswa Islam (HMI) Komisariat Kedokteran Gigi Universitas Muslim Indonesia. Mewujudkan insan akademis, pencipta, pengabdi yang bernafaskan Islam.",
+      "inLanguage": "id-ID"
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://hmikomkgumi.xyz/#organization",
+      "name": "HMI KomKG UMI",
+      "url": "https://hmikomkgumi.xyz/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://hmikomkgumi.xyz/img/logo.png"
+      }
+    }
+    <% if(typeof news !== 'undefined' && news.length > 0) { %>,
+    {
+      "@type": "ItemList",
+      "@id": "https://hmikomkgumi.xyz/#news-list",
+      "name": "Update Berita dan Program Kerja Terbaru",
+      "itemListElement": [
+        <% news.forEach((item, index) => { %>
+        {
+          "@type": "ListItem",
+          "position": <%= index + 1 %>,
+          "url": "https://hmikomkgumi.xyz/berita/<%= item.id %>",
+          "item": {
+            "@type": "NewsArticle",
+            "headline": <%- JSON.stringify(item.title) %>,
+            "image": <%- JSON.stringify(item.image) %>,
+            "datePublished": <%- JSON.stringify(item.date) %>,
+            "url": "https://hmikomkgumi.xyz/berita/<%= item.id %>",
+            "author": {
+              "@type": "Organization",
+              "name": "Admin HMI KomKG UMI"
+            }
+          }
+        }<%= index < news.length - 1 ? ',' : '' %>
+        <% }) %>
+      ]
+    }
+    <% } %>
+  ]
+}
+</script>
+
+<script>
+// DYNAMIC META TAGS INJECTION (OPEN GRAPH & TWITTER)
+// Memastikan link tampil cantik saat di-share ke WhatsApp, FB, IG, Twitter
+document.addEventListener('DOMContentLoaded', () => {
+    const metaTags = [
+        { name: "description", content: "Website Resmi HMI Komisariat Kedokteran Gigi UMI. Update terbaru seputar kegiatan, proker, dan informasi komisariat." },
+        { name: "keywords", content: "HMI KomKG UMI, HMI, Kedokteran Gigi UMI, Organisasi Mahasiswa Makassar, Yakusa, Yakin Usaha Sampai, Proker HMI" },
+        { name: "author", content: "Admin HMI KomKG UMI" },
+        { property: "og:title", content: "Beranda | HMI KomKG UMI" },
+        { property: "og:description", content: "Website Resmi HMI Komisariat Kedokteran Gigi UMI. Wadah pengembangan akademik, keislaman, dan sosial kemasyarakatan." },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: "https://hmikomkgumi.xyz/" },
+        { property: "twitter:card", content: "summary_large_image" },
+        { property: "twitter:title", content: "Beranda | HMI KomKG UMI" }
+    ];
+
+    metaTags.forEach(tag => {
+        let selector = tag.name ? `meta[name="${tag.name}"]` : `meta[property="${tag.property}"]`;
+        if (!document.head.querySelector(selector)) {
+            let el = document.createElement('meta');
+            if(tag.name) el.name = tag.name;
+            if(tag.property) el.setAttribute('property', tag.property);
+            el.content = tag.content;
+            document.head.appendChild(el);
+        }
+    });
+});
+</script>
+<!-- ================= END SUPER BIG UPGRADE SEO ================= -->
+
 <!-- POPUP PENGUMUMAN HORIZONTAL -->
 <% if (typeof siteSettings !== 'undefined' && (siteSettings.announceActive === 'true' || siteSettings.announceActive === true)) { %>
 <%- include('partials/announce') %>
