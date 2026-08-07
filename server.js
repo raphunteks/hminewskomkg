@@ -148,6 +148,20 @@ async function initDefaultData() {
     }
     let bioLnk = await kv.get('bioLinks');
     if (!bioLnk) await kv.set('bioLinks', []);
+
+    // SUPER BIG UPGRADE: Inisialisasi Database Developer Team
+    let hasDevTeam = await kv.get('devTeamList');
+    if (!hasDevTeam || hasDevTeam.length === 0) {
+        await kv.set('devTeamList', [
+            { id: 1, name: 'M. Aksa Arsyad, drg., S.KG', role: 'Lead Developer', dept: 'Demisioner Dept. Information and Communication', category: 'FullStack Development', image: '', ig: 'https://www.instagram.com/axaaxyz_01' },
+            { id: 2, name: 'Silvy Ananda', role: 'Backend Development', dept: 'Dept. Information and Communication', category: 'Backend Development', image: '', ig: '' },
+            { id: 3, name: 'Muh. Sauqi Zahran. B', role: 'Backend Development', dept: 'Dept. Information and Communication', category: 'Backend Development', image: '', ig: '' },
+            { id: 4, name: 'Daegal Fauza Iryanto', role: 'Frontend Development', dept: 'Dept. Information and Communication', category: 'Frontend Development', image: '', ig: '' },
+            { id: 5, name: 'Zahwa Alzahra Djohan', role: 'Frontend Development', dept: 'Dept. Information and Communication', category: 'Frontend Development', image: '', ig: '' },
+            { id: 6, name: 'Zaneta Zahra Zulaikha', role: 'UI/UX Design (CSS)', dept: 'Dept. Information and Communication', category: 'UI/UX Design (CSS)', image: '', ig: '' },
+            { id: 7, name: 'Novita Widyantari', role: 'UI/UX Design (CSS)', dept: 'Dept. Information and Communication', category: 'UI/UX Design (CSS)', image: '', ig: '' }
+        ]);
+    }
 }
 
 (async () => {
@@ -257,12 +271,23 @@ app.get('/data-anggota', async (req, res) => {
     }
 });
 
+// SUPER BIG UPGRADE: Route Our Team / Developer
+app.get('/ourteam', async (req, res) => {
+    try {
+        const { siteSettings, socialMediaList } = await getSiteData();
+        const devTeam = await kv.get('devTeamList') || [];
+        res.render('ourteam', { page: 'ourteam', devTeam, siteSettings, socialMediaList });
+    } catch (err) { 
+        res.render('ourteam', { page: 'ourteam', devTeam: [], siteSettings: defaultSettings, socialMediaList: defaultSocialMedia }); 
+    }
+});
+
 // ==============================================================
 // BIG UPGRADE: ROUTING CEK URL UNTUK SHORTLINK ATAU LINK-IN-BIO
 // ==============================================================
 app.get('/:slug', async (req, res, next) => {
     const slug = req.params.slug.toLowerCase();
-    const reserved = ['admin', 'css', 'img', 'js', 'berita', 'galeri', 'tentang', 'data-anggota', 'api'];
+    const reserved = ['admin', 'css', 'img', 'js', 'berita', 'galeri', 'tentang', 'data-anggota', 'ourteam', 'api'];
     if (reserved.includes(slug)) return next();
     
     try {
@@ -340,10 +365,13 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
         let bioPages = safeArr(await kv.get('bioPages')).map(x => ({...x, path: safeStr(x.path), title: safeStr(x.title), bio: safeStr(x.bio), bgType: safeStr(x.bgType), bgValue: safeStr(x.bgValue)}));
         let bioLinks = safeArr(await kv.get('bioLinks')).map(x => ({...x, title: safeStr(x.title), url: safeStr(x.url)}));
 
+        // Panggil Data Dev Team
+        let devTeam = safeArr(await kv.get('devTeamList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role), dept: safeStr(x.dept), category: safeStr(x.category), ig: safeStr(x.ig)}));
+
         res.render('admin-dashboard', { 
             page: 'admin', news, albums, pengurus, bidang, dataAnggota, 
             kohatiPengurus, kohatiBidang, shortlinks, siteSettings, socialMediaList,
-            bioPages, bioLinks
+            bioPages, bioLinks, devTeam
         });
     } catch (err) { 
         console.error("Dashboard Render Error:", err);
@@ -594,6 +622,50 @@ app.post('/admin/edit-biolink/:id', requireAdmin, upload.any(), async (req, res)
 app.post('/admin/hapus-biolink/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('bioLinks') || [];
     await kv.set('bioLinks', list.filter(l => l.id != req.params.id));
+    res.redirect('/admin/dashboard');
+});
+
+// ==============================================================
+// SUPER BIG UPGRADE: API KELOLA DEVELOPER TEAM
+// ==============================================================
+app.post('/admin/tambah-devteam', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = await kv.get('devTeamList') || [];
+        list.push({
+            id: Date.now(),
+            name: req.body.name,
+            role: req.body.role,
+            dept: req.body.dept || '',
+            category: req.body.category,
+            ig: req.body.ig || '',
+            image: fileHelper(req, 'image_b64')
+        });
+        await kv.set('devTeamList', list);
+        res.redirect('/admin/dashboard');
+    } catch(e) { res.redirect('/admin/dashboard'); }
+});
+
+app.post('/admin/edit-devteam/:id', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = await kv.get('devTeamList') || [];
+        let i = list.findIndex(l => l.id == req.params.id);
+        if (i !== -1) {
+            if (req.body.name) list[i].name = req.body.name;
+            if (req.body.role) list[i].role = req.body.role;
+            if (req.body.dept !== undefined) list[i].dept = req.body.dept;
+            if (req.body.category) list[i].category = req.body.category;
+            if (req.body.ig !== undefined) list[i].ig = req.body.ig;
+            const newImg = fileHelper(req, 'image_b64');
+            if (newImg) list[i].image = newImg;
+            await kv.set('devTeamList', list);
+        }
+        res.redirect('/admin/dashboard');
+    } catch(e) { res.redirect('/admin/dashboard'); }
+});
+
+app.post('/admin/hapus-devteam/:id', requireAdmin, async (req, res) => {
+    let list = await kv.get('devTeamList') || [];
+    await kv.set('devTeamList', list.filter(l => l.id != req.params.id));
     res.redirect('/admin/dashboard');
 });
 
