@@ -153,13 +153,10 @@ async function initDefaultData() {
     let hasDevTeam = await kv.get('devTeamList');
     if (!hasDevTeam || hasDevTeam.length === 0) {
         await kv.set('devTeamList', [
-            { id: 1, name: 'M. Aksa Arsyad, drg., S.KG', role: 'Lead Developer', dept: 'Demisioner Dept. Information and Communication', category: 'FullStack Development', image: '', ig: 'https://www.instagram.com/axaaxyz_01' },
-            { id: 2, name: 'Silvy Ananda', role: 'Backend Development', dept: 'Dept. Information and Communication', category: 'Backend Development', image: '', ig: '' },
-            { id: 3, name: 'Muh. Sauqi Zahran. B', role: 'Backend Development', dept: 'Dept. Information and Communication', category: 'Backend Development', image: '', ig: '' },
-            { id: 4, name: 'Daegal Fauza Iryanto', role: 'Frontend Development', dept: 'Dept. Information and Communication', category: 'Frontend Development', image: '', ig: '' },
-            { id: 5, name: 'Zahwa Alzahra Djohan', role: 'Frontend Development', dept: 'Dept. Information and Communication', category: 'Frontend Development', image: '', ig: '' },
-            { id: 6, name: 'Zaneta Zahra Zulaikha', role: 'UI/UX Design (CSS)', dept: 'Dept. Information and Communication', category: 'UI/UX Design (CSS)', image: '', ig: '' },
-            { id: 7, name: 'Novita Widyantari', role: 'UI/UX Design (CSS)', dept: 'Dept. Information and Communication', category: 'UI/UX Design (CSS)', image: '', ig: '' }
+            { id: 1, name: 'M. Aksa Arsyad, drg., S.KG', role: 'Lead Developer', dept: 'Demisioner Dept. Penerangan', category: 'FullStack Development', image: '/img/axaprofil.png', ig: 'https://www.instagram.com/axaaxyz_01' },
+            { id: 2, name: 'Ibnu Rusyd, S.KG', role: 'Backend Development', dept: 'Demisioner Dept. Penerangan', category: 'Backend Development', image: '/img/ibnuprofil.png', ig: 'https://www.instagram.com/_ibnurusyd' },
+            { id: 3, name: 'Riswandani AR, S.KG', role: 'Frontend Development', dept: 'Demisioner Dept. Kepemudaan', category: 'Frontend Development', image: '/img/riswanprofil.png', ig: 'https://www.instagram.com/riswandani_ar' },
+            { id: 4, name: 'Tasya Awaliyah Arsyad, drg., S.KG', role: 'UI/UX Design (CSS)', dept: 'Demisioner Dept. Pengembangan Profesi', category: 'UI/UX Design (CSS)', image: '', ig: 'https://www.instagram.com/tasyaawlyhh.arsyad' }
         ]);
     }
 }
