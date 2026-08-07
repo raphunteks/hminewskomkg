@@ -499,8 +499,9 @@
                         </td>
                         <td><span class="cat-badge" style="background:rgba(59,130,246,0.1); color:#60a5fa; border:1px solid rgba(59,130,246,0.3);"><%= dev.category %></span></td>
                         <td class="td-actions">
-                            <button type="button" class="action-btn edit" onclick="openEditDevTeamModal('<%= dev.id %>', '<%= dev.name.replace(/'/g, "\\'") %>', '<%= dev.role.replace(/'/g, "\\'") %>', '<%= (dev.dept || '').replace(/'/g, "\\'") %>', '<%= dev.category %>', '<%= (dev.ig || '').replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
-                            <form action="/admin/hapus-devteam/<%= dev.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus profil developer ini?')"><i data-lucide="trash-2"></i></button></form>
+                            <% const isProtected = (dev.id == 1 || dev.name.includes('Aksa Arsyad')) ? 'true' : 'false'; %>
+                            <button type="button" class="action-btn edit" onclick="openEditDevTeamModal('<%= dev.id %>', '<%= dev.name.replace(/'/g, "\\'") %>', '<%= dev.role.replace(/'/g, "\\'") %>', '<%= (dev.dept || '').replace(/'/g, "\\'") %>', '<%= dev.category %>', '<%= (dev.ig || '').replace(/'/g, "\\'") %>', <%= isProtected %>)"><i data-lucide="edit"></i></button>
+                            <form action="/admin/hapus-devteam/<%= dev.id %>" method="POST" class="form-inline" onsubmit="return handleProtectedDelete(event, <%= isProtected %>)"><button type="submit" class="action-btn delete"><i data-lucide="trash-2"></i></button></form>
                         </td>
                     </tr>
                     <% }) %>
@@ -684,6 +685,11 @@
     <div class="modal-content" style="border-color:#3b82f6;">
         <div class="modal-header"><h3 style="color:#60a5fa;">Edit Developer</h3><button type="button" class="close-modal" onclick="closeModal('modalEditDevTeam')"><i data-lucide="x"></i></button></div>
         <form id="formEditDevTeam" method="POST" enctype="multipart/form-data">
+            <div class="form-group" id="pinGroupDev" style="display:none; background:rgba(239, 68, 68, 0.1); padding:15px; border-radius:10px; border:1px solid rgba(239, 68, 68, 0.3);">
+                <label style="color:#ef4444;"><i data-lucide="lock" style="width:16px; display:inline-block; vertical-align:middle;"></i> PIN Otorisasi (Khusus Lead Dev)</label>
+                <input type="password" name="pin" id="editDevPin" class="input-control" placeholder="Masukkan PIN 999..." style="border-color:#ef4444;">
+                <p style="font-size:0.75rem; color:#fca5a5; margin-top:5px;">Data ini diproteksi oleh server. Masukkan PIN untuk mengubah.</p>
+            </div>
             <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" id="editDevName" class="input-control" required></div>
             <div class="grid-2">
                 <div class="form-group"><label>Kategori (Penting Untuk Layout)</label>
@@ -781,15 +787,48 @@
         openModal('modalAnggotaBidang'); 
     }
 
-    // UPGRADE: Script Modal Edit Developer Team
-    function openEditDevTeamModal(id, name, role, dept, category, ig) {
+    // UPGRADE: Script Modal Edit Developer Team dengan Proteksi PIN
+    function openEditDevTeamModal(id, name, role, dept, category, ig, isProtected) {
         document.getElementById('editDevName').value = name;
         document.getElementById('editDevRole').value = role;
         document.getElementById('editDevDept').value = dept;
         document.getElementById('editDevCategory').value = category;
         document.getElementById('editDevIg').value = ig;
+        
+        const pinGroup = document.getElementById('pinGroupDev');
+        const pinInput = document.getElementById('editDevPin');
+        if(isProtected) {
+            pinGroup.style.display = 'block';
+            pinInput.required = true;
+            pinInput.value = ''; // Reset form PIN
+        } else {
+            pinGroup.style.display = 'none';
+            pinInput.required = false;
+            pinInput.value = '';
+        }
+
         document.getElementById('formEditDevTeam').action = '/admin/edit-devteam/' + id;
         openModal('modalEditDevTeam');
+    }
+
+    // UPGRADE: Script Handle Delete Developer (Proteksi PIN via Prompt)
+    function handleProtectedDelete(event, isProtected) {
+        if (isProtected) {
+            const pin = prompt("PERINGATAN SISTEM!\nMenghapus Lead Developer membutuhkan PIN Otorisasi.\n\nMasukkan PIN Rahasia:");
+            if (pin !== '999') {
+                alert("AKSES DITOLAK! PIN Salah atau Dibatalkan.");
+                event.preventDefault();
+                return false;
+            }
+            // Inject PIN ke dalam form saat submit
+            const form = event.target;
+            const hiddenPin = document.createElement('input');
+            hiddenPin.type = 'hidden';
+            hiddenPin.name = 'pin';
+            hiddenPin.value = pin;
+            form.appendChild(hiddenPin);
+        }
+        return confirm('Hapus profil developer ini secara permanen?');
     }
 
     async function compressImage(file, maxWidth = 1000) {
