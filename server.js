@@ -1,4 +1,3 @@
-// test
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
@@ -157,7 +156,7 @@ async function initDefaultData() {
             { id: 1, name: 'M. Aksa Arsyad, drg., S.KG', role: 'Lead Developer', dept: 'Demisioner Dept. Penerangan', category: 'FullStack Development', image: '/img/axaprofil.jpg', ig: 'https://www.instagram.com/axaaxyz_01' },
             { id: 2, name: 'Ibnu Rusyd, S.KG', role: 'Backend Development', dept: 'Demisioner Dept. Penerangan', category: 'Backend Development', image: '/img/ibnuprofil.png', ig: 'https://www.instagram.com/_ibnurusyd' },
             { id: 3, name: 'Riswandani AR, S.KG', role: 'Frontend Development', dept: 'Demisioner Dept. Kepemudaan', category: 'Frontend Development', image: '/img/riswanprofil.png', ig: 'https://www.instagram.com/riswandani_ar' },
-            { id: 4, name: 'Tasya Awaliyah Arsyad, drg., S.KG', role: 'UI/UX Design (CSS)', dept: 'Demisioner Dept. Pengembangan Profesi', category: 'UI/UX Design (CSS)', image: '', ig: 'https://www.instagram.com/tasyaawlyhh.arsyad' }
+            { id: 4, name: 'Tasya Awaliyah Arsyad, drg., S.KG', role: 'UI/UX Design (CSS)', dept: 'Demisioner Dept. Pengembangan Profesi', category: 'UI/UX Design (CSS)', image: '/img/tasyaprofil.jpg', ig: 'https://www.instagram.com/tasyaawlyhh.arsyad' }
         ]);
     }
 }
@@ -648,6 +647,13 @@ app.post('/admin/edit-devteam/:id', requireAdmin, upload.any(), async (req, res)
         let list = await kv.get('devTeamList') || [];
         let i = list.findIndex(l => l.id == req.params.id);
         if (i !== -1) {
+            // SUPER BIG UPGRADE: Proteksi Backend Khusus Lead Developer M. Aksa Arsyad
+            if (list[i].id == 1 || list[i].name.includes('Aksa Arsyad')) {
+                if (req.body.pin !== '999') {
+                    return res.send("<script>alert('AKSES DITOLAK! PIN Rahasia Salah. Anda tidak berhak mengubah data Lead Developer.'); window.location.href='/admin/dashboard';</script>");
+                }
+            }
+
             if (req.body.name) list[i].name = req.body.name;
             if (req.body.role) list[i].role = req.body.role;
             if (req.body.dept !== undefined) list[i].dept = req.body.dept;
@@ -663,6 +669,15 @@ app.post('/admin/edit-devteam/:id', requireAdmin, upload.any(), async (req, res)
 
 app.post('/admin/hapus-devteam/:id', requireAdmin, async (req, res) => {
     let list = await kv.get('devTeamList') || [];
+    let i = list.findIndex(l => l.id == req.params.id);
+    if (i !== -1) {
+        // SUPER BIG UPGRADE: Proteksi Backend Khusus Lead Developer M. Aksa Arsyad
+        if (list[i].id == 1 || list[i].name.includes('Aksa Arsyad')) {
+            if (req.body.pin !== '999') {
+                return res.send("<script>alert('AKSES DITOLAK! PIN Rahasia Salah. Anda tidak berhak menghapus data Lead Developer.'); window.location.href='/admin/dashboard';</script>");
+            }
+        }
+    }
     await kv.set('devTeamList', list.filter(l => l.id != req.params.id));
     res.redirect('/admin/dashboard');
 });
