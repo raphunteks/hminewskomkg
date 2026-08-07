@@ -1,0 +1,144 @@
+<% 
+    // ==============================================================
+    // ENTERPRISE SEO & BREADCRUMB INJECTION
+    // ==============================================================
+    let page = 'ourteam';
+    let pageTitle = 'Developer Team';
+%>
+<%- include('partials/header', { page: page, pageTitle: pageTitle }) %>
+
+<!-- ==============================================================
+     DYNAMIC SCHEMA.ORG INJECTION (ABOUT PAGE & PERSON)
+     Memaksimalkan Indexing Profil Developer di Google Search
+============================================================== -->
+<script type="application/ld+json" id="dynamic-seo-schema-team">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "AboutPage",
+      "@id": "https://hmikomkgumi.xyz/ourteam/#webpage",
+      "url": "https://hmikomkgumi.xyz/ourteam",
+      "name": "Developer Team | HMI KomKG UMI",
+      "description": "Sosok dibalik layar pengembangan Sistem Informasi BEM KBMFKG UMI & HMI KomKG UMI."
+    }
+    <% if(typeof devTeam !== 'undefined' && devTeam.length > 0) { %>
+    , {
+      "@type": "ItemList",
+      "name": "Daftar Tim Pengembang",
+      "itemListElement": [
+        <% devTeam.forEach((member, index) => { %>
+        {
+          "@type": "ListItem",
+          "position": <%= index + 1 %>,
+          "item": {
+            "@type": "Person",
+            "name": <%- JSON.stringify(member.name) %>,
+            "jobTitle": <%- JSON.stringify(member.role) %>,
+            "image": <%- JSON.stringify(member.image) %>,
+            "affiliation": {
+              "@type": "Organization",
+              "name": "HMI KomKG UMI"
+            },
+            "sameAs": [
+              <%- member.ig ? JSON.stringify(member.ig) : '""' %>
+            ]
+          }
+        }<%= index < devTeam.length - 1 ? ',' : '' %>
+        <% }) %>
+      ]
+    }
+    <% } %>
+  ]
+}
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const metaTags = [
+        { name: "description", content: "Kenali Developer Team hebat dibalik layar pengembangan Sistem Informasi HMI KomKG UMI." },
+        { name: "keywords", content: "Developer Team, Programmer HMI, HMI KomKG UMI, Aksa Arsyad, IT HMI" },
+        { property: "og:title", content: "Developer Team | HMI KomKG UMI" },
+        { property: "og:description", content: "Sosok dibalik layar pengembangan Sistem Informasi web HMI KomKG UMI." },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: "https://hmikomkgumi.xyz/ourteam" }
+    ];
+
+    metaTags.forEach(tag => {
+        let selector = tag.name ? `meta[name="${tag.name}"]` : `meta[property="${tag.property}"]`;
+        if (!document.head.querySelector(selector)) {
+            let el = document.createElement('meta');
+            if(tag.name) el.name = tag.name;
+            if(tag.property) el.setAttribute('property', tag.property);
+            el.content = tag.content;
+            document.head.appendChild(el);
+        }
+    });
+});
+</script>
+
+<section class="container" style="margin-top: 40px; margin-bottom: 80px;">
+    <!-- HEADER CREDITS -->
+    <div class="dev-page-header">
+        <span class="dev-badge">CREDITS</span>
+        <h1 class="dev-main-title">Developer <span class="text-blue-gradient">Team</span></h1>
+        <p class="dev-subtitle">Sosok dibalik layar pengembangan Sistem Informasi HMI KomKG UMI.</p>
+    </div>
+
+    <% 
+        // Mengelompokkan tim berdasarkan kategori sesuai urutan desain
+        const categories = [
+            { name: 'FullStack Development', icon: 'server' },
+            { name: 'Backend Development', icon: 'database' },
+            { name: 'Frontend Development', icon: 'layout-template' },
+            { name: 'UI/UX Design (CSS)', icon: 'pen-tool' }
+        ];
+    %>
+
+    <% categories.forEach(cat => { %>
+        <% const members = devTeam.filter(m => m.category === cat.name); %>
+        <% if(members.length > 0) { %>
+            
+            <div class="dev-category-wrap">
+                <!-- JUDUL KATEGORI -->
+                <div class="dev-category-header">
+                    <div class="dev-icon-box">
+                        <i data-lucide="<%= cat.icon %>"></i>
+                    </div>
+                    <h2 class="dev-category-title"><%= cat.name %></h2>
+                </div>
+
+                <!-- GRID CARDS -->
+                <!-- Jika FullStack (atau cuma 1 orang), gunakan 1 kolom di tengah. Sisanya 2 kolom -->
+                <div class="<%= members.length === 1 ? 'grid-dev-1' : 'grid-dev-2' %>">
+                    <% members.forEach(member => { %>
+                        <div class="dev-card">
+                            <div class="dev-avatar-wrap">
+                                <img src="<%= member.image || '/img/logo-hmikomkgumi.png' %>" alt="<%= member.name %>" loading="lazy" decoding="async">
+                            </div>
+                            <h3 class="dev-name"><%= member.name %></h3>
+                            <p class="dev-role"><%= member.role %></p>
+                            <p class="dev-dept"><%= member.dept %></p>
+                            
+                            <div class="dev-divider"></div>
+                            
+                            <div class="dev-social">
+                                <% if(member.ig) { %>
+                                    <a href="<%= member.ig %>" target="_blank" rel="noopener noreferrer" aria-label="Instagram <%= member.name %>">
+                                        <i data-lucide="instagram"></i>
+                                    </a>
+                                <% } else { %>
+                                    <span style="opacity:0.3;"><i data-lucide="instagram"></i></span>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+
+        <% } %>
+    <% }) %>
+
+</section>
+
+<%- include('partials/footer') %>
