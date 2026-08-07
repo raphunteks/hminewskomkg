@@ -1189,3 +1189,71 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
         height: 16px;
     }
 }
+
+/* ==============================================================
+   SUPER BIG UPGRADE: DEVELOPER TEAM UI (OURTEAM)
+   Desain Clean White Light-Glassmorphism
+============================================================== */
+.dev-page-header { text-align: center; margin-bottom: 60px; animation: cinematicFadeIn 0.8s ease forwards; }
+.dev-badge { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 5px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; display: inline-block; margin-bottom: 15px; }
+.dev-main-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; color: #fff; margin-bottom: 10px; letter-spacing: -0.5px; }
+.text-blue-gradient { background: linear-gradient(135deg, #3b82f6, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.dev-subtitle { color: #9ca3af; font-size: 0.95rem; max-width: 500px; margin: 0 auto; }
+
+.dev-category-wrap { margin-bottom: 50px; }
+.dev-category-header { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 30px; position: relative; padding-bottom: 10px; }
+.dev-category-header::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 250px; height: 3px; background: linear-gradient(90deg, transparent, #3b82f6, transparent); border-radius: 2px; }
+.dev-icon-box { width: 45px; height: 45px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #60a5fa; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2); }
+.dev-category-title { font-size: 1.6rem; color: #fff; font-weight: 800; margin: 0; }
+
+.grid-dev-1 { display: grid; grid-template-columns: minmax(auto, 600px); justify-content: center; gap: 30px; }
+.grid-dev-2 { display: grid; grid-template-columns: repeat(2, minmax(auto, 500px)); justify-content: center; gap: 30px; }
+
+/* Clean White Card Concept */
+.dev-card { 
+    background: rgba(255, 255, 255, 0.98); 
+    border-radius: 24px; 
+    padding: 35px 25px 20px; 
+    text-align: center; 
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255,255,255,0.5); 
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+    position: relative;
+}
+.dev-card:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3), 0 0 20px rgba(59, 130, 246, 0.3); }
+
+/* Avatar dengan Border Biru Neon */
+.dev-avatar-wrap { 
+    width: 110px; height: 110px; 
+    margin: 0 auto 20px; 
+    border-radius: 50%; 
+    padding: 5px; 
+    background: linear-gradient(135deg, #2563eb, #60a5fa); 
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4); 
+    position: relative;
+}
+.dev-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 3px solid #ffffff; background:#fff; }
+
+.dev-name { color: #111827; font-size: 1.25rem; font-weight: 800; margin-bottom: 5px; letter-spacing: -0.3px; }
+.dev-role { color: #2563eb; font-size: 0.9rem; font-weight: 700; margin-bottom: 5px; }
+.dev-dept { color: #6b7280; font-size: 0.8rem; font-weight: 500; }
+
+.dev-divider { width: 80%; height: 1px; background: rgba(0,0,0,0.06); margin: 20px auto 15px; }
+
+.dev-social { display: flex; justify-content: center; align-items: center; }
+.dev-social a { 
+    width: 38px; height: 38px; 
+    display: inline-flex; align-items: center; justify-content: center; 
+    border-radius: 50%; 
+    background: #f3f4f6; 
+    color: #374151; 
+    transition: all 0.3s ease; 
+    border: 1px solid rgba(0,0,0,0.05);
+}
+.dev-social a:hover { background: #2563eb; color: #ffffff; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); }
+.dev-social svg { width: 18px; height: 18px; }
+
+@media (max-width: 768px) {
+    .grid-dev-2 { grid-template-columns: 1fr; }
+    .dev-category-title { font-size: 1.3rem; }
+    .dev-main-title { font-size: 2.2rem; }
+}
