@@ -154,7 +154,7 @@ async function initDefaultData() {
     let hasDevTeam = await kv.get('devTeamList');
     if (!hasDevTeam || hasDevTeam.length === 0) {
         await kv.set('devTeamList', [
-            { id: 1, name: 'M. Aksa Arsyad, drg., S.KG', role: 'Lead Developer', dept: 'Demisioner Dept. Penerangan', category: 'FullStack Development', image: '/img/axaprofil.png', ig: 'https://www.instagram.com/axaaxyz_01' },
+            { id: 1, name: 'M. Aksa Arsyad, drg., S.KG', role: 'Lead Developer', dept: 'Demisioner Dept. Penerangan', category: 'FullStack Development', image: '/img/axaprofil.jpg', ig: 'https://www.instagram.com/axaaxyz_01' },
             { id: 2, name: 'Ibnu Rusyd, S.KG', role: 'Backend Development', dept: 'Demisioner Dept. Penerangan', category: 'Backend Development', image: '/img/ibnuprofil.png', ig: 'https://www.instagram.com/_ibnurusyd' },
             { id: 3, name: 'Riswandani AR, S.KG', role: 'Frontend Development', dept: 'Demisioner Dept. Kepemudaan', category: 'Frontend Development', image: '/img/riswanprofil.png', ig: 'https://www.instagram.com/riswandani_ar' },
             { id: 4, name: 'Tasya Awaliyah Arsyad, drg., S.KG', role: 'UI/UX Design (CSS)', dept: 'Demisioner Dept. Pengembangan Profesi', category: 'UI/UX Design (CSS)', image: '', ig: 'https://www.instagram.com/tasyaawlyhh.arsyad' }
