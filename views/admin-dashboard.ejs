@@ -20,6 +20,7 @@
     <button class="admin-tab-btn" onclick="openAdmTab('adm-setelan', this)"><i data-lucide="settings"></i> Header, Footer & Tentang</button>
     <button class="admin-tab-btn" onclick="openAdmTab('adm-bio', this)"><i data-lucide="smartphone"></i> Link in Bio</button>
     <button class="admin-tab-btn" onclick="openAdmTab('adm-shortlink', this)"><i data-lucide="link"></i> Shortlink Custom</button>
+    <button class="admin-tab-btn" onclick="openAdmTab('adm-devteam', this)"><i data-lucide="code"></i> Developer Team</button>
     <button class="admin-tab-btn" onclick="openAdmTab('adm-announce', this)"><i data-lucide="bell"></i> Announcement Pop-up</button>
 </div>
 
@@ -469,6 +470,49 @@
     </div>
 </div>
 
+<!-- ==============================================================
+     TAB DEVELOPER TEAM (OUR TEAM)
+============================================================== -->
+<div id="adm-devteam" class="admin-tab-pane">
+    <div class="glass admin-panel" style="max-width:1000px; margin:0 auto; border-top: 4px solid #3b82f6;">
+        <div class="panel-header">
+            <h3 class="panel-title" style="color: #60a5fa;"><i data-lucide="code" style="color: #60a5fa;"></i> Kelola Developer Team</h3>
+            <div class="panel-actions">
+                <a href="/ourteam" target="_blank" class="btn btn-secondary" style="padding:8px 15px; font-size:0.85rem;"><i data-lucide="eye"></i> Preview Web</a>
+                <button class="btn btn-primary" onclick="openModal('modalDevTeam')" style="padding:8px 15px; font-size:0.85rem; background:#3b82f6; border-color:#3b82f6; color:#fff;">+ Tambah Developer</button>
+            </div>
+        </div>
+        
+        <p class="text-muted" style="font-size:0.85rem; margin-bottom: 20px;">Data ini akan ditampilkan pada halaman <a href="/ourteam" target="_blank" style="color:#60a5fa;">/ourteam</a> dengan desain grid khusus berdasarkan kategori.</p>
+
+        <div class="table-wrapper">
+            <table class="admin-table">
+                <thead><tr><th>Foto</th><th>Developer</th><th>Kategori Posisi</th><th style="text-align:right;">Aksi</th></tr></thead>
+                <tbody>
+                    <% devTeam.forEach(dev => { %>
+                    <tr>
+                        <td><img src="<%= dev.image || '/img/logo-hmikomkgumi.png' %>" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid #3b82f6;"></td>
+                        <td>
+                            <strong style="color:#fff;"><%= dev.name %></strong><br>
+                            <small style="color:#60a5fa;"><%= dev.role %></small><br>
+                            <small class="text-muted" style="font-size:0.7rem;"><%= dev.dept %></small>
+                        </td>
+                        <td><span class="cat-badge" style="background:rgba(59,130,246,0.1); color:#60a5fa; border:1px solid rgba(59,130,246,0.3);"><%= dev.category %></span></td>
+                        <td class="td-actions">
+                            <button type="button" class="action-btn edit" onclick="openEditDevTeamModal('<%= dev.id %>', '<%= dev.name.replace(/'/g, "\\'") %>', '<%= dev.role.replace(/'/g, "\\'") %>', '<%= (dev.dept || '').replace(/'/g, "\\'") %>', '<%= dev.category %>', '<%= (dev.ig || '').replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
+                            <form action="/admin/hapus-devteam/<%= dev.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus profil developer ini?')"><i data-lucide="trash-2"></i></button></form>
+                        </td>
+                    </tr>
+                    <% }) %>
+                    <% if(devTeam.length === 0) { %>
+                        <tr><td colspan="4" style="text-align:center; padding:30px; opacity:0.6;">Belum ada data developer.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <div id="adm-announce" class="admin-tab-pane">
     <div class="glass admin-panel" style="max-width:800px; margin:0 auto;">
         <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="bell"></i> Setelan Announcement Pop-up</h3>
@@ -611,6 +655,55 @@
 <div class="modal-overlay" id="modalSosmed"><div class="modal-content"><div class="modal-header"><h3>Tambah Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalSosmed')"><i data-lucide="x"></i></button></div><form action="/admin/tambah-sosmed" method="POST" enctype="multipart/form-data"><div class="form-group"><label>Nama Sosmed</label><input type="text" name="name" class="input-control" required></div><div class="form-group"><label>URL Profile</label><input type="url" name="url" class="input-control" required></div><div class="form-group"><label>Upload Icon/Logo</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalSosmed')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan</button></div></form></div></div>
 <div class="modal-overlay" id="modalEditSosmed"><div class="modal-content"><div class="modal-header"><h3>Edit Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalEditSosmed')"><i data-lucide="x"></i></button></div><form id="formEditSosmed" method="POST" enctype="multipart/form-data"><div class="form-group"><label>Nama Sosmed</label><input type="text" name="name" id="editSosmedName" class="input-control" required></div><div class="form-group"><label>URL Profile</label><input type="url" name="url" id="editSosmedUrl" class="input-control" required></div><div class="form-group"><label>Ganti Icon Baru</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditSosmed')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Update Sosmed</button></div></form></div></div>
 
+<!-- SUPER BIG UPGRADE: MODALS DEVELOPER TEAM -->
+<div class="modal-overlay" id="modalDevTeam">
+    <div class="modal-content" style="border-color:#3b82f6;">
+        <div class="modal-header"><h3 style="color:#60a5fa;">Tambah Developer</h3><button type="button" class="close-modal" onclick="closeModal('modalDevTeam')"><i data-lucide="x"></i></button></div>
+        <form action="/admin/tambah-devteam" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" class="input-control" required></div>
+            <div class="grid-2">
+                <div class="form-group"><label>Kategori (Penting Untuk Layout)</label>
+                    <select name="category" class="input-control" required>
+                        <option value="FullStack Development">FullStack Development</option>
+                        <option value="Backend Development">Backend Development</option>
+                        <option value="Frontend Development">Frontend Development</option>
+                        <option value="UI/UX Design (CSS)">UI/UX Design (CSS)</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Jabatan Utama</label><input type="text" name="role" class="input-control" placeholder="Contoh: Lead Developer" required></div>
+            </div>
+            <div class="form-group"><label>Departemen / Demisioner</label><input type="text" name="dept" class="input-control" placeholder="Contoh: Demisioner Dept. Penerangan"></div>
+            <div class="form-group"><label>Link Instagram</label><input type="url" name="ig" class="input-control" placeholder="URL Instagram..."></div>
+            <div class="form-group"><label>Upload Foto Profil (Rekomendasi: Background Transparan)</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalDevTeam')">Batal</button><button type="submit" class="btn submit-btn" style="background:#3b82f6; color:#fff; border:none; flex:1;">Simpan Developer</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEditDevTeam">
+    <div class="modal-content" style="border-color:#3b82f6;">
+        <div class="modal-header"><h3 style="color:#60a5fa;">Edit Developer</h3><button type="button" class="close-modal" onclick="closeModal('modalEditDevTeam')"><i data-lucide="x"></i></button></div>
+        <form id="formEditDevTeam" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" id="editDevName" class="input-control" required></div>
+            <div class="grid-2">
+                <div class="form-group"><label>Kategori (Penting Untuk Layout)</label>
+                    <select name="category" id="editDevCategory" class="input-control" required>
+                        <option value="FullStack Development">FullStack Development</option>
+                        <option value="Backend Development">Backend Development</option>
+                        <option value="Frontend Development">Frontend Development</option>
+                        <option value="UI/UX Design (CSS)">UI/UX Design (CSS)</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Jabatan Utama</label><input type="text" name="role" id="editDevRole" class="input-control" required></div>
+            </div>
+            <div class="form-group"><label>Departemen / Demisioner</label><input type="text" name="dept" id="editDevDept" class="input-control"></div>
+            <div class="form-group"><label>Link Instagram</label><input type="url" name="ig" id="editDevIg" class="input-control"></div>
+            <div class="form-group"><label>Upload Foto Profil Baru (Opsional)</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditDevTeam')">Batal</button><button type="submit" class="btn submit-btn" style="background:#3b82f6; color:#fff; border:none; flex:1;">Update Profil</button></div>
+        </form>
+    </div>
+</div>
+
 <script>
     function openAdmTab(tabId, btn) {
         document.querySelectorAll('.admin-tab-pane').forEach(tab => tab.classList.remove('active'));
@@ -686,6 +779,17 @@
 
         document.getElementById('formAnggotaBidang').action = actionPath + bidangId + "/" + memberId; 
         openModal('modalAnggotaBidang'); 
+    }
+
+    // UPGRADE: Script Modal Edit Developer Team
+    function openEditDevTeamModal(id, name, role, dept, category, ig) {
+        document.getElementById('editDevName').value = name;
+        document.getElementById('editDevRole').value = role;
+        document.getElementById('editDevDept').value = dept;
+        document.getElementById('editDevCategory').value = category;
+        document.getElementById('editDevIg').value = ig;
+        document.getElementById('formEditDevTeam').action = '/admin/edit-devteam/' + id;
+        openModal('modalEditDevTeam');
     }
 
     async function compressImage(file, maxWidth = 1000) {
