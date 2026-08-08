@@ -125,10 +125,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="dev-social">
                                 <% if(member.ig) { %>
                                     <a href="<%= member.ig %>" target="_blank" rel="noopener noreferrer" aria-label="Instagram <%= member.name %>">
-                                        <i data-lucide="instagram"></i>
+                                        <!-- Inline SVG Instagram untuk menjamin selalu tampil seketika -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
                                     </a>
                                 <% } else { %>
-                                    <span style="opacity:0.3;"><i data-lucide="instagram"></i></span>
+                                    <span style="opacity:0.3;" title="Tidak ada Instagram">
+                                        <!-- Inline SVG Instagram untuk menjamin selalu tampil seketika -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                                    </span>
                                 <% } %>
                             </div>
                         </div>
@@ -140,5 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
     <% }) %>
 
 </section>
+
+<!-- PROTECT INSPECT DEVTOOLS (Memblokir klik kanan, F12, Inspect Element) -->
+<script src="/js/protect-devtools.js" defer></script>
 
 <%- include('partials/footer') %>
