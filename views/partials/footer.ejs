@@ -24,6 +24,8 @@
                         <li><a href="/">Beranda</a></li>
                         <li><a href="/tentang">Tentang Kami</a></li>
                         <li><a href="/galeri">Galeri Kegiatan</a></li>
+                        <li><a href="/data-anggota">Data Anggota</a></li>
+                        <li><a href="/narahubung">Narahubung</a></li>
                     </ul>
                 </div>
                 
@@ -62,8 +64,19 @@
         </div>
     </footer>
 
+    <!-- ==============================================================
+         SUPER BIG UPGRADE: TOMBOL FLOATING SCROLL TO TOP (PERSIS GAMBAR 2 & 4)
+    ============================================================== -->
+    <button type="button" id="btnScrollTop" class="scroll-to-top-btn" aria-label="Scroll to top" title="Kembali ke atas">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"></line>
+            <polyline points="5 12 12 5 19 12"></polyline>
+        </svg>
+    </button>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // 1. Inisialisasi Ikon Lucide
             const initIcons = () => {
                 if (typeof lucide !== 'undefined') { 
                     lucide.createIcons(); 
@@ -72,6 +85,25 @@
                 }
             };
             initIcons();
+
+            // 2. Logic Floating Scroll to Top Button
+            const scrollBtn = document.getElementById('btnScrollTop');
+            if (scrollBtn) {
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 200) {
+                        scrollBtn.classList.add('visible');
+                    } else {
+                        scrollBtn.classList.remove('visible');
+                    }
+                }, { passive: true });
+
+                scrollBtn.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
         });
     </script>
 </body>
