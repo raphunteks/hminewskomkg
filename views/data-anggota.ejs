@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { property: "og:description", content: "<%= pageDescription %>" },
         { property: "og:type", content: "website" },
         { property: "og:url", content: "<%= seoBaseUrl %>/data-anggota" },
-        { property: "og:image", content: "<%= seoBaseUrl %>/img/logo.png" }, // Pastikan logo.png ada di folder public/img
+        { property: "og:image", content: "<%= seoBaseUrl %>/img/logo.png" },
         { property: "og:site_name", content: "HMI KomKG UMI" },
         
         // Twitter Cards
@@ -59,18 +59,21 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<div style="max-width: 900px; margin: 0 auto; text-align: center; margin-bottom: 50px;">
-    <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size:2rem;">Data Anggota HMI KomKG-UMI</h2>
-    <p class="text-muted" style="margin-bottom: 40px;">Database keanggotaan terupdate. Pilih dan preview file PDF dibawah ini.</p>
+<div style="max-width: 1000px; margin: 0 auto; text-align: center; margin-bottom: 50px;">
+    <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size: clamp(1.8rem, 4vw, 2.3rem);">Data Anggota HMI KomKG-UMI</h2>
+    <p class="text-muted" style="margin-bottom: 35px; font-size: 1rem;">Database keanggotaan terupdate. Pilih dan baca langsung dokumen PDF di bawah ini.</p>
     
     <% 
     // ==============================================================
     // UPGRADE LOGIC (SMART FALLBACK & CRUD INTEGRATION): 
     // ==============================================================
-    // Jika data dari Admin/Database kosong, otomatis pakai file default
     let pdfList = (typeof dataAnggota !== 'undefined' && dataAnggota && dataAnggota.length > 0) 
                   ? dataAnggota 
                   : [{ title: "Data Anggota Komisariat (Default)", file: "/data-anggota.pdf", date: "Default" }];
+
+    let firstPdfAbsolute = pdfList[0].file.startsWith('http') 
+                           ? pdfList[0].file 
+                           : seoBaseUrl + (pdfList[0].file.startsWith('/') ? '' : '/') + pdfList[0].file;
     %>
 
     <!-- ==============================================================
@@ -136,8 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
 
     <!-- Tab navigation for multiple PDFs -->
-    <!-- UPGRADE SEO: Mengubah <button> menjadi <a> tag dengan href valid agar Googlebot bisa merayapi PDF-nya -->
-    <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom: 30px;" itemscope itemtype="https://schema.org/ItemList">
+    <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom: 25px;" itemscope itemtype="https://schema.org/ItemList">
         <meta itemprop="name" content="Daftar Dokumen PDF Data Anggota" />
         
         <% pdfList.forEach((item, index) => { 
@@ -145,59 +147,77 @@ document.addEventListener('DOMContentLoaded', () => {
         %>
             <article itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" style="display: contents;">
                 <meta itemprop="position" content="<%= index + 1 %>" />
-                <a href="<%= absolutePdfUrl %>" 
-                   onclick="event.preventDefault(); changePdf('<%= item.file %>', this)" 
-                   class="btn <%= index === 0 ? 'btn-primary' : 'btn-secondary' %> tab-pdf-btn" 
-                   style="padding: 10px 20px; font-size: 0.9rem; border-radius: 12px; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.15);"
-                   itemprop="item">
-                    <i data-lucide="external-link" style="width:18px;"></i> 
+                <button type="button" 
+                        onclick="changePdf('<%= item.file %>', this, '<%= absolutePdfUrl %>')" 
+                        class="btn <%= index === 0 ? 'btn-primary' : 'btn-secondary' %> tab-pdf-btn" 
+                        style="padding: 10px 20px; font-size: 0.9rem; border-radius: 12px; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.15);"
+                        itemprop="item">
+                    <i data-lucide="file-text" style="width:18px;"></i> 
                     <span itemprop="name"><%= item.title %></span>
-                </a>
+                </button>
             </article>
         <% }) %>
     </div>
 
-    <!-- PURE CSS 3D PDF VIEWER -->
-    <!-- Menggunakan parameter view=FitH agar otomatis presisi & bisa di-scroll vertikal -->
-    <div class="css3d-pdf-wrapper" style="margin-top: 0;">
-        <div class="css3d-pdf-frame">
-            <iframe 
-                id="pdf-viewer" 
-                src="<%= pdfList[0].file %>#toolbar=0&navpanes=0&view=FitH" 
-                class="native-pdf-viewer" 
-                title="Data Anggota Viewer"
-                scrolling="yes"
-                style="width: 100%; height: 100%; border: none;">
-                Browser Anda tidak mendukung iframe PDF. Silakan <a href="<%= pdfList[0].file.startsWith('http') ? pdfList[0].file : seoBaseUrl + (pdfList[0].file.startsWith('/') ? '' : '/') + pdfList[0].file %>" target="_blank" style="color:#4ade80; text-decoration:underline;">download PDF ini</a>.
-            </iframe>
-        </div>
+    <!-- ==============================================================
+         NATIVE PDF VIEWER CONTAINER (PERSIS GAMBAR 5)
+         Toolbar native aktif & tombol "BUKA FULL PDF" melayang di pojok kanan bawah
+    ============================================================== -->
+    <div class="native-pdf-bezel-frame">
+        
+        <!-- Iframe PDF Native (Toolbar dibiarkan aktif tanpa #toolbar=0) -->
+        <iframe 
+            id="pdf-viewer" 
+            src="<%= pdfList[0].file %>#view=FitH" 
+            class="native-embed-iframe" 
+            title="Data Anggota PDF Viewer"
+            type="application/pdf">
+            Browser Anda tidak mendukung pratinjau PDF. Silakan 
+            <a href="<%= firstPdfAbsolute %>" target="_blank" style="color:#4ade80; text-decoration:underline;">download PDF ini</a>.
+        </iframe>
+
+        <!-- TOMBOL FLOATING "BUKA FULL PDF" (PERSIS GAYA GAMBAR 5) -->
+        <a id="btnBukaFullPdf" 
+           href="<%= firstPdfAbsolute %>" 
+           target="_blank" 
+           rel="noopener noreferrer" 
+           class="btn-buka-full-pdf" 
+           title="Buka PDF di Tab Baru / Layar Penuh">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+            <span>BUKA FULL PDF</span>
+        </a>
     </div>
     
-    <p class="text-muted" style="text-align:center; margin-top:20px; font-size:0.9rem;">
-        <i data-lucide="mouse-pointer-click" style="width:16px; display:inline; margin-bottom:-2px;"></i> Klik tombol di atas untuk membuka PDF di tab baru, atau scroll pada area dokumen untuk membaca.
+    <p class="text-muted" style="text-align:center; margin-top:15px; font-size:0.85rem;">
+        <i data-lucide="info" style="width:15px; display:inline; vertical-align:text-bottom;"></i> Gunakan toolbar di bagian atas dokumen untuk mencari teks, zoom, mencetak, atau klik tombol <strong>BUKA FULL PDF</strong> untuk membaca dalam tampilan layar penuh.
     </p>
 </div>
 
 <script>
-    function changePdf(src, btn) {
-        // Update iframe src (Mempertahankan parameter view=FitH agar tampilan tetap presisi vertikal)
-        document.getElementById('pdf-viewer').src = src + '#toolbar=0&navpanes=0&view=FitH';
+    function changePdf(src, btn, absoluteUrl) {
+        // 1. Update src iframe PDF native
+        const viewer = document.getElementById('pdf-viewer');
+        if (viewer) {
+            viewer.src = src + '#view=FitH';
+        }
         
-        // Animasi perpindahan warna tombol Tab
+        // 2. Update tautan tombol floating Buka Full PDF
+        const btnFull = document.getElementById('btnBukaFullPdf');
+        if (btnFull) {
+            btnFull.href = absoluteUrl;
+        }
+
+        // 3. Animasi pergantian status tombol tab
         document.querySelectorAll('.tab-pdf-btn').forEach(b => {
             b.classList.remove('btn-primary');
             b.classList.add('btn-secondary');
         });
         btn.classList.remove('btn-secondary');
         btn.classList.add('btn-primary');
-
-        // Buka file PDF langsung di tab baru secara otomatis saat di-klik
-        // Menggunakan Absolute URL agar path-nya tidak rusak di tab baru
-        let absoluteSrc = src;
-        if (!src.startsWith('http')) {
-            absoluteSrc = 'https://www.hmikomkgumi.xyz' + (src.startsWith('/') ? '' : '/') + src;
-        }
-        window.open(absoluteSrc, '_blank');
     }
 </script>
 <script src="/js/protect-devtools.js" defer></script>
