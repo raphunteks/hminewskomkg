@@ -1,9 +1,21 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- SCRIPT ANTI-FLICKER TEMA (MEMASTIKAN TEMA TERAPLIKASI SEBELUM DOM DI-RENDER) -->
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('hmi_theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+
     <meta name="google-site-verification" content="lV4veWnfsXOsnHBVIUxj7uQUA_jdJIQ6Guk4bPGFGHc" />
 
     <% 
@@ -235,9 +247,27 @@
                 <li><a href="/tentang" class="nav-item <%= typeof page !== 'undefined' && page === 'tentang' ? 'active' : '' %>"><i data-lucide="info"></i> Tentang</a></li>
                 <li><a href="/galeri" class="nav-item <%= typeof page !== 'undefined' && page === 'galeri' ? 'active' : '' %>"><i data-lucide="image"></i> Galeri</a></li>
                 <li><a href="/data-anggota" class="nav-item <%= typeof page !== 'undefined' && page === 'data-anggota' ? 'active' : '' %>"><i data-lucide="users"></i> Data Anggota</a></li>
+                <li><a href="/narahubung" class="nav-item <%= typeof page !== 'undefined' && page === 'narahubung' ? 'active' : '' %>"><i data-lucide="phone-call"></i> Narahubung</a></li>
             </ul>
             
             <div class="nav-actions">
+                <!-- ==============================================================
+                     THEME SWITCHER BUTTON (PERSIS GAMBAR 1: LIGHT / HIJAU GELAP)
+                ============================================================== -->
+                <div class="theme-switch-wrapper" title="Ganti Tema">
+                    <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Ganti Tema">
+                        <span class="theme-sun-icon">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="4" fill="#fef3c7"></circle>
+                                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+                            </svg>
+                        </span>
+                        <span class="theme-switch-pill">
+                            <span class="theme-switch-thumb"></span>
+                        </span>
+                    </button>
+                </div>
+
                 <a href="/admin" class="btn-icon" title="Login Admin" aria-label="Login Admin">
                     <i data-lucide="lock"></i>
                 </a>
@@ -250,10 +280,36 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // 1. Mobile Menu Toggle
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             const navLinks = document.getElementById('nav-links');
             if (mobileMenuBtn && navLinks) {
                 mobileMenuBtn.addEventListener('click', function() { navLinks.classList.toggle('active'); });
+            }
+
+            // 2. Logic Theme Switcher (Sync localStorage)
+            const themeBtn = document.getElementById('theme-toggle-btn');
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+
+            // Set state awal tombol switch
+            if (currentTheme === 'dark') {
+                themeBtn.classList.add('active-dark');
+            }
+
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const activeTheme = document.documentElement.getAttribute('data-theme') || 'light';
+                    const newTheme = activeTheme === 'light' ? 'dark' : 'light';
+                    
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('hmi_theme', newTheme);
+                    
+                    if (newTheme === 'dark') {
+                        themeBtn.classList.add('active-dark');
+                    } else {
+                        themeBtn.classList.remove('active-dark');
+                    }
+                });
             }
         });
     </script>
