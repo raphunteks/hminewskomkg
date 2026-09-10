@@ -1,6 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const fs = require('fs');
 const multer = require('multer');
 const { createClient } = require('@vercel/kv');
 require('dotenv').config();
@@ -8,7 +9,17 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Konfigurasi Multer
+// Memastikan direktori upload fisik tersedia di server
+const uploadDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    try {
+        fs.mkdirSync(uploadDir, { recursive: true });
+    } catch (e) {
+        console.warn('Direktori public/uploads sudah ada atau dibuat di runtime.');
+    }
+}
+
+// Konfigurasi Multer Memory Storage
 const upload = multer({ 
     storage: multer.memoryStorage(),
     limits: { fileSize: 50 * 1024 * 1024 } 
@@ -16,11 +27,11 @@ const upload = multer({
 
 // Inisialisasi Koneksi ke Upstash Redis KV
 const kv = createClient({
-  url: process.env.KV2_KV_REST_API_URL || 'https://stable-gazelle-127629.upstash.io',
-  token: process.env.KV2_KV_REST_API_TOKEN || 'gQAAAAAAAfKNAAIgcDEyZWI1YmIzNDBmNWQ0ZjY1YjI5NTZmOTU2NjMyZDFhMg',
+    url: process.env.KV2_KV_REST_API_URL || 'https://stable-gazelle-127629.upstash.io',
+    token: process.env.KV2_KV_REST_API_TOKEN || 'gQAAAAAAAfKNAAIgcDEyZWI1YmIzNDBmNWQ0ZjY1YjI5NTZmOTU2NjMyZDFhMg',
 });
 
-// Konfigurasi EJS & Public folder
+// Konfigurasi EJS & Public Folder
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -34,6 +45,111 @@ app.get('/googlee9821896ca0e6ace.html', (req, res) => {
     res.send('google-site-verification: googlee9821896ca0e6ace.html');
 });
 
+// ==============================================================
+// SEO-FRIENDLY STORAGE HELPER (NON-BASE64 ENGINE)
+// Mengubah data Base64 / Multer Buffer menjadi URL berkas asli
+// ==============================================================
+async function saveUploadedFile(req, fieldName, prefix = 'hmi') {
+    try {
+        let buffer = null;
+        let mimeType = 'image/png';
+        let ext = '.png';
+
+        const b64Input = req.body[fieldName] || req.body[fieldName + '_b64'];
+        
+        // 1. Cek jika data dikirim dalam bentuk Base64
+        if (b64Input && typeof b64Input === 'string' && b64Input.includes('base64,')) {
+            const matches = b64Input.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+            if (matches && matches.length === 3) {
+                mimeType = matches[1];
+                buffer = Buffer.from(matches[2], 'base64');
+            }
+        } 
+        // 2. Cek jika berkas dikirim via multipart FormData (Multer)
+        else if (req.files && Array.isArray(req.files)) {
+            const rawName = fieldName.replace('_b64', '');
+            const found = req.files.find(f => f.fieldname === rawName || f.fieldname === fieldName);
+            if (found && found.buffer) {
+                buffer = found.buffer;
+                mimeType = found.mimetype;
+            }
+        }
+
+        // Jika bukan upload baru dan sudah berupa URL/Path lama, pertahankan nilai aslinya
+        if (!buffer) {
+            const rawValue = req.body[fieldName];
+            if (rawValue && typeof rawValue === 'string' && !rawValue.startsWith('data:')) {
+                return rawValue;
+            }
+            return '';
+        }
+
+        // Tentukan ekstensi berkas secara akurat untuk SEO
+        if (mimeType.includes('pdf')) ext = '.pdf';
+        else if (mimeType.includes('webp')) ext = '.webp';
+        else if (mimeType.includes('jpeg') || mimeType.includes('jpg')) ext = '.jpg';
+        else if (mimeType.includes('png')) ext = '.png';
+        else if (mimeType.includes('svg')) ext = '.svg';
+
+        const safePrefix = prefix.replace(/[^a-zA-Z0-9_-]/g, '-').toLowerCase();
+        const filename = `${safePrefix}-${Date.now()}-${Math.floor(Math.random() * 100000)}${ext}`;
+        const localPath = path.join(uploadDir, filename);
+
+        // Simpan secara fisik ke server (jika didukung filesystem)
+        try {
+            fs.writeFileSync(localPath, buffer);
+        } catch (fsErr) {
+            console.warn('Filesystem read-only, penyimpanan dialihkan ke Redis KV.');
+        }
+
+        // Simpan persistensi permanen di Upstash Redis KV (Cloud Persistence)
+        await kv.set(`upload:${filename}`, {
+            mime: mimeType,
+            data: buffer.toString('base64')
+        });
+
+        // Kembalikan URL bersih yang ramah SEO (Google Images Indexing)
+        return `/api/upload/${filename}`;
+    } catch (err) {
+        console.error('Error pada saveUploadedFile:', err);
+        return '';
+    }
+}
+
+// ==============================================================
+// ENDPOINT SERVING BERKAS SEO-FRIENDLY (/api/upload/:filename)
+// ==============================================================
+app.get('/api/upload/:filename', async (req, res) => {
+    try {
+        const filename = path.basename(req.params.filename);
+        const localPath = path.join(uploadDir, filename);
+
+        // Prioritas 1: Sajikan berkas dari penyimpanan lokal jika tersedia
+        if (fs.existsSync(localPath)) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+            return res.sendFile(localPath);
+        }
+
+        // Prioritas 2: Fallback ke database Redis KV
+        const cloudFile = await kv.get(`upload:${filename}`);
+        if (cloudFile && cloudFile.data) {
+            const mimeType = cloudFile.mime || 'application/octet-stream';
+            const fileBuffer = Buffer.from(cloudFile.data, 'base64');
+            res.setHeader('Content-Type', mimeType);
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+            return res.send(fileBuffer);
+        }
+
+        return res.status(404).send('Berkas tidak ditemukan.');
+    } catch (err) {
+        console.error('Error saat menyajikan berkas upload:', err);
+        res.status(500).send('Terjadi kesalahan memuat berkas.');
+    }
+});
+
+// ==============================================================
+// DEFAULT SETTINGS & INITIAL DATA
+// ==============================================================
 const defaultSettings = {
     webTitle: "HMI KomKG-UMI",
     headerLogo: "/img/logo-hmikomkgumi.png",
@@ -59,7 +175,13 @@ const defaultSettings = {
     announceActive: "false",
     announceImage: "",
     announceTitle: "Latihan Kader I 2025",
-    announceContent: "<p>Kala dunia tersihir oleh retorika kosong dan pemikiran instan, kami memilih jalan terjal. Berpikir dalam, bertanya kritis, dan membangun gagasan yang hidup. LK I 2025 bukan sekadar awal; ia adalah dentuman pertama dari revolusi intelektual yang tak akan berhenti di ruang diskusi.</p>"
+    announceContent: "<p>Kala dunia tersihir oleh retorika kosong dan pemikiran instan, kami memilih jalan terjal. Berpikir dalam, bertanya kritis, dan membangun gagasan yang hidup. LK I 2025 bukan sekadar awal; ia adalah dentuman pertama dari revolusi intelektual yang tak akan berhenti di ruang diskusi.</p>",
+    // Data Narahubung & Kontak Resmi
+    contactAddress: "Jl. Pajonga Dg. Ngalle No. 27 A, Pa'batong, Kec. Mamajang, Kota Makassar, Sulawesi Selatan",
+    contactEmail: "hmikomkedokgigiumi.190120@gmail.com",
+    contactWa: "+62 853-3892-2586",
+    contactWaName: "M. Aksa A",
+    contactMaps: '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1986.8184522616118!2d119.41377772579179!3d-5.161978821534889!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dbf1d606370a527%3A0xdb175c222d9d580b!2sUniversitas%20Muslim%20Indonesia%2C%20Fakultas%20Kedokteran%20Gigi!5e0!3m2!1sid!2sid!4v1789058845150!5m2!1sid!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>'
 };
 
 const defaultSocialMedia = [
@@ -105,7 +227,7 @@ async function initDefaultData() {
     let hasPengurus = await kv.get('pengurusList');
     if (!hasPengurus || hasPengurus.length === 0) {
         await kv.set('pengurusList', [
-            { id: 1, name: 'Muh. Xavier Syafwan', role: 'Ketua Umum', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=80' }
+            { id: 1, name: 'Muh. Xavier Syafwan', role: 'Ketua Umum', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=80', ig: '', fb: '', twitter: '', linkedin: '', tiktok: '' }
         ]);
     }
     let hasBidang = await kv.get('bidangList');
@@ -118,7 +240,7 @@ async function initDefaultData() {
     let hasKohatiPengurus = await kv.get('kohatiPengurusList');
     if (!hasKohatiPengurus || hasKohatiPengurus.length === 0) {
         await kv.set('kohatiPengurusList', [
-            { id: 1, name: 'Andi Nurul Hidayah', role: 'Ketua Umum KOHATI', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80' }
+            { id: 1, name: 'Andi Nurul Hidayah', role: 'Ketua Umum KOHATI', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80', ig: '', fb: '', twitter: '', linkedin: '', tiktok: '' }
         ]);
     }
     let hasKohatiBidang = await kv.get('kohatiBidangList');
@@ -136,10 +258,10 @@ async function initDefaultData() {
             id: 1, 
             path: 'links', 
             title: 'HMI KomKG-UMI', 
-            bio: 'Official Links Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI',
-            profileImage: '/img/logo-hmikomkgumi.png',
-            bgType: 'gradient',
-            bgValue: 'linear-gradient(135deg, #064e3b 0%, #111827 100%)'
+            bio: 'Official Links Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI', 
+            profileImage: '/img/logo-hmikomkgumi.png', 
+            bgType: 'gradient', 
+            bgValue: 'linear-gradient(135deg, #064e3b 0%, #111827 100%)' 
         }]);
     }
     let bioLnk = await kv.get('bioLinks');
@@ -166,37 +288,12 @@ async function initDefaultData() {
     }
 })();
 
-// Helper penanganan berkas dengan fallback Multer Buffer
-const fileHelper = (req, fieldB64) => {
-    let str = req.body[fieldB64] || '';
-    const rawName = fieldB64.replace('_b64', '');
-    if (!str && req.files && Array.isArray(req.files)) {
-        const found = req.files.find(f => f.fieldname === rawName || f.fieldname === fieldB64);
-        if (found) str = `data:${found.mimetype};base64,${found.buffer.toString('base64')}`;
-    }
-    return str;
-};
-
 app.get('/favicon.ico', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 app.get('/favicon.png', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
 
-app.get('/api/booklet.pdf', async (req, res) => {
-    try {
-        const b64Data = await kv.get('booklet_file_db');
-        if (!b64Data || !b64Data.includes('base64,')) {
-            return res.status(404).send('PDF not found');
-        }
-        const base64String = b64Data.split('base64,')[1];
-        const pdfBuffer = Buffer.from(base64String, 'base64');
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'inline; filename="Buku_Pedoman.pdf"');
-        res.send(pdfBuffer);
-    } catch (err) {
-        console.error("API PDF Error:", err);
-        res.status(500).send("Gagal memuat PDF dari database.");
-    }
-});
-
+// ==============================================================
+// PUBLIC ROUTES
+// ==============================================================
 app.get('/', async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
@@ -264,6 +361,16 @@ app.get('/data-anggota', async (req, res) => {
     }
 });
 
+// ROUTE HALAMAN NARAHUBUNG
+app.get('/narahubung', async (req, res) => {
+    try {
+        const { siteSettings, socialMediaList } = await getSiteData();
+        res.render('narahubung', { page: 'narahubung', siteSettings, socialMediaList });
+    } catch (err) {
+        res.render('narahubung', { page: 'narahubung', siteSettings: defaultSettings, socialMediaList: defaultSocialMedia });
+    }
+});
+
 app.get('/ourteam', async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
@@ -274,9 +381,10 @@ app.get('/ourteam', async (req, res) => {
     }
 });
 
+// ROUTE SHORTLINK & LINK IN BIO
 app.get('/:slug', async (req, res, next) => {
     const slug = req.params.slug.toLowerCase();
-    const reserved = ['admin', 'css', 'img', 'js', 'berita', 'galeri', 'tentang', 'data-anggota', 'ourteam', 'api'];
+    const reserved = ['admin', 'css', 'img', 'js', 'berita', 'galeri', 'tentang', 'data-anggota', 'narahubung', 'ourteam', 'api', 'uploads'];
     if (reserved.includes(slug)) return next();
     
     try {
@@ -299,7 +407,9 @@ app.get('/:slug', async (req, res, next) => {
     next();
 });
 
-// Admin Security
+// ==============================================================
+// ADMIN AUTHENTICATION
+// ==============================================================
 app.get('/admin', async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
@@ -363,27 +473,46 @@ app.get('/admin/logout', (req, res) => {
     res.redirect('/admin');
 });
 
-// Kelola Berita
+// ==============================================================
+// ADMIN ACTIONS (SEO-FRIENDLY MULTIMEDIA CRUD)
+// ==============================================================
+
+// KELOLA BERITA
 app.post('/admin/tambah-berita', requireAdmin, upload.any(), async (req, res) => {
-    let news = await kv.get('newsList') || [];
-    news.unshift({ id: Date.now(), title: req.body.title, category: req.body.category, date: req.body.date || new Date().toLocaleDateString('id-ID'), content: req.body.content, image: fileHelper(req, 'image_b64'), photos: [] });
-    await kv.set('newsList', news); 
-    res.redirect('/admin/dashboard');
+    try {
+        let news = await kv.get('newsList') || [];
+        const uploadedCover = await saveUploadedFile(req, 'image', 'berita');
+        news.unshift({ 
+            id: Date.now(), 
+            title: req.body.title, 
+            category: req.body.category, 
+            date: req.body.date || new Date().toLocaleDateString('id-ID'), 
+            content: req.body.content, 
+            image: uploadedCover || 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=800&q=80', 
+            photos: [] 
+        });
+        await kv.set('newsList', news); 
+        res.redirect('/admin/dashboard');
+    } catch (e) { res.redirect('/admin/dashboard'); }
 });
 
 app.post('/admin/edit-berita/:id', requireAdmin, upload.any(), async (req, res) => {
-    let news = await kv.get('newsList') || []; 
-    let i = news.findIndex(n => n.id == req.params.id);
-    if (i !== -1) {
-        news[i].title = req.body.title; 
-        news[i].category = req.body.category; 
-        news[i].content = req.body.content;
-        if (req.body.date) news[i].date = req.body.date;
-        const img = fileHelper(req, 'image_b64'); 
-        if (img) news[i].image = img;
-        await kv.set('newsList', news);
-    }
-    res.redirect('/admin/dashboard');
+    try {
+        let news = await kv.get('newsList') || []; 
+        let i = news.findIndex(n => n.id == req.params.id);
+        if (i !== -1) {
+            news[i].title = req.body.title; 
+            news[i].category = req.body.category; 
+            news[i].content = req.body.content;
+            if (req.body.date) news[i].date = req.body.date;
+            
+            const uploadedCover = await saveUploadedFile(req, 'image', 'berita');
+            if (uploadedCover) news[i].image = uploadedCover;
+            
+            await kv.set('newsList', news);
+        }
+        res.redirect('/admin/dashboard');
+    } catch (e) { res.redirect('/admin/dashboard'); }
 });
 
 app.post('/admin/hapus-berita/:id', requireAdmin, async (req, res) => {
@@ -393,28 +522,26 @@ app.post('/admin/hapus-berita/:id', requireAdmin, async (req, res) => {
 });
 
 app.post('/admin/tambah-foto-berita/:id', requireAdmin, upload.any(), async (req, res) => {
-    let photosB64 = req.body.photos_b64; 
-    let newPhotos = [];
-    if (photosB64) { 
-        if (!Array.isArray(photosB64)) photosB64 = [photosB64]; 
-        photosB64.forEach(b64 => { 
-            if (b64 && b64.length > 50) newPhotos.push({ id: Date.now() + Math.random(), url: b64 }); 
-        }); 
-    }
-    if (req.files && Array.isArray(req.files)) {
-        req.files.filter(f => f.fieldname === 'photos' || f.fieldname === 'photos[]').forEach(f => {
-            newPhotos.push({ id: Date.now() + Math.random(), url: `data:${f.mimetype};base64,${f.buffer.toString('base64')}` });
-        });
-    }
+    try {
+        let newPhotos = [];
+        if (req.files && Array.isArray(req.files)) {
+            const files = req.files.filter(f => f.fieldname === 'photos' || f.fieldname === 'photos[]');
+            for (const file of files) {
+                const fakeReq = { files: [file], body: {} };
+                const fileUrl = await saveUploadedFile(fakeReq, 'photos', 'berita-doc');
+                if (fileUrl) newPhotos.push({ id: Date.now() + Math.random(), url: fileUrl });
+            }
+        }
 
-    let news = await kv.get('newsList') || []; 
-    let index = news.findIndex(n => n.id == req.params.id);
-    if (index !== -1) { 
-        if (!news[index].photos) news[index].photos = []; 
-        news[index].photos = [...news[index].photos, ...newPhotos]; 
-        await kv.set('newsList', news); 
-    }
-    res.redirect('/admin/dashboard');
+        let news = await kv.get('newsList') || []; 
+        let index = news.findIndex(n => n.id == req.params.id);
+        if (index !== -1) { 
+            if (!news[index].photos) news[index].photos = []; 
+            news[index].photos = [...news[index].photos, ...newPhotos]; 
+            await kv.set('newsList', news); 
+        }
+        res.redirect('/admin/dashboard');
+    } catch (e) { res.redirect('/admin/dashboard'); }
 });
 
 app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req, res) => {
@@ -427,7 +554,7 @@ app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req
     res.redirect('/admin/dashboard');
 });
 
-// Setelan Header, Footer & Kohati
+// SETELAN HEADER & FOOTER
 app.post('/admin/setelan-header', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
@@ -439,9 +566,10 @@ app.post('/admin/setelan-header', requireAdmin, upload.any(), async (req, res) =
         siteSettings.seoDescription = req.body.seoDescription || siteSettings.seoDescription;
         siteSettings.seoKeywords = req.body.seoKeywords || siteSettings.seoKeywords;
         
-        const hLogo = fileHelper(req, 'headerLogo_b64'); 
+        const hLogo = await saveUploadedFile(req, 'headerLogo', 'logo');
         if (hLogo) siteSettings.headerLogo = hLogo;
-        const sImg = fileHelper(req, 'seoImage_b64'); 
+        
+        const sImg = await saveUploadedFile(req, 'seoImage', 'og-cover');
         if (sImg) siteSettings.seoImage = sImg;
 
         await kv.set('siteSettings', siteSettings); 
@@ -456,8 +584,10 @@ app.post('/admin/setelan-footer', requireAdmin, upload.any(), async (req, res) =
         siteSettings.footerDesc = req.body.footerDesc || siteSettings.footerDesc;
         siteSettings.footerCopyright = req.body.footerCopyright || siteSettings.footerCopyright;
         siteSettings.footerProgrammer = req.body.footerProgrammer || siteSettings.footerProgrammer;
-        const fLogo = fileHelper(req, 'footerLogo_b64'); 
+        
+        const fLogo = await saveUploadedFile(req, 'footerLogo', 'footer-logo');
         if (fLogo) siteSettings.footerLogo = fLogo;
+        
         await kv.set('siteSettings', siteSettings); 
         res.redirect('/admin/dashboard');
     } catch (err) { res.redirect('/admin/dashboard'); }
@@ -472,7 +602,7 @@ app.post('/admin/setelan-kohati-toggle', requireAdmin, upload.any(), async (req,
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
-// Setelan Tentang & PDF Dearflip
+// SETELAN TENTANG KAMI
 app.post('/admin/setelan-tentang', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
@@ -484,16 +614,12 @@ app.post('/admin/setelan-tentang', requireAdmin, upload.any(), async (req, res) 
             siteSettings.kohatiProfilText = req.body.kohatiProfilText;
             siteSettings.kohatiVisiText = req.body.kohatiVisiText;
             siteSettings.kohatiMisiText = req.body.kohatiMisiText;
-            siteSettings.mapsEmbed = req.body.mapsEmbed !== undefined ? req.body.mapsEmbed : siteSettings.mapsEmbed;
 
-            const bPdf = fileHelper(req, 'bookletPdf_b64'); 
+            const bPdf = await saveUploadedFile(req, 'bookletPdf', 'booklet');
             const pdfUrl = req.body.bookletPdfUrl; 
 
-            if (bPdf && bPdf.length > 50) { 
-                try {
-                    await kv.set('booklet_file_db', bPdf);
-                    siteSettings.bookletPdf = '/api/booklet.pdf';
-                } catch (dbErr) {}
+            if (bPdf) { 
+                siteSettings.bookletPdf = bPdf;
             } else if (pdfUrl && pdfUrl.length > 5) { 
                 let finalUrl = pdfUrl;
                 if(pdfUrl.includes('drive.google.com/file/d/')) {
@@ -510,20 +636,42 @@ app.post('/admin/setelan-tentang', requireAdmin, upload.any(), async (req, res) 
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
+// ==============================================================
+// SETELAN NARAHUBUNG & KONTAK RESMI (SUPER BIG UPGRADE)
+// ==============================================================
+app.post('/admin/setelan-narahubung', requireAdmin, async (req, res) => {
+    try {
+        const { siteSettings } = await getSiteData();
+        siteSettings.contactAddress = req.body.contactAddress || siteSettings.contactAddress;
+        siteSettings.contactEmail = req.body.contactEmail || siteSettings.contactEmail;
+        siteSettings.contactWa = req.body.contactWa || siteSettings.contactWa;
+        siteSettings.contactWaName = req.body.contactWaName || siteSettings.contactWaName;
+        siteSettings.contactMaps = req.body.contactMaps || siteSettings.contactMaps;
+        
+        await kv.set('siteSettings', siteSettings);
+        res.redirect('/admin/dashboard');
+    } catch (err) { 
+        res.redirect('/admin/dashboard'); 
+    }
+});
+
+// SETELAN ANNOUNCEMENT POPUP
 app.post('/admin/setelan-announcement', requireAdmin, upload.any(), async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
         siteSettings.announceActive = req.body.announceActive ? 'true' : 'false';
         siteSettings.announceTitle = req.body.announceTitle || siteSettings.announceTitle;
         siteSettings.announceContent = req.body.announceContent || siteSettings.announceContent;
-        const img = fileHelper(req, 'announceImage_b64'); 
+        
+        const img = await saveUploadedFile(req, 'announceImage', 'announcement');
         if (img) siteSettings.announceImage = img;
+        
         await kv.set('siteSettings', siteSettings); 
         res.redirect('/admin/dashboard');
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
-// Shortlink
+// SHORTLINK
 app.post('/admin/tambah-shortlink', requireAdmin, async (req, res) => {
     let list = await kv.get('shortlinkList') || []; 
     list.unshift({ id: Date.now(), title: req.body.title, path: req.body.path.replace(/\s+/g, '-').toLowerCase(), originalUrl: req.body.originalUrl }); 
@@ -549,25 +697,30 @@ app.post('/admin/hapus-shortlink/:id', requireAdmin, async (req, res) => {
     res.redirect('/admin/dashboard');
 });
 
-// Sosmed
+// SOSIAL MEDIA MANAGEMENT (TAB KHUSUS)
 app.post('/admin/tambah-sosmed', requireAdmin, upload.any(), async (req, res) => {
-    let list = await kv.get('socialMediaList') || []; 
-    list.push({ id: Date.now(), name: req.body.name, url: req.body.url, icon: fileHelper(req, 'icon_b64') }); 
-    await kv.set('socialMediaList', list); 
-    res.redirect('/admin/dashboard');
+    try {
+        let list = await kv.get('socialMediaList') || []; 
+        const iconUrl = await saveUploadedFile(req, 'icon', 'sosmed');
+        list.push({ id: Date.now(), name: req.body.name, url: req.body.url, icon: iconUrl }); 
+        await kv.set('socialMediaList', list); 
+        res.redirect('/admin/dashboard');
+    } catch (e) { res.redirect('/admin/dashboard'); }
 });
 
 app.post('/admin/edit-sosmed/:id', requireAdmin, upload.any(), async (req, res) => {
-    let list = await kv.get('socialMediaList') || []; 
-    let i = list.findIndex(l => l.id == req.params.id);
-    if(i !== -1) { 
-        list[i].name = req.body.name; 
-        list[i].url = req.body.url; 
-        const newIcon = fileHelper(req, 'icon_b64'); 
-        if (newIcon) list[i].icon = newIcon; 
-        await kv.set('socialMediaList', list); 
-    } 
-    res.redirect('/admin/dashboard');
+    try {
+        let list = await kv.get('socialMediaList') || []; 
+        let i = list.findIndex(l => l.id == req.params.id);
+        if(i !== -1) { 
+            list[i].name = req.body.name; 
+            list[i].url = req.body.url; 
+            const newIcon = await saveUploadedFile(req, 'icon', 'sosmed');
+            if (newIcon) list[i].icon = newIcon; 
+            await kv.set('socialMediaList', list); 
+        } 
+        res.redirect('/admin/dashboard');
+    } catch (e) { res.redirect('/admin/dashboard'); }
 });
 
 app.post('/admin/hapus-sosmed/:id', requireAdmin, async (req, res) => {
@@ -576,24 +729,26 @@ app.post('/admin/hapus-sosmed/:id', requireAdmin, async (req, res) => {
     res.redirect('/admin/dashboard');
 });
 
-// Link In Bio
+// LINK IN BIO
 app.post('/admin/tambah-bio-page', requireAdmin, upload.any(), async (req, res) => {
     try {
         let pages = await kv.get('bioPages') || [];
         let bgType = 'gradient';
         let bgValue = req.body.bgGradient || 'linear-gradient(135deg, #064e3b 0%, #111827 100%)';
-        const bgImg = fileHelper(req, 'bgImage_b64');
+        const bgImg = await saveUploadedFile(req, 'bgImage', 'bio-bg');
         if (bgImg) {
             bgType = 'image';
             bgValue = bgImg;
         }
+
+        const pImg = await saveUploadedFile(req, 'profileImage', 'bio-profile') || '/img/logo-hmikomkgumi.png';
 
         pages.push({
             id: Date.now(),
             path: (req.body.path || '').replace(/\s+/g, '-').toLowerCase(),
             title: req.body.title || 'Untitled',
             bio: req.body.bio || '',
-            profileImage: fileHelper(req, 'profileImage_b64') || '/img/logo-hmikomkgumi.png',
+            profileImage: pImg,
             bgType: bgType,
             bgValue: bgValue
         });
@@ -611,10 +766,10 @@ app.post('/admin/edit-bio-page/:id', requireAdmin, upload.any(), async (req, res
             if (req.body.title) pages[i].title = req.body.title;
             if (req.body.bio) pages[i].bio = req.body.bio;
             
-            const pImg = fileHelper(req, 'profileImage_b64');
+            const pImg = await saveUploadedFile(req, 'profileImage', 'bio-profile');
             if (pImg) pages[i].profileImage = pImg;
 
-            const bgImg = fileHelper(req, 'bgImage_b64');
+            const bgImg = await saveUploadedFile(req, 'bgImage', 'bio-bg');
             if (bgImg) {
                 pages[i].bgType = 'image';
                 pages[i].bgValue = bgImg;
@@ -639,12 +794,13 @@ app.post('/admin/hapus-bio-page/:id', requireAdmin, async (req, res) => {
 app.post('/admin/tambah-biolink', requireAdmin, upload.any(), async (req, res) => {
     try {
         let list = await kv.get('bioLinks') || [];
+        const iconUrl = await saveUploadedFile(req, 'icon', 'biolink');
         list.push({ 
             id: Date.now(), 
             bioPageId: req.body.bioPageId,
             title: req.body.title || 'Link',
             url: req.body.url || '#', 
-            icon: fileHelper(req, 'icon_b64') 
+            icon: iconUrl 
         });
         await kv.set('bioLinks', list);
         res.redirect('/admin/dashboard');
@@ -659,7 +815,7 @@ app.post('/admin/edit-biolink/:id', requireAdmin, upload.any(), async (req, res)
             if (req.body.title) list[i].title = req.body.title;
             if (req.body.url) list[i].url = req.body.url;
             if (req.body.bioPageId) list[i].bioPageId = req.body.bioPageId;
-            const newIcon = fileHelper(req, 'icon_b64');
+            const newIcon = await saveUploadedFile(req, 'icon', 'biolink');
             if (newIcon) list[i].icon = newIcon;
             await kv.set('bioLinks', list);
         }
@@ -673,10 +829,11 @@ app.post('/admin/hapus-biolink/:id', requireAdmin, async (req, res) => {
     res.redirect('/admin/dashboard');
 });
 
-// Developer Team
+// DEVELOPER TEAM
 app.post('/admin/tambah-devteam', requireAdmin, upload.any(), async (req, res) => {
     try {
         let list = await kv.get('devTeamList') || [];
+        const img = await saveUploadedFile(req, 'image', 'devteam') || '/img/logo-hmikomkgumi.png';
         list.push({
             id: Date.now(),
             name: req.body.name,
@@ -684,7 +841,7 @@ app.post('/admin/tambah-devteam', requireAdmin, upload.any(), async (req, res) =
             dept: req.body.dept || '',
             category: req.body.category,
             ig: req.body.ig || '',
-            image: fileHelper(req, 'image_b64') || '/img/logo-hmikomkgumi.png'
+            image: img
         });
         await kv.set('devTeamList', list);
         res.redirect('/admin/dashboard');
@@ -707,8 +864,10 @@ app.post('/admin/edit-devteam/:id', requireAdmin, upload.any(), async (req, res)
             if (req.body.dept !== undefined) list[i].dept = req.body.dept;
             if (req.body.category) list[i].category = req.body.category;
             if (req.body.ig !== undefined) list[i].ig = req.body.ig;
-            const newImg = fileHelper(req, 'image_b64');
+            
+            const newImg = await saveUploadedFile(req, 'image', 'devteam');
             if (newImg) list[i].image = newImg;
+            
             await kv.set('devTeamList', list);
         }
         res.redirect('/admin/dashboard');
@@ -729,16 +888,17 @@ app.post('/admin/hapus-devteam/:id', requireAdmin, async (req, res) => {
     res.redirect('/admin/dashboard');
 });
 
-// Kepengurusan Dinamis & Bidang
+// PENGURUS & BIDANG DINAMIS (UMUM & KOHATI)
 const manageTeam = async (req, res, dbKey, action) => {
     try {
         let list = await kv.get(dbKey) || [];
         if (action === 'add') { 
+            const img = await saveUploadedFile(req, 'image', 'pengurus') || '/img/logo-hmikomkgumi.png';
             list.push({ 
                 id: Date.now(), 
                 name: req.body.name, 
                 role: req.body.role || '', 
-                image: fileHelper(req, 'image_b64') || '/img/logo-hmikomkgumi.png',
+                image: img,
                 ig: req.body.ig || '',
                 fb: req.body.fb || '',
                 twitter: req.body.twitter || '',
@@ -751,7 +911,10 @@ const manageTeam = async (req, res, dbKey, action) => {
             if (i !== -1) { 
                 if(req.body.name) list[i].name = req.body.name; 
                 if(req.body.role !== undefined) list[i].role = req.body.role; 
-                let img = fileHelper(req, 'image_b64'); if (img) list[i].image = img; 
+                
+                const img = await saveUploadedFile(req, 'image', 'pengurus');
+                if (img) list[i].image = img; 
+                
                 if(req.body.bidang_name) list[i].name = req.body.bidang_name; 
                 if(req.body.ig !== undefined) list[i].ig = req.body.ig;
                 if(req.body.fb !== undefined) list[i].fb = req.body.fb;
@@ -773,11 +936,12 @@ const manageBidangMember = async (req, res, dbKey, action) => {
         if (bIndex !== -1) {
             if (!list[bIndex].members) list[bIndex].members = [];
             if (action === 'add') { 
+                const img = await saveUploadedFile(req, 'image', 'anggota') || '/img/logo-hmikomkgumi.png';
                 list[bIndex].members.push({ 
                     id: Date.now(), 
                     name: req.body.name, 
                     role: req.body.role || '', 
-                    image: fileHelper(req, 'image_b64') || '/img/logo-hmikomkgumi.png',
+                    image: img,
                     ig: req.body.ig || '',
                     fb: req.body.fb || '',
                     twitter: req.body.twitter || '',
@@ -790,7 +954,10 @@ const manageBidangMember = async (req, res, dbKey, action) => {
                 if (mIndex !== -1) { 
                     if(req.body.name) list[bIndex].members[mIndex].name = req.body.name; 
                     if(req.body.role !== undefined) list[bIndex].members[mIndex].role = req.body.role; 
-                    let img = fileHelper(req, 'image_b64'); if (img) list[bIndex].members[mIndex].image = img; 
+                    
+                    const img = await saveUploadedFile(req, 'image', 'anggota');
+                    if (img) list[bIndex].members[mIndex].image = img; 
+                    
                     if(req.body.ig !== undefined) list[bIndex].members[mIndex].ig = req.body.ig;
                     if(req.body.fb !== undefined) list[bIndex].members[mIndex].fb = req.body.fb;
                     if(req.body.twitter !== undefined) list[bIndex].members[mIndex].twitter = req.body.twitter;
@@ -825,10 +992,10 @@ app.post('/admin/tambah-anggota-kohati-bidang/:bidangId', requireAdmin, upload.a
 app.post('/admin/edit-anggota-kohati-bidang/:bidangId/:memberId', requireAdmin, upload.any(), (req,res) => manageBidangMember(req,res,'kohatiBidangList','edit'));
 app.post('/admin/hapus-anggota-kohati-bidang/:bidangId/:memberId', requireAdmin, (req,res) => manageBidangMember(req,res,'kohatiBidangList','delete'));
 
-// Galeri Album
+// GALERI ALBUM
 app.post('/admin/tambah-album', requireAdmin, upload.any(), async (req, res) => { 
     try { 
-        let coverStr = fileHelper(req, 'cover_b64'); 
+        const coverStr = await saveUploadedFile(req, 'cover', 'album-cover');
         let albums = await kv.get('albumsList') || []; 
         albums.unshift({ id: Date.now(), title: req.body.title, date: new Date().toLocaleDateString('id-ID'), cover: coverStr, photos: [] }); 
         await kv.set('albumsList', albums); 
@@ -843,7 +1010,7 @@ app.post('/admin/edit-album/:id', requireAdmin, upload.any(), async (req, res) =
         if (index !== -1) { 
             albums[index].title = req.body.title; 
             if (req.body.date) albums[index].date = req.body.date; 
-            let coverStr = fileHelper(req, 'cover_b64'); 
+            const coverStr = await saveUploadedFile(req, 'cover', 'album-cover');
             if (coverStr) albums[index].cover = coverStr; 
             await kv.set('albumsList', albums); 
         } 
@@ -859,18 +1026,14 @@ app.post('/admin/hapus-album/:id', requireAdmin, async (req, res) => {
 
 app.post('/admin/tambah-foto-album/:id', requireAdmin, upload.any(), async (req, res) => { 
     try { 
-        let photosB64 = req.body.photos_b64; 
         let newPhotos = []; 
-        if (photosB64) { 
-            if (!Array.isArray(photosB64)) photosB64 = [photosB64]; 
-            photosB64.forEach(b64 => { 
-                if (b64 && b64.length > 50) newPhotos.push({ id: Date.now() + Math.random(), url: b64 }); 
-            }); 
-        }
         if (req.files && Array.isArray(req.files)) {
-            req.files.filter(f => f.fieldname === 'photos' || f.fieldname === 'photos[]').forEach(f => {
-                newPhotos.push({ id: Date.now() + Math.random(), url: `data:${f.mimetype};base64,${f.buffer.toString('base64')}` });
-            });
+            const files = req.files.filter(f => f.fieldname === 'photos' || f.fieldname === 'photos[]');
+            for (const file of files) {
+                const fakeReq = { files: [file], body: {} };
+                const fileUrl = await saveUploadedFile(fakeReq, 'photos', 'galeri-doc');
+                if (fileUrl) newPhotos.push({ id: Date.now() + Math.random(), url: fileUrl });
+            }
         }
 
         let albums = await kv.get('albumsList') || []; 
@@ -894,12 +1057,12 @@ app.post('/admin/hapus-foto-album/:albumId/:photoId', requireAdmin, async (req, 
     res.redirect('/admin/dashboard'); 
 });
 
-// PDF Data Anggota
+// PDF DATA ANGGOTA
 app.post('/admin/tambah-data-anggota', requireAdmin, upload.any(), async (req, res) => { 
     try { 
-        let fileStr = fileHelper(req, 'file_b64'); 
+        const fileStr = await saveUploadedFile(req, 'file', 'data-anggota');
         let dataAnggota = await kv.get('dataAnggotaList') || []; 
-        dataAnggota.unshift({ id: Date.now(), title: req.body.title, date: req.body.date || new Date().toLocaleDateString('id-ID'), file: fileStr }); 
+        dataAnggota.unshift({ id: Date.now(), title: req.body.title, date: req.body.date || new Date().toLocaleDateString('id-ID'), file: fileStr || '/data-anggota.pdf' }); 
         await kv.set('dataAnggotaList', dataAnggota); 
         res.redirect('/admin/dashboard'); 
     } catch(e){ res.redirect('/admin/dashboard'); }
@@ -912,7 +1075,7 @@ app.post('/admin/edit-data-anggota/:id', requireAdmin, upload.any(), async (req,
         if (index !== -1) { 
             dataAnggota[index].title = req.body.title; 
             if (req.body.date) dataAnggota[index].date = req.body.date; 
-            let fileStr = fileHelper(req, 'file_b64'); 
+            const fileStr = await saveUploadedFile(req, 'file', 'data-anggota');
             if (fileStr) dataAnggota[index].file = fileStr; 
             await kv.set('dataAnggotaList', dataAnggota); 
         } 
@@ -926,6 +1089,7 @@ app.post('/admin/hapus-data-anggota/:id', requireAdmin, async (req, res) => {
     res.redirect('/admin/dashboard'); 
 });
 
+// ERROR HANDLING
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Terjadi Kesalahan Internal di Server.');
