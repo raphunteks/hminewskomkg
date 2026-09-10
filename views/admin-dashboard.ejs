@@ -15,18 +15,26 @@
     <a href="/admin/logout" class="btn btn-danger"><i data-lucide="log-out" style="width:18px;"></i> Logout</a>
 </div>
 
+<!-- ==============================================================
+     NAVIGASI TAB ADMIN LENGKAP (DITAMBAH TAB SOSIAL MEDIA)
+============================================================== -->
 <div class="admin-tab-nav">
     <button class="admin-tab-btn active" onclick="openAdmTab('adm-kelola', this)"><i data-lucide="database"></i> Kelola Data</button>
-    <button class="admin-tab-btn" onclick="openAdmTab('adm-setelan', this)"><i data-lucide="settings"></i> Header, Footer & Tentang</button>
+    <button class="admin-tab-btn" onclick="openAdmTab('adm-setelan', this)"><i data-lucide="settings"></i> Header, Footer, Tentang & Narahubung</button>
+    <button class="admin-tab-btn" onclick="openAdmTab('adm-sosmed', this)"><i data-lucide="share-2"></i> Sosial Media</button>
     <button class="admin-tab-btn" onclick="openAdmTab('adm-bio', this)"><i data-lucide="smartphone"></i> Link in Bio</button>
     <button class="admin-tab-btn" onclick="openAdmTab('adm-shortlink', this)"><i data-lucide="link"></i> Shortlink Custom</button>
     <button class="admin-tab-btn" onclick="openAdmTab('adm-devteam', this)"><i data-lucide="code"></i> Developer Team</button>
     <button class="admin-tab-btn" onclick="openAdmTab('adm-announce', this)"><i data-lucide="bell"></i> Announcement Pop-up</button>
 </div>
 
+<!-- ==============================================================
+     TAB 1: KELOLA DATA UTAMA
+============================================================== -->
 <div id="adm-kelola" class="admin-tab-pane active">
     <div class="admin-layout">
         <div class="admin-main-content">
+            <!-- PANEL KELOLA BERITA -->
             <div class="glass admin-panel" style="margin-bottom:0;">
                 <div class="panel-header">
                     <h3 class="panel-title"><i data-lucide="file-text"></i> Kelola Berita</h3>
@@ -56,6 +64,7 @@
                 </div>
             </div>
 
+            <!-- PANEL PENGURUS HARIAN UMUM -->
             <div class="glass admin-panel" style="margin-bottom:0;">
                 <div class="panel-header">
                     <h3 class="panel-title"><i data-lucide="users"></i> Pengurus Harian (Umum)</h3>
@@ -114,6 +123,7 @@
                 </div>
             </div>
 
+            <!-- PANEL PENGURUS KOHATI -->
             <div class="glass admin-panel" style="margin-bottom:0; border: 1px solid rgba(244,114,182,0.3);">
                 <div class="panel-header">
                     <h3 class="panel-title" style="color:#f472b6;"><i data-lucide="heart" style="color:#f472b6;"></i> Pengurus Harian (KOHATI)</h3>
@@ -173,6 +183,7 @@
             </div>
         </div>
 
+        <!-- SIDEBAR KANAN KELOLA (GALERI & DATA ANGGOTA) -->
         <div class="admin-sidebar">
             <div class="glass admin-panel" style="margin-bottom:0;">
                 <h3 class="panel-title" style="margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;"><i data-lucide="image"></i> Kelola Galeri</h3>
@@ -229,8 +240,8 @@
                             <span class="list-item-title"><strong>Data Anggota Komisariat (Default)</strong><br><small style="color:#9ca3af;">/data-anggota.pdf</small></span>
                             <div style="display:flex; gap:5px;">
                                 <button type="button" class="action-btn" style="color:#fff;" onclick="window.open('/data-anggota.pdf', '_blank')" title="Lihat PDF"><i data-lucide="eye"></i></button>
-                                <button type="button" class="action-btn edit" disabled style="opacity:0.5; cursor:not-allowed;" title="Tidak bisa diedit langsung, buat data baru untuk menimpa"><i data-lucide="edit"></i></button>
-                                <button type="button" class="action-btn delete" disabled style="opacity:0.5; cursor:not-allowed;" title="Tidak bisa dihapus, buat data baru untuk menimpa"><i data-lucide="trash-2"></i></button>
+                                <button type="button" class="action-btn edit" disabled style="opacity:0.5; cursor:not-allowed;"><i data-lucide="edit"></i></button>
+                                <button type="button" class="action-btn delete" disabled style="opacity:0.5; cursor:not-allowed;"><i data-lucide="trash-2"></i></button>
                             </div>
                         </div>
                     <% } %>
@@ -241,11 +252,12 @@
 </div>
 
 <!-- ==============================================================
-     TAB 2: SETELAN WEB
+     TAB 2: SETELAN HEADER, FOOTER, TENTANG & NARAHUBUNG
 ============================================================== -->
 <div id="adm-setelan" class="admin-tab-pane">
     <div class="grid-2">
         <div style="display:flex; flex-direction:column; gap:30px;">
+            <!-- SETELAN HEADER & SEO -->
             <div class="glass admin-panel" style="margin-bottom:0;">
                 <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="layout"></i> Setelan Header & Web</h3>
                 <form action="/admin/setelan-header" method="POST" enctype="multipart/form-data">
@@ -263,11 +275,11 @@
 
                     <div class="form-group">
                         <label>Deskripsi Penelusuran (Meta Description)</label>
-                        <textarea name="seoDescription" class="input-control" rows="3" placeholder="Contoh: Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI"><%= siteSettings.seoDescription %></textarea>
+                        <textarea name="seoDescription" class="input-control" rows="3"><%= siteSettings.seoDescription %></textarea>
                     </div>
                     <div class="form-group">
                         <label>Kata Kunci (Meta Keywords)</label>
-                        <input type="text" name="seoKeywords" class="input-control" value="<%= siteSettings.seoKeywords %>" placeholder="hmi komkg umi, hmikomkgumi, hmi, hmi kom kg umi, hmicabmakassar, yakusa">
+                        <input type="text" name="seoKeywords" class="input-control" value="<%= siteSettings.seoKeywords %>">
                     </div>
                     <div class="form-group">
                         <label>Cover / Thumbnail Link (OG Image)</label>
@@ -283,6 +295,7 @@
                 </form>
             </div>
 
+            <!-- SETELAN FOOTER -->
             <div class="glass admin-panel" style="margin-bottom:0; border-top: 4px solid #3b82f6;">
                 <h3 class="panel-title" style="margin-bottom:20px; color: #60a5fa;"><i data-lucide="panel-bottom"></i> Setelan Footer</h3>
                 <form action="/admin/setelan-footer" method="POST" enctype="multipart/form-data">
@@ -293,22 +306,9 @@
                     <div class="form-group"><label>Teks Programmer / Watermark</label><input type="text" name="footerProgrammer" class="input-control" value="<%= siteSettings.footerProgrammer %>"></div>
                     <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:5px; background: #3b82f6; border-color: #3b82f6;">Simpan Perubahan Footer</button>
                 </form>
-
-                <h4 style="margin:30px 0 15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px; color: #60a5fa;">Daftar Sosial Media Footer</h4>
-                <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
-                    <% socialMediaList.forEach(soc => { %>
-                        <div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-size:0.85rem; font-weight: bold;"><%= soc.name %></span>
-                            <div style="display: flex; gap: 5px;">
-                                <button type="button" class="action-btn edit" style="padding:4px;" onclick="openEditSosmedModal('<%= soc.id %>', '<%= soc.name.replace(/'/g, "\\'") %>', '<%= soc.url.replace(/'/g, "\\'") %>')"><i data-lucide="edit" style="width:14px;"></i></button>
-                                <form action="/admin/hapus-sosmed/<%= soc.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" style="padding:4px;" onclick="return confirm('Hapus Sosmed?')"><i data-lucide="trash-2" style="width:14px;"></i></button></form>
-                            </div>
-                        </div>
-                    <% }) %>
-                    <button type="button" class="btn btn-secondary" onclick="openModal('modalSosmed')" style="font-size:0.8rem; padding:8px;">+ Tambah Sosial Media Baru</button>
-                </div>
             </div>
 
+            <!-- SETELAN TOGGLE KOHATI -->
             <div class="glass admin-panel" style="margin-bottom:0; border-top: 4px solid #f472b6;">
                 <h3 class="panel-title" style="margin-bottom:20px; color:#f472b6;"><i data-lucide="heart"></i> Status Fitur KOHATI</h3>
                 <form action="/admin/setelan-kohati-toggle" method="POST">
@@ -322,9 +322,7 @@
             </div>
         </div>
 
-        <div class="glass admin-panel" style="margin-bottom:0; align-self:start;">
-            <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="file-text"></i> Halaman Tentang Kami</h3>
-
+        <div style="display:flex; flex-direction:column; gap:30px;">
             <% 
             function cleanText(str) {
                 if(!str) return '';
@@ -340,46 +338,128 @@
             }
             %>
 
-            <form action="/admin/setelan-tentang" method="POST" enctype="multipart/form-data">
-                <h4 style="color:#4ade80; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Bagian Profil Umum</h4>
-                <div class="form-group"><label>Teks Profil (Bagian Atas)</label><textarea name="profilText" class="input-control" rows="5" placeholder="Ketik profil di sini..."><%= cleanText(siteSettings.profilText) %></textarea></div>
-                <div class="form-group"><label>Teks Welcome (Sambutan)</label><textarea name="welcomeText" class="input-control" rows="5" placeholder="Ketik sambutan di sini..."><%= cleanText(siteSettings.welcomeText) %></textarea></div>
+            <!-- SETELAN TENTANG KAMI -->
+            <div class="glass admin-panel" style="margin-bottom:0;">
+                <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="file-text"></i> Halaman Tentang Kami</h3>
+                <form action="/admin/setelan-tentang" method="POST" enctype="multipart/form-data">
+                    <h4 style="color:#4ade80; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Bagian Profil Umum</h4>
+                    <div class="form-group"><label>Teks Profil (Bagian Atas)</label><textarea name="profilText" class="input-control" rows="4"><%= cleanText(siteSettings.profilText) %></textarea></div>
+                    <div class="form-group"><label>Teks Welcome (Sambutan)</label><textarea name="welcomeText" class="input-control" rows="4"><%= cleanText(siteSettings.welcomeText) %></textarea></div>
 
-                <h4 style="color:#4ade80; margin-top:30px; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Bagian Visi & Misi Umum</h4>
-                <div class="form-group"><label>Teks Visi Umum</label><textarea name="visiText" class="input-control" rows="4"><%= cleanText(siteSettings.visiText) %></textarea></div>
-                <div class="form-group"><label>Teks Misi Umum</label><textarea name="misiText" class="input-control" rows="5"><%= cleanText(siteSettings.misiText) %></textarea></div>
+                    <h4 style="color:#4ade80; margin-top:25px; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Bagian Visi & Misi Umum</h4>
+                    <div class="form-group"><label>Teks Visi Umum</label><textarea name="visiText" class="input-control" rows="3"><%= cleanText(siteSettings.visiText) %></textarea></div>
+                    <div class="form-group"><label>Teks Misi Umum</label><textarea name="misiText" class="input-control" rows="4"><%= cleanText(siteSettings.misiText) %></textarea></div>
 
-                <div class="form-group" style="margin-top:30px;">
-                    <label>Embed Code Google Maps (Iframe)</label>
-                    <textarea name="mapsEmbed" class="input-control" rows="3"><%= siteSettings.mapsEmbed %></textarea>
+                    <div class="form-group" style="margin-top:25px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px dashed rgba(255,255,255,0.2);">
+                        <label style="color:#4ade80; font-size:1rem; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">Upload Booklet / Pedoman PDF</label>
+                        <p class="text-muted" style="font-size:0.8rem; margin-bottom: 12px;">Pilih salah satu metode di bawah. Disarankan menggunakan Link Google Drive.</p>
+                        <label style="font-size:0.85rem;">Metode 1: Link Google Drive</label>
+                        <input type="url" name="bookletPdfUrl" class="input-control" placeholder="Paste link Google Drive disini...">
+                        <div style="text-align:center; color:#9ca3af; margin: 10px 0; font-size:0.8rem; font-weight:bold;">ATAU</div>
+                        <label style="font-size:0.85rem;">Metode 2: Upload File Lokal</label>
+                        <input type="file" name="bookletPdf" class="input-control file-to-b64" accept="application/pdf">
+                        <% if(siteSettings.bookletPdf) { %><p class="form-hint" style="color:#4ade80; margin-top:8px;">✅ Status: File/Link Booklet sudah tersedia dan aktif.</p><% } %>
+                    </div>
+
+                    <div class="form-group" style="margin-top:30px; border-top:1px solid rgba(244,114,182,0.3); padding-top:20px;">
+                        <h4 style="color:#f472b6; margin-bottom:15px;"><i data-lucide="heart" style="width:16px;"></i> Konten Halaman Kohati</h4>
+                        <label>Teks Profil KOHATI</label><textarea name="kohatiProfilText" class="input-control" rows="3"><%= cleanText(siteSettings.kohatiProfilText) %></textarea>
+                        <label style="margin-top:10px;">Teks Visi KOHATI</label><textarea name="kohatiVisiText" class="input-control" rows="3"><%= cleanText(siteSettings.kohatiVisiText) %></textarea>
+                        <label style="margin-top:10px;">Teks Misi KOHATI</label><textarea name="kohatiMisiText" class="input-control" rows="4"><%= cleanText(siteSettings.kohatiMisiText) %></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:20px;">Simpan Halaman Tentang & Booklet</button>
+                </form>
+            </div>
+
+            <!-- ==============================================================
+                 SUPER BIG UPGRADE: SETELAN NARAHUBUNG & KONTAK RESMI
+            ============================================================== -->
+            <div class="glass admin-panel" style="margin-bottom:0; border-top: 4px solid #10b981;">
+                <div class="panel-header">
+                    <h3 class="panel-title" style="color:#34d399;"><i data-lucide="phone-call" style="color:#34d399;"></i> Setelan Narahubung & Kontak Resmi</h3>
+                    <a href="/narahubung" target="_blank" class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem;"><i data-lucide="eye"></i> Preview</a>
                 </div>
+                <form action="/admin/setelan-narahubung" method="POST">
+                    <div class="form-group">
+                        <label>Alamat Sekretariat Utama</label>
+                        <textarea name="contactAddress" class="input-control" rows="2" placeholder="Alamat lengkap sekretariat..."><%= siteSettings.contactAddress || "Jl. Pajonga Dg. Ngalle No. 27 A, Pa'batong, Kec. Mamajang, Kota Makassar, Sulawesi Selatan" %></textarea>
+                    </div>
 
-                <div class="form-group" style="margin-top:30px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px dashed rgba(255,255,255,0.2);">
-                    <label style="color:#4ade80; font-size:1rem; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">Upload Booklet / Pedoman PDF</label>
-                    <p class="text-muted" style="font-size:0.8rem; margin-bottom: 15px;">Pilih salah satu metode di bawah. Disarankan menggunakan Link Google Drive.</p>
-                    <label style="font-size:0.85rem;">Metode 1: Link Google Drive (Sangat Disarankan)</label>
-                    <input type="url" name="bookletPdfUrl" class="input-control" placeholder="Paste link Google Drive disini...">
-                    <div style="text-align:center; color:#9ca3af; margin: 15px 0; font-size:0.8rem; font-weight:bold;">ATAU</div>
-                    <label style="font-size:0.85rem;">Metode 2: Upload File Lokal (Maksimal 1 MB)</label>
-                    <input type="file" name="bookletPdf" class="input-control file-to-b64" accept="application/pdf">
-                    <% if(siteSettings.bookletPdf) { %><p class="form-hint" style="color:#4ade80; margin-top:10px;">✅ Status: File/Link Booklet sudah tersedia dan aktif.</p><% } %>
-                </div>
+                    <div class="form-group">
+                        <label>Email Resmi Komisariat</label>
+                        <input type="email" name="contactEmail" class="input-control" value="<%= siteSettings.contactEmail || 'hmikomkedokgigiumi.190120@gmail.com' %>" placeholder="email@domain.com">
+                    </div>
 
-                <div class="form-group" style="margin-top:40px; border-top:1px solid rgba(244,114,182,0.3); padding-top:20px;">
-                    <h4 style="color:#f472b6; margin-bottom:15px;"><i data-lucide="heart" style="width:16px;"></i> Konten Halaman Kohati</h4>
-                    <label style="margin-top:15px;">Teks Profil KOHATI</label><textarea name="kohatiProfilText" class="input-control" rows="4"><%= cleanText(siteSettings.kohatiProfilText) %></textarea>
-                    <label style="margin-top:15px;">Teks Visi KOHATI</label><textarea name="kohatiVisiText" class="input-control" rows="3"><%= cleanText(siteSettings.kohatiVisiText) %></textarea>
-                    <label style="margin-top:15px;">Teks Misi KOHATI</label><textarea name="kohatiMisiText" class="input-control" rows="5"><%= cleanText(siteSettings.kohatiMisiText) %></textarea>
-                </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Nomor WhatsApp (Infocom)</label>
+                            <input type="text" name="contactWa" class="input-control" value="<%= siteSettings.contactWa || '+62 853-3892-2586' %>" placeholder="+62 812xxxx">
+                        </div>
+                        <div class="form-group">
+                            <label>Nama Penanggung Jawab</label>
+                            <input type="text" name="contactWaName" class="input-control" value="<%= siteSettings.contactWaName || 'M. Aksa A' %>" placeholder="Nama Admin Infocom">
+                        </div>
+                    </div>
 
-                <button type="submit" class="btn btn-primary submit-btn" style="width:100%; margin-top:20px;">Simpan Halaman Tentang & PDF</button>
-            </form>
+                    <div class="form-group">
+                        <label>Embed Code Google Maps (Iframe Peta)</label>
+                        <textarea name="contactMaps" class="input-control" rows="3" placeholder='<iframe src="https://www.google.com/maps/embed?..."></iframe>'><%= siteSettings.contactMaps || siteSettings.mapsEmbed || '' %></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary submit-btn" style="width:100%; background:#10b981; border-color:#10b981; color:#000; font-weight:bold;">Simpan Setelan Narahubung</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- ==============================================================
-     TAB 3: BIO & SHORTLINK & ANNOUNCE 
+     TAB 3: DEDICATED SOSIAL MEDIA MANAGEMENT (IG, FB, DLL)
+============================================================== -->
+<div id="adm-sosmed" class="admin-tab-pane">
+    <div class="glass admin-panel" style="max-width:900px; margin:0 auto; border-top: 4px solid #f59e0b;">
+        <div class="panel-header">
+            <h3 class="panel-title" style="color: #fbbf24;"><i data-lucide="share-2" style="color: #fbbf24;"></i> Kelola Sosial Media (Instagram, Facebook & Lainnya)</h3>
+            <button class="btn btn-primary" onclick="openModal('modalSosmed')" style="background:#f59e0b; border-color:#f59e0b; color:#000; font-weight:bold; padding:8px 15px; font-size:0.85rem;">+ Tambah Sosial Media</button>
+        </div>
+        
+        <p class="text-muted" style="font-size:0.85rem; margin-bottom: 20px;">Ikon dan tautan sosial media ini akan tampil otomatis di footer website dan memudahkan pengunjung terhubung dengan akun resmi HMI KomKG UMI.</p>
+
+        <div class="table-wrapper">
+            <table class="admin-table">
+                <thead><tr><th>Icon</th><th>Platform / Nama</th><th>Tautan Profil (URL)</th><th style="text-align:right;">Aksi</th></tr></thead>
+                <tbody>
+                    <% socialMediaList.forEach(soc => { %>
+                    <tr>
+                        <td>
+                            <% if(soc.icon && soc.icon.length > 0) { %>
+                                <img src="<%= soc.icon %>" style="width:32px; height:32px; object-fit:contain; border-radius:6px; background:rgba(255,255,255,0.05); padding:3px;">
+                            <% } else { %>
+                                <div style="width:32px; height:32px; border-radius:6px; background:rgba(245,158,11,0.15); display:flex; align-items:center; justify-content:center; color:#fbbf24;">
+                                    <i data-lucide="<%= soc.name.toLowerCase().includes('ig') || soc.name.toLowerCase().includes('instagram') ? 'instagram' : (soc.name.toLowerCase().includes('fb') || soc.name.toLowerCase().includes('facebook') ? 'facebook' : 'link') %>" style="width:18px;"></i>
+                                </div>
+                            <% } %>
+                        </td>
+                        <td class="fw-600"><%= soc.name %></td>
+                        <td style="font-size:0.85rem;"><a href="<%= soc.url %>" target="_blank" style="color:#60a5fa; text-decoration:underline;"><%= soc.url %></a></td>
+                        <td class="td-actions">
+                            <button type="button" class="action-btn edit" onclick="openEditSosmedModal('<%= soc.id %>', '<%= soc.name.replace(/'/g, "\\'") %>', '<%= soc.url.replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
+                            <form action="/admin/hapus-sosmed/<%= soc.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus tautan sosial media ini?')"><i data-lucide="trash-2"></i></button></form>
+                        </td>
+                    </tr>
+                    <% }) %>
+                    <% if (socialMediaList.length === 0) { %>
+                        <tr><td colspan="4" style="text-align:center; padding:30px; opacity:0.6;">Belum ada akun sosial media yang ditambahkan.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ==============================================================
+     TAB 4: LINK IN BIO
 ============================================================== -->
 <div id="adm-bio" class="admin-tab-pane">
     <div class="admin-layout">
@@ -455,6 +535,9 @@
     </div>
 </div>
 
+<!-- ==============================================================
+     TAB 5: SHORTLINK CUSTOM
+============================================================== -->
 <div id="adm-shortlink" class="admin-tab-pane">
     <div class="glass admin-panel" style="max-width:800px; margin:0 auto;">
         <div class="panel-header">
@@ -485,7 +568,7 @@
 </div>
 
 <!-- ==============================================================
-     TAB DEVELOPER TEAM (OUR TEAM)
+     TAB 6: DEVELOPER TEAM (OURTEAM)
 ============================================================== -->
 <div id="adm-devteam" class="admin-tab-pane">
     <div class="glass admin-panel" style="max-width:1000px; margin:0 auto; border-top: 4px solid #3b82f6;">
@@ -528,6 +611,9 @@
     </div>
 </div>
 
+<!-- ==============================================================
+     TAB 7: ANNOUNCEMENT POP-UP
+============================================================== -->
 <div id="adm-announce" class="admin-tab-pane">
     <div class="glass admin-panel" style="max-width:800px; margin:0 auto;">
         <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="bell"></i> Setelan Announcement Pop-up</h3>
@@ -545,7 +631,7 @@
 </div>
 
 <!-- ==============================================================
-     MODALS UTUH & LENGKAP (BERITA, GALERI, SHORTLINK, BIO, DLL)
+     MODALS UTUH & LENGKAP (BERITA, GALERI, SHORTLINK, BIO, SOSMED, DLL)
 ============================================================== -->
 
 <!-- 1. MODAL TAMBAH BERITA -->
@@ -765,7 +851,33 @@
     </div>
 </div>
 
-<!-- MODALS KEPENGURUSAN, BIDANG & SOSMED -->
+<!-- 15. MODAL TAMBAH SOSIAL MEDIA -->
+<div class="modal-overlay" id="modalSosmed">
+    <div class="modal-content" style="border-color:#f59e0b;">
+        <div class="modal-header"><h3 style="color:#fbbf24;">Tambah Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalSosmed')"><i data-lucide="x"></i></button></div>
+        <form action="/admin/tambah-sosmed" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Nama Platform (Instagram, Facebook, dll)</label><input type="text" name="name" class="input-control" placeholder="Contoh: Instagram" required></div>
+            <div class="form-group"><label>URL Profil Akun</label><input type="url" name="url" class="input-control" placeholder="https://instagram.com/..." required></div>
+            <div class="form-group"><label>Upload Icon/Logo (Opsional)</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalSosmed')">Batal</button><button type="submit" class="btn submit-btn" style="background:#f59e0b; color:#000; font-weight:bold; flex:1;">Simpan Akun</button></div>
+        </form>
+    </div>
+</div>
+
+<!-- 16. MODAL EDIT SOSIAL MEDIA -->
+<div class="modal-overlay" id="modalEditSosmed">
+    <div class="modal-content" style="border-color:#f59e0b;">
+        <div class="modal-header"><h3 style="color:#fbbf24;">Edit Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalEditSosmed')"><i data-lucide="x"></i></button></div>
+        <form id="formEditSosmed" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Nama Platform</label><input type="text" name="name" id="editSosmedName" class="input-control" required></div>
+            <div class="form-group"><label>URL Profil Akun</label><input type="url" name="url" id="editSosmedUrl" class="input-control" required></div>
+            <div class="form-group"><label>Ganti Icon Baru (Opsional)</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditSosmed')">Batal</button><button type="submit" class="btn submit-btn" style="background:#f59e0b; color:#000; font-weight:bold; flex:1;">Update Akun</button></div>
+        </form>
+    </div>
+</div>
+
+<!-- MODALS KEPENGURUSAN, BIDANG & DEVELOPER TEAM -->
 <div class="modal-overlay" id="modalPengurus">
     <div class="modal-content">
         <div class="modal-header"><h3>Tambah Pengurus Utama</h3><button type="button" class="close-modal" onclick="closeModal('modalPengurus')"><i data-lucide="x"></i></button></div>
@@ -857,8 +969,6 @@
 <div class="modal-overlay" id="modalBidang"><div class="modal-content"><div class="modal-header"><h3>Tambah Bidang Baru</h3><button type="button" class="close-modal" onclick="closeModal('modalBidang')"><i data-lucide="x"></i></button></div><form action="/admin/tambah-bidang" method="POST"><div class="form-group"><label>Nama Bidang</label><input type="text" name="bidang_name" class="input-control" required></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalBidang')">Batal</button><button type="submit" class="btn btn-primary">Buat Bidang</button></div></form></div></div>
 <div class="modal-overlay" id="modalKohatiBidang"><div class="modal-content" style="border-color:#f472b6;"><div class="modal-header"><h3 style="color:#f472b6;">Tambah Bidang Kohati Baru</h3><button type="button" class="close-modal" onclick="closeModal('modalKohatiBidang')"><i data-lucide="x"></i></button></div><form action="/admin/tambah-kohati-bidang" method="POST"><div class="form-group"><label>Nama Bidang</label><input type="text" name="bidang_name" class="input-control" required></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalKohatiBidang')">Batal</button><button type="submit" class="btn" style="background:#f472b6; color:#fff; flex:1;">Buat Bidang</button></div></form></div></div>
 <div class="modal-overlay" id="modalEditBidang"><div class="modal-content"><div class="modal-header"><h3>Edit Nama Bidang</h3><button type="button" class="close-modal" onclick="closeModal('modalEditBidang')"><i data-lucide="x"></i></button></div><form id="formEditBidang" method="POST"><div class="form-group"><label>Nama Bidang Baru</label><input type="text" name="bidang_name" id="editBidangName" class="input-control" required></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditBidang')">Batal</button><button type="submit" class="btn btn-primary">Update Bidang</button></div></form></div></div>
-<div class="modal-overlay" id="modalSosmed"><div class="modal-content"><div class="modal-header"><h3>Tambah Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalSosmed')"><i data-lucide="x"></i></button></div><form action="/admin/tambah-sosmed" method="POST" enctype="multipart/form-data"><div class="form-group"><label>Nama Sosmed</label><input type="text" name="name" class="input-control" required></div><div class="form-group"><label>URL Profile</label><input type="url" name="url" class="input-control" required></div><div class="form-group"><label>Upload Icon/Logo</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalSosmed')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan</button></div></form></div></div>
-<div class="modal-overlay" id="modalEditSosmed"><div class="modal-content"><div class="modal-header"><h3>Edit Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalEditSosmed')"><i data-lucide="x"></i></button></div><form id="formEditSosmed" method="POST" enctype="multipart/form-data"><div class="form-group"><label>Nama Sosmed</label><input type="text" name="name" id="editSosmedName" class="input-control" required></div><div class="form-group"><label>URL Profile</label><input type="url" name="url" id="editSosmedUrl" class="input-control" required></div><div class="form-group"><label>Ganti Icon Baru</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditSosmed')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Update Sosmed</button></div></form></div></div>
 
 <!-- MODALS DEVELOPER TEAM -->
 <div class="modal-overlay" id="modalDevTeam">
@@ -915,7 +1025,7 @@
 </div>
 
 <!-- ==============================================================
-     MODALS DATA INJECTION & LOGIC
+     MODALS DATA INJECTION & LOGIC JAVASCRIPT
 ============================================================== -->
 <script id="albumsDataJson" type="application/json"><%- typeof albums !== 'undefined' ? JSON.stringify(albums).replace(/</g, '\\u003c') : '[]' %></script>
 <script id="newsDataJson" type="application/json"><%- typeof news !== 'undefined' ? JSON.stringify(news).replace(/</g, '\\u003c') : '[]' %></script>
@@ -1251,12 +1361,12 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     let hidden = input.parentElement.querySelector('.b64-hidden');
-                    if (!hidden) {
-                        hidden = document.createElement('input');
-                        hidden.type = 'hidden';
-                        hidden.name = input.name + '_b64';
-                        hidden.className = 'b64-hidden';
-                        input.parentElement.appendChild(hidden);
+                    if (!hidden) { 
+                        hidden = document.createElement('input'); 
+                        hidden.type = 'hidden'; 
+                        hidden.name = input.name + '_b64'; 
+                        hidden.className = 'b64-hidden'; 
+                        input.parentElement.appendChild(hidden); 
                     }
                     hidden.value = event.target.result;
                 };
