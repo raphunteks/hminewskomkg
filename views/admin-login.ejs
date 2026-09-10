@@ -1,31 +1,130 @@
-<%- include('partials/header') %>
+<% 
+    // ==============================================================
+    // FIX ERROR 500 & SEO BREADCRUMB
+    // Injeksi variabel SEO secara eksplisit untuk Halaman Login Admin
+    // ==============================================================
+    let page = 'admin';
+    let pageTitle = 'Login Administrator';
+    let pageDescription = 'Halaman login otentikasi resmi pengelola website HMI Komisariat Kedokteran Gigi UMI.';
+%>
+<%- include('partials/header', { page: page, pageTitle: pageTitle, pageDescription: pageDescription }) %>
 
+<!-- ==============================================================
+     CONTAINER AUTENTIKASI DENGAN EFEK HOVER-EXPANDING (PERSIS GAMBAR 4)
+============================================================== -->
 <div class="auth-wrapper">
-    <div class="glass auth-card">
+    
+    <!-- CARD LOGIN GLASSMORPHISM MODERN -->
+    <div class="glass auth-card auth-card-expand">
         <div class="auth-top-line"></div>
         
+        <!-- HEADER FORM LOGIN -->
         <div class="auth-header">
-            <div class="auth-icon"><i data-lucide="lock" style="width:30px; height:30px;"></i></div>
-            <h2>Admin Login</h2>
-            <p class="text-muted">Dashboard Pengelola Website</p>
+            <div class="auth-icon-wrap">
+                <i data-lucide="lock" class="auth-lock-icon"></i>
+            </div>
+            <h1 class="auth-title">Admin Login</h1>
+            <p class="auth-subtitle">Dashboard Pengelola Website</p>
         </div>
         
-        <% if (error) { %>
-            <div class="alert-error"><%= error %></div>
+        <!-- NOTIFIKASI ERROR JIKA USERNAME / PASSWORD SALAH -->
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert-error-modern">
+                <i data-lucide="alert-triangle" style="width:18px; height:18px; flex-shrink:0;"></i>
+                <span><%= error %></span>
+            </div>
         <% } %>
 
-        <form action="/admin/login" method="POST">
+        <!-- FORM AUTENTIKASI -->
+        <form action="/admin/login" method="POST" id="adminLoginForm" class="auth-form">
+            
+            <!-- INPUT USERNAME -->
             <div class="form-group">
-                <label>Username</label>
-                <input type="text" name="username" class="input-control" required placeholder="Masukkan username">
+                <label for="adminUsername" class="auth-label">Username</label>
+                <div class="auth-input-container">
+                    <input 
+                        type="text" 
+                        id="adminUsername" 
+                        name="username" 
+                        class="input-control auth-input" 
+                        required 
+                        placeholder="Masukkan username" 
+                        autocomplete="username" 
+                        autofocus>
+                </div>
             </div>
+            
+            <!-- INPUT PASSWORD + TOGGLE LIHAT PASSWORD -->
             <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" class="input-control" required placeholder="••••••••">
+                <label for="adminPassword" class="auth-label">Password</label>
+                <div class="auth-input-container password-input-wrap">
+                    <input 
+                        type="password" 
+                        id="adminPassword" 
+                        name="password" 
+                        class="input-control auth-input" 
+                        required 
+                        placeholder="••••••••" 
+                        autocomplete="current-password">
+                    <button type="button" class="btn-toggle-password" id="togglePasswordBtn" title="Lihat/Sembunyikan Kata Sandi" aria-label="Toggle Kata Sandi">
+                        <i data-lucide="eye" id="togglePasswordIcon" style="width:18px; height:18px;"></i>
+                    </button>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">Masuk Ke Dashboard</button>
+            
+            <!-- TOMBOL LOGIN MODERN -->
+            <button type="submit" class="btn btn-primary auth-submit-btn" id="btnSubmitLogin">
+                <span>Masuk Ke Dashboard</span>
+                <i data-lucide="arrow-right" style="width:18px; height:18px;"></i>
+            </button>
         </form>
+
+        <!-- FOOTER CARD INFO -->
+        <div class="auth-card-footer">
+            <a href="/" class="auth-back-link">
+                <i data-lucide="arrow-left" style="width:14px; height:14px;"></i>
+                <span>Kembali ke Beranda Publik</span>
+            </a>
+        </div>
     </div>
 </div>
+
+<!-- ==============================================================
+     LOGIKA JAVASCRIPT: TOGGLE SHOW/HIDE PASSWORD
+============================================================== -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        // Fitur Show/Hide Password
+        const toggleBtn = document.getElementById('togglePasswordBtn');
+        const passInput = document.getElementById('adminPassword');
+        const passIcon = document.getElementById('togglePasswordIcon');
+
+        if (toggleBtn && passInput && passIcon) {
+            toggleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const isPassword = passInput.type === 'password';
+                passInput.type = isPassword ? 'text' : 'password';
+                
+                // Ubah ikon mata terbuka / tercoret
+                passIcon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            });
+        }
+
+        // Animasi feedback tombol saat form di-submit
+        const loginForm = document.getElementById('adminLoginForm');
+        const submitBtn = document.getElementById('btnSubmitLogin');
+        if (loginForm && submitBtn) {
+            loginForm.addEventListener('submit', () => {
+                submitBtn.style.opacity = '0.75';
+                submitBtn.style.pointerEvents = 'none';
+                submitBtn.innerHTML = `<span>Memverifikasi Akun...</span>`;
+            });
+        }
+    });
+</script>
+<script src="/js/protect-devtools.js" defer></script>
 
 <%- include('partials/footer') %>
