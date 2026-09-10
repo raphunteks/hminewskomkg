@@ -251,6 +251,7 @@ async function initDefaultData() {
     }
     if (!(await kv.get('dataAnggotaList'))) await kv.set('dataAnggotaList', []);
     if (!(await kv.get('shortlinkList'))) await kv.set('shortlinkList', []);
+    if (!(await kv.get('contactMessagesList'))) await kv.set('contactMessagesList', []);
     
     let bioPages = await kv.get('bioPages');
     if (!bioPages || bioPages.length === 0) {
@@ -371,6 +372,38 @@ app.get('/narahubung', async (req, res) => {
     }
 });
 
+// ENDPOINT PENERIMA PESAN FORMULIR NARAHUBUNG
+app.post('/api/kirim-pesan-narahubung', upload.any(), async (req, res) => {
+    try {
+        let messages = await kv.get('contactMessagesList') || [];
+        
+        // Simpan dokumen pendukung (jika dilampirkan)
+        let docFileUrl = '';
+        if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+            docFileUrl = await saveUploadedFile(req, 'supportDoc', 'lampiran-pesan');
+        }
+
+        const newMessage = {
+            id: Date.now(),
+            date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+            name: req.body.name || 'Anonim',
+            method: req.body.method || 'wa',
+            contact: req.body.contact || '-',
+            subject: req.body.subject || 'Umum',
+            message: req.body.message || '-',
+            docUrl: docFileUrl
+        };
+
+        messages.unshift(newMessage);
+        await kv.set('contactMessagesList', messages);
+
+        res.json({ status: 'success', message: 'Pesan berhasil tercatat di database.' });
+    } catch (err) {
+        console.error("Error kirim pesan narahubung:", err);
+        res.status(500).json({ status: 'error', message: 'Gagal mencatat pesan.' });
+    }
+});
+
 app.get('/ourteam', async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
@@ -457,10 +490,13 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
 
         let devTeam = safeArr(await kv.get('devTeamList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role), dept: safeStr(x.dept), category: safeStr(x.category), ig: safeStr(x.ig)}));
 
+        // Data Pesan Masuk Narahubung
+        const contactMessages = safeArr(await kv.get('contactMessagesList'));
+
         res.render('admin-dashboard', { 
             page: 'admin', news, albums, pengurus, bidang, dataAnggota, 
             kohatiPengurus, kohatiBidang, shortlinks, siteSettings, socialMediaList,
-            bioPages, bioLinks, devTeam
+            bioPages, bioLinks, devTeam, contactMessages
         });
     } catch (err) { 
         console.error("Dashboard Render Error:", err);
@@ -476,6 +512,17 @@ app.get('/admin/logout', (req, res) => {
 // ==============================================================
 // ADMIN ACTIONS (SEO-FRIENDLY MULTIMEDIA CRUD)
 // ==============================================================
+
+// KELOLA PESAN NARAHUBUNG
+app.post('/admin/hapus-pesan/:id', requireAdmin, async (req, res) => {
+    try {
+        let messages = await kv.get('contactMessagesList') || [];
+        await kv.set('contactMessagesList', messages.filter(m => m.id != req.params.id));
+        res.redirect('/admin/dashboard');
+    } catch (e) {
+        res.redirect('/admin/dashboard');
+    }
+});
 
 // KELOLA BERITA
 app.post('/admin/tambah-berita', requireAdmin, upload.any(), async (req, res) => {
@@ -636,9 +683,7 @@ app.post('/admin/setelan-tentang', requireAdmin, upload.any(), async (req, res) 
     } catch (err) { res.redirect('/admin/dashboard'); }
 });
 
-// ==============================================================
-// SETELAN NARAHUBUNG & KONTAK RESMI (SUPER BIG UPGRADE)
-// ==============================================================
+// SETELAN NARAHUBUNG & KONTAK RESMI
 app.post('/admin/setelan-narahubung', requireAdmin, async (req, res) => {
     try {
         const { siteSettings } = await getSiteData();
