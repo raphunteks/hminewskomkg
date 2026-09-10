@@ -1,0 +1,326 @@
+<% 
+    // ==============================================================
+    // FIX ERROR 500 & SEO BREADCRUMB: 
+    // Injeksi variabel SEO secara eksplisit untuk Halaman Narahubung
+    // ==============================================================
+    let page = 'narahubung';
+    let pageTitle = 'Narahubung & Kontak Resmi';
+    let pageDescription = 'Hubungi HMI Komisariat Kedokteran Gigi UMI. Layanan informasi kegiatan, pengajuan kerjasama, surat undangan resmi, dan alamat sekretariat.';
+    const seoBaseUrl = 'https://hmikomkgumi.xyz';
+%>
+<%- include('partials/header', { page: page, pageTitle: pageTitle, pageDescription: pageDescription }) %>
+
+<!-- ==============================================================
+     ADVANCED JSON-LD SCHEMA.ORG (CONTACTPAGE & ORGANIZATION)
+============================================================== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "ContactPage",
+      "@id": "<%= seoBaseUrl %>/narahubung/#webpage",
+      "url": "<%= seoBaseUrl %>/narahubung",
+      "name": "<%= pageTitle %> | HMI KomKG UMI",
+      "description": "<%= pageDescription %>",
+      "inLanguage": "id-ID",
+      "isPartOf": { "@id": "<%= seoBaseUrl %>/#website" }
+    },
+    {
+      "@type": "Organization",
+      "@id": "<%= seoBaseUrl %>/#organization",
+      "name": "HMI KomKG UMI",
+      "url": "<%= seoBaseUrl %>/",
+      "email": "hmikomkedokgigiumi.190120@gmail.com",
+      "telephone": "+6285338922586",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Jl. Pajonga Dg. Ngalle No. 27 A, Pa'batong, Kec. Mamajang",
+        "addressLocality": "Makassar",
+        "addressRegion": "Sulawesi Selatan",
+        "postalCode": "90131",
+        "addressCountry": "ID"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "<%= seoBaseUrl %>/narahubung/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Beranda",
+          "item": "<%= seoBaseUrl %>/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Narahubung",
+          "item": "<%= seoBaseUrl %>/narahubung"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<script src="/js/protect-devtools.js" defer></script>
+
+<div class="narahubung-container">
+    
+    <!-- HEADER HALAMAN -->
+    <header class="narahubung-header" style="text-align: center; margin-bottom: 40px;">
+        <span class="badge" style="margin-bottom: 12px;">Pusat Komunikasi & Informasi</span>
+        <h1 style="font-size: clamp(2rem, 4vw, 2.6rem); font-weight: 800; margin-bottom: 10px;">Narahubung Resmi</h1>
+        <p class="text-muted" style="max-width: 650px; margin: 0 auto; font-size: 1rem; line-height: 1.6;">
+            Hubungi pengurus HMI Komisariat Kedokteran Gigi UMI untuk keperluan administrasi, undangan kemahasiswaan, kemitraan, atau konsultasi seputar komisariat.
+        </p>
+    </header>
+
+    <!-- GRID UTAMA 2 KOLOM (PERSIS GAMBAR 4) -->
+    <div class="narahubung-grid">
+        
+        <!-- ==============================================================
+             KOLOM KIRI: FORMULIR KIRIM PESAN CEPAT
+        ============================================================== -->
+        <div class="glass narahubung-card form-side">
+            <div class="card-headline">
+                <span class="card-icon-emoji">✉️</span>
+                <h2>Kirim Pesan Cepat</h2>
+            </div>
+            
+            <form id="formNarahubung" onsubmit="handleFormSubmit(event)">
+                <!-- 1. Nama Lengkap / Instansi -->
+                <div class="form-group">
+                    <label for="senderName">Nama Lengkap / Instansi <span class="required-star">*</span></label>
+                    <input type="text" id="senderName" class="input-control" placeholder="Masukkan nama atau instansi Anda..." required>
+                </div>
+
+                <!-- 2. Metode Balasan (Toggle WA / Email) -->
+                <div class="form-group">
+                    <label>Metode Balasan <span class="required-star">*</span></label>
+                    <div class="toggle-reply-method">
+                        <button type="button" class="reply-tab-btn active" id="btnMethodWA" onclick="switchReplyMethod('wa')">
+                            <i data-lucide="message-circle" style="width: 16px;"></i> WhatsApp
+                        </button>
+                        <button type="button" class="reply-tab-btn" id="btnMethodEmail" onclick="switchReplyMethod('email')">
+                            <i data-lucide="mail" style="width: 16px;"></i> Email
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input Kontak Dinamis (WhatsApp / Email) -->
+                <div class="form-group" id="groupInputWA">
+                    <label for="senderWA">Nomor WhatsApp <span class="required-star">*</span></label>
+                    <input type="tel" id="senderWA" class="input-control" placeholder="Nomor WA (Contoh: 0812xxxx)" required>
+                </div>
+
+                <div class="form-group" id="groupInputEmail" style="display: none;">
+                    <label for="senderEmail">Alamat Email <span class="required-star">*</span></label>
+                    <input type="email" id="senderEmail" class="input-control" placeholder="Alamat Email (Contoh: nama@domain.com)">
+                </div>
+
+                <!-- 3. Tujuan Pesan -->
+                <div class="form-group">
+                    <label for="messageSubject">Tujuan Pesan <span class="required-star">*</span></label>
+                    <select id="messageSubject" class="input-control" required>
+                        <option value="" disabled selected>-- Pilih Tujuan Pesan --</option>
+                        <option value="Permohonan Kerjasama & Kemitraan">Permohonan Kerjasama & Kemitraan</option>
+                        <option value="Undangan Kegiatan / Pelatihan">Undangan Kegiatan / Pelatihan</option>
+                        <option value="Informasi Basic Training (LK I)">Informasi Basic Training (LK I)</option>
+                        <option value="Administrasi & Surat Menyurat">Administrasi & Surat Menyurat</option>
+                        <option value="Aspirasi & Konsultasi Mahasiswa">Aspirasi & Konsultasi Mahasiswa</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+
+                <!-- 4. Dokumen Pendukung (Opsional) -->
+                <div class="form-group">
+                    <label for="supportDoc">Dokumen Pendukung (Opsional)</label>
+                    <div class="custom-file-upload">
+                        <input type="file" id="supportDoc" class="file-hidden-input" accept=".pdf,image/*" onchange="updateFileName(this)">
+                        <button type="button" class="btn-browse-file" onclick="document.getElementById('supportDoc').click()">Pilih File</button>
+                        <span id="fileNameLabel" class="file-name-label">Tidak ada file yang dipilih</span>
+                    </div>
+                    <small class="text-muted" style="font-size: 0.75rem; margin-top: 4px; display: block;">Format PDF atau Gambar (Maks. 5MB)</small>
+                </div>
+
+                <!-- 5. Isi Pesan -->
+                <div class="form-group">
+                    <label for="messageBody">Isi Pesan <span class="required-star">*</span></label>
+                    <textarea id="messageBody" class="input-control" rows="4" placeholder="Jelaskan maksud pesan atau penawaran Anda secara detail..." required></textarea>
+                </div>
+
+                <!-- Tombol Submit -->
+                <button type="submit" class="btn-submit-message">
+                    <span>Kirim Pesan Sekarang</span>
+                    <i data-lucide="send" style="width: 18px;"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- ==============================================================
+             KOLOM KANAN: LOKASI & KONTAK RESMI + PETA EMBED
+        ============================================================== -->
+        <div class="narahubung-side-info">
+            
+            <div class="glass narahubung-card">
+                <div class="card-headline">
+                    <span class="card-icon-emoji">📍</span>
+                    <h2>Lokasi & Kontak Resmi</h2>
+                </div>
+
+                <div class="contact-info-list">
+                    
+                    <!-- 1. Sekretariat Utama -->
+                    <div class="contact-item-card">
+                        <div class="contact-icon-box">
+                            <i data-lucide="building-2"></i>
+                        </div>
+                        <div class="contact-text-wrap">
+                            <h4>Sekretariat Utama</h4>
+                            <p>Jl. Pajonga Dg. Ngalle No. 27 A, Pa'batong, Kec. Mamajang, Kota Makassar, Sulawesi Selatan</p>
+                        </div>
+                    </div>
+
+                    <!-- 2. Email Resmi -->
+                    <div class="contact-item-card">
+                        <div class="contact-icon-box">
+                            <i data-lucide="mail"></i>
+                        </div>
+                        <div class="contact-text-wrap">
+                            <h4>Email Resmi</h4>
+                            <a href="mailto:hmikomkedokgigiumi.190120@gmail.com" class="contact-link" title="Kirim Email">
+                                hmikomkedokgigiumi.190120@gmail.com
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 3. Penerangan (WhatsApp) -->
+                    <div class="contact-item-card">
+                        <div class="contact-icon-box wa-box">
+                            <i data-lucide="phone"></i>
+                        </div>
+                        <div class="contact-text-wrap">
+                            <h4>Infocom / Penerangan (WhatsApp)</h4>
+                            <a href="https://api.whatsapp.com/send/?phone=6285338922586&text=Halo%20Admin%20HMI%20KomKG%20UMI,%20saya%20ingin%20berkonsultasi&type=phone_number&app_absent=0" target="_blank" class="contact-link wa-highlight" title="Chat via WhatsApp">
+                                +62 853-3892-2586 <span class="badge-person">(M. Aksa A)</span>
+                            </a>
+                            <small class="contact-subhint">*Klik nomor di atas untuk langsung terhubung ke WhatsApp Admin</small>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Peta Lokasi Sekretariat / Kampus -->
+            <div class="glass narahubung-card" style="margin-top: 25px;">
+                <div class="card-headline">
+                    <span class="card-icon-emoji">🗺️</span>
+                    <h2>Peta Lokasi Kampus & Sekretariat</h2>
+                </div>
+                <div class="map-frame-wrapper ratio ratio-16x9">
+                    <!-- EMBED GOOGLE MAPS DARI PERINTAH ANDA -->
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1986.8184522616118!2d119.41377772579179!3d-5.161978821534889!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dbf1d606370a527%3A0xdb175c222d9d580b!2sUniversitas%20Muslim%20Indonesia%2C%20Fakultas%20Kedokteran%20Gigi!5e0!3m2!1sid!2sid!4v1789058845150!5m2!1sid!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- ==============================================================
+     LOGIKA JAVASCRIPT: TOGGLE METODE BALASAN & PENGIRIMAN PESAN
+============================================================== -->
+<script>
+    let activeMethod = 'wa';
+
+    function switchReplyMethod(method) {
+        activeMethod = method;
+        const btnWA = document.getElementById('btnMethodWA');
+        const btnEmail = document.getElementById('btnMethodEmail');
+        const groupWA = document.getElementById('groupInputWA');
+        const groupEmail = document.getElementById('groupInputEmail');
+        const inputWA = document.getElementById('senderWA');
+        const inputEmail = document.getElementById('senderEmail');
+
+        if (method === 'wa') {
+            btnWA.classList.add('active');
+            btnEmail.classList.remove('active');
+            groupWA.style.display = 'block';
+            groupEmail.style.display = 'none';
+            inputWA.required = true;
+            inputEmail.required = false;
+        } else {
+            btnEmail.classList.add('active');
+            btnWA.classList.remove('active');
+            groupWA.style.display = 'none';
+            groupEmail.style.display = 'block';
+            inputEmail.required = true;
+            inputWA.required = false;
+        }
+    }
+
+    function updateFileName(input) {
+        const label = document.getElementById('fileNameLabel');
+        if (input.files && input.files.length > 0) {
+            label.innerText = input.files[0].name;
+            label.style.color = '#4ade80';
+        } else {
+            label.innerText = 'Tidak ada file yang dipilih';
+            label.style.color = '#9ca3af';
+        }
+    }
+
+    function handleFormSubmit(event) {
+        event.preventDefault();
+
+        const name = document.getElementById('senderName').value.trim();
+        const contact = activeMethod === 'wa' ? document.getElementById('senderWA').value.trim() : document.getElementById('senderEmail').value.trim();
+        const subject = document.getElementById('messageSubject').value;
+        const message = document.getElementById('messageBody').value.trim();
+        const fileInput = document.getElementById('supportDoc');
+        const hasFile = fileInput.files && fileInput.files.length > 0;
+
+        if (activeMethod === 'wa') {
+            // Format Pesan WhatsApp Terstruktur
+            let text = `*PESAN NARAHUBUNG WEBSITE HMI KOMKG UMI*\n\n` +
+                       `👤 *Nama/Instansi:* ${name}\n` +
+                       `📱 *Nomor WhatsApp:* ${contact}\n` +
+                       `🎯 *Tujuan Pesan:* ${subject}\n` +
+                       `📝 *Isi Pesan:*\n${message}\n\n`;
+
+            if (hasFile) {
+                text += `📎 *Lampiran Dokumen:* File terlampir via chat.\n\n`;
+            }
+
+            text += `_Dikirim melalui formulir kontak hmikomkgumi.xyz_`;
+
+            const waUrl = "https://api.whatsapp.com/send/?phone=6285338922586&text=" + encodeURIComponent(text) + "&type=phone_number&app_absent=0";
+            window.open(waUrl, '_blank');
+        } else {
+            // Format Email via mailto
+            const mailSubject = `[Narahubung HMI KomKG UMI] ${subject} - ${name}`;
+            const mailBody = `Nama/Instansi: ${name}\n` +
+                             `Email Balasan: ${contact}\n` +
+                             `Tujuan Pesan: ${subject}\n\n` +
+                             `Isi Pesan:\n${message}\n\n` +
+                             (hasFile ? `(Catatan: Silakan lampirkan dokumen Anda secara manual pada email ini)\n\n` : '') +
+                             `Dikirim dari website resmi HMI KomKG UMI`;
+
+            const mailtoUrl = `mailto:hmikomkedokgigiumi.190120@gmail.com?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+            window.location.href = mailtoUrl;
+        }
+
+        // Reset Formulir
+        document.getElementById('formNarahubung').reset();
+        document.getElementById('fileNameLabel').innerText = 'Tidak ada file yang dipilih';
+        document.getElementById('fileNameLabel').style.color = '#9ca3af';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+</script>
+
+<%- include('partials/footer') %>
