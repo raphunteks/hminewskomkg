@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ ip: clientIP })
             });
 
-            const textResponse = await response.text();
+            const textResponse = await response.text(); 
             
             try {
                 const data = JSON.parse(textResponse);
@@ -305,6 +305,105 @@ document.addEventListener('DOMContentLoaded', () => {
         recordVisitPost(); 
     }, 2000);
 
+});
+</script>
+
+<!-- ==============================================================
+     SUPER BIG UPGRADE: FLOATING WHATSAPP CHAT POPUP WIDGET (PERSIS GAMBAR 3)
+============================================================== -->
+<div class="wa-widget-container" id="waWidgetContainer">
+    <!-- Pop-up Card -->
+    <div class="wa-chat-box" id="waChatBox">
+        <div class="wa-box-header">
+            <div class="wa-header-left">
+                <span class="wa-header-icon">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.37-.44.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1s.9 2.44 1.03 2.61c.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.61.19 1.16.17 1.6.1 1.49-.07 1.47-.61 1.68-1.2.21-.59.21-1.1.15-1.2-.06-.11-.23-.17-.48-.3"></path>
+                    </svg>
+                </span>
+                <span class="wa-header-title">Chat Admin HMI KomKG UMI</span>
+            </div>
+            <button type="button" class="wa-close-btn" id="waCloseBtn" aria-label="Tutup Chat WhatsApp">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="wa-box-body">
+            <p class="wa-subtitle">Ada yang bisa kami bantu seputar informasi kegiatan, kaderisasi atau komisariat?</p>
+            <div class="wa-input-wrap">
+                <textarea id="waCustomMessage" class="wa-textarea" rows="2" placeholder="Ketik pesan konsultasi singkat..."></textarea>
+            </div>
+            <button type="button" id="waSubmitBtn" class="wa-send-btn">
+                <span>Kirim ke WhatsApp</span>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating Trigger Button -->
+    <button type="button" class="wa-floating-btn" id="waToggleBtn" aria-label="Buka Chat WhatsApp" title="Chat WhatsApp Admin">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="#ffffff">
+            <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.37-.44.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1s.9 2.44 1.03 2.61c.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.61.19 1.16.17 1.6.1 1.49-.07 1.47-.61 1.68-1.2.21-.59.21-1.1.15-1.2-.06-.11-.23-.17-.48-.3"></path>
+        </svg>
+    </button>
+</div>
+
+<!-- SCRIPT PENGGERAK WIDGET WHATSAPP CHAT -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const waToggleBtn = document.getElementById('waToggleBtn');
+    const waChatBox = document.getElementById('waChatBox');
+    const waCloseBtn = document.getElementById('waCloseBtn');
+    const waSubmitBtn = document.getElementById('waSubmitBtn');
+    const waCustomMessage = document.getElementById('waCustomMessage');
+
+    // Toggle Tampilkan Box
+    if (waToggleBtn && waChatBox) {
+        waToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            waChatBox.classList.toggle('active');
+            if (waChatBox.classList.contains('active')) {
+                waCustomMessage.focus();
+            }
+        });
+    }
+
+    // Tutup Box via tombol silang (X)
+    if (waCloseBtn && waChatBox) {
+        waCloseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            waChatBox.classList.remove('active');
+        });
+    }
+
+    // Tutup otomatis jika klik di luar box
+    document.addEventListener('click', (e) => {
+        if (waChatBox && waChatBox.classList.contains('active')) {
+            if (!waChatBox.contains(e.target) && !waToggleBtn.contains(e.target)) {
+                waChatBox.classList.remove('active');
+            }
+        }
+    });
+
+    // Kirim pesan custom ke WhatsApp Admin
+    if (waSubmitBtn) {
+        waSubmitBtn.addEventListener('click', () => {
+            const rawMsg = (waCustomMessage ? waCustomMessage.value : '').trim();
+            const msg = rawMsg || "Halo Admin HMI KomKG UMI, saya ingin bertanya seputar informasi kegiatan komisariat.";
+            
+            // Format URL WhatsApp persis sesuai instruksi Anda
+            const waUrl = "https://api.whatsapp.com/send/?phone=6285338922586&text=" + encodeURIComponent(msg) + "&type=phone_number&app_absent=0";
+            
+            window.open(waUrl, '_blank');
+            if (waCustomMessage) waCustomMessage.value = '';
+            waChatBox.classList.remove('active');
+        });
+    }
 });
 </script>
 
