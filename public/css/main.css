@@ -31,6 +31,7 @@
     --theme-analytic-bg: rgba(255, 255, 255, 0.9);
     --theme-analytic-total: #0f172a;
     --theme-drawer-bg: rgba(255, 255, 255, 0.96);
+    --theme-sidebar-bg: rgba(255, 255, 255, 0.9);
 }
 
 html[data-theme="dark"] {
@@ -61,6 +62,7 @@ html[data-theme="dark"] {
     --theme-analytic-bg: rgba(17, 24, 39, 0.6);
     --theme-analytic-total: #f9fafb;
     --theme-drawer-bg: rgba(17, 24, 39, 0.96);
+    --theme-sidebar-bg: rgba(17, 24, 39, 0.85);
 }
 
 /* ==============================================================
@@ -401,9 +403,8 @@ h1, h2, h3, h4, h5 { color: var(--theme-heading); margin-bottom: 0.5rem; line-he
     transform: translateY(-3px); 
     animation: pulseGlow 1.5s infinite cubic-bezier(0.66, 0, 0, 1);
 }
-.btn-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.5); box-shadow: 0 4px 15px rgba(239,68,68,0.1); }
-.btn-danger:hover { background: rgba(239, 68, 68, 0.3); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239,68,68,0.2); }
-.btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none !important; animation: none !important; }
+.btn-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.5); }
+.btn-danger:hover { background: rgba(239, 68, 68, 0.3); transform: translateY(-2px); }
 .btn-secondary { background: rgba(0,0,0,0.05); border: 1px solid var(--theme-glass-border); color: var(--theme-text); }
 .btn-secondary:hover { background: rgba(239, 68, 68, 0.1); color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); transform: translateY(-2px); }
 
@@ -664,7 +665,9 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 }
 @keyframes shimmer { 100% { transform: translateX(100%); } }
 
-/* ADMIN DASHBOARD UI */
+/* ==============================================================
+   ADMIN DASHBOARD CORE UI & PANELS
+============================================================== */
 .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 25px; margin-bottom: 20px; }
 .admin-info { display: flex; align-items: center; gap: 20px; }
 .admin-icon { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #22c55e; padding: 3px; background: #ffffff; box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
@@ -750,6 +753,367 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .filter-tag { padding: 6px 16px; background: rgba(0,0,0,0.05); border: 1px solid var(--theme-glass-border); border-radius: 20px; font-size: 0.85rem; cursor: pointer; color: var(--theme-muted); transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; text-decoration: none; }
 .filter-tag:hover { background: rgba(0,0,0,0.1); color: var(--theme-heading); }
 .filter-tag.active { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: var(--theme-primary); box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-weight: bold; }
+
+/* ==============================================================
+   SUPER BIG UPGRADE: COLLAPSIBLE ADMIN SIDEBAR (PERSIS GBR 2 & 3)
+============================================================== */
+.admin-dashboard-container {
+    display: flex;
+    gap: 25px;
+    align-items: flex-start;
+    position: relative;
+    width: 100%;
+}
+
+.admin-sidebar-nav {
+    width: 260px;
+    min-width: 260px;
+    background: var(--theme-sidebar-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--theme-glass-border);
+    border-radius: 20px;
+    padding: 20px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: var(--theme-glass-shadow);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    position: sticky;
+    top: 100px;
+    z-index: 25;
+}
+
+.sidebar-top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--theme-glass-border);
+}
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--theme-primary);
+}
+.sidebar-brand-icon { width: 22px; height: 22px; color: var(--theme-primary); }
+.sidebar-brand-text { white-space: nowrap; color: var(--theme-heading); }
+
+.sidebar-collapse-btn {
+    background: rgba(0,0,0,0.04);
+    border: 1px solid var(--theme-glass-border);
+    border-radius: 8px;
+    padding: 6px;
+    color: var(--theme-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.sidebar-collapse-btn:hover {
+    color: var(--theme-primary);
+    background: rgba(34,197,94,0.1);
+}
+
+.sidebar-action-wrap {
+    margin: 4px 0 8px;
+}
+.btn-sidebar-create {
+    width: 100%;
+    background: #10b981;
+    color: #ffffff;
+    border: none;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-start;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+    transition: all 0.25s ease;
+}
+.btn-sidebar-create:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+}
+
+.sidebar-menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.sidebar-nav-item {
+    appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    color: var(--theme-muted);
+    font-weight: 600;
+    font-size: 0.88rem;
+    text-align: left;
+    transition: all 0.2s ease;
+    position: relative;
+}
+.sidebar-nav-item:hover {
+    color: var(--theme-heading);
+    background: rgba(0,0,0,0.04);
+}
+.sidebar-nav-item.active {
+    color: #0284c7;
+    background: rgba(2, 132, 199, 0.1);
+    font-weight: 700;
+}
+.sidebar-nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: #0284c7;
+    border-radius: 0 4px 4px 0;
+}
+
+.sidebar-nav-icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sidebar-badge-dot {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(239,68,68,0.4);
+}
+
+/* STATE SIDEBAR COLLAPSED (MODE RAMPING ICON-ONLY - PERSIS GBR 3) */
+.admin-dashboard-container.sidebar-collapsed .admin-sidebar-nav {
+    width: 76px;
+    min-width: 76px;
+    padding: 20px 10px;
+    align-items: center;
+}
+.admin-dashboard-container.sidebar-collapsed .sidebar-brand-text,
+.admin-dashboard-container.sidebar-collapsed .sidebar-text {
+    display: none;
+}
+.admin-dashboard-container.sidebar-collapsed .sidebar-top-header {
+    justify-content: center;
+    width: 100%;
+}
+.admin-dashboard-container.sidebar-collapsed .sidebar-brand {
+    display: none;
+}
+.admin-dashboard-container.sidebar-collapsed .btn-sidebar-create {
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 12px;
+}
+.admin-dashboard-container.sidebar-collapsed .sidebar-nav-item {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 12px;
+}
+.admin-dashboard-container.sidebar-collapsed .sidebar-nav-item.active::before {
+    display: none;
+}
+
+.admin-main-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* ==============================================================
+   SUPER BIG UPGRADE: MODERN HOVER-EXPANDING LOGIN CARD (GBR 4)
+============================================================== */
+.auth-wrapper {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 15px;
+}
+
+.auth-card-expand {
+    width: 100%;
+    max-width: 450px;
+    padding: 40px 32px;
+    border-radius: 24px;
+    background: var(--theme-glass-bg);
+    border: 1px solid var(--theme-glass-border);
+    border-top: 1px solid var(--theme-glass-border-top);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(0);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.auth-card-expand:hover {
+    transform: translateY(-8px) scale(1.015);
+    box-shadow: 0 25px 50px rgba(34, 197, 94, 0.2), 0 0 25px rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.4);
+}
+
+.auth-top-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #10b981, #4ade80, #38bdf8);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.auth-icon-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--theme-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    border: 2px solid rgba(34, 197, 94, 0.3);
+    box-shadow: 0 6px 18px rgba(34, 197, 94, 0.2);
+}
+.auth-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+    color: var(--theme-heading);
+}
+.auth-subtitle {
+    font-size: 0.85rem;
+    color: var(--theme-muted);
+}
+
+.alert-error-modern {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.auth-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--theme-text);
+    margin-bottom: 6px;
+    display: block;
+}
+.auth-input-container {
+    position: relative;
+}
+.auth-input {
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 12px;
+    background: var(--theme-input-bg);
+    border: 1.5px solid var(--theme-input-border);
+    color: var(--theme-input-color);
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+}
+.auth-input:focus {
+    border-color: #22c55e;
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.25);
+}
+
+.password-input-wrap .auth-input {
+    padding-right: 45px;
+}
+.btn-toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--theme-muted);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+.btn-toggle-password:hover {
+    color: var(--theme-primary);
+}
+
+.auth-submit-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 800;
+    border-radius: 12px;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 6px 18px rgba(34, 197, 94, 0.35);
+}
+
+.auth-card-footer {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--theme-glass-border);
+}
+.auth-back-link {
+    font-size: 0.85rem;
+    color: var(--theme-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+.auth-back-link:hover {
+    color: var(--theme-primary);
+}
 
 /* ==============================================================
    SUPER BIG UPGRADE: FIX PRESISI GAMBAR DETAIL BERITA & GALERI
@@ -1567,6 +1931,34 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
    RESPONSIVE MOBILE & LAYOUT FIXES (SIDEBAR DRAWER SWIPE)
 ============================================================== */
 @media (max-width: 992px) {
+    .admin-dashboard-container {
+        flex-direction: column;
+    }
+    .admin-sidebar-nav {
+        width: 100%;
+        min-width: 100%;
+        position: relative;
+        top: 0;
+    }
+    .admin-dashboard-container.sidebar-collapsed .admin-sidebar-nav {
+        width: 100%;
+        min-width: 100%;
+    }
+    .admin-dashboard-container.sidebar-collapsed .sidebar-brand-text,
+    .admin-dashboard-container.sidebar-collapsed .sidebar-text {
+        display: inline;
+    }
+    .admin-dashboard-container.sidebar-collapsed .sidebar-brand {
+        display: flex;
+    }
+    .admin-dashboard-container.sidebar-collapsed .btn-sidebar-create,
+    .admin-dashboard-container.sidebar-collapsed .sidebar-nav-item {
+        width: 100%;
+        height: auto;
+        padding: 11px 14px;
+        justify-content: flex-start;
+    }
+
     .admin-layout { grid-template-columns: 1fr; }
     
     .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
@@ -1601,7 +1993,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
         flex-direction: column; 
         position: fixed; 
         top: 0; 
-        left: -100%; /* Sembunyi di kiri layar */
+        left: -100%; 
         width: 280px; 
         height: 100vh; 
         background: var(--theme-drawer-bg); 
@@ -1611,12 +2003,12 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
         gap: 12px; 
         box-shadow: 10px 0 35px rgba(0, 0, 0, 0.4); 
         border-right: 1px solid var(--theme-header-border); 
-        transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* Efek swipe mulus */
+        transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
         z-index: 51; 
         overflow-y: auto; 
     }
     .nav-links.active { 
-        left: 0; /* Terbuka penuh ke kanan */
+        left: 0; 
     }
     
     .nav-item::after { display: none; }
@@ -1789,7 +2181,6 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
         margin-bottom: 10px; 
     }
 
-    /* Posisi mobile tombol WA & Scroll to Top */
     .scroll-to-top-btn { bottom: 85px; right: 18px; width: 42px; height: 42px; }
     .wa-widget-container { bottom: 18px; right: 18px; }
     .wa-floating-btn { width: 52px; height: 52px; }
