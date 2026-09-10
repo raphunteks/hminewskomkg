@@ -1,23 +1,36 @@
 </div> <!-- Menutup div.container dari header -->
     </main> <!-- Menutup tag main dari header -->
     
-    <!-- Footer Utama -->
+    <%
+        // SAFE OBJECT FALLBACK: Mencegah crash jika variabel tidak terdefinisi
+        const safeSettings = (typeof siteSettings !== 'undefined' && siteSettings) ? siteSettings : {};
+        const safeSocialMedia = (typeof socialMediaList !== 'undefined' && Array.isArray(socialMediaList)) ? socialMediaList : [
+            { id: 1, name: 'Instagram', icon: '', url: 'https://www.instagram.com/hmi_komkgumi' },
+            { id: 2, name: 'Facebook', icon: '', url: 'https://www.facebook.com/hmi_komkgumi' }
+        ];
+    %>
+
+    <!-- ==============================================================
+         FOOTER UTAMA (RESPONSIF MOBILE, TABLET & DESKTOP)
+    ============================================================== -->
     <footer class="site-footer" style="z-index: 10; position: relative;">
         <div class="container">
             <div class="grid-3 footer-top">
+                
+                <!-- KOLOM 1: LOGO & DESKRIPSI KOMISARIAT -->
                 <div style="grid-column: span 1;">
-                    <!-- UPGRADE 1: Class footer-logo-box digunakan tanpa membatasi dengan inline max-width 40px -->
                     <div class="footer-logo-area">
                         <div class="footer-logo-box">
-                            <img src="<%= siteSettings.footerLogo %>" alt="Logo" class="footer-logo-img" loading="lazy">
+                            <img src="<%= safeSettings.footerLogo || '/img/logo-hmikomkgumi.png' %>" alt="Logo Footer HMI" class="footer-logo-img" loading="lazy" onerror="this.src='/img/logo-hmikomkgumi.png'">
                         </div>
                         <div class="logo-text">
-                            <h2 style="font-size:1.4rem; margin:0;"><%= siteSettings.footerTitle %></h2>
+                            <h2 style="font-size:1.4rem; margin:0;"><%= safeSettings.footerTitle || 'Komisariat Kedokteran Gigi UMI' %></h2>
                         </div>
                     </div>
-                    <p class="footer-desc"><%= siteSettings.footerDesc %></p>
+                    <p class="footer-desc"><%= safeSettings.footerDesc || 'Tempat berkembang bareng untuk generasi muslim yang progresif, intelektual, dan menjunjung tinggi nilai-nilai keislaman dan keindonesiaan dalam lingkup Kedokteran Gigi.' %></p>
                 </div>
                 
+                <!-- KOLOM 2: MENU NAVIGASI LENGKAP -->
                 <div class="footer-links">
                     <h3>Menu</h3>
                     <ul>
@@ -29,24 +42,31 @@
                     </ul>
                 </div>
                 
+                <!-- KOLOM 3: SOCIAL MEDIA INTEGRASI DATABASE KV (IG, FB, DLL) -->
                 <div class="footer-links">
                     <h3>Follow Kita!</h3>
                     <div class="social-links">
-                        <% socialMediaList.forEach(soc => { %>
-                            <a href="<%= soc.url %>" target="_blank" class="social-btn" title="<%= soc.name %>" rel="noopener noreferrer">
+                        <% safeSocialMedia.forEach(soc => { 
+                            let socName = (soc.name || '').toLowerCase();
+                        %>
+                            <a href="<%= soc.url || '#' %>" target="_blank" class="social-btn" title="<%= soc.name %>" rel="noopener noreferrer" aria-label="<%= soc.name %>">
                                 <% if(soc.icon && soc.icon.length > 0) { %>
                                     <img src="<%= soc.icon %>" alt="<%= soc.name %>" width="22" height="22" loading="lazy">
                                 <% } else { %>
-                                    <% if (soc.name.toLowerCase().includes('instagram') || soc.name.toLowerCase().includes('ig')) { %>
+                                    <% if (socName.includes('instagram') || socName.includes('ig')) { %>
                                         <i data-lucide="instagram"></i>
-                                    <% } else if (soc.name.toLowerCase().includes('facebook') || soc.name.toLowerCase().includes('fb')) { %>
+                                    <% } else if (socName.includes('facebook') || socName.includes('fb')) { %>
                                         <i data-lucide="facebook"></i>
-                                    <% } else if (soc.name.toLowerCase().includes('twitter') || soc.name.toLowerCase().includes('x')) { %>
+                                    <% } else if (socName.includes('twitter') || socName.includes('x')) { %>
                                         <i data-lucide="twitter"></i>
-                                    <% } else if (soc.name.toLowerCase().includes('youtube') || soc.name.toLowerCase().includes('yt')) { %>
+                                    <% } else if (socName.includes('youtube') || socName.includes('yt')) { %>
                                         <i data-lucide="youtube"></i>
-                                    <% } else if (soc.name.toLowerCase().includes('tiktok')) { %>
+                                    <% } else if (socName.includes('tiktok')) { %>
                                         <i data-lucide="tv"></i>
+                                    <% } else if (socName.includes('whatsapp') || socName.includes('wa')) { %>
+                                        <i data-lucide="message-circle"></i>
+                                    <% } else if (socName.includes('linkedin')) { %>
+                                        <i data-lucide="linkedin"></i>
                                     <% } else { %>
                                         <i data-lucide="link"></i>
                                     <% } %>
@@ -57,9 +77,10 @@
                 </div>
             </div>
             
+            <!-- FOOTER BOTTOM & CREDITS -->
             <div class="footer-bottom">
-                <span><%= siteSettings.footerCopyright %></span>
-                <span><a href="https://www.hmikomkgumi.xyz/ourteam" style="color: inherit; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='#4ade80'" onmouseout="this.style.color='inherit'"><%= siteSettings.footerProgrammer %></a></span>
+                <span><%= safeSettings.footerCopyright || '© 2026 HMI Komisariat Kedokteran Gigi UMI. All rights reserved.' %></span>
+                <span><a href="https://www.hmikomkgumi.xyz/ourteam" style="color: inherit; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='#4ade80'" onmouseout="this.style.color='inherit'"><%= safeSettings.footerProgrammer || '💻 Axa Xyz' %></a></span>
             </div>
         </div>
     </footer>
@@ -74,6 +95,7 @@
         </svg>
     </button>
 
+    <!-- SCRIPT INITIALIZER ICONS & SCROLL-TO-TOP LOGIC -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // 1. Inisialisasi Ikon Lucide
@@ -90,6 +112,7 @@
             const scrollBtn = document.getElementById('btnScrollTop');
             if (scrollBtn) {
                 window.addEventListener('scroll', () => {
+                    // Muncul otomatis saat di-scroll lebih dari 200px dari atas
                     if (window.scrollY > 200) {
                         scrollBtn.classList.add('visible');
                     } else {
