@@ -46,6 +46,30 @@ app.get('/googlee9821896ca0e6ace.html', (req, res) => {
 });
 
 // ==============================================================
+// HELPER SEO SLUG GENERATOR (SEO GOLD STANDARD)
+// ==============================================================
+function slugify(text) {
+    if (!text) return '';
+    return text.toString()
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')     // Hapus karakter non-alfanumerik
+        .replace(/[\s_-]+/g, '-')     // Ganti spasi/garis bawah dengan strip
+        .replace(/^-+|-+$/g, '');    // Hapus strip di awal dan akhir
+}
+
+function generateUniqueSlug(title, customSlug, existingNews, currentId = null) {
+    let baseSlug = slugify(customSlug) || slugify(title) || 'berita';
+    let slug = baseSlug;
+    let counter = 1;
+    while (existingNews.some(n => (n.slug === slug || String(n.id) === slug) && n.id != currentId)) {
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+    }
+    return slug;
+}
+
+// ==============================================================
 // SEO-FRIENDLY STORAGE HELPER (NON-BASE64 ENGINE)
 // Mengubah data Base64 / Multer Buffer menjadi URL berkas asli
 // ==============================================================
@@ -215,7 +239,16 @@ async function initDefaultData() {
     let hasNews = await kv.get('newsList');
     if (!hasNews || hasNews.length === 0) {
         await kv.set('newsList', [
-            { id: 1, title: 'Silaturahmi, Penghargaan dan Launching Kaos', category: 'Terbaru', date: '10 May 2025', content: 'Kegiatan silaturahmi kader...', image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=800&q=80', photos: [] }
+            { 
+                id: 1, 
+                slug: 'silaturahmi-penghargaan-dan-launching-kaos',
+                title: 'Silaturahmi, Penghargaan dan Launching Kaos', 
+                category: 'Terbaru', 
+                date: '10 May 2025', 
+                content: 'Kegiatan silaturahmi kader...', 
+                image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=800&q=80', 
+                photos: [] 
+            }
         ]);
     }
     let hasAlbums = await kv.get('albumsList');
@@ -299,6 +332,11 @@ app.get('/', async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
         let news = await kv.get('newsList') || [];
+        // Pastikan setiap berita memiliki slug
+        news = news.map(n => ({
+            ...n,
+            slug: n.slug || slugify(n.title) || String(n.id)
+        }));
         const filter = req.query.filter; 
         if (filter && filter !== 'Semua') {
             news = news.filter(n => n.category.toLowerCase() === filter.toLowerCase());
@@ -309,14 +347,38 @@ app.get('/', async (req, res) => {
     }
 });
 
-app.get('/berita/:id', async (req, res) => {
+// ROUTE DETAIL BERITA DUAL-MODE (MENDUKUNG SLUG MAUPUN ID ANGKA LAMA)
+app.get('/berita/:slugOrId', async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
         const newsList = await kv.get('newsList') || [];
-        const berita = newsList.find(n => n.id === parseInt(req.params.id));
-        if (!berita) return res.status(404).render('admin-404', { page: '404', siteSettings, socialMediaList });
-        res.render('berita-detail', { page: 'beranda', berita, siteSettings, socialMediaList });
-    } catch (err) { res.status(500).send("Error Load Detail Berita"); }
+        const param = req.params.slugOrId.toString().trim().toLowerCase();
+        
+        // Cari berdasarkan slug judul atau ID angka
+        let berita = newsList.find(n => (n.slug && n.slug.toLowerCase() === param) || String(n.id) === param);
+        if (!berita) {
+            return res.status(404).render('admin-404', { page: '404', siteSettings, socialMediaList });
+        }
+
+        // Pastikan slug terisi
+        if (!berita.slug) {
+            berita.slug = slugify(berita.title) || String(berita.id);
+        }
+
+        const seoBaseUrl = 'https://www.hmikomkgumi.xyz';
+        const canonicalUrl = `${seoBaseUrl}/berita/${berita.slug}`;
+
+        res.render('berita-detail', { 
+            page: 'beranda', 
+            berita, 
+            siteSettings, 
+            socialMediaList,
+            canonicalUrl,
+            seoBaseUrl
+        });
+    } catch (err) { 
+        res.status(500).send("Error Load Detail Berita: " + err.message); 
+    }
 });
 
 app.get('/tentang', async (req, res) => {
@@ -474,7 +536,14 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
         const safeArr = (arr) => Array.isArray(arr) ? arr : [];
         const safeStr = (val) => typeof val === 'string' ? val : '';
 
-        const news = safeArr(await kv.get('newsList')).map(x => ({...x, title: safeStr(x.title), category: safeStr(x.category), date: safeStr(x.date), content: safeStr(x.content)}));
+        const news = safeArr(await kv.get('newsList')).map(x => ({
+            ...x, 
+            slug: safeStr(x.slug || slugify(x.title)),
+            title: safeStr(x.title), 
+            category: safeStr(x.category), 
+            date: safeStr(x.date), 
+            content: safeStr(x.content)
+        }));
         const albums = safeArr(await kv.get('albumsList')).map(x => ({...x, title: safeStr(x.title), date: safeStr(x.date)}));
         
         const pengurus = safeArr(await kv.get('pengurusList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role), ig: safeStr(x.ig), fb: safeStr(x.fb), twitter: safeStr(x.twitter), linkedin: safeStr(x.linkedin), tiktok: safeStr(x.tiktok)}));
@@ -524,14 +593,20 @@ app.post('/admin/hapus-pesan/:id', requireAdmin, async (req, res) => {
     }
 });
 
-// KELOLA BERITA
+// KELOLA BERITA (AUTO SLUG & CUSTOM SLUG SUPPORT)
 app.post('/admin/tambah-berita', requireAdmin, upload.any(), async (req, res) => {
     try {
         let news = await kv.get('newsList') || [];
         const uploadedCover = await saveUploadedFile(req, 'image', 'berita');
+        
+        const title = req.body.title ? req.body.title.trim() : 'Berita Baru';
+        const customSlug = req.body.slug ? req.body.slug.trim() : '';
+        const uniqueSlug = generateUniqueSlug(title, customSlug, news);
+
         news.unshift({ 
             id: Date.now(), 
-            title: req.body.title, 
+            slug: uniqueSlug,
+            title: title, 
             category: req.body.category, 
             date: req.body.date || new Date().toLocaleDateString('id-ID'), 
             content: req.body.content, 
@@ -548,7 +623,11 @@ app.post('/admin/edit-berita/:id', requireAdmin, upload.any(), async (req, res) 
         let news = await kv.get('newsList') || []; 
         let i = news.findIndex(n => n.id == req.params.id);
         if (i !== -1) {
-            news[i].title = req.body.title; 
+            const title = req.body.title ? req.body.title.trim() : news[i].title;
+            const customSlug = req.body.slug !== undefined ? req.body.slug.trim() : '';
+            news[i].slug = generateUniqueSlug(title, customSlug || news[i].slug, news, news[i].id);
+
+            news[i].title = title; 
             news[i].category = req.body.category; 
             news[i].content = req.body.content;
             if (req.body.date) news[i].date = req.body.date;
@@ -1011,7 +1090,7 @@ const manageBidangMember = async (req, res, dbKey, action) => {
                 } 
             }
             else if (action === 'delete') { list[bIndex].members = list[bIndex].members.filter(m => m.id != req.params.memberId); }
-            await kv.set(dbKey, list);
+            await kv.set(dbKey, list); 
         }
         res.redirect('/admin/dashboard');
     } catch(e) { res.redirect('/admin/dashboard'); }
