@@ -5,12 +5,13 @@
     // ==============================================================
     let page = 'beranda';
     let pageTitle = 'Beranda';
+    let quotesList = (typeof kaderQuotes !== 'undefined' && Array.isArray(kaderQuotes)) ? kaderQuotes : [];
 %>
 <%- include('partials/header', { page: page, pageTitle: pageTitle }) %>
 
 <!-- ==============================================================
      SUPER BIG UPGRADE: ADVANCED SEO & DYNAMIC SCHEMA.ORG INJECTION
-     Otomatis mendeteksi dan mengindeks Berita/Proker Baru ke Google
+     Otomatis mengindeks Berita & Kutipan Kader ke Google Search Console
 ============================================================== -->
 <script type="application/ld+json" id="dynamic-seo-schema">
 {
@@ -38,7 +39,7 @@
     {
       "@type": "ItemList",
       "@id": "https://hmikomkgumi.xyz/#news-list",
-      "name": "Update Berita dan Program Kerja Terbaru",
+      "name": "Update Berita dan Kajian Terbaru",
       "itemListElement": [
         <% news.forEach((item, index) => { %>
         {
@@ -57,6 +58,31 @@
             }
           }
         }<%= index < news.length - 1 ? ',' : '' %>
+        <% }) %>
+      ]
+    }
+    <% } %>
+    <% if(quotesList.length > 0) { %>,
+    {
+      "@type": "ItemList",
+      "@id": "https://hmikomkgumi.xyz/#kader-quotes",
+      "name": "Apa Kata Kader - Inspirasi dan Refleksi Kader HMI KomKG UMI",
+      "itemListElement": [
+        <% quotesList.forEach((q, qIndex) => { %>
+        {
+          "@type": "ListItem",
+          "position": <%= qIndex + 1 %>,
+          "item": {
+            "@type": "Person",
+            "name": <%- JSON.stringify(q.name) %>,
+            "jobTitle": <%- JSON.stringify(q.role) %>,
+            "image": <%- JSON.stringify(q.image || 'https://hmikomkgumi.xyz/img/logo-hmikomkgumi.png') %>,
+            <% if (q.ig && q.ig.trim() !== '') { %>
+            "sameAs": [<%- JSON.stringify(q.ig) %>],
+            <% } %>
+            "description": <%- JSON.stringify(q.quote) %>
+          }
+        }<%= qIndex < quotesList.length - 1 ? ',' : '' %>
         <% }) %>
       ]
     }
@@ -110,11 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <!-- ==============================================================
      SUPER BIG UPGRADE: SECTION "APA KATA KADER?" 
-     (5-CARD COMPACT STREAM, TANPA DUMMY, KHUSUS IG, GEN-Z CENTERED)
+     (FIX: QUOTES SCROLLABLE UTUH, INLINE SVG IG, GEN-Z CENTERED)
 ============================================================== -->
-<% 
-    let quotesList = (typeof kaderQuotes !== 'undefined' && Array.isArray(kaderQuotes)) ? kaderQuotes : [];
-%>
 <% if (quotesList.length > 0) { %>
 <section class="kader-section-container" aria-label="Apa Kata Kader HMI">
     <div class="genz-header-center">
@@ -136,14 +159,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         <% if (item.ig && item.ig.trim() !== '') { %>
                             <a href="<%= item.ig %>" target="_blank" rel="noopener noreferrer" class="kader-ig-floating" aria-label="Instagram <%= item.name %>" title="Kunjungi Instagram">
-                                <i data-lucide="instagram"></i>
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                                </svg>
                             </a>
                         <% } %>
                     </div>
                     
                     <div class="kader-quote-capsule">
                         <div class="kader-quote-symbol">“</div>
-                        <p class="kader-quote-message">“<%= item.quote %>”</p>
+                        <!-- Container Scrollable: Teks Utuh Tanpa Terpotong & Grid Tetap Rata -->
+                        <div class="kader-quote-scroll-box">
+                            <p class="kader-quote-message">“<%= item.quote %>”</p>
+                        </div>
                         <div class="kader-profile-info">
                             <h3 class="kader-profile-name"><%= item.name %></h3>
                             <p class="kader-profile-role"><%= item.role %></p>
@@ -162,16 +192,25 @@ document.addEventListener('DOMContentLoaded', () => {
 <section>
     <div class="genz-header-center" style="margin-top: 70px;">
         <span class="genz-badge-pill">
-            <i data-lucide="newspaper" style="width:14px; height:14px;"></i> WARTA & PROKER
+            <i data-lucide="newspaper" style="width:14px; height:14px;"></i> BERITA & KAJIANN
         </span>
         <h2 class="genz-section-title">Berita & <span class="text-gradient">Informasi</span></h2>
         <p class="genz-section-subtitle">Update kabar terbaru dan dinamika kegiatan komisariat</p>
         
+        <!-- Filter Bar Tombol Pill (Interaktif & Modern) -->
         <div class="filter-tags" role="navigation" aria-label="Filter Kategori Berita" style="justify-content: center; margin-top: 20px;">
-            <a href="/" class="filter-tag <%= currentFilter === 'Semua' ? 'active' : '' %>" aria-label="Tampilkan Semua Berita">Semua</a>
-            <a href="/?filter=Terbaru" class="filter-tag <%= currentFilter === 'Terbaru' ? 'active' : '' %>" aria-label="Filter Berita Terbaru">Terbaru</a>
-            <a href="/?filter=Pin" class="filter-tag <%= currentFilter === 'Pin' ? 'active' : '' %>" aria-label="Filter Berita Disematkan">Pin</a>
-            <a href="/?filter=Populer" class="filter-tag <%= currentFilter === 'Populer' ? 'active' : '' %>" aria-label="Filter Berita Populer">Populer</a>
+            <a href="/" class="filter-tag <%= currentFilter === 'Semua' ? 'active' : '' %>" aria-label="Tampilkan Semua Berita">
+                <i data-lucide="layout-grid" style="width:14px; height:14px;"></i> Semua
+            </a>
+            <a href="/?filter=Terbaru" class="filter-tag <%= currentFilter === 'Terbaru' ? 'active' : '' %>" aria-label="Filter Berita Terbaru">
+                <i data-lucide="clock" style="width:14px; height:14px;"></i> Terbaru
+            </a>
+            <a href="/?filter=Pin" class="filter-tag <%= currentFilter === 'Pin' ? 'active' : '' %>" aria-label="Filter Berita Disematkan">
+                <i data-lucide="pin" style="width:14px; height:14px;"></i> Pin
+            </a>
+            <a href="/?filter=Populer" class="filter-tag <%= currentFilter === 'Populer' ? 'active' : '' %>" aria-label="Filter Berita Populer">
+                <i data-lucide="trending-up" style="width:14px; height:14px;"></i> Populer
+            </a>
         </div>
     </div>
 
