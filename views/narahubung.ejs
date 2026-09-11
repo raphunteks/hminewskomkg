@@ -70,378 +70,7 @@
   ]
 }
 </script>
-
-<style>
-    /* Styling Terpadu Halaman Narahubung Glassmorphism */
-    .narahubung-container {
-        max-width: 1160px;
-        margin: 0 auto 60px auto;
-        padding: 0 16px;
-    }
-
-    .narahubung-grid {
-        display: grid;
-        grid-template-columns: 1.15fr 0.85fr;
-        gap: 28px;
-        align-items: start;
-    }
-
-    .narahubung-card {
-        background: rgba(22, 27, 34, 0.78);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(74, 222, 128, 0.25);
-        border-radius: 20px;
-        padding: 28px;
-        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
-        position: relative;
-    }
-
-    .card-headline {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 22px;
-        padding-bottom: 14px;
-        border-bottom: 1px solid rgba(74, 222, 128, 0.18);
-    }
-
-    .card-headline h2 {
-        font-size: 1.25rem;
-        color: #4ade80;
-        font-weight: 700;
-        margin: 0;
-    }
-
-    .card-icon-emoji {
-        font-size: 1.4rem;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        margin-bottom: 18px;
-    }
-
-    .form-group label {
-        font-size: 0.84rem;
-        font-weight: 600;
-        color: #e2e8f0;
-    }
-
-    .input-control {
-        width: 100%;
-        background: rgba(15, 23, 42, 0.85);
-        border: 1px solid rgba(74, 222, 128, 0.22);
-        border-radius: 12px;
-        color: #f8fafc;
-        padding: 12px 16px;
-        font-size: 0.92rem;
-        outline: none;
-        box-sizing: border-box;
-        transition: border-color 0.2s, box-shadow 0.2s;
-        font-family: inherit;
-    }
-
-    .input-control:focus {
-        border-color: #4ade80;
-        box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
-    }
-
-    /* Toggle Balasan WA / Email */
-    .toggle-reply-method {
-        display: flex;
-        gap: 8px;
-        background: rgba(15, 23, 42, 0.7);
-        padding: 4px;
-        border-radius: 12px;
-        border: 1px solid rgba(74, 222, 128, 0.2);
-    }
-
-    .reply-tab-btn {
-        flex: 1;
-        padding: 10px 14px;
-        border-radius: 10px;
-        border: none;
-        background: transparent;
-        color: #94a3b8;
-        font-weight: 600;
-        font-size: 0.86rem;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        transition: all 0.25s ease;
-    }
-
-    .reply-tab-btn.active {
-        background: linear-gradient(135deg, #4ade80 0%, #16a34a 100%);
-        color: #052e16;
-        font-weight: 800;
-        box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
-    }
-
-    /* Custom File Upload */
-    .custom-file-upload {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: rgba(15, 23, 42, 0.7);
-        padding: 8px 14px;
-        border-radius: 12px;
-        border: 1px dashed rgba(74, 222, 128, 0.35);
-        box-sizing: border-box;
-    }
-
-    .file-hidden-input {
-        display: none;
-    }
-
-    .btn-browse-file {
-        background: rgba(74, 222, 128, 0.15);
-        border: 1px solid rgba(74, 222, 128, 0.4);
-        color: #4ade80;
-        font-size: 0.82rem;
-        font-weight: 700;
-        padding: 8px 14px;
-        border-radius: 8px;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: background 0.2s;
-    }
-
-    .btn-browse-file:hover {
-        background: rgba(74, 222, 128, 0.25);
-    }
-
-    .file-name-label {
-        font-size: 0.84rem;
-        color: #9ca3af;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    /* Tombol Submit */
-    .btn-submit-message {
-        width: 100%;
-        background: linear-gradient(135deg, #4ade80 0%, #16a34a 100%);
-        color: #052e16;
-        font-weight: 800;
-        font-size: 0.96rem;
-        padding: 14px 20px;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        transition: transform 0.2s, box-shadow 0.2s;
-        box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
-        margin-top: 10px;
-    }
-
-    .btn-submit-message:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 26px rgba(34, 197, 94, 0.45);
-    }
-
-    .btn-submit-message:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    /* Informasi Kontak Sisi Kanan */
-    .contact-info-list {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-    }
-
-    .contact-item-card {
-        display: flex;
-        gap: 14px;
-        align-items: flex-start;
-        padding: 16px;
-        background: rgba(15, 23, 42, 0.55);
-        border-radius: 14px;
-        border: 1px solid rgba(74, 222, 128, 0.15);
-    }
-
-    .contact-icon-box {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: rgba(74, 222, 128, 0.15);
-        color: #4ade80;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .contact-icon-box.wa-box {
-        background: rgba(37, 211, 102, 0.15);
-        color: #25d366;
-    }
-
-    .contact-text-wrap h4 {
-        font-size: 0.92rem;
-        color: #f8fafc;
-        margin-bottom: 4px;
-        font-weight: 700;
-    }
-
-    .contact-text-wrap p {
-        font-size: 0.85rem;
-        color: #94a3b8;
-        line-height: 1.5;
-        margin: 0;
-    }
-
-    .contact-link {
-        font-size: 0.88rem;
-        color: #4ade80;
-        text-decoration: none;
-        font-weight: 600;
-        word-break: break-all;
-    }
-
-    .contact-link.wa-highlight {
-        color: #22c55e;
-        font-weight: 700;
-    }
-
-    .badge-person {
-        font-size: 0.76rem;
-        background: rgba(34, 197, 94, 0.2);
-        color: #4ade80;
-        padding: 2px 8px;
-        border-radius: 20px;
-        font-weight: 700;
-        margin-left: 4px;
-    }
-
-    .contact-subhint {
-        display: block;
-        font-size: 0.74rem;
-        color: #94a3b8;
-        margin-top: 4px;
-    }
-
-    /* Peta Embed Responsive 16:9 */
-    .map-frame-wrapper {
-        position: relative;
-        width: 100%;
-        padding-top: 56.25%;
-        border-radius: 14px;
-        overflow: hidden;
-        border: 1px solid rgba(74, 222, 128, 0.2);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-    }
-
-    .map-frame-wrapper iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border: none;
-    }
-
-    /* ==============================================================
-       STYLING ANALYTICS WIDGET (VIEWS TODAY, THIS WEEK, TOTAL VIEWS)
-       PERSIS SEPERTI DI INDEX.EJS
-    ============================================================== */
-    .analytics-section {
-        margin-top: 40px;
-        width: 100%;
-    }
-
-    .analytics-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-    }
-
-    .analytic-card {
-        background: rgba(22, 27, 34, 0.78);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(74, 222, 128, 0.28);
-        border-radius: 18px;
-        padding: 18px 20px;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-        transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    .analytic-card:hover {
-        transform: translateY(-2px);
-        border-color: rgba(74, 222, 128, 0.5);
-        box-shadow: 0 12px 32px rgba(74, 222, 128, 0.12);
-    }
-
-    .analytic-title {
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: #94a3b8;
-        letter-spacing: 0.8px;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-    }
-
-    .analytic-value {
-        font-size: 1.65rem;
-        font-weight: 800;
-        font-family: 'JetBrains Mono', monospace;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 40px;
-    }
-
-    .stat-today { color: #4ade80; }
-    .stat-week { color: #38bdf8; }
-    .stat-total { color: #fbbf24; }
-
-    @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-
-    .spin-icon {
-        animation: spin 1s linear infinite;
-        width: 22px;
-        height: 22px;
-        color: #94a3b8;
-    }
-
-    /* Responsif Mobile Breakpoint */
-    @media (max-width: 860px) {
-        .narahubung-grid {
-            grid-template-columns: 1fr;
-            gap: 22px;
-        }
-        .narahubung-card {
-            padding: 22px 18px;
-        }
-        .input-control {
-            font-size: 16px; /* Mencegah auto-zoom di iOS Safari */
-        }
-    }
-
-    @media (max-width: 680px) {
-        .analytics-grid {
-            grid-template-columns: 1fr;
-            gap: 12px;
-        }
-    }
-</style>
+<script src="/js/protect-devtools.js" defer></script>
 
 <div class="narahubung-container">
     
@@ -454,7 +83,7 @@
         </p>
     </header>
 
-    <!-- GRID UTAMA 2 KOLOM -->
+    <!-- GRID UTAMA 2 KOLOM (PERSIS GAMBAR 4) -->
     <div class="narahubung-grid">
         
         <!-- ==============================================================
@@ -602,7 +231,7 @@
                     <span class="card-icon-emoji">🗺️</span>
                     <h2>Peta Lokasi Kampus & Sekretariat</h2>
                 </div>
-                <div class="map-frame-wrapper">
+                <div class="map-frame-wrapper ratio ratio-16x9">
                     <%- contactMaps %>
                 </div>
             </div>
@@ -610,36 +239,10 @@
         </div>
 
     </div>
-
-    <!-- ==============================================================
-         DASHBOARD ANALYTICS WIDGET (PERSIS SEPERTI DI INDEX.EJS)
-    ============================================================== -->
-    <section class="analytics-section" aria-label="Statistik Kunjungan Website">
-        <div class="analytics-grid">
-            <div class="analytic-card">
-                <h4 class="analytic-title">VIEWS TODAY</h4>
-                <div class="analytic-value stat-today" id="val-today">
-                    <i data-lucide="loader-2" class="spin-icon"></i>
-                </div>
-            </div>
-            <div class="analytic-card">
-                <h4 class="analytic-title">THIS WEEK</h4>
-                <div class="analytic-value stat-week" id="val-week">
-                    <i data-lucide="loader-2" class="spin-icon"></i>
-                </div>
-            </div>
-            <div class="analytic-card">
-                <h4 class="analytic-title">TOTAL VIEWS</h4>
-                <div class="analytic-value stat-total" id="val-total">
-                    <i data-lucide="loader-2" class="spin-icon"></i>
-                </div>
-            </div>
-        </div>
-    </section>
 </div>
 
 <!-- ==============================================================
-     LOGIKA JAVASCRIPT: FORM SUBMIT & GOOGLE APPS SCRIPT ANALYTICS
+     LOGIKA JAVASCRIPT: PENGIRIMAN AJAX KE DATABASE BACKEND
 ============================================================== -->
 <script>
     let activeMethod = 'wa';
@@ -673,16 +276,7 @@
     function updateFileName(input) {
         const label = document.getElementById('fileNameLabel');
         if (input.files && input.files.length > 0) {
-            const file = input.files[0];
-            if (file.size > 5 * 1024 * 1024) {
-                showAlert('error', 'Ukuran file melebihi batas maksimal 5MB.');
-                input.value = '';
-                label.innerText = 'File terlalu besar (Maks. 5MB)';
-                label.style.color = '#ef4444';
-                return;
-            }
-            const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
-            label.innerText = `${file.name} (${sizeMb} MB)`;
+            label.innerText = input.files[0].name;
             label.style.color = '#4ade80';
         } else {
             label.innerText = 'Tidak ada file yang dipilih';
@@ -690,12 +284,15 @@
         }
     }
 
-    // Submit form multipart/form-data ke backend
+    // ==============================================================
+    // SUBMIT DATA LANGSUNG KE BACKEND DATABASE ADMIN (/api/kirim-pesan-narahubung)
+    // ==============================================================
     async function handleFormSubmit(event) {
         event.preventDefault();
 
         const submitBtn = document.getElementById('btnSubmitPesan');
         const submitText = document.getElementById('btnSubmitText');
+        const alertBox = document.getElementById('narahubungAlertBox');
 
         const name = document.getElementById('senderName').value.trim();
         const contact = activeMethod === 'wa' ? document.getElementById('senderWA').value.trim() : document.getElementById('senderEmail').value.trim();
@@ -704,10 +301,11 @@
         const fileInput = document.getElementById('supportDoc');
 
         if (!name || !contact || !subject || !message) {
-            showAlert('error', 'Mohon lengkapi semua kolom wajib bertanda bintang (*).');
+            showAlert('error', 'Mohon lengkapi semua kolom wajib.');
             return;
         }
 
+        // Siapkan Payload Multipart Form Data
         const formData = new FormData();
         formData.append('name', name);
         formData.append('method', activeMethod);
@@ -719,6 +317,7 @@
             formData.append('supportDoc', fileInput.files[0]);
         }
 
+        // Status Loading
         submitBtn.disabled = true;
         submitBtn.style.opacity = '0.7';
         submitText.innerText = 'Mengirim Pesan ke Database...';
@@ -732,8 +331,9 @@
             const result = await response.json();
 
             if (result.status === 'success') {
-                showAlert('success', 'Pesan Anda berhasil terkirim dan tersimpan di database! Pengurus HMI KomKG UMI akan segera menindaklanjuti pesan Anda.');
+                showAlert('success', 'Pesan Anda berhasil terkirim dan tersimpan di database admin! Pengurus HMI KomKG UMI akan segera menindaklanjuti pesan Anda.');
                 
+                // Reset Form
                 document.getElementById('formNarahubung').reset();
                 document.getElementById('fileNameLabel').innerText = 'Tidak ada file yang dipilih';
                 document.getElementById('fileNameLabel').style.color = '#9ca3af';
@@ -774,107 +374,14 @@
 
         alertBox.style.display = 'block';
         if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        // Scroll halus menuju alert
         alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    // ==============================================================
-    // SCRIPT PENGGERAK API GOOGLE APPS SCRIPT (PERSIS SEPERTI INDEX.EJS)
-    // ==============================================================
     document.addEventListener('DOMContentLoaded', () => {
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbw8MA9YGFK3SIAXhIZAF9m1J4eOGf9LGQD-j4xXjvVSaQ826JrqeEKApPcKJWfJxw/exec";
-
-        let currentStats = { today: -1, week: -1, total: -1 };
-
-        function animateValue(obj, start, end, duration) {
-            if (start === end) return; 
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString('id-ID'); 
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        }
-
-        function updateUI(data, speed) {
-            if(data.today !== undefined && data.today !== currentStats.today) {
-                animateValue(document.getElementById('val-today'), Math.max(0, currentStats.today), data.today, speed);
-                currentStats.today = data.today;
-            }
-            if(data.week !== undefined && data.week !== currentStats.week) {
-                animateValue(document.getElementById('val-week'), Math.max(0, currentStats.week), data.week, speed);
-                currentStats.week = data.week;
-            }
-            if(data.total !== undefined && data.total !== currentStats.total) {
-                animateValue(document.getElementById('val-total'), Math.max(0, currentStats.total), data.total, speed);
-                currentStats.total = data.total;
-            }
-        }
-
-        async function fastFetchData() {
-            try {
-                const response = await fetch(GAS_URL + "?t=" + new Date().getTime());
-                const textResponse = await response.text(); 
-                
-                try {
-                    const data = JSON.parse(textResponse);
-                    updateUI(data, 1000);
-                } catch (jsonErr) {
-                    console.warn("GAS Redirect/CORS Error, menggunakan fallback UI.");
-                    setFallbackUI();
-                }
-            } catch (err) {
-                console.warn("Koneksi ke GAS lambat/gagal.", err);
-            }
-        }
-
-        async function recordVisitPost() {
-            try {
-                const ipResponse = await fetch('https://api.ipify.org?format=json');
-                const ipData = await ipResponse.json();
-                const clientIP = ipData.ip || 'Unknown';
-
-                const response = await fetch(GAS_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ ip: clientIP })
-                });
-
-                const textResponse = await response.text(); 
-                
-                try {
-                    const data = JSON.parse(textResponse);
-                    if(data.status === "success") {
-                        updateUI(data, 500);
-                    }
-                } catch (jsonErr) {
-                    // Berjalan secara silent
-                }
-            } catch (error) {
-                // Berjalan secara silent
-            }
-        }
-
-        function setFallbackUI() {
-            if(currentStats.today === -1) {
-                document.getElementById('val-today').innerHTML = "-";
-                document.getElementById('val-week').innerHTML = "-";
-                document.getElementById('val-total').innerHTML = "-";
-            }
-        }
-
-        fastFetchData();
-
-        setTimeout(() => { 
-            recordVisitPost(); 
-        }, 2000);
-
         if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 </script>
-<script src="/js/protect-devtools.js" defer></script>
 
 <%- include('partials/footer') %>
