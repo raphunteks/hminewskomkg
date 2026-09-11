@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 
 <!-- ==============================================================
-     LOGIKA ENGINE RENDERING MOZILLA PDF.JS (ANTI-PIPIH / RETINA SCALED)
+     LOGIKA ENGINE RENDERING MOZILLA PDF.JS (BLOCK CONTEXT & NON-FLAT SCROLL)
 ============================================================== -->
 <script>
     if (typeof pdfjsLib !== 'undefined') {
@@ -249,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
+        // Bersihkan halaman lama
         viewport.innerHTML = '';
 
         try {
@@ -262,22 +263,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (loader) loader.style.display = 'none';
 
-            // Hitung lebar target kontainer secara akurat
-            const containerWidth = viewport.clientWidth > 0 ? (viewport.clientWidth - 20) : (window.innerWidth - 40);
-            const targetWidth = Math.max(300, Math.min(800, containerWidth));
+            // Hitung lebar area pandang
+            const containerWidth = viewport.clientWidth > 0 ? viewport.clientWidth : window.innerWidth;
+            const targetWidth = Math.max(300, Math.min(850, containerWidth - 24));
             const dpr = Math.min(window.devicePixelRatio || 2, 2.5);
 
             for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
                 const page = await pdfDoc.getPage(pageNum);
                 const unscaledViewport = page.getViewport({ scale: 1.0 });
 
-                // Skala adaptif penuh agar dokumen tidak menyusut vertikal
+                // Skala proporsional penuh per halaman
                 const fitScale = targetWidth / unscaledViewport.width;
                 const renderViewport = page.getViewport({ scale: fitScale * dpr });
 
                 const cssWidth = Math.floor(unscaledViewport.width * fitScale);
                 const cssHeight = Math.floor(unscaledViewport.height * fitScale);
 
+                // Pembungkus halaman bergaya lembaran kertas block
                 const pageWrapper = document.createElement('div');
                 pageWrapper.className = 'pdf-page-wrapper';
                 pageWrapper.style.width = `${cssWidth}px`;
@@ -340,7 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
 ============================================================== -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Render PDF bawaan pertama kali dimuat
+    // Render PDF pertama kali
     renderContinuousPdf("<%= pdfList[0].file %>");
 
     const GAS_URL = "https://script.google.com/macros/s/AKfycbw8MA9YGFK3SIAXhIZAF9m1J4eOGf9LGQD-j4xXjvVSaQ826JrqeEKApPcKJWfJxw/exec";
