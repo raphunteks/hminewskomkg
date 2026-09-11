@@ -44,13 +44,13 @@
         {
           "@type": "ListItem",
           "position": <%= index + 1 %>,
-          "url": "https://hmikomkgumi.xyz/berita/<%= item.id %>",
+          "url": "https://hmikomkgumi.xyz/berita/<%= item.slug %>",
           "item": {
             "@type": "NewsArticle",
             "headline": <%- JSON.stringify(item.title) %>,
             "image": <%- JSON.stringify(item.image) %>,
             "datePublished": <%- JSON.stringify(item.date) %>,
-            "url": "https://hmikomkgumi.xyz/berita/<%= item.id %>",
+            "url": "https://hmikomkgumi.xyz/berita/<%= item.slug %>",
             "author": {
               "@type": "Organization",
               "name": "Admin HMI KomKG UMI"
@@ -68,7 +68,6 @@
 
 <script>
 // DYNAMIC META TAGS INJECTION (OPEN GRAPH & TWITTER)
-// Memastikan link tampil cantik saat di-share ke WhatsApp, FB, IG, Twitter
 document.addEventListener('DOMContentLoaded', () => {
     const metaTags = [
         { name: "description", content: "Website Resmi HMI Komisariat Kedokteran Gigi UMI. Update terbaru seputar kegiatan, proker, dan informasi komisariat." },
@@ -94,16 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-<!-- ================= END SUPER BIG UPGRADE SEO ================= -->
 
 <!-- POPUP PENGUMUMAN HORIZONTAL -->
 <% if (typeof siteSettings !== 'undefined' && (siteSettings.announceActive === 'true' || siteSettings.announceActive === true)) { %>
 <%- include('partials/announce') %>
 <% } %>
 
-<!-- ==============================================================
-     EXPERT SEO UPGRADE: Semantic WebSite Header
-============================================================== -->
+<!-- Semantic WebSite Header -->
 <header class="glass hero" itemscope itemtype="https://schema.org/WebSite">
     <link itemprop="url" href="https://hmikomkgumi.xyz"/>
     <span class="badge">Yakusa! Yakin Usaha Sampai</span>
@@ -113,7 +109,63 @@ document.addEventListener('DOMContentLoaded', () => {
 </header>
 
 <!-- ==============================================================
-     EXPERT SEO UPGRADE: Semantic Section & Navigation
+     SECTION: APA KATA KADER? (PERSIS GAYA GAMBAR 4)
+============================================================== -->
+<% 
+    let quotesList = (typeof kaderQuotes !== 'undefined' && Array.isArray(kaderQuotes) && kaderQuotes.length > 0) 
+        ? kaderQuotes 
+        : [
+            {
+                id: 1,
+                name: "ANDI FAJRIN PERDANA SAM",
+                role: "Ketua BEM KBMFKG UMI 2023-2024",
+                quote: "Pemenang yang sesungguhnya adalah ketika kamu mampu melawan amarah dengan kesabaran, dan memaafkan dengan ketulusan. Itulah sifat kader HMI yang sesungguhnya!",
+                image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=80",
+                ig: "https://www.instagram.com/",
+                email: "hmikomkedokgigiumi.190120@gmail.com"
+            }
+        ];
+%>
+<section class="kader-quote-section" aria-label="Apa Kata Kader HMI">
+    <div class="section-header" style="margin-top: 50px;">
+        <div>
+            <h2>Apa Kata Kader?</h2>
+            <p class="text-muted">Inspirasi, refleksi, dan pandangan perjuangan kader HMI KomKG UMI</p>
+        </div>
+    </div>
+
+    <div class="kader-quote-wrapper">
+        <% quotesList.forEach(item => { %>
+            <div class="kader-card">
+                <div class="kader-img-container">
+                    <img src="<%= item.image %>" alt="Foto <%= item.name %>" class="kader-photo" onerror="this.src='/img/logo-hmikomkgumi.png'" loading="lazy" decoding="async">
+                    
+                    <div class="kader-quote-box glass">
+                        <p class="kader-quote-text">“<%= item.quote %>”</p>
+                        <h3 class="kader-name"><%= item.name %></h3>
+                        <p class="kader-role"><%= item.role %></p>
+                        
+                        <div class="kader-social-links">
+                            <% if (item.ig && item.ig.trim() !== '') { %>
+                                <a href="<%= item.ig %>" target="_blank" rel="noopener noreferrer" class="kader-social-icon" aria-label="Instagram <%= item.name %>">
+                                    <i data-lucide="instagram"></i>
+                                </a>
+                            <% } %>
+                            <% if (item.email && item.email.trim() !== '') { %>
+                                <a href="mailto:<%= item.email %>" class="kader-social-icon" aria-label="Email <%= item.name %>">
+                                    <i data-lucide="mail"></i>
+                                </a>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+</section>
+
+<!-- ==============================================================
+     SECTION: BERITA & INFORMASI (MURNI MENGGUNAKAN ITEM.SLUG)
 ============================================================== -->
 <section>
     <div class="section-header" style="margin-top: 50px;">
@@ -129,10 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     </div>
 
-    <!-- ==============================================================
-         EXPERT SEO UPGRADE: ItemList & NewsArticle Microdata
-         (Didesain dengan display:contents agar layout Grid tidak rusak)
-    ============================================================== -->
     <div class="grid-3" itemscope itemtype="https://schema.org/ItemList">
         <meta itemprop="itemListOrder" content="https://schema.org/ItemListOrderDescending" />
         
@@ -142,12 +190,11 @@ document.addEventListener('DOMContentLoaded', () => {
             <article itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" style="display:contents;">
                 <meta itemprop="position" content="<%= index + 1 %>" />
                 
-                <a href="/berita/<%= item.id %>" class="glass news-card" itemprop="item" itemscope itemtype="https://schema.org/NewsArticle">
-                    <meta itemprop="url" content="https://hmikomkgumi.xyz/berita/<%= item.id %>">
+                <a href="/berita/<%= item.slug %>" class="glass news-card" itemprop="item" itemscope itemtype="https://schema.org/NewsArticle">
+                    <meta itemprop="url" content="https://hmikomkgumi.xyz/berita/<%= item.slug %>">
                     <meta itemprop="author" content="Admin HMI KomKG UMI">
                     
                     <div class="card-img-wrap">
-                        <!-- OPTIMASI 4: NATIVE LAZY LOADING & ASYNC DECODING (Dengan itemprop Image) -->
                         <img itemprop="image" src="<%= item.image %>" alt="Cover Berita: <%= item.title %>" loading="lazy" decoding="async" width="400" height="200">
                         <div class="card-badge" itemprop="articleSection"><%= item.category %></div>
                     </div>
@@ -177,10 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <%- include('partials/instagram-feed') %>
 
-<!-- ==============================================================
-     SUPER BIG UPGRADE: DASHBOARD ANALYTICS WIDGET
-     Versi Anti-Error CORS & Fast Response
-============================================================== -->
+<!-- DASHBOARD ANALYTICS WIDGET -->
 <section class="analytics-section" aria-label="Statistik Kunjungan Website">
     <div class="analytics-grid">
         <div class="analytic-card">
@@ -207,10 +251,8 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- SCRIPT PENGGERAK API GOOGLE APPS SCRIPT -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // --- GANTI DENGAN URL DEPLOYMENT GOOGLE SCRIPT YANG BARU ---
     const GAS_URL = "https://script.google.com/macros/s/AKfycbw8MA9YGFK3SIAXhIZAF9m1J4eOGf9LGQD-j4xXjvVSaQ826JrqeEKApPcKJWfJxw/exec";
 
-    // Variabel state untuk mencegah update animasi berulang
     let currentStats = { today: -1, week: -1, total: -1 };
 
     function animateValue(obj, start, end, duration) {
@@ -242,10 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // TAHAP 1: FAST FETCH (Memuat data dalam milidetik)
     async function fastFetchData() {
         try {
-            // Parameter ?t= mencegah HP melakukan Cache angka lama
             const response = await fetch(GAS_URL + "?t=" + new Date().getTime());
             const textResponse = await response.text(); 
             
@@ -261,7 +301,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // TAHAP 2: SILENT POST (Merekam IP Pengunjung di Latar Belakang)
     async function recordVisitPost() {
         try {
             const ipResponse = await fetch('https://api.ipify.org?format=json');
@@ -279,10 +318,10 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const data = JSON.parse(textResponse);
                 if(data.status === "success") {
-                    updateUI(data, 500); // Update halus jika angka bertambah
+                    updateUI(data, 500);
                 }
             } catch (jsonErr) {
-                // Abaikan error HTML karena UI sudah terisi oleh GET sebelumnya
+                // Abaikan error parsing HTML
             }
         } catch (error) {
             // Berjalan secara silent
@@ -297,22 +336,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // EKSEKUSI TAHAP 1: Langsung muat data agar pengunjung instan melihat angka!
     fastFetchData();
 
-    // EKSEKUSI TAHAP 2: Rekam IP pengunjung di belakang layar setelah 2 detik
     setTimeout(() => { 
         recordVisitPost(); 
     }, 2000);
 
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 });
 </script>
 
-<!-- ==============================================================
-     SUPER BIG UPGRADE: FLOATING WHATSAPP CHAT POPUP WIDGET (PERSIS GAMBAR 3)
-============================================================== -->
+<!-- FLOATING WHATSAPP CHAT POPUP WIDGET -->
 <div class="wa-widget-container" id="waWidgetContainer">
-    <!-- Pop-up Card -->
     <div class="wa-chat-box" id="waChatBox">
         <div class="wa-box-header">
             <div class="wa-header-left">
@@ -345,7 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     </div>
 
-    <!-- Floating Trigger Button -->
     <button type="button" class="wa-floating-btn" id="waToggleBtn" aria-label="Buka Chat WhatsApp" title="Chat WhatsApp Admin">
         <svg viewBox="0 0 24 24" width="34" height="34" fill="#ffffff">
             <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.37-.44.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1s.9 2.44 1.03 2.61c.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.61.19 1.16.17 1.6.1 1.49-.07 1.47-.61 1.68-1.2.21-.59.21-1.1.15-1.2-.06-.11-.23-.17-.48-.3"></path>
@@ -353,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </button>
 </div>
 
-<!-- SCRIPT PENGGERAK WIDGET WHATSAPP CHAT -->
+<!-- SCRIPT WIDGET WHATSAPP CHAT -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const waToggleBtn = document.getElementById('waToggleBtn');
@@ -362,7 +396,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const waSubmitBtn = document.getElementById('waSubmitBtn');
     const waCustomMessage = document.getElementById('waCustomMessage');
 
-    // Toggle Tampilkan Box
     if (waToggleBtn && waChatBox) {
         waToggleBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -373,7 +406,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Tutup Box via tombol silang (X)
     if (waCloseBtn && waChatBox) {
         waCloseBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -381,7 +413,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Tutup otomatis jika klik di luar box
     document.addEventListener('click', (e) => {
         if (waChatBox && waChatBox.classList.contains('active')) {
             if (!waChatBox.contains(e.target) && !waToggleBtn.contains(e.target)) {
@@ -390,13 +421,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Kirim pesan custom ke WhatsApp Admin
     if (waSubmitBtn) {
         waSubmitBtn.addEventListener('click', () => {
             const rawMsg = (waCustomMessage ? waCustomMessage.value : '').trim();
             const msg = rawMsg || "Halo Admin HMI KomKG UMI, saya ingin bertanya seputar informasi kegiatan komisariat.";
-            
-            // Format URL WhatsApp persis sesuai instruksi Anda
             const waUrl = "https://api.whatsapp.com/send/?phone=6285338922586&text=" + encodeURIComponent(msg) + "&type=phone_number&app_absent=0";
             
             window.open(waUrl, '_blank');
