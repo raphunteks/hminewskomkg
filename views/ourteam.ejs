@@ -30,7 +30,7 @@
       "name": "Daftar Tim Pengembang",
       "itemListElement": [
         <% devTeam.forEach((member, index) => { 
-            let memberImg = (member.image && member.image.trim() !== '') ? member.image : (seoBaseUrl + defaultAvatar);
+            let memberImg = (member.image && member.image.trim() !== '') ? member.image.trim() : (seoBaseUrl + defaultAvatar);
             if (!memberImg.startsWith('http')) {
                 memberImg = seoBaseUrl + (memberImg.startsWith('/') ? '' : '/') + memberImg;
             }
@@ -84,6 +84,83 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
+
+<style>
+    /* ==============================================================
+       STYLING ANALYTICS WIDGET (VIEWS TODAY, THIS WEEK, TOTAL VIEWS)
+       PERSIS SEPERTI DI INDEX.EJS
+    ============================================================== */
+    .analytics-section {
+        margin-top: 50px;
+        width: 100%;
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .analytic-card {
+        background: rgba(22, 27, 34, 0.78);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(74, 222, 128, 0.28);
+        border-radius: 18px;
+        padding: 18px 20px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .analytic-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(74, 222, 128, 0.5);
+        box-shadow: 0 12px 32px rgba(74, 222, 128, 0.12);
+    }
+
+    .analytic-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #94a3b8;
+        letter-spacing: 0.8px;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+
+    .analytic-value {
+        font-size: 1.65rem;
+        font-weight: 800;
+        font-family: 'JetBrains Mono', monospace;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+    }
+
+    .stat-today { color: #4ade80; }
+    .stat-week { color: #38bdf8; }
+    .stat-total { color: #fbbf24; }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .spin-icon {
+        animation: spin 1s linear infinite;
+        width: 22px;
+        height: 22px;
+        color: #94a3b8;
+    }
+
+    @media (max-width: 680px) {
+        .analytics-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+    }
+</style>
 
 <section class="container" style="margin-top: 40px; margin-bottom: 80px;">
     <!-- HEADER CREDITS -->
@@ -157,9 +234,137 @@ document.addEventListener('DOMContentLoaded', () => {
         <% } %>
     <% }) %>
 
+    <!-- ==============================================================
+         SUPER BIG UPGRADE: DASHBOARD ANALYTICS WIDGET
+         (PERSIS SEPERTI DI INDEX.EJS)
+    ============================================================== -->
+    <section class="analytics-section" aria-label="Statistik Kunjungan Website">
+        <div class="analytics-grid">
+            <div class="analytic-card">
+                <h4 class="analytic-title">VIEWS TODAY</h4>
+                <div class="analytic-value stat-today" id="val-today">
+                    <i data-lucide="loader-2" class="spin-icon"></i>
+                </div>
+            </div>
+            <div class="analytic-card">
+                <h4 class="analytic-title">THIS WEEK</h4>
+                <div class="analytic-value stat-week" id="val-week">
+                    <i data-lucide="loader-2" class="spin-icon"></i>
+                </div>
+            </div>
+            <div class="analytic-card">
+                <h4 class="analytic-title">TOTAL VIEWS</h4>
+                <div class="analytic-value stat-total" id="val-total">
+                    <i data-lucide="loader-2" class="spin-icon"></i>
+                </div>
+            </div>
+        </div>
+    </section>
 </section>
 
-<!-- PROTECT INSPECT DEVTOOLS (Memblokir klik kanan, F12, Inspect Element) -->
+<!-- ==============================================================
+     SCRIPT PENGGERAK API GOOGLE APPS SCRIPT (PERSIS INDEX.EJS)
+============================================================== -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbw8MA9YGFK3SIAXhIZAF9m1J4eOGf9LGQD-j4xXjvVSaQ826JrqeEKApPcKJWfJxw/exec";
+
+    let currentStats = { today: -1, week: -1, total: -1 };
+
+    function animateValue(obj, start, end, duration) {
+        if (start === end) return; 
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString('id-ID'); 
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    function updateUI(data, speed) {
+        if(data.today !== undefined && data.today !== currentStats.today) {
+            animateValue(document.getElementById('val-today'), Math.max(0, currentStats.today), data.today, speed);
+            currentStats.today = data.today;
+        }
+        if(data.week !== undefined && data.week !== currentStats.week) {
+            animateValue(document.getElementById('val-week'), Math.max(0, currentStats.week), data.week, speed);
+            currentStats.week = data.week;
+        }
+        if(data.total !== undefined && data.total !== currentStats.total) {
+            animateValue(document.getElementById('val-total'), Math.max(0, currentStats.total), data.total, speed);
+            currentStats.total = data.total;
+        }
+    }
+
+    // TAHAP 1: FAST FETCH (Memuat data dalam milidetik)
+    async function fastFetchData() {
+        try {
+            const response = await fetch(GAS_URL + "?t=" + new Date().getTime());
+            const textResponse = await response.text(); 
+            
+            try {
+                const data = JSON.parse(textResponse);
+                updateUI(data, 1000);
+            } catch (jsonErr) {
+                console.warn("GAS Redirect/CORS Error, menggunakan fallback UI.");
+                setFallbackUI();
+            }
+        } catch (err) {
+            console.warn("Koneksi ke GAS lambat/gagal.", err);
+        }
+    }
+
+    // TAHAP 2: SILENT POST (Merekam IP Pengunjung di Latar Belakang)
+    async function recordVisitPost() {
+        try {
+            const ipResponse = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipResponse.json();
+            const clientIP = ipData.ip || 'Unknown';
+
+            const response = await fetch(GAS_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ ip: clientIP })
+            });
+
+            const textResponse = await response.text(); 
+            
+            try {
+                const data = JSON.parse(textResponse);
+                if(data.status === "success") {
+                    updateUI(data, 500);
+                }
+            } catch (jsonErr) {
+                // Berjalan secara silent
+            }
+        } catch (error) {
+            // Berjalan secara silent
+        }
+    }
+
+    function setFallbackUI() {
+        if(currentStats.today === -1) {
+            document.getElementById('val-today').innerHTML = "-";
+            document.getElementById('val-week').innerHTML = "-";
+            document.getElementById('val-total').innerHTML = "-";
+        }
+    }
+
+    fastFetchData();
+
+    setTimeout(() => { 
+        recordVisitPost(); 
+    }, 2000);
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+});
+</script>
+
+<!-- PROTECT INSPECT DEVTOOLS -->
 <script src="/js/protect-devtools.js" defer></script>
 
 <%- include('partials/footer') %>
