@@ -4,6 +4,8 @@
     // ==============================================================
     let page = 'ourteam';
     let pageTitle = 'Developer Team';
+    const defaultAvatar = '/img/logo-hmikomkgumi.png';
+    const seoBaseUrl = 'https://hmikomkgumi.xyz';
 %>
 <%- include('partials/header', { page: page, pageTitle: pageTitle }) %>
 
@@ -17,25 +19,30 @@
   "@graph": [
     {
       "@type": "AboutPage",
-      "@id": "https://hmikomkgumi.xyz/ourteam/#webpage",
-      "url": "https://hmikomkgumi.xyz/ourteam",
+      "@id": "<%= seoBaseUrl %>/ourteam/#webpage",
+      "url": "<%= seoBaseUrl %>/ourteam",
       "name": "Developer Team | HMI KomKG UMI",
       "description": "Sosok dibalik layar pengembangan Sistem Informasi BEM KBMFKG UMI & HMI KomKG UMI."
     }
-    <% if(typeof devTeam !== 'undefined' && devTeam.length > 0) { %>
+    <% if(typeof devTeam !== 'undefined' && devTeam && devTeam.length > 0) { %>
     , {
       "@type": "ItemList",
       "name": "Daftar Tim Pengembang",
       "itemListElement": [
-        <% devTeam.forEach((member, index) => { %>
+        <% devTeam.forEach((member, index) => { 
+            let memberImg = (member.image && member.image.trim() !== '') ? member.image : (seoBaseUrl + defaultAvatar);
+            if (!memberImg.startsWith('http')) {
+                memberImg = seoBaseUrl + (memberImg.startsWith('/') ? '' : '/') + memberImg;
+            }
+        %>
         {
           "@type": "ListItem",
           "position": <%= index + 1 %>,
           "item": {
             "@type": "Person",
-            "name": <%- JSON.stringify(member.name) %>,
-            "jobTitle": <%- JSON.stringify(member.role) %>,
-            "image": <%- JSON.stringify(member.image) %>,
+            "name": <%- JSON.stringify(member.name || 'Developer') %>,
+            "jobTitle": <%- JSON.stringify(member.role || 'Contributor') %>,
+            "image": <%- JSON.stringify(memberImg) %>,
             "affiliation": {
               "@type": "Organization",
               "name": "HMI KomKG UMI"
@@ -61,7 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { property: "og:title", content: "Developer Team | HMI KomKG UMI" },
         { property: "og:description", content: "Sosok dibalik layar pengembangan Sistem Informasi web HMI KomKG UMI." },
         { property: "og:type", content: "website" },
-        { property: "og:url", content: "https://hmikomkgumi.xyz/ourteam" }
+        { property: "og:url", content: "<%= seoBaseUrl %>/ourteam" },
+        { property: "og:image", content: "<%= seoBaseUrl %><%= defaultAvatar %>" }
     ];
 
     metaTags.forEach(tag => {
@@ -93,10 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
             { name: 'Frontend Development', icon: 'layout-template' },
             { name: 'UI/UX Design (CSS)', icon: 'pen-tool' }
         ];
+
+        const safeTeam = (typeof devTeam !== 'undefined' && Array.isArray(devTeam)) ? devTeam : [];
     %>
 
     <% categories.forEach(cat => { %>
-        <% const members = devTeam.filter(m => m.category === cat.name); %>
+        <% const members = safeTeam.filter(m => m.category === cat.name); %>
         <% if(members.length > 0) { %>
             
             <div class="dev-category-wrap">
@@ -109,12 +119,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <!-- GRID CARDS -->
-                <!-- Jika FullStack (atau cuma 1 orang), gunakan 1 kolom di tengah. Sisanya 2 kolom -->
                 <div class="<%= members.length === 1 ? 'grid-dev-1' : 'grid-dev-2' %>">
-                    <% members.forEach(member => { %>
+                    <% members.forEach(member => { 
+                        // Sanitasi URL Foto: jika kosong / tidak ada, pakai defaultAvatar
+                        let photoSrc = (member.image && member.image.trim() !== '') ? member.image.trim() : defaultAvatar;
+                    %>
                         <div class="dev-card">
                             <div class="dev-avatar-wrap">
-                                <img src="<%= member.image || '/img/logo-hmikomkgumi.png' %>" alt="<%= member.name %>" loading="lazy" decoding="async">
+                                <img src="<%= photoSrc %>" 
+                                     alt="<%= member.name %>" 
+                                     loading="lazy" 
+                                     decoding="async"
+                                     onerror="this.onerror=null; this.src='<%= defaultAvatar %>';">
                             </div>
                             <h3 class="dev-name"><%= member.name %></h3>
                             <p class="dev-role"><%= member.role %></p>
@@ -123,14 +139,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="dev-divider"></div>
                             
                             <div class="dev-social">
-                                <% if(member.ig) { %>
+                                <% if(member.ig && member.ig.trim() !== '') { %>
                                     <a href="<%= member.ig %>" target="_blank" rel="noopener noreferrer" aria-label="Instagram <%= member.name %>">
-                                        <!-- Inline SVG Instagram untuk menjamin selalu tampil seketika -->
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
                                     </a>
                                 <% } else { %>
                                     <span style="opacity:0.3;" title="Tidak ada Instagram">
-                                        <!-- Inline SVG Instagram untuk menjamin selalu tampil seketika -->
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
                                     </span>
                                 <% } %>
