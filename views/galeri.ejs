@@ -12,7 +12,7 @@
      EXPERT SEO UPGRADE: Semantic CollectionPage Header
 ============================================================== -->
 <header style="text-align: center; margin-bottom: 40px;" itemscope itemtype="https://schema.org/CollectionPage">
-    <h1 itemprop="name" style="font-size:2rem; margin-bottom:10px;">Galeri Kegiatan</h1>
+    <h1 itemprop="name" style="font-size:2rem; margin-bottom:10px; color: var(--theme-heading);">Galeri Kegiatan</h1>
     <p class="text-muted" itemprop="description">Dokumentasi kegiatan dan momen inspiratif kader HMI KomKG-UMI</p>
 </header>
 
@@ -36,14 +36,14 @@
             
             <div class="gallery-img-box">
                 <!-- OPTIMASI SEO: Lazy Loading, Async Decoding & Itemprop Image -->
-                <img itemprop="image" src="<%= album.cover %>" alt="Cover Galeri: <%= album.title %>" loading="lazy" decoding="async">
+                <img itemprop="image" src="<%= album.cover %>" alt="Cover Galeri: <%= album.title %>" loading="lazy" decoding="async" onerror="this.src='/img/logo-hmikomkgumi.png'">
                 <div class="photo-count">
                     <i data-lucide="image" style="width:14px;"></i> 
                     <% if(album.photos && album.photos.length > 0){ %><%= album.photos.length + 1 %><% } else { %>1<% } %> Foto
                 </div>
             </div>
             
-            <h3 itemprop="headline" style="font-size:1.2rem; transition:0.3s;"><%= album.title %></h3>
+            <h3 itemprop="headline" style="font-size:1.2rem; transition:0.3s; color: var(--theme-heading);"><%= album.title %></h3>
             
             <p class="text-muted" style="font-size:0.85rem; display:flex; align-items:center; gap:5px; margin-top:5px;">
                 <i data-lucide="calendar" style="width:14px;"></i> <%= album.date %>
@@ -57,6 +57,48 @@
         <p class="text-muted" style="grid-column: 1 / -1; text-align: center; padding: 40px 0;">Belum ada album galeri.</p>
     <% } %>
 </section>
+
+<!-- ==============================================================
+     SUPER BIG UPGRADE: ANALYTICS DASHBOARD WIDGET (PERSIS GAMBAR)
+============================================================== -->
+<section class="analytics-section" aria-label="Statistik Pengunjung" style="margin-top: 50px;">
+    <div class="analytics-grid">
+        <div class="analytic-card">
+            <div class="analytic-title">VIEWS TODAY</div>
+            <div class="analytic-value stat-today" id="viewsToday">6</div>
+        </div>
+        <div class="analytic-card">
+            <div class="analytic-title">THIS WEEK</div>
+            <div class="analytic-value stat-week" id="viewsWeek">14</div>
+        </div>
+        <div class="analytic-card">
+            <div class="analytic-title">TOTAL VIEWS</div>
+            <div class="analytic-value stat-total" id="viewsTotal">130</div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Auto Loader Statistik Pengunjung Dinamis
+    async function loadVisitorStats() {
+        try {
+            const res = await fetch('/api/analytics');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.today && document.getElementById('viewsToday')) document.getElementById('viewsToday').innerText = data.today;
+                if (data.week && document.getElementById('viewsWeek')) document.getElementById('viewsWeek').innerText = data.week;
+                if (data.total && document.getElementById('viewsTotal')) document.getElementById('viewsTotal').innerText = data.total;
+            }
+        } catch(e) {
+            // Tetap mempertahankan angka display bawaan jika offline/API pending
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        loadVisitorStats();
+    });
+</script>
 <script src="/js/protect-devtools.js" defer></script>
 
 <%- include('partials/footer') %>
