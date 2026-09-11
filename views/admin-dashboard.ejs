@@ -5,8 +5,8 @@
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
 <% 
-    // Fallback data pesan narahubung aman dari error
     let safeMessages = (typeof contactMessages !== 'undefined' && Array.isArray(contactMessages)) ? contactMessages : [];
+    let safeKaderQuotes = (typeof kaderQuotes !== 'undefined' && Array.isArray(kaderQuotes)) ? kaderQuotes : [];
 %>
 
 <!-- ==============================================================
@@ -56,6 +56,11 @@
             <button type="button" class="sidebar-nav-item" onclick="openAdmTab('adm-kelola', this)" title="Kelola Data">
                 <div class="sidebar-nav-icon-wrap"><i data-lucide="database"></i></div>
                 <span class="sidebar-text">Kelola Data</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" onclick="openAdmTab('adm-kaderquote', this)" title="Apa Kata Kader?">
+                <div class="sidebar-nav-icon-wrap"><i data-lucide="quote"></i></div>
+                <span class="sidebar-text">Apa Kata Kader?</span>
             </button>
 
             <button type="button" class="sidebar-nav-item" onclick="openAdmTab('adm-setelan', this)" title="Header, Footer, Tentang & Narahubung">
@@ -191,7 +196,7 @@
             </div>
         </div>
 
-        <!-- TAB 1: KELOLA DATA UTAMA (BERITA DENGAN URL SLUG TERPADU) -->
+        <!-- TAB 1: KELOLA DATA UTAMA (BERITA DENGAN SLUG MURNI) -->
         <div id="adm-kelola" class="admin-tab-pane" style="display: none;">
             <div class="admin-layout">
                 <div class="admin-main-content">
@@ -211,24 +216,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% news.forEach(item => { 
-                                        let itemSlug = item.slug || item.id;
-                                    %>
+                                    <% news.forEach(item => { %>
                                     <tr>
                                         <td class="fw-600">
                                             <span style="color:var(--theme-heading);"><%= item.title %></span>
                                             <div style="font-size:0.75rem; color:#16a34a; margin-top:3px; display:flex; align-items:center; gap:8px;">
                                                 <span><i data-lucide="calendar" style="width:12px; display:inline;"></i> <%= item.date %></span>
                                                 <span>•</span>
-                                                <a href="/berita/<%= itemSlug %>" target="_blank" style="color:#38bdf8; text-decoration:none; display:inline-flex; align-items:center; gap:3px;">
-                                                    <i data-lucide="link" style="width:12px;"></i> /berita/<%= itemSlug %>
+                                                <a href="/berita/<%= item.slug %>" target="_blank" style="color:#38bdf8; text-decoration:none; display:inline-flex; align-items:center; gap:3px;">
+                                                    <i data-lucide="link" style="width:12px;"></i> /berita/<%= item.slug %>
                                                 </a>
                                             </div>
                                         </td>
                                         <td><span class="cat-badge"><%= item.category %></span></td>
                                         <td class="td-actions">
                                             <div id="raw-content-<%= item.id %>" style="display: none;"><%- item.content %></div>
-                                            <a href="/berita/<%= itemSlug %>" target="_blank" class="action-btn" style="color:#38bdf8;" title="Lihat Berita Live"><i data-lucide="external-link"></i></a>
+                                            <a href="/berita/<%= item.slug %>" target="_blank" class="action-btn" style="color:#38bdf8;" title="Lihat Berita Live"><i data-lucide="external-link"></i></a>
                                             <button type="button" class="action-btn" style="color:var(--theme-text);" onclick="openKelolaFotoBerita('<%= item.id %>')" title="Kelola Foto"><i data-lucide="image-plus"></i></button>
                                             <button type="button" class="action-btn edit" onclick="openEditBeritaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.category %>', '<%= item.date %>', '<%= (item.slug || '').replace(/'/g, "\\'") %>')" title="Edit Berita"><i data-lucide="edit"></i></button>
                                             <form action="/admin/hapus-berita/<%= item.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus berita?')"><i data-lucide="trash-2"></i></button></form>
@@ -409,7 +412,7 @@
                                 <div style="display:flex; gap:5px;">
                                     <button type="button" class="action-btn" style="color:var(--theme-text);" onclick="window.open('<%= item.file %>', '_blank')" title="Lihat PDF"><i data-lucide="eye"></i></button>
                                     <button type="button" class="action-btn edit" onclick="openEditDataAnggotaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.date %>')" title="Edit Data"><i data-lucide="edit"></i></button>
-                                    <form action="/admin/hapus-data-anggota/<%= item.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus PDF ini? Jika ini satu-satunya data, web akan kembali ke file default bawaan.')" title="Hapus Data"><i data-lucide="trash-2"></i></button></form>
+                                    <form action="/admin/hapus-data-anggota/<%= item.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus PDF ini?')" title="Hapus Data"><i data-lucide="trash-2"></i></button></form>
                                 </div>
                             </div>
                             <% }) %>
@@ -430,6 +433,67 @@
             </div>
         </div>
 
+        <!-- TAB: APA KATA KADER? (TESTIMONI / KUTIPAN KADER) -->
+        <div id="adm-kaderquote" class="admin-tab-pane" style="display: none;">
+            <div class="glass admin-panel" style="max-width:1000px; margin:0 auto; border-top: 4px solid #10b981;">
+                <div class="panel-header">
+                    <h3 class="panel-title" style="color:#10b981;"><i data-lucide="quote" style="color:#10b981;"></i> Kelola Section "Apa Kata Kader?"</h3>
+                    <div class="panel-actions">
+                        <button class="btn btn-primary" onclick="openModal('modalKaderQuote')" style="padding:8px 15px; font-size:0.85rem;">+ Tambah Kutipan Kader</button>
+                    </div>
+                </div>
+                
+                <p class="text-muted" style="font-size:0.85rem; margin-bottom: 20px;">
+                    Kutipan dan foto kader ini ditampilkan di Beranda sebelum section Berita & Informasi dengan kartu melayang (floating card) bergaya modern persis Gambar 4.
+                </p>
+
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Foto</th>
+                                <th>Nama & Jabatan</th>
+                                <th>Kutipan (Quote)</th>
+                                <th>Kontak Sosmed</th>
+                                <th style="text-align:right;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% safeKaderQuotes.forEach(q => { %>
+                            <tr>
+                                <td>
+                                    <img src="<%= q.image || '/img/logo-hmikomkgumi.png' %>" onerror="this.src='/img/logo-hmikomkgumi.png'" style="width:48px; height:48px; border-radius:10px; object-fit:cover; border:2px solid #10b981;">
+                                </td>
+                                <td>
+                                    <strong style="color:var(--theme-heading);"><%= q.name %></strong><br>
+                                    <small style="color:#10b981; font-weight:700;"><%= q.role %></small>
+                                </td>
+                                <td>
+                                    <p style="font-size:0.82rem; color:var(--theme-muted); max-width:320px; line-height:1.5; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                                        “<%= q.quote %>”
+                                    </p>
+                                </td>
+                                <td>
+                                    <div style="display:flex; gap:6px;">
+                                        <% if (q.ig) { %><a href="<%= q.ig %>" target="_blank" class="cat-badge" style="color:#e1306c;"><i data-lucide="instagram" style="width:12px;"></i></a><% } %>
+                                        <% if (q.email) { %><a href="mailto:<%= q.email %>" class="cat-badge" style="color:#0284c7;"><i data-lucide="mail" style="width:12px;"></i></a><% } %>
+                                    </div>
+                                </td>
+                                <td class="td-actions">
+                                    <button type="button" class="action-btn edit" onclick="openEditKaderQuoteModal('<%= q.id %>', '<%= q.name.replace(/'/g, "\\'") %>', '<%= q.role.replace(/'/g, "\\'") %>', '<%= q.quote.replace(/'/g, "\\'").replace(/\n/g, ' ') %>', '<%= (q.ig || '').replace(/'/g, "\\'") %>', '<%= (q.email || '').replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-kader-quote/<%= q.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus kutipan kader ini?')"><i data-lucide="trash-2"></i></button></form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                            <% if (safeKaderQuotes.length === 0) { %>
+                                <tr><td colspan="5" style="text-align:center; padding:30px; opacity:0.6;">Belum ada kutipan kader.</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- TAB 2: SETELAN HEADER, FOOTER, TENTANG & NARAHUBUNG -->
         <div id="adm-setelan" class="admin-tab-pane" style="display: none;">
             <div class="grid-2">
@@ -443,7 +507,10 @@
                             <div class="form-group"><label>Teks Logo Kiri (Awal)</label><input type="text" name="headerTitle" class="input-control" value="<%= siteSettings.headerTitle %>"></div>
                             <div class="form-group"><label>Teks Logo Kanan (Warna Hijau)</label><input type="text" name="headerHighlight" class="input-control" value="<%= siteSettings.headerHighlight %>"></div>
                             <div class="form-group"><label>Teks Bawah Logo</label><input type="text" name="headerSubtitle" class="input-control" value="<%= siteSettings.headerSubtitle %>"></div>
-                            <div class="form-group"><label>Logo Header & Favicon</label><input type="file" name="headerLogo" class="input-control file-compress" accept="image/*"></div>
+                            <div class="form-group">
+                                <label>Logo Header & Favicon <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                                <input type="file" name="headerLogo" class="input-control file-compress" accept="image/*">
+                            </div>
 
                             <h4 style="color:#16a34a; margin-top:35px; margin-bottom:15px; border-bottom:1px solid var(--theme-glass-border); padding-bottom:10px; display:flex; align-items:center; gap:8px;">
                                 <i data-lucide="search" style="width:18px;"></i> Setelan SEO & Open Graph
@@ -459,7 +526,7 @@
                                 <input type="text" name="seoKeywords" class="input-control" value="<%= siteSettings.seoKeywords %>">
                             </div>
                             <div class="form-group">
-                                <label>Cover / Thumbnail Link (OG Image)</label>
+                                <label>Cover / Thumbnail Link (OG Image) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
                                 <input type="file" name="seoImage" class="input-control file-compress" accept="image/*">
                                 <% if(siteSettings.seoImage) { %>
                                     <div style="margin-top:10px;">
@@ -476,7 +543,10 @@
                     <div class="glass admin-panel" style="margin-bottom:0; border-top: 4px solid #3b82f6;">
                         <h3 class="panel-title" style="margin-bottom:20px; color: #60a5fa;"><i data-lucide="panel-bottom"></i> Setelan Footer</h3>
                         <form action="/admin/setelan-footer" method="POST" enctype="multipart/form-data">
-                            <div class="form-group"><label>Logo Footer</label><input type="file" name="footerLogo" class="input-control file-compress" accept="image/*"></div>
+                            <div class="form-group">
+                                <label>Logo Footer <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                                <input type="file" name="footerLogo" class="input-control file-compress" accept="image/*">
+                            </div>
                             <div class="form-group"><label>Teks Judul Footer</label><input type="text" name="footerTitle" class="input-control" value="<%= siteSettings.footerTitle %>"></div>
                             <div class="form-group"><label>Deskripsi Footer</label><textarea name="footerDesc" class="input-control" rows="3"><%= siteSettings.footerDesc %></textarea></div>
                             <div class="form-group"><label>Teks Hak Cipta (Copyright)</label><input type="text" name="footerCopyright" class="input-control" value="<%= siteSettings.footerCopyright %>"></div>
@@ -788,7 +858,10 @@
                         <label for="announceActive" style="margin:0; color:#16a34a; cursor:pointer;">Aktifkan Pop-up Pengumuman</label>
                     </div>
                     <div class="form-group"><label>Judul Pengumuman</label><input type="text" name="announceTitle" class="input-control" value="<%= siteSettings.announceTitle %>"></div>
-                    <div class="form-group"><label>Upload Poster</label><input type="file" name="announceImage" class="input-control file-compress" accept="image/*"></div>
+                    <div class="form-group">
+                        <label>Upload Poster <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                        <input type="file" name="announceImage" class="input-control file-compress" accept="image/*">
+                    </div>
                     <div class="form-group"><label>Isi Teks Pengumuman</label><textarea name="announceContent" class="input-control" rows="6"><%= cleanText(siteSettings.announceContent) %></textarea></div>
                     <button type="submit" class="btn btn-primary submit-btn" style="width:100%;">Simpan Setelan Pengumuman</button>
                 </form>
@@ -841,7 +914,7 @@
 </div>
 
 <!-- ==============================================================
-     MODAL BERITA (DILENGKAPI INPUT SLUG CUSTOM SEO)
+     MODAL BERITA (REVISI KONTRAS SLUG SESUAI GAMBAR 3)
 ============================================================== -->
 <!-- 1. MODAL TAMBAH BERITA -->
 <div class="modal-overlay" id="modalBerita">
@@ -853,18 +926,22 @@
                 <input type="text" name="title" id="tambahBeritaTitle" class="input-control" required oninput="autoGenerateSlug('tambahBeritaTitle', 'tambahBeritaSlug')">
             </div>
             <div class="form-group">
-                <label>URL Slug SEO (Opsional)</label>
-                <div style="display:flex; align-items:center; background:rgba(0,0,0,0.05); border:1px solid var(--theme-glass-border); border-radius:10px; padding:0 12px;">
-                    <span style="color:#9ca3af; font-size:0.85rem; user-select:none;">/berita/</span>
-                    <input type="text" name="slug" id="tambahBeritaSlug" class="input-control" placeholder="hmi-mengabdi-komkg-umi" style="border:none; background:transparent; padding-left:4px;">
+                <label>URL Slug SEO (Custom)</label>
+                <!-- KOTAK INPUT SLUG PUTIH BERSIH DENGAN TEKS HITAM PEKAT PERSIS GAMBAR 3 -->
+                <div style="display:flex; align-items:center; background:#ffffff !important; border:1.5px solid #cbd5e1; border-radius:12px; padding:0 14px; overflow:hidden; box-shadow:inset 0 2px 4px rgba(0,0,0,0.06);">
+                    <span style="color:#475569; font-size:0.92rem; font-weight:800; user-select:none;">/berita/</span>
+                    <input type="text" name="slug" id="tambahBeritaSlug" class="input-control" placeholder="hmi-mengabdi-komkg-umi" style="border:none !important; background:#ffffff !important; color:#0f172a !important; padding:12px 6px !important; font-weight:700; font-size:0.95rem; outline:none !important; box-shadow:none !important;">
                 </div>
-                <small class="text-muted" style="font-size:0.75rem; margin-top:4px; display:block;">Biarkan kosong untuk otomatis membuat slug ramah SEO dari judul berita.</small>
+                <small class="text-muted" style="font-size:0.75rem; margin-top:5px; display:block;">Biarkan kosong untuk otomatis membuat slug ramah SEO dari judul berita.</small>
             </div>
             <div class="grid-2">
                 <div class="form-group"><label>Kategori</label><input type="text" name="category" class="input-control" placeholder="Terbaru, Opini, Kaderisasi..." required></div>
                 <div class="form-group"><label>Tanggal Rilis</label><input type="text" name="date" class="input-control" placeholder="Contoh: 15 Mei 2026"></div>
             </div>
-            <div class="form-group"><label>Thumbnail / Gambar Utama</label><input type="file" name="image" class="input-control file-compress" accept="image/*" required></div>
+            <div class="form-group">
+                <label>Thumbnail / Gambar Utama <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="image" class="input-control file-compress" accept="image/*" required>
+            </div>
             <div class="form-group">
                 <label>Isi Berita</label>
                 <div id="editorBeritaTambah" style="height: 180px; background: rgba(0,0,0,0.05); border-radius: 8px;"></div>
@@ -883,16 +960,20 @@
             <div class="form-group"><label>Judul Berita</label><input type="text" name="title" id="editBeritaTitle" class="input-control" required></div>
             <div class="form-group">
                 <label>URL Slug SEO (Custom)</label>
-                <div style="display:flex; align-items:center; background:rgba(0,0,0,0.05); border:1px solid var(--theme-glass-border); border-radius:10px; padding:0 12px;">
-                    <span style="color:#9ca3af; font-size:0.85rem; user-select:none;">/berita/</span>
-                    <input type="text" name="slug" id="editBeritaSlug" class="input-control" placeholder="slug-judul-berita" style="border:none; background:transparent; padding-left:4px;">
+                <!-- KOTAK INPUT SLUG PUTIH BERSIH DENGAN TEKS HITAM PEKAT PERSIS GAMBAR 3 -->
+                <div style="display:flex; align-items:center; background:#ffffff !important; border:1.5px solid #cbd5e1; border-radius:12px; padding:0 14px; overflow:hidden; box-shadow:inset 0 2px 4px rgba(0,0,0,0.06);">
+                    <span style="color:#475569; font-size:0.92rem; font-weight:800; user-select:none;">/berita/</span>
+                    <input type="text" name="slug" id="editBeritaSlug" class="input-control" placeholder="slug-judul-berita" style="border:none !important; background:#ffffff !important; color:#0f172a !important; padding:12px 6px !important; font-weight:700; font-size:0.95rem; outline:none !important; box-shadow:none !important;">
                 </div>
             </div>
             <div class="grid-2">
                 <div class="form-group"><label>Kategori</label><input type="text" name="category" id="editBeritaCategory" class="input-control" required></div>
                 <div class="form-group"><label>Tanggal Rilis</label><input type="text" name="date" id="editBeritaDate" class="input-control"></div>
             </div>
-            <div class="form-group"><label>Ganti Thumbnail (Opsional)</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
+            <div class="form-group">
+                <label>Ganti Thumbnail (Opsional) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="image" class="input-control file-compress" accept="image/*">
+            </div>
             <div class="form-group">
                 <label>Isi Berita</label>
                 <div id="editorBeritaEdit" style="height: 180px; background: rgba(0,0,0,0.05); border-radius: 8px;"></div>
@@ -908,10 +989,96 @@
     <div class="modal-content" style="max-width:650px;">
         <div class="modal-header"><h3>Kelola Foto Dokumentasi Berita</h3><button type="button" class="close-modal" onclick="closeModal('modalKelolaFotoBerita')"><i data-lucide="x"></i></button></div>
         <form id="formTambahFotoBerita" method="POST" enctype="multipart/form-data" style="margin-bottom:20px; border-bottom:1px solid var(--theme-glass-border); padding-bottom:15px;">
-            <div class="form-group"><label>Tambah Foto Baru</label><input type="file" name="photos" class="input-control" accept="image/*" multiple required></div>
+            <div class="form-group">
+                <label>Tambah Foto Baru <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="photos" class="input-control" accept="image/*" multiple required>
+            </div>
             <button type="submit" class="btn btn-primary" style="font-size:0.85rem; padding:8px 15px;"><i data-lucide="upload"></i> Upload Foto</button>
         </form>
         <div id="containerFotoBerita" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto;"></div>
+    </div>
+</div>
+
+<!-- MODAL SECTION: APA KATA KADER? (TAMBAH & EDIT) -->
+<div class="modal-overlay" id="modalKaderQuote">
+    <div class="modal-content" style="max-width:600px; border-color:#10b981;">
+        <div class="modal-header">
+            <h3 style="color:#10b981;">Tambah Kutipan Kader Baru</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalKaderQuote')"><i data-lucide="x"></i></button>
+        </div>
+        <form action="/admin/tambah-kader-quote" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Nama Lengkap Kader <span style="color:#ef4444;">*</span></label>
+                <input type="text" name="name" class="input-control" placeholder="Contoh: ANDI FAJRIN PERDANA SAM" required>
+            </div>
+            <div class="form-group">
+                <label>Jabatan / Demisioner <span style="color:#ef4444;">*</span></label>
+                <input type="text" name="role" class="input-control" placeholder="Contoh: Ketua BEM KBMFKG UMI 2023-2024" required>
+            </div>
+            <div class="form-group">
+                <label>Kutipan / Kata Mutiara Kader <span style="color:#ef4444;">*</span></label>
+                <textarea name="quote" class="input-control" rows="4" placeholder="Tuliskan kata motivasi atau refleksi kader..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Foto Kader <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span> <span style="color:#ef4444;">*</span></label>
+                <input type="file" name="image" class="input-control file-compress" accept="image/*" required>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Link Instagram (Opsional)</label>
+                    <input type="url" name="ig" class="input-control" placeholder="https://instagram.com/...">
+                </div>
+                <div class="form-group">
+                    <label>Alamat Email (Opsional)</label>
+                    <input type="email" name="email" class="input-control" placeholder="kader@domain.com">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalKaderQuote')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Simpan Kutipan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEditKaderQuote">
+    <div class="modal-content" style="max-width:600px; border-color:#10b981;">
+        <div class="modal-header">
+            <h3 style="color:#10b981;">Edit Kutipan Kader</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalEditKaderQuote')"><i data-lucide="x"></i></button>
+        </div>
+        <form id="formEditKaderQuote" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Nama Lengkap Kader</label>
+                <input type="text" name="name" id="editKaderName" class="input-control" required>
+            </div>
+            <div class="form-group">
+                <label>Jabatan / Demisioner</label>
+                <input type="text" name="role" id="editKaderRole" class="input-control" required>
+            </div>
+            <div class="form-group">
+                <label>Kutipan / Kata Mutiara</label>
+                <textarea name="quote" id="editKaderQuote" class="input-control" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Ganti Foto (Opsional) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="image" class="input-control file-compress" accept="image/*">
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Link Instagram</label>
+                    <input type="url" name="ig" id="editKaderIg" class="input-control">
+                </div>
+                <div class="form-group">
+                    <label>Alamat Email</label>
+                    <input type="email" name="email" id="editKaderEmail" class="input-control">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditKaderQuote')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Update Kutipan</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -921,7 +1088,10 @@
         <div class="modal-header"><h3>Tambah Galeri / Album Baru</h3><button type="button" class="close-modal" onclick="closeModal('modalAlbum')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-album" method="POST" enctype="multipart/form-data">
             <div class="form-group"><label>Judul Album Kegiatan</label><input type="text" name="title" class="input-control" placeholder="Contoh: Basic Training LK I..." required></div>
-            <div class="form-group"><label>Cover Album</label><input type="file" name="cover" class="input-control file-compress" accept="image/*" required></div>
+            <div class="form-group">
+                <label>Cover Album <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="cover" class="input-control file-compress" accept="image/*" required>
+            </div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalAlbum')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Buat Album</button></div>
         </form>
     </div>
@@ -934,7 +1104,10 @@
         <form id="formEditAlbum" method="POST" enctype="multipart/form-data">
             <div class="form-group"><label>Judul Album</label><input type="text" name="title" id="editAlbumTitle" class="input-control" required></div>
             <div class="form-group"><label>Tanggal Album</label><input type="text" name="date" id="editAlbumDate" class="input-control"></div>
-            <div class="form-group"><label>Ganti Cover (Opsional)</label><input type="file" name="cover" class="input-control file-compress" accept="image/*"></div>
+            <div class="form-group">
+                <label>Ganti Cover (Opsional) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="cover" class="input-control file-compress" accept="image/*">
+            </div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditAlbum')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Update Album</button></div>
         </form>
     </div>
@@ -945,7 +1118,10 @@
     <div class="modal-content" style="max-width:650px;">
         <div class="modal-header"><h3>Kelola Foto Dalam Album</h3><button type="button" class="close-modal" onclick="closeModal('modalKelolaFotoAlbum')"><i data-lucide="x"></i></button></div>
         <form id="formTambahFotoAlbum" method="POST" enctype="multipart/form-data" style="margin-bottom:20px; border-bottom:1px solid var(--theme-glass-border); padding-bottom:15px;">
-            <div class="form-group"><label>Tambah Foto ke Album</label><input type="file" name="photos" class="input-control" accept="image/*" multiple required></div>
+            <div class="form-group">
+                <label>Tambah Foto ke Album <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="photos" class="input-control" accept="image/*" multiple required>
+            </div>
             <button type="submit" class="btn btn-primary" style="font-size:0.85rem; padding:8px 15px;"><i data-lucide="upload"></i> Upload Foto</button>
         </form>
         <div id="containerFotoAlbum" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto;"></div>
@@ -986,9 +1162,15 @@
             <div class="form-group"><label>Path / URL (Tanpa spasi)</label><input type="text" name="path" class="input-control" placeholder="contoh: lk1, webinar, pendaftaran" required></div>
             <div class="form-group"><label>Judul Halaman (Teks Header)</label><input type="text" name="title" class="input-control" placeholder="Contoh: Official Registration HMI" required></div>
             <div class="form-group"><label>Bio / Deskripsi Singkat</label><textarea name="bio" class="input-control" rows="3" placeholder="Deskripsi singkat profil..."></textarea></div>
-            <div class="form-group"><label>Foto Profil / Logo Bio</label><input type="file" name="profileImage" class="input-control file-compress" accept="image/*"></div>
+            <div class="form-group">
+                <label>Foto Profil / Logo Bio <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="profileImage" class="input-control file-compress" accept="image/*">
+            </div>
             <div class="form-group"><label>Warna Background CSS Gradient</label><input type="text" name="bgGradient" class="input-control" value="linear-gradient(135deg, #064e3b 0%, #111827 100%)"></div>
-            <div class="form-group"><label>Atau Background Gambar (Opsional)</label><input type="file" name="bgImage" class="input-control file-compress" accept="image/*"></div>
+            <div class="form-group">
+                <label>Atau Background Gambar (Opsional) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="bgImage" class="input-control file-compress" accept="image/*">
+            </div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalTambahBioPage')">Batal</button><button type="submit" class="btn submit-btn" style="background:#8b5cf6; color:#fff; border:none; flex:1;">Buat Halaman Bio</button></div>
         </form>
     </div>
@@ -1002,9 +1184,15 @@
             <div class="form-group"><label>Path / URL</label><input type="text" name="path" id="editBioPath" class="input-control" required></div>
             <div class="form-group"><label>Judul Halaman</label><input type="text" name="title" id="editBioTitle" class="input-control" required></div>
             <div class="form-group"><label>Bio / Deskripsi</label><textarea name="bio" id="editBioDesc" class="input-control" rows="3"></textarea></div>
-            <div class="form-group"><label>Ganti Foto Profil (Opsional)</label><input type="file" name="profileImage" class="input-control file-compress" accept="image/*"></div>
+            <div class="form-group">
+                <label>Ganti Foto Profil (Opsional) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="profileImage" class="input-control file-compress" accept="image/*">
+            </div>
             <div class="form-group"><label>Warna Background CSS Gradient</label><input type="text" name="bgGradient" id="editBioBgGradient" class="input-control"></div>
-            <div class="form-group"><label>Ganti Background Gambar (Opsional)</label><input type="file" name="bgImage" class="input-control file-compress" accept="image/*"></div>
+            <div class="form-group">
+                <label>Ganti Background Gambar (Opsional) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="bgImage" class="input-control file-compress" accept="image/*">
+            </div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditBioPage')">Batal</button><button type="submit" class="btn submit-btn" style="background:#8b5cf6; color:#fff; border:none; flex:1;">Update Halaman Bio</button></div>
         </form>
     </div>
@@ -1025,7 +1213,10 @@
             </div>
             <div class="form-group"><label>Judul Tombol</label><input type="text" name="title" class="input-control" placeholder="Contoh: Formulir Pendaftaran LK I" required></div>
             <div class="form-group"><label>URL Tujuan</label><input type="url" name="url" class="input-control" placeholder="https://forms.gle/..." required></div>
-            <div class="form-group"><label>Icon Tombol (Opsional)</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div>
+            <div class="form-group">
+                <label>Icon Tombol (Opsional) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="icon" class="input-control file-compress" accept="image/*">
+            </div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalTambahBioLink')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Simpan Tombol</button></div>
         </form>
     </div>
@@ -1046,7 +1237,10 @@
             </div>
             <div class="form-group"><label>Judul Tombol</label><input type="text" name="title" id="editBioLinkTitle" class="input-control" required></div>
             <div class="form-group"><label>URL Tujuan</label><input type="url" name="url" id="editBioLinkUrl" class="input-control" required></div>
-            <div class="form-group"><label>Ganti Icon Baru (Opsional)</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div>
+            <div class="form-group">
+                <label>Ganti Icon Baru (Opsional) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="icon" class="input-control file-compress" accept="image/*">
+            </div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditBioLink')">Batal</button><button type="submit" class="btn btn-primary submit-btn">Update Tombol</button></div>
         </form>
     </div>
@@ -1083,9 +1277,12 @@
     <div class="modal-content" style="border-color:#f59e0b;">
         <div class="modal-header"><h3 style="color:#fbbf24;">Tambah Sosial Media</h3><button type="button" class="close-modal" onclick="closeModal('modalSosmed')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-sosmed" method="POST" enctype="multipart/form-data">
-            <div class="form-group"><label>Nama Platform (Instagram, Facebook, dll)</label><input type="text" name="name" class="input-control" placeholder="Contoh: Instagram" required></div>
+            <div class="form-group"><label>Nama Platform</label><input type="text" name="name" class="input-control" placeholder="Contoh: Instagram" required></div>
             <div class="form-group"><label>URL Profil Akun</label><input type="url" name="url" class="input-control" placeholder="https://instagram.com/..." required></div>
-            <div class="form-group"><label>Upload Icon/Logo (Opsional)</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div>
+            <div class="form-group">
+                <label>Upload Icon/Logo (Opsional) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="icon" class="input-control file-compress" accept="image/*">
+            </div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalSosmed')">Batal</button><button type="submit" class="btn submit-btn" style="background:#f59e0b; color:#000; font-weight:bold; flex:1;">Simpan Akun</button></div>
         </form>
     </div>
@@ -1098,20 +1295,26 @@
         <form id="formEditSosmed" method="POST" enctype="multipart/form-data">
             <div class="form-group"><label>Nama Platform</label><input type="text" name="name" id="editSosmedName" class="input-control" required></div>
             <div class="form-group"><label>URL Profil Akun</label><input type="url" name="url" id="editSosmedUrl" class="input-control" required></div>
-            <div class="form-group"><label>Ganti Icon Baru (Opsional)</label><input type="file" name="icon" class="input-control file-compress" accept="image/*"></div>
+            <div class="form-group">
+                <label>Ganti Icon Baru (Opsional) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="icon" class="input-control file-compress" accept="image/*">
+            </div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditSosmed')">Batal</button><button type="submit" class="btn submit-btn" style="background:#f59e0b; color:#000; font-weight:bold; flex:1;">Update Akun</button></div>
         </form>
     </div>
 </div>
 
-<!-- MODALS KEPENGURUSAN, BIDANG & DEVELOPER TEAM -->
+<!-- MODALS KEPENGURUSAN -->
 <div class="modal-overlay" id="modalPengurus">
     <div class="modal-content">
         <div class="modal-header"><h3>Tambah Pengurus Utama</h3><button type="button" class="close-modal" onclick="closeModal('modalPengurus')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-pengurus" method="POST" enctype="multipart/form-data">
             <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" class="input-control" required></div>
             <div class="form-group"><label>Jabatan</label><input type="text" name="role" class="input-control" required></div>
-            <div class="form-group"><label>Upload Foto</label><input type="file" name="image" class="input-control file-compress" accept="image/*" required></div>
+            <div class="form-group">
+                <label>Upload Foto <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="image" class="input-control file-compress" accept="image/*" required>
+            </div>
             <div style="margin-top:20px; padding-top:15px; border-top:1px solid var(--theme-glass-border);">
                 <p style="font-size:0.85rem; color:#16a34a; margin-bottom:10px;">Link Sosial Media (Opsional)</p>
                 <div class="grid-2">
@@ -1133,7 +1336,10 @@
         <form id="formEditDynamic" method="POST" enctype="multipart/form-data">
             <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" id="editDynamicName" class="input-control" required></div>
             <div class="form-group"><label>Jabatan</label><input type="text" name="role" id="editDynamicRole" class="input-control"></div>
-            <div class="form-group"><label>Upload Foto Baru (Opsional)</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
+            <div class="form-group">
+                <label>Upload Foto Baru (Opsional) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="image" class="input-control file-compress" accept="image/*">
+            </div>
             <div style="margin-top:20px; padding-top:15px; border-top:1px solid var(--theme-glass-border);">
                 <p style="font-size:0.85rem; color:#16a34a; margin-bottom:10px;">Link Sosial Media (Opsional)</p>
                 <div class="grid-2">
@@ -1155,7 +1361,10 @@
         <form id="formAnggotaBidang" method="POST" enctype="multipart/form-data">
             <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" id="editAnggotaBidangName" class="input-control" required></div>
             <div class="form-group"><label>Jabatan (Opsional)</label><input type="text" name="role" id="editAnggotaBidangRole" class="input-control"></div>
-            <div class="form-group"><label>Upload Foto</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
+            <div class="form-group">
+                <label>Upload Foto <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="image" class="input-control file-compress" accept="image/*">
+            </div>
             <div style="margin-top:20px; padding-top:15px; border-top:1px solid var(--theme-glass-border);">
                 <p style="font-size:0.85rem; color:#16a34a; margin-bottom:10px;">Link Sosial Media (Opsional)</p>
                 <div class="grid-2">
@@ -1177,7 +1386,10 @@
         <form action="/admin/tambah-kohati-pengurus" method="POST" enctype="multipart/form-data">
             <div class="form-group"><label>Nama Lengkap</label><input type="text" name="name" class="input-control" required></div>
             <div class="form-group"><label>Jabatan Kohati</label><input type="text" name="role" class="input-control" required></div>
-            <div class="form-group"><label>Upload Foto</label><input type="file" name="image" class="input-control file-compress" accept="image/*" required></div>
+            <div class="form-group">
+                <label>Upload Foto <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="image" class="input-control file-compress" accept="image/*" required>
+            </div>
             <div style="margin-top:20px; padding-top:15px; border-top:1px solid rgba(244,114,182,0.3);">
                 <p style="font-size:0.85rem; color:#f472b6; margin-bottom:10px;">Link Sosial Media (Opsional)</p>
                 <div class="grid-2">
@@ -1216,7 +1428,10 @@
             </div>
             <div class="form-group"><label>Departemen / Demisioner</label><input type="text" name="dept" class="input-control" placeholder="Contoh: Demisioner Dept. Penerangan"></div>
             <div class="form-group"><label>Link Instagram</label><input type="url" name="ig" class="input-control" placeholder="URL Instagram..."></div>
-            <div class="form-group"><label>Upload Foto Profil</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
+            <div class="form-group">
+                <label>Upload Foto Profil <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="image" class="input-control file-compress" accept="image/*">
+            </div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalDevTeam')">Batal</button><button type="submit" class="btn submit-btn" style="background:#3b82f6; color:#fff; border:none; flex:1;">Simpan Developer</button></div>
         </form>
     </div>
@@ -1245,7 +1460,10 @@
             </div>
             <div class="form-group"><label>Departemen / Demisioner</label><input type="text" name="dept" id="editDevDept" class="input-control"></div>
             <div class="form-group"><label>Link Instagram</label><input type="url" name="ig" id="editDevIg" class="input-control"></div>
-            <div class="form-group"><label>Upload Foto Profil Baru (Opsional)</label><input type="file" name="image" class="input-control file-compress" accept="image/*"></div>
+            <div class="form-group">
+                <label>Upload Foto Profil Baru (Opsional) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="image" class="input-control file-compress" accept="image/*">
+            </div>
             <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('modalEditDevTeam')">Batal</button><button type="submit" class="btn submit-btn" style="background:#3b82f6; color:#fff; border:none; flex:1;">Update Profil</button></div>
         </form>
     </div>
@@ -1259,6 +1477,7 @@
 <script id="bioPagesJson" type="application/json"><%- typeof bioPages !== 'undefined' ? JSON.stringify(bioPages).replace(/</g, '\\u003c') : '[]' %></script>
 <script id="bioLinksJson" type="application/json"><%- typeof bioLinks !== 'undefined' ? JSON.stringify(bioLinks).replace(/</g, '\\u003c') : '[]' %></script>
 <script id="contactMessagesJson" type="application/json"><%- JSON.stringify(safeMessages).replace(/</g, '\\u003c') %></script>
+<script id="kaderQuotesJson" type="application/json"><%- JSON.stringify(safeKaderQuotes).replace(/</g, '\\u003c') %></script>
 
 <script>
     let albumsData = []; 
@@ -1266,6 +1485,7 @@
     let bioPagesData = [];
     let bioLinksData = [];
     let contactMessagesData = [];
+    let kaderQuotesData = [];
 
     try {
         const rawAlbums = document.getElementById('albumsDataJson').textContent;
@@ -1273,12 +1493,14 @@
         const rawBioPages = document.getElementById('bioPagesJson').textContent;
         const rawBioLinks = document.getElementById('bioLinksJson').textContent;
         const rawMessages = document.getElementById('contactMessagesJson').textContent;
+        const rawQuotes = document.getElementById('kaderQuotesJson').textContent;
 
         if (rawAlbums && rawAlbums.trim() !== '' && !rawAlbums.includes('<' + '%')) albumsData = JSON.parse(rawAlbums);
         if (rawNews && rawNews.trim() !== '' && !rawNews.includes('<' + '%')) newsData = JSON.parse(rawNews);
         if (rawBioPages && rawBioPages.trim() !== '' && !rawBioPages.includes('<' + '%')) bioPagesData = JSON.parse(rawBioPages);
         if (rawBioLinks && rawBioLinks.trim() !== '' && !rawBioLinks.includes('<' + '%')) bioLinksData = JSON.parse(rawBioLinks);
         if (rawMessages && rawMessages.trim() !== '' && !rawMessages.includes('<' + '%')) contactMessagesData = JSON.parse(rawMessages);
+        if (rawQuotes && rawQuotes.trim() !== '' && !rawQuotes.includes('<' + '%')) kaderQuotesData = JSON.parse(rawQuotes);
     } catch(e) { console.warn('Parsing EJS data failed:', e); }
 
     let quillTambah, quillEdit;
@@ -1324,7 +1546,6 @@
         const target = document.getElementById(targetInputId);
         if (!source || !target) return;
         
-        // Hanya generate otomatis jika user belum mengubah slug secara manual
         if (!target.dataset.touched || target.value.trim() === '') {
             target.value = source.value
                 .toLowerCase()
@@ -1474,6 +1695,16 @@
             container.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#9ca3af; font-size:0.85rem;">Belum ada foto dokumentasi tambahan.</p>';
         }
         openModal('modalKelolaFotoBerita');
+    }
+
+    function openEditKaderQuoteModal(id, name, role, quote, ig, email) {
+        document.getElementById('editKaderName').value = name;
+        document.getElementById('editKaderRole').value = role;
+        document.getElementById('editKaderQuote').value = quote;
+        document.getElementById('editKaderIg').value = ig || '';
+        document.getElementById('editKaderEmail').value = email || '';
+        document.getElementById('formEditKaderQuote').action = '/admin/edit-kader-quote/' + id;
+        openModal('modalEditKaderQuote');
     }
 
     function openEditAlbumModal(id, title, date) {
