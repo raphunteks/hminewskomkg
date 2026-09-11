@@ -109,71 +109,65 @@ document.addEventListener('DOMContentLoaded', () => {
 </header>
 
 <!-- ==============================================================
-     SECTION: APA KATA KADER? (PERSIS GAYA GAMBAR 4)
+     SUPER BIG UPGRADE: SECTION "APA KATA KADER?" 
+     (5-CARD COMPACT STREAM, TANPA DUMMY, KHUSUS IG, GEN-Z CENTERED)
 ============================================================== -->
 <% 
-    let quotesList = (typeof kaderQuotes !== 'undefined' && Array.isArray(kaderQuotes) && kaderQuotes.length > 0) 
-        ? kaderQuotes 
-        : [
-            {
-                id: 1,
-                name: "ANDI FAJRIN PERDANA SAM",
-                role: "Ketua BEM KBMFKG UMI 2023-2024",
-                quote: "Pemenang yang sesungguhnya adalah ketika kamu mampu melawan amarah dengan kesabaran, dan memaafkan dengan ketulusan. Itulah sifat kader HMI yang sesungguhnya!",
-                image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=80",
-                ig: "https://www.instagram.com/",
-                email: "hmikomkedokgigiumi.190120@gmail.com"
-            }
-        ];
+    let quotesList = (typeof kaderQuotes !== 'undefined' && Array.isArray(kaderQuotes)) ? kaderQuotes : [];
 %>
-<section class="kader-quote-section" aria-label="Apa Kata Kader HMI">
-    <div class="section-header" style="margin-top: 50px;">
-        <div>
-            <h2>Apa Kata Kader?</h2>
-            <p class="text-muted">Inspirasi, refleksi, dan pandangan perjuangan kader HMI KomKG UMI</p>
-        </div>
+<% if (quotesList.length > 0) { %>
+<section class="kader-section-container" aria-label="Apa Kata Kader HMI">
+    <div class="genz-header-center">
+        <span class="genz-badge-pill">
+            <i data-lucide="sparkles" style="width:14px; height:14px;"></i> REFLEKSI & GERAKAN
+        </span>
+        <h2 class="genz-section-title">Apa Kata <span class="text-gradient">Kader?</span></h2>
+        <p class="genz-section-subtitle">Untaian kata inspirasi, idealisme, dan dedikasi kader HMI KomKG UMI</p>
     </div>
 
-    <div class="kader-quote-wrapper">
-        <% quotesList.forEach(item => { %>
-            <div class="kader-card">
-                <div class="kader-img-container">
-                    <img src="<%= item.image %>" alt="Foto <%= item.name %>" class="kader-photo" onerror="this.src='/img/logo-hmikomkgumi.png'" loading="lazy" decoding="async">
-                    
-                    <div class="kader-quote-box glass">
-                        <p class="kader-quote-text">“<%= item.quote %>”</p>
-                        <h3 class="kader-name"><%= item.name %></h3>
-                        <p class="kader-role"><%= item.role %></p>
+    <!-- Container Grid Multi-Kader (Mendukung hingga 5 Orang) -->
+    <div class="kader-stream-wrapper">
+        <div class="kader-stream-grid">
+            <% quotesList.forEach(item => { %>
+                <article class="kader-neo-card">
+                    <div class="kader-image-frame">
+                        <img src="<%= item.image %>" alt="Foto <%= item.name %>" class="kader-portrait" onerror="this.src='/img/logo-hmikomkgumi.png'" loading="lazy" decoding="async">
+                        <div class="kader-hologram-overlay"></div>
                         
-                        <div class="kader-social-links">
-                            <% if (item.ig && item.ig.trim() !== '') { %>
-                                <a href="<%= item.ig %>" target="_blank" rel="noopener noreferrer" class="kader-social-icon" aria-label="Instagram <%= item.name %>">
-                                    <i data-lucide="instagram"></i>
-                                </a>
-                            <% } %>
-                            <% if (item.email && item.email.trim() !== '') { %>
-                                <a href="mailto:<%= item.email %>" class="kader-social-icon" aria-label="Email <%= item.name %>">
-                                    <i data-lucide="mail"></i>
-                                </a>
-                            <% } %>
+                        <% if (item.ig && item.ig.trim() !== '') { %>
+                            <a href="<%= item.ig %>" target="_blank" rel="noopener noreferrer" class="kader-ig-floating" aria-label="Instagram <%= item.name %>" title="Kunjungi Instagram">
+                                <i data-lucide="instagram"></i>
+                            </a>
+                        <% } %>
+                    </div>
+                    
+                    <div class="kader-quote-capsule">
+                        <div class="kader-quote-symbol">“</div>
+                        <p class="kader-quote-message">“<%= item.quote %>”</p>
+                        <div class="kader-profile-info">
+                            <h3 class="kader-profile-name"><%= item.name %></h3>
+                            <p class="kader-profile-role"><%= item.role %></p>
                         </div>
                     </div>
-                </div>
-            </div>
-        <% }) %>
+                </article>
+            <% }) %>
+        </div>
     </div>
 </section>
+<% } %>
 
 <!-- ==============================================================
-     SECTION: BERITA & INFORMASI (MURNI MENGGUNAKAN ITEM.SLUG)
+     SECTION: BERITA & INFORMASI (GEN-Z CENTERED & 100% SLUG MURNI)
 ============================================================== -->
 <section>
-    <div class="section-header" style="margin-top: 50px;">
-        <div>
-            <h2>Berita & Informasi</h2>
-            <p class="text-muted">Update terbaru dari kegiatan komisariat</p>
-        </div>
-        <div class="filter-tags" role="navigation" aria-label="Filter Kategori Berita">
+    <div class="genz-header-center" style="margin-top: 70px;">
+        <span class="genz-badge-pill">
+            <i data-lucide="newspaper" style="width:14px; height:14px;"></i> WARTA & PROKER
+        </span>
+        <h2 class="genz-section-title">Berita & <span class="text-gradient">Informasi</span></h2>
+        <p class="genz-section-subtitle">Update kabar terbaru dan dinamika kegiatan komisariat</p>
+        
+        <div class="filter-tags" role="navigation" aria-label="Filter Kategori Berita" style="justify-content: center; margin-top: 20px;">
             <a href="/" class="filter-tag <%= currentFilter === 'Semua' ? 'active' : '' %>" aria-label="Tampilkan Semua Berita">Semua</a>
             <a href="/?filter=Terbaru" class="filter-tag <%= currentFilter === 'Terbaru' ? 'active' : '' %>" aria-label="Filter Berita Terbaru">Terbaru</a>
             <a href="/?filter=Pin" class="filter-tag <%= currentFilter === 'Pin' ? 'active' : '' %>" aria-label="Filter Berita Disematkan">Pin</a>
