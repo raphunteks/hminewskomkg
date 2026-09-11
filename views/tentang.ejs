@@ -14,7 +14,7 @@
     // Men-generate Schema SEO "Person" secara otomatis setiap ada data pengurus baru
     // ==============================================================
     let personsSchema = [];
-    let baseUrl = "https://hmikomkgumi.com"; // Bisa disesuaikan dengan domain asli Anda
+    let baseUrl = "https://hmikomkgumi.xyz"; // Domain resmi komisariat
     
     // Fungsi Auto-Builder Schema
     function addMemberToSchema(member, department) {
@@ -84,7 +84,7 @@
       "description": "Organisasi mahasiswa Islam tingkat fakultas kedokteran gigi. Islamic student organization at the faculty of dentistry level.",
       "logo": {
         "@type": "ImageObject",
-        "url": "<%= baseUrl %>/img/bemfkgumi.png"
+        "url": "<%= baseUrl %>/img/logo-hmikomkgumi.png"
       }
     },
     {
@@ -135,18 +135,18 @@
         <% } %>
     </nav>
 
-    <!-- Mengubah div menjadi <section> Semantic -->
+    <!-- TAB 1: PROFIL & SAMBUTAN -->
     <section id="tab-profil" class="tab-content active">
         <div class="vm-card" style="max-width: 900px; margin: 0 auto 40px; border-left: none; padding: 40px;">
-            <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size:1.8rem;">Profil</h2>
+            <h2 style="color: var(--theme-primary); margin-bottom:15px; font-weight:800; font-size:1.8rem;">Profil</h2>
             
-            <!-- itemprop="description" mendikte Google bahwa ini adalah profil resmi -->
-            <div class="rich-text-content" itemprop="description" style="margin-bottom: 40px; font-size:1.05rem; line-height:1.7; white-space: pre-line; color: #e5e7eb;">
+            <!-- SMART COLOR: Adaptif hitam tajam pada tema Light dan terang pada tema Dark -->
+            <div class="rich-text-content" itemprop="description" style="margin-bottom: 40px; font-size:1.05rem; line-height:1.8; white-space: pre-line; color: var(--theme-vm-text);">
                 <%- siteSettings.profilText || '' %>
             </div>
 
-            <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size:1.8rem;">Welcome</h2>
-            <div class="rich-text-content" style="font-size:1.05rem; line-height:1.7; white-space: pre-line; color: #e5e7eb;">
+            <h2 style="color: var(--theme-primary); margin-bottom:15px; font-weight:800; font-size:1.8rem;">Welcome</h2>
+            <div class="rich-text-content" style="font-size:1.05rem; line-height:1.8; white-space: pre-line; color: var(--theme-vm-text);">
                 <%- siteSettings.welcomeText || '' %>
             </div>
         </div>
@@ -157,12 +157,11 @@
                     
                     <% if (siteSettings.bookletPdf && siteSettings.bookletPdf.length > 5) { %>
                     <div style="width: 100%;">
-                        <h3 style="margin-bottom: 20px; font-size:1.5rem; text-align:center; color:#4ade80;">Buku Pedoman / Profil</h3>
+                        <h3 style="margin-bottom: 20px; font-size:1.5rem; text-align:center; color: var(--theme-primary);">Buku Pedoman / Profil</h3>
                         
-                        <!-- UPGRADE 3: PURE CSS 3D PDF VIEWER -->
+                        <!-- PURE CSS 3D PDF VIEWER -->
                         <div class="css3d-pdf-wrapper">
                             <div class="css3d-pdf-frame">
-                                <!-- UPGRADE PDF: Menambahkan parameter view=FitH untuk memaksa tampilan vertikal -->
                                 <iframe 
                                     src="<%= siteSettings.bookletPdf %>#toolbar=0&navpanes=0&view=FitH" 
                                     type="application/pdf" 
@@ -181,17 +180,13 @@
                     <% } %>
                     
                     <% if (siteSettings.mapsEmbed) { %>
-                    <!-- itemprop="location" mendikte Google bahwa ini adalah lokasi fisik sekretariat -->
                     <div style="width: 100%;" itemprop="location" itemscope itemtype="https://schema.org/Place">
-                        <h3 style="margin-bottom: 15px; font-size:1.5rem; text-align:center; color:#4ade80;">Lokasi Sekretariat</h3>
-                        <div class="ratio ratio-16x9 glass" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 5px;">
-                            
-                            <!-- UPGRADE SOLUSI MAPS: Penambahan class "map-responsive-container" -->
+                        <h3 style="margin-bottom: 15px; font-size:1.5rem; text-align:center; color: var(--theme-primary);">Lokasi Sekretariat</h3>
+                        <div class="ratio ratio-16x9 glass" style="border-radius: 12px; border: 1px solid var(--theme-glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 5px;">
                             <div class="map-responsive-container" style="border-radius: 8px; overflow: hidden; width: 100%; height: 100%; position: relative;">
                                 <%- siteSettings.mapsEmbed %>
                             </div>
                             
-                            <!-- Inline CSS Eksklusif untuk memaksa Google Maps iframe menjadi 100% presisi -->
                             <style>
                                 .map-responsive-container iframe {
                                     position: absolute !important;
@@ -202,7 +197,6 @@
                                     border: 0 !important;
                                 }
                             </style>
-
                         </div>
                     </div>
                     <% } %>
@@ -215,9 +209,10 @@
 
     </section>
 
+    <!-- TAB 2: VISI & MISI -->
     <section id="tab-visimisi" class="tab-content">
         <div style="text-align: center; margin-bottom: 30px;">
-            <h2 style="font-size:2rem; margin-bottom:10px;">Visi dan Misi</h2>
+            <h2 style="font-size:2rem; margin-bottom:10px; color: var(--theme-heading);">Visi dan Misi</h2>
             <p class="text-muted" style="font-size:1.05rem;">Panduan bagi HMI Komisariat Kedokteran Gigi UMI untuk merencanakan kegiatan organisasi.</p>
         </div>
         
@@ -225,36 +220,32 @@
             <div class="vm-card">
                 <div class="vm-icon">🚀</div>
                 <h3 class="vm-title">Visi</h3>
-                <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.visiText || '' %></div>
+                <div class="rich-text-content" style="white-space: pre-line; color: var(--theme-vm-text);"><%- siteSettings.visiText || '' %></div>
             </div>
 
             <div class="vm-card">
                 <div class="vm-icon">📈</div>
                 <h3 class="vm-title">Misi</h3>
-                <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.misiText || '' %></div>
+                <div class="rich-text-content" style="white-space: pre-line; color: var(--theme-vm-text);"><%- siteSettings.misiText || '' %></div>
             </div>
         </div>
     </section>
 
+    <!-- TAB 3: STRUKTUR KEPENGURUSAN UMUM -->
     <section id="tab-struktur" class="tab-content">
         <div class="glass" style="padding: 40px; text-align: center;">
-            <h2>Struktur Kepengurusan</h2>
+            <h2 style="color: var(--theme-heading);">Struktur Kepengurusan</h2>
             <p class="text-muted" style="margin-bottom: 40px;">Pengurus Harian</p>
             
             <div class="team-scroll-wrapper">
                 <% pengurus.forEach(person => { %>
-                <!-- EXPERT SEO: Mendeklarasikan Anggota Pengurus (Person Schema) -->
                 <div class="glass team-card" itemprop="member" itemscope itemtype="https://schema.org/Person">
                     <div class="team-img">
-                        <img itemprop="image" src="<%= person.image %>" alt="<%= person.name %>">
+                        <img itemprop="image" src="<%= person.image %>" alt="<%= person.name %>" onerror="this.src='/img/logo-hmikomkgumi.png'">
                     </div>
                     <h4 class="team-name" itemprop="name"><%= person.name %></h4>
                     <p class="team-role" itemprop="jobTitle"><%= person.role %></p>
                     
-                    <!-- ==============================================================
-                         SUPER BIG UPGRADE: PURE INLINE SVG SOCIAL MEDIA (HMI UMUM)
-                         Anti-Error/Bundaran Putih. Langsung muncul secara instan!
-                    ============================================================== -->
                     <% if(person.ig || person.fb || person.twitter || person.linkedin || person.tiktok) { %>
                     <div class="team-socials">
                         <% if(person.ig) { %><a href="<%= person.ig %>" target="_blank" class="team-social-btn" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a><% } %>
@@ -268,25 +259,24 @@
                 <% }) %>
             </div>
             
-            <div style="margin-top: 50px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1);">
-                <h3 style="margin-bottom:30px; text-align:center;">Bidang-Bidang</h3>
+            <div style="margin-top: 50px; padding-top: 40px; border-top: 1px solid var(--theme-glass-border);">
+                <h3 style="margin-bottom:30px; text-align:center; color: var(--theme-heading);">Bidang-Bidang</h3>
                 <div style="display:flex; flex-direction:column; gap:40px;">
                     <% bidang.forEach(b => { %>
                         <div>
-                            <h4 style="color:#4ade80; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:10px; margin-bottom:20px; text-align:center;"><%= b.name %></h4>
+                            <h4 style="color: var(--theme-primary); border-bottom:1px dashed var(--theme-glass-border); padding-bottom:10px; margin-bottom:20px; text-align:center;"><%= b.name %></h4>
                             <% if(b.members && b.members.length > 0) { %>
                                 <div class="team-scroll-wrapper">
                                     <% b.members.forEach(m => { %>
                                         <div class="glass team-card" style="padding:15px;" itemprop="member" itemscope itemtype="https://schema.org/Person">
                                             <div class="team-img" style="width:80px; height:80px;">
-                                                <img itemprop="image" src="<%= m.image %>" alt="<%= m.name %>">
+                                                <img itemprop="image" src="<%= m.image %>" alt="<%= m.name %>" onerror="this.src='/img/logo-hmikomkgumi.png'">
                                             </div>
                                             <h4 class="team-name" itemprop="name" style="font-size:0.95rem;"><%= m.name %></h4>
                                             <% if(m.role) { %>
-                                                <p itemprop="jobTitle" style="color:#4ade80; font-size:0.8rem; font-weight:bold; margin-top:2px;"><%= m.role %></p>
+                                                <p itemprop="jobTitle" style="color: var(--theme-primary); font-size:0.8rem; font-weight:bold; margin-top:2px;"><%= m.role %></p>
                                             <% } %>
                                             
-                                            <!-- ANGGOTA BIDANG SOSIAL MEDIA INLINE SVG -->
                                             <% if(m.ig || m.fb || m.twitter || m.linkedin || m.tiktok) { %>
                                             <div class="team-socials" style="margin-top:10px;">
                                                 <% if(m.ig) { %><a href="<%= m.ig %>" target="_blank" class="team-social-btn" style="width:28px; height:28px;"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a><% } %>
@@ -300,7 +290,7 @@
                                     <% }) %>
                                 </div>
                             <% } else { %>
-                                <p style="text-align:center; color:#9ca3af; font-size:0.9rem;">Belum ada anggota.</p>
+                                <p style="text-align:center; color: var(--theme-muted); font-size:0.9rem;">Belum ada anggota.</p>
                             <% } %>
                         </div>
                     <% }) %>
@@ -309,6 +299,7 @@
         </div>
     </section>
 
+    <!-- TAB 4: KOHATI -->
     <% if (String(siteSettings.kohatiActive) === 'true') { %>
     <section id="tab-kohati" class="tab-content">
         <div style="margin-bottom: 40px;">
@@ -316,7 +307,7 @@
                 <h2 style="color: #f472b6; margin-bottom: 20px; border-bottom: 1px solid rgba(244,114,182,0.3); padding-bottom: 10px; display: inline-block;">
                     <i data-lucide="heart" style="vertical-align: text-bottom;"></i> Profil KOHATI
                 </h2>
-                <div class="rich-text-content" style="font-size:1.05rem; line-height:1.7; white-space: pre-line; color: #e5e7eb;">
+                <div class="rich-text-content" style="font-size:1.05rem; line-height:1.8; white-space: pre-line; color: var(--theme-vm-text);">
                     <%- siteSettings.kohatiProfilText || '' %>
                 </div>
             </div>
@@ -329,13 +320,13 @@
                 <div class="vm-card" style="border-left-color: #f472b6; background: rgba(244,114,182,0.1);">
                     <div class="vm-icon" style="color: #f472b6;">🚀</div>
                     <h3 class="vm-title" style="color: #f472b6;">Visi KOHATI</h3>
-                    <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.kohatiVisiText || '' %></div>
+                    <div class="rich-text-content" style="white-space: pre-line; color: var(--theme-vm-text);"><%- siteSettings.kohatiVisiText || '' %></div>
                 </div>
 
                 <div class="vm-card" style="border-left-color: #f472b6; background: rgba(244,114,182,0.1);">
                     <div class="vm-icon" style="color: #f472b6;">📈</div>
                     <h3 class="vm-title" style="color: #f472b6;">Misi KOHATI</h3>
-                    <div class="rich-text-content" style="white-space: pre-line; color: #e5e7eb;"><%- siteSettings.kohatiMisiText || '' %></div>
+                    <div class="rich-text-content" style="white-space: pre-line; color: var(--theme-vm-text);"><%- siteSettings.kohatiMisiText || '' %></div>
                 </div>
             </div>
 
@@ -347,12 +338,11 @@
                     <% kohatiPengurus.forEach(person => { %>
                     <div class="glass team-card" style="border-color: rgba(244,114,182,0.2);" itemprop="member" itemscope itemtype="https://schema.org/Person">
                         <div class="team-img" style="border-color: rgba(244,114,182,0.5);">
-                            <img itemprop="image" src="<%= person.image %>" alt="<%= person.name %>">
+                            <img itemprop="image" src="<%= person.image %>" alt="<%= person.name %>" onerror="this.src='/img/logo-hmikomkgumi.png'">
                         </div>
                         <h4 class="team-name" itemprop="name"><%= person.name %></h4>
                         <p itemprop="jobTitle" style="color:#f472b6; font-size:0.85rem; font-weight:bold;"><%= person.role %></p>
                         
-                        <!-- PENGURUS KOHATI SOCIAL MEDIA INLINE SVG -->
                         <% if(person.ig || person.fb || person.twitter || person.linkedin || person.tiktok) { %>
                         <div class="team-socials">
                             <% if(person.ig) { %><a href="<%= person.ig %>" target="_blank" class="team-social-btn kohati-social-btn" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a><% } %>
@@ -377,14 +367,13 @@
                                         <% b.members.forEach(m => { %>
                                             <div class="glass team-card" style="padding:15px; border-color: rgba(244,114,182,0.2);" itemprop="member" itemscope itemtype="https://schema.org/Person">
                                                 <div class="team-img" style="width:80px; height:80px; border-color: rgba(244,114,182,0.5);">
-                                                    <img itemprop="image" src="<%= m.image %>" alt="<%= m.name %>">
+                                                    <img itemprop="image" src="<%= m.image %>" alt="<%= m.name %>" onerror="this.src='/img/logo-hmikomkgumi.png'">
                                                 </div>
                                                 <h4 class="team-name" itemprop="name" style="font-size:0.95rem;"><%= m.name %></h4>
                                                 <% if(m.role) { %>
                                                     <p itemprop="jobTitle" style="color:#f472b6; font-size:0.8rem; font-weight:bold; margin-top:2px;"><%= m.role %></p>
                                                 <% } %>
                                                 
-                                                <!-- ANGGOTA BIDANG KOHATI SOCIAL MEDIA -->
                                                 <% if(m.ig || m.fb || m.twitter || m.linkedin || m.tiktok) { %>
                                                 <div class="team-socials" style="margin-top:10px;">
                                                     <% if(m.ig) { %><a href="<%= m.ig %>" target="_blank" class="team-social-btn kohati-social-btn" style="width:28px; height:28px;"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a><% } %>
@@ -398,7 +387,7 @@
                                         <% }) %>
                                     </div>
                                 <% } else { %>
-                                    <p style="text-align:center; color:#9ca3af; font-size:0.9rem;">Belum ada anggota.</p>
+                                    <p style="text-align:center; color: var(--theme-muted); font-size:0.9rem;">Belum ada anggota.</p>
                                 <% } %>
                             </div>
                         <% }) %>
@@ -415,11 +404,13 @@
     function openTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        event.currentTarget.classList.add('active');
+        const target = document.getElementById(tabId);
+        if (target) target.classList.add('active');
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('active');
+        }
     }
     
-    // Lucide hanya bertugas memuat ikon lain (selain sosmed profil yang sudah dijamin oleh inline SVG)
     document.addEventListener('DOMContentLoaded', () => {
         if(typeof lucide !== 'undefined') lucide.createIcons();
     });
