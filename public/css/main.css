@@ -509,9 +509,71 @@ html[data-theme="dark"] .genz-badge-pill {
 }
 
 /* ==============================================================
+   SUPER BIG UPGRADE: FILTER TAGS / PILL BUTTONS (GAMBAR 2 FIX)
+   Desain tombol modern interaktif, presisi dual-theme, anti-polos
+============================================================== */
+.filter-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 22px;
+}
+
+.filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--theme-muted);
+    background: var(--theme-glass-bg);
+    border: 1px solid var(--theme-glass-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+}
+
+.filter-tag:hover {
+    color: var(--theme-primary);
+    border-color: var(--theme-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(22, 163, 74, 0.2);
+}
+
+.filter-tag.active {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    border-color: #16a34a;
+    box-shadow: 0 6px 20px rgba(22, 163, 74, 0.35);
+    transform: translateY(-2px);
+}
+
+html[data-theme="dark"] .filter-tag.active {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: #022c22 !important;
+    border-color: #4ade80;
+    box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+}
+
+.filter-tag svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+    stroke-width: 2.2px;
+}
+
+/* ==============================================================
    SUPER BIG UPGRADE: SECTION "APA KATA KADER?"
    5-Card Stream: Glassmorphism + Neumorphism + Holographic Glow
    Anti-Tertimpa Font Color Protection (Light & Dark Mode)
+   FIX: Quotes Scrollable Box & High-Contrast Instagram Button (Gambar 1)
 ============================================================== */
 .kader-section-container {
     width: 100%;
@@ -530,6 +592,7 @@ html[data-theme="dark"] .genz-badge-pill {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 20px;
     width: 100%;
+    align-items: stretch;
 }
 
 @media (min-width: 1100px) {
@@ -567,6 +630,7 @@ html[data-theme="dark"] .genz-badge-pill {
     height: 230px;
     overflow: hidden;
     background: #0f172a;
+    flex-shrink: 0;
 }
 
 .kader-portrait {
@@ -589,40 +653,43 @@ html[data-theme="dark"] .genz-badge-pill {
     pointer-events: none;
 }
 
+/* FIX GAMBAR 1: IKON INSTAGRAM JELAS, HIGH CONTRAST & TAJAM */
 .kader-ig-floating {
     position: absolute;
     top: 12px;
     right: 12px;
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background: rgba(15, 23, 42, 0.7);
+    background: rgba(15, 23, 42, 0.75);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
     color: #ffffff !important;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    z-index: 6;
+    z-index: 10;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .kader-ig-floating:hover {
-    background: #e1306c;
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
     color: #ffffff !important;
     transform: scale(1.15) rotate(8deg);
-    box-shadow: 0 4px 15px rgba(225, 48, 108, 0.6);
+    box-shadow: 0 6px 18px rgba(225, 48, 108, 0.6);
     border-color: transparent;
 }
 
 .kader-ig-floating svg {
-    width: 16px;
-    height: 16px;
-    stroke-width: 2.2;
-    stroke: currentColor;
-    fill: none;
+    width: 18px !important;
+    height: 18px !important;
+    stroke-width: 2.2 !important;
+    stroke: #ffffff !important;
+    fill: none !important;
+    display: block !important;
 }
 
 .kader-quote-capsule {
@@ -641,21 +708,46 @@ html[data-theme="dark"] .genz-badge-pill {
     line-height: 1;
     color: #4ade80;
     font-family: Georgia, serif;
-    margin-bottom: -12px;
-    opacity: 0.85;
+    margin-bottom: -10px;
+    opacity: 0.9;
+}
+
+/* FIX GAMBAR 1: QUOTES TIDAK TERPOTONG & RATA DENGAN SCROLLING SMOOTH */
+.kader-quote-scroll-box {
+    max-height: 115px;
+    min-height: 85px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 6px;
+    margin-bottom: 14px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(74, 222, 128, 0.4) transparent;
+}
+
+.kader-quote-scroll-box::-webkit-scrollbar {
+    width: 4px;
+}
+.kader-quote-scroll-box::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+.kader-quote-scroll-box::-webkit-scrollbar-thumb {
+    background: rgba(74, 222, 128, 0.5);
+    border-radius: 4px;
+}
+.kader-quote-scroll-box::-webkit-scrollbar-thumb:hover {
+    background: #4ade80;
 }
 
 .kader-quote-message {
-    font-size: 0.82rem !important;
-    line-height: 1.6 !important;
+    font-size: 0.83rem !important;
+    line-height: 1.65 !important;
     color: #f1f5f9 !important;
     font-style: italic;
     font-weight: 500;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-bottom: 14px;
+    margin: 0;
+    word-break: break-word;
+    display: block !important;
 }
 
 .kader-profile-info {
@@ -2419,16 +2511,28 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     .kader-quote-capsule {
         padding: 12px 14px 16px !important;
     }
+    .kader-quote-scroll-box {
+        max-height: 95px !important;
+        min-height: 70px !important;
+    }
     .kader-quote-message {
         font-size: 0.78rem !important;
-        -webkit-line-clamp: 3;
-        margin-bottom: 10px !important;
+        margin-bottom: 0 !important;
     }
     .kader-profile-name {
         font-size: 0.85rem !important;
     }
     .kader-profile-role {
         font-size: 0.7rem !important;
+    }
+
+    /* FILTER TAGS MOBILE */
+    .filter-tags {
+        gap: 8px;
+    }
+    .filter-tag {
+        padding: 6px 14px;
+        font-size: 0.78rem;
     }
 
     /* COMPACT FOOTER MOBILE */
@@ -2591,28 +2695,28 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
         border-radius: 16px;
         margin: 15px auto;
     }
-    .pdf-render-viewport {
-        padding: 14px 8px 75px 8px;
+    .pdf-render-viewport { 
+        padding: 14px 8px 75px 8px; 
     }
-    .pdf-page-wrapper {
-        margin-bottom: 14px !important;
+    .pdf-page-wrapper { 
+        margin-bottom: 14px !important; 
     }
     .btn-buka-full-pdf { 
         bottom: 14px; 
         right: 14px; 
         padding: 8px 14px; 
         font-size: 0.78rem; 
-        border-width: 2px;
-        box-shadow: 2.5px 2.5px 0px #000000;
+        border-width: 2px; 
+        box-shadow: 2.5px 2.5px 0px #000000; 
     }
 
-    .team-social-btn {
-        width: 32px;
-        height: 32px;
+    .team-social-btn { 
+        width: 32px; 
+        height: 32px; 
     }
-    .team-social-btn svg {
-        width: 16px;
-        height: 16px;
+    .team-social-btn svg { 
+        width: 16px; 
+        height: 16px; 
     }
 
     .grid-dev-2 { grid-template-columns: 1fr; }
