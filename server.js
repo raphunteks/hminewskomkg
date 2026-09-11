@@ -250,20 +250,9 @@ async function initDefaultData() {
         ]);
     }
     
-    // Inisialisasi Data Default Section "Apa Kata Kader?"
-    let hasKaderQuotes = await kv.get('kaderQuotesList');
-    if (!hasKaderQuotes || hasKaderQuotes.length === 0) {
-        await kv.set('kaderQuotesList', [
-            {
-                id: 1,
-                name: 'ANDI FAJRIN PERDANA SAM',
-                role: 'Ketua BEM KBMFKG UMI 2023-2024',
-                quote: 'Pemenang yang sesungguhnya adalah ketika kamu mampu melawan amarah dengan kesabaran, dan memaafkan dengan ketulusan. Itulah sifat kader HMI yang sesungguhnya!',
-                image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=80',
-                ig: 'https://www.instagram.com/',
-                email: 'hmikomkedokgigiumi.190120@gmail.com'
-            }
-        ]);
+    // Inisialisasi Database Bersih Tanpa Dummy (Data murni dari Admin Dashboard)
+    if (!(await kv.get('kaderQuotesList'))) {
+        await kv.set('kaderQuotesList', []);
     }
 
     let hasAlbums = await kv.get('albumsList');
@@ -579,7 +568,7 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
         
         const pengurus = safeArr(await kv.get('pengurusList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role), ig: safeStr(x.ig), fb: safeStr(x.fb), twitter: safeStr(x.twitter), linkedin: safeStr(x.linkedin), tiktok: safeStr(x.tiktok)}));
         const bidang = safeArr(await kv.get('bidangList')).map(x => ({...x, name: safeStr(x.name), members: safeArr(x.members).map(m => ({...m, name: safeStr(m.name), role: safeStr(m.role), ig: safeStr(m.ig), fb: safeStr(m.fb), twitter: safeStr(m.twitter), linkedin: safeStr(m.linkedin), tiktok: safeStr(m.tiktok)}))}));
-        const kohatiPengurus = safeArr(await kv.get('kohatiPengurusList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role), ig: safeStr(x.ig), fb: safeStr(x.fb), twitter: safeStr(x.twitter), linkedin: safeStr(x.linkedin), tiktok: safeStr(x.tiktok)}));
+        const kohatiPengurus = safeArr(await kv.get('kohatiPengurusList')).map(x => ({...x, name: safeStr(x.name), role: safeStr(x.role), ig: safeStr(x.ig), fb: safeStr(x.fb), twitter: safeStr(m => safeStr(m.twitter)), linkedin: safeStr(x.linkedin), tiktok: safeStr(x.tiktok)}));
         const kohatiBidang = safeArr(await kv.get('kohatiBidangList')).map(x => ({...x, name: safeStr(x.name), members: safeArr(x.members).map(m => ({...m, name: safeStr(m.name), role: safeStr(m.role), ig: safeStr(m.ig), fb: safeStr(m.fb), twitter: safeStr(m.twitter), linkedin: safeStr(m.linkedin), tiktok: safeStr(m.tiktok)}))}));
         
         const dataAnggota = safeArr(await kv.get('dataAnggotaList')).map(x => ({...x, title: safeStr(x.title), date: safeStr(x.date)}));
@@ -593,15 +582,14 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
         // Data Pesan Masuk Narahubung
         const contactMessages = safeArr(await kv.get('contactMessagesList'));
 
-        // Data Kutipan Kader (Apa Kata Kader?)
+        // Data Kutipan Kader (Apa Kata Kader?) - Khusus Instagram Tanpa Email
         const kaderQuotes = safeArr(await kv.get('kaderQuotesList')).map(x => ({
             ...x,
             name: safeStr(x.name),
             role: safeStr(x.role),
             quote: safeStr(x.quote),
             image: safeStr(x.image),
-            ig: safeStr(x.ig),
-            email: safeStr(x.email)
+            ig: safeStr(x.ig)
         }));
 
         res.render('admin-dashboard', { 
@@ -722,7 +710,7 @@ app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req
     res.redirect('/admin/dashboard');
 });
 
-// KELOLA KUTIPAN KADER (APA KATA KADER?)
+// KELOLA KUTIPAN KADER (APA KATA KADER?) - KHUSUS INSTAGRAM TANPA EMAIL
 app.post('/admin/tambah-kader-quote', requireAdmin, upload.any(), async (req, res) => {
     try {
         let list = await kv.get('kaderQuotesList') || [];
@@ -733,8 +721,7 @@ app.post('/admin/tambah-kader-quote', requireAdmin, upload.any(), async (req, re
             role: (req.body.role || '').trim(),
             quote: (req.body.quote || '').trim(),
             image: img,
-            ig: (req.body.ig || '').trim(),
-            email: (req.body.email || '').trim()
+            ig: (req.body.ig || '').trim()
         });
         await kv.set('kaderQuotesList', list);
         res.redirect('/admin/dashboard');
@@ -750,7 +737,7 @@ app.post('/admin/edit-kader-quote/:id', requireAdmin, upload.any(), async (req, 
             if (req.body.role) list[i].role = req.body.role.trim();
             if (req.body.quote) list[i].quote = req.body.quote.trim();
             if (req.body.ig !== undefined) list[i].ig = req.body.ig.trim();
-            if (req.body.email !== undefined) list[i].email = req.body.email.trim();
+            delete list[i].email; // Menghapus field email pada data lama
 
             const newImg = await saveUploadedFile(req, 'image', 'kader-quote');
             if (newImg) list[i].image = newImg;
