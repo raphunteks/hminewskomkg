@@ -11,8 +11,8 @@
     // ==============================================================
     let albumTitleClean = typeof album !== 'undefined' && album ? album.title : 'Galeri Kegiatan';
     let pageDescription = `Dokumentasi dan foto kegiatan ${albumTitleClean} HMI Komisariat Kedokteran Gigi UMI. Explore the photo gallery and event documentation for ${albumTitleClean}.`;
-    let pageImage = typeof album !== 'undefined' && album && album.cover ? album.cover : '/img/default.png';
-    let baseUrl = "https://hmikomkgumi.com"; // Bisa disesuaikan dengan domain asli Anda
+    let pageImage = typeof album !== 'undefined' && album && album.cover ? album.cover : '/img/logo-hmikomkgumi.png';
+    let baseUrl = "https://hmikomkgumi.xyz"; // Domain resmi komisariat
 
     // ==============================================================
     // DYNAMIC SEO SCHEMA GENERATOR (ENTERPRISE LEVEL)
@@ -106,12 +106,12 @@
         <p>Explore the photo gallery and event documentation for <%= album.title %>. Capturing moments of HMI Dentistry Commissariat UMI.</p>
     </div>
 
-    <header class="container" style="text-align:center; margin-bottom:40px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:30px;">
-        <a href="/galeri" style="color:#4ade80; display:inline-flex; align-items:center; gap:5px; margin-bottom:20px; font-weight:600; transition:0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#4ade80'">
-            <i data-lucide="arrow-left" style="width:16px;"></i> Kembali ke Galeri
+    <header class="container" style="text-align:center; margin-bottom:40px; border-bottom:1px solid var(--theme-glass-border); padding-bottom:30px;">
+        <a href="/galeri" style="color: var(--theme-primary); display:inline-flex; align-items:center; gap:6px; margin-bottom:20px; font-weight:700; transition:0.3s ease;">
+            <i data-lucide="arrow-left" style="width:18px;"></i> Kembali ke Galeri
         </a>
         
-        <h1 itemprop="headline" style="font-size: 2.5rem; margin-bottom: 10px;"><%= album.title || 'Detail Galeri' %></h1>
+        <h1 itemprop="headline" style="font-size: clamp(1.8rem, 4vw, 2.5rem); margin-bottom: 10px; color: var(--theme-heading); font-weight: 800;"><%= album.title || 'Detail Galeri' %></h1>
         <p class="text-muted" style="display:inline-flex; align-items:center; gap:5px; font-size: 1rem;">
             <i data-lucide="calendar" style="width:16px;"></i> 
             <time itemprop="datePublished" datetime="<%= album.date || '' %>"><%= album.date || '-' %></time>
@@ -125,7 +125,7 @@
         <!-- Foto Cover Utama -->
         <% if (album.cover) { %>
         <figure class="gallery-detail-item gallery-clickable" onclick="openLightbox(0)" itemprop="image" itemscope itemtype="https://schema.org/ImageObject" style="margin:0;">
-            <img itemprop="contentUrl" src="<%= album.cover %>" alt="Cover: <%= album.title %>">
+            <img itemprop="contentUrl" src="<%= album.cover %>" alt="Cover: <%= album.title %>" onerror="this.src='/img/logo-hmikomkgumi.png'">
             <meta itemprop="name" content="Cover: <%= album.title %>">
         </figure>
         <% } %>
@@ -134,7 +134,7 @@
         <% if(album.photos && album.photos.length > 0) { %>
             <% album.photos.forEach((photo, index) => { %>
                 <figure class="gallery-detail-item gallery-clickable" onclick="openLightbox(<%= album.cover ? index + 1 : index %>)" itemprop="image" itemscope itemtype="https://schema.org/ImageObject" style="margin:0;">
-                    <img itemprop="contentUrl" src="<%= photo.url %>" alt="Dokumentasi <%= album.title %> - <%= index + 1 %>">
+                    <img itemprop="contentUrl" src="<%= photo.url %>" alt="Dokumentasi <%= album.title %> - <%= index + 1 %>" onerror="this.src='/img/logo-hmikomkgumi.png'">
                     <meta itemprop="name" content="Dokumentasi <%= index + 1 %>">
                 </figure>
             <% }) %>
@@ -180,15 +180,12 @@
 <!-- ==============================================================
      LOGIKA LIGHTBOX ANTI-CRASH (Bebas Error 500 & Syntax Error)
 ============================================================== -->
-<!-- INJEKSI DATA AMAN: Memisahkan EJS dari Javascript Parser -->
 <script id="albumDataJson" type="application/json"><%- typeof album !== 'undefined' && album ? JSON.stringify(album).replace(/</g, '\\u003c') : '{}' %></script>
 
 <script>
-    // Memindahkan parsing data ke Client-Side secara aman
     let albumData = {};
     try {
         const rawAlbum = document.getElementById('albumDataJson').textContent;
-        // Pengecekan Aman: Pastikan string tidak kosong dan bukan tag EJS mentah
         if (rawAlbum && rawAlbum.trim() !== '' && !rawAlbum.includes('<' + '%')) {
             albumData = JSON.parse(rawAlbum);
         }
@@ -198,7 +195,6 @@
 
     const lightboxImages = [];
 
-    // Filter array gambar secara aman
     if (albumData.cover) {
         lightboxImages.push(albumData.cover);
     }
@@ -252,7 +248,6 @@
 
         counterEl.innerText = (currentLightboxIndex + 1) + " / " + lightboxImages.length;
         
-        // Manipulasi nama download dilakukan di frontend
         const safeTitle = (albumData.title || "Galeri").toString().replace(/[^a-zA-Z0-9]/g, '_');
         downloadEl.href = imageUrl;
         downloadEl.download = "Galeri_HMI_" + safeTitle + "_" + (currentLightboxIndex + 1);
@@ -278,7 +273,7 @@
 ============================================================== -->
 <% } else { %>
 <div class="container" style="text-align:center; padding: 100px 20px;">
-    <div style="background: rgba(255,255,255,0.05); padding: 50px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); max-width: 600px; margin: 0 auto;">
+    <div class="glass" style="padding: 50px; max-width: 600px; margin: 0 auto;">
         <i data-lucide="alert-circle" style="width:64px; height:64px; color:#ef4444; margin-bottom:20px;"></i>
         <h2 style="margin-bottom: 10px;">Galeri Tidak Ditemukan</h2>
         <p class="text-muted" style="margin-bottom:30px;">Album galeri yang Anda cari mungkin telah dihapus, rusak, atau tidak tersedia.</p>
@@ -286,5 +281,44 @@
     </div>
 </div>
 <% } %>
+
+<!-- ==============================================================
+     SUPER BIG UPGRADE: ANALYTICS DASHBOARD WIDGET (PERSIS GAMBAR)
+============================================================== -->
+<section class="analytics-section" aria-label="Statistik Pengunjung" style="margin-top: 50px;">
+    <div class="analytics-grid">
+        <div class="analytic-card">
+            <div class="analytic-title">VIEWS TODAY</div>
+            <div class="analytic-value stat-today" id="viewsToday">6</div>
+        </div>
+        <div class="analytic-card">
+            <div class="analytic-title">THIS WEEK</div>
+            <div class="analytic-value stat-week" id="viewsWeek">14</div>
+        </div>
+        <div class="analytic-card">
+            <div class="analytic-title">TOTAL VIEWS</div>
+            <div class="analytic-value stat-total" id="viewsTotal">130</div>
+        </div>
+    </div>
+</section>
+
+<script>
+    async function loadVisitorStats() {
+        try {
+            const res = await fetch('/api/analytics');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.today && document.getElementById('viewsToday')) document.getElementById('viewsToday').innerText = data.today;
+                if (data.week && document.getElementById('viewsWeek')) document.getElementById('viewsWeek').innerText = data.week;
+                if (data.total && document.getElementById('viewsTotal')) document.getElementById('viewsTotal').innerText = data.total;
+            }
+        } catch(e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        loadVisitorStats();
+    });
+</script>
 
 <%- include('partials/footer') %>
