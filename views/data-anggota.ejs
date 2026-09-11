@@ -62,126 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<style>
-    /* Bezel Frame Utama Persis Gambar 2 */
-    .native-pdf-bezel-frame {
-        position: relative;
-        width: 100%;
-        max-width: 900px;
-        height: 78vh;
-        min-height: 560px;
-        margin: 0 auto;
-        background: #1e293b;
-        border: 2.5px solid #0f172a;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
-    }
-
-    /* Scroll Viewport Native Multi-Page */
-    .pdf-render-viewport {
-        width: 100%;
-        height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
-        padding: 16px 10px 80px 10px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 18px;
-        box-sizing: border-box;
-        background: #334155;
-    }
-
-    /* Kertas Dokumen Per Halaman */
-    .pdf-page-wrapper {
-        width: 100%;
-        max-width: 780px;
-        background: #ffffff;
-        border-radius: 4px;
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-    }
-
-    .pdf-page-wrapper canvas {
-        display: block;
-        width: 100% !important;
-        height: auto !important;
-    }
-
-    /* Indikator Loading Dokumen */
-    .pdf-loading-indicator {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(15, 23, 42, 0.88);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        z-index: 40;
-        color: #4ade80;
-        font-size: 0.95rem;
-        font-weight: 600;
-    }
-
-    /* Tombol Floating BUKA FULL PDF Persis Gambar 2 */
-    .btn-buka-full-pdf {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        background: #a3e635;
-        color: #000000 !important;
-        border: 2.5px solid #000000;
-        border-radius: 10px;
-        padding: 10px 16px;
-        font-size: 0.86rem;
-        font-weight: 800;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        box-shadow: 3px 3px 0px #000000;
-        z-index: 50;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .btn-buka-full-pdf:hover {
-        transform: translate(-1px, -1px);
-        box-shadow: 4px 4px 0px #000000;
-        background: #bef264;
-    }
-
-    .btn-buka-full-pdf:active {
-        transform: translate(1px, 1px);
-        box-shadow: 1px 1px 0px #000000;
-    }
-
-    @media (max-width: 640px) {
-        .native-pdf-bezel-frame {
-            height: 72vh;
-            min-height: 480px;
-            border-radius: 16px;
-        }
-        .pdf-render-viewport {
-            padding: 10px 6px 70px 6px;
-            gap: 12px;
-        }
-        .btn-buka-full-pdf {
-            bottom: 14px;
-            right: 14px;
-            padding: 8px 12px;
-            font-size: 0.78rem;
-        }
-    }
-</style>
-
 <div style="max-width: 1000px; margin: 0 auto; text-align: center; margin-bottom: 50px;">
     <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size: clamp(1.8rem, 4vw, 2.3rem);">Data Anggota HMI KomKG-UMI</h2>
     <p class="text-muted" style="margin-bottom: 35px; font-size: 1rem;">Database keanggotaan terupdate. Pilih dan baca langsung dokumen PDF di bawah ini.</p>
@@ -346,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 
 <!-- ==============================================================
-     LOGIKA ENGINE RENDERING MOZILLA PDF.JS
+     LOGIKA ENGINE RENDERING MOZILLA PDF.JS (ANTI-PIPIH / RETINA SCALED)
 ============================================================== -->
 <script>
     if (typeof pdfjsLib !== 'undefined') {
@@ -369,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
-        viewport.querySelectorAll('.pdf-page-wrapper').forEach(el => el.remove());
+        viewport.innerHTML = '';
 
         try {
             if (activePdfTask) {
@@ -382,31 +262,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (loader) loader.style.display = 'none';
 
+            // Hitung lebar target kontainer secara akurat
+            const containerWidth = viewport.clientWidth > 0 ? (viewport.clientWidth - 20) : (window.innerWidth - 40);
+            const targetWidth = Math.max(300, Math.min(800, containerWidth));
+            const dpr = Math.min(window.devicePixelRatio || 2, 2.5);
+
             for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
                 const page = await pdfDoc.getPage(pageNum);
+                const unscaledViewport = page.getViewport({ scale: 1.0 });
+
+                // Skala adaptif penuh agar dokumen tidak menyusut vertikal
+                const fitScale = targetWidth / unscaledViewport.width;
+                const renderViewport = page.getViewport({ scale: fitScale * dpr });
+
+                const cssWidth = Math.floor(unscaledViewport.width * fitScale);
+                const cssHeight = Math.floor(unscaledViewport.height * fitScale);
 
                 const pageWrapper = document.createElement('div');
                 pageWrapper.className = 'pdf-page-wrapper';
+                pageWrapper.style.width = `${cssWidth}px`;
+                pageWrapper.style.height = `${cssHeight}px`;
 
                 const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
+                const context = canvas.getContext('2d', { alpha: false });
 
-                // Komputasi skala DPI tajam di layar Retina HP
-                const dpr = window.devicePixelRatio || 1.5;
-                const unscaledViewport = page.getViewport({ scale: 1 });
-                const targetWidth = Math.min(780, viewport.clientWidth - 24);
-                const scale = (targetWidth / unscaledViewport.width) * dpr;
-                const scaledViewport = page.getViewport({ scale: scale });
-
-                canvas.width = scaledViewport.width;
-                canvas.height = scaledViewport.height;
+                canvas.width = Math.floor(renderViewport.width);
+                canvas.height = Math.floor(renderViewport.height);
+                canvas.style.width = `${cssWidth}px`;
+                canvas.style.height = `${cssHeight}px`;
 
                 pageWrapper.appendChild(canvas);
                 viewport.appendChild(pageWrapper);
 
                 const renderContext = {
                     canvasContext: context,
-                    viewport: scaledViewport
+                    viewport: renderViewport
                 };
 
                 await page.render(renderContext).promise;
