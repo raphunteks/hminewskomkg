@@ -400,6 +400,26 @@
 
 </article>
 
+<!-- ==============================================================
+     SUPER BIG UPGRADE: ANALYTICS DASHBOARD WIDGET (PERSIS GAMBAR)
+============================================================== -->
+<section class="analytics-section" aria-label="Statistik Pengunjung">
+    <div class="analytics-grid">
+        <div class="analytic-card">
+            <div class="analytic-title">VIEWS TODAY</div>
+            <div class="analytic-value stat-today" id="viewsToday">6</div>
+        </div>
+        <div class="analytic-card">
+            <div class="analytic-title">THIS WEEK</div>
+            <div class="analytic-value stat-week" id="viewsWeek">14</div>
+        </div>
+        <div class="analytic-card">
+            <div class="analytic-title">TOTAL VIEWS</div>
+            <div class="analytic-value stat-total" id="viewsTotal">130</div>
+        </div>
+    </div>
+</section>
+
 <script>
     function openTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -411,8 +431,24 @@
         }
     }
     
+    // Auto Loader Statistik Pengunjung Dinamis
+    async function loadVisitorStats() {
+        try {
+            const res = await fetch('/api/analytics');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.today && document.getElementById('viewsToday')) document.getElementById('viewsToday').innerText = data.today;
+                if (data.week && document.getElementById('viewsWeek')) document.getElementById('viewsWeek').innerText = data.week;
+                if (data.total && document.getElementById('viewsTotal')) document.getElementById('viewsTotal').innerText = data.total;
+            }
+        } catch(e) {
+            // Mempertahankan angka display bawaan jika offline/API pending
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         if(typeof lucide !== 'undefined') lucide.createIcons();
+        loadVisitorStats();
     });
 </script>
 <script src="/js/protect-devtools.js" defer></script>
