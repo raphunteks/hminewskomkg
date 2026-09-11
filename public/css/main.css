@@ -31,7 +31,7 @@
     --theme-analytic-bg: rgba(255, 255, 255, 0.9);
     --theme-analytic-total: #0f172a;
     --theme-drawer-bg: rgba(255, 255, 255, 0.96);
-    --theme-sidebar-bg: rgba(255, 255, 255, 0.9);
+    --theme-sidebar-bg: rgba(255, 255, 255, 0.92);
 }
 
 html[data-theme="dark"] {
@@ -131,7 +131,7 @@ button, input, textarea, select { font-family: inherit; }
 
 /* LAYOUT (Z-INDEX FIXED) */
 .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-main { flex-grow: 1; padding-top: 120px; padding-bottom: 60px; position: relative; z-index: 20; }
+main { flex-grow: 1; padding-top: 110px; padding-bottom: 60px; position: relative; z-index: 20; }
 
 /* UI UPGRADE 5: DYNAMIC BLOB ANIMATIONS (GPU ACCELERATED - VERY FAST) */
 .bg-blob { 
@@ -457,6 +457,110 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .rich-text-content a:hover { color: #22c55e; }
 .rich-text-content blockquote { border-left: 4px solid #22c55e; padding-left: 15px; margin-left: 0; font-style: italic; color: var(--theme-muted); background: rgba(0,0,0,0.03); padding:10px 15px; border-radius: 0 8px 8px 0; }
 
+/* ==============================================================
+   SMART COLOR SYSTEM (AUTO HIGH-CONTRAST LIGHT & DARK ENGINE)
+   Memastikan teks, paragraf, judul, dan konten otomatis hitam pekat
+   di tema Light (default), dan putih bersih bersinar di tema Dark.
+============================================================== */
+html[data-theme="light"] body,
+html[data-theme="light"] main,
+html[data-theme="light"] .container,
+html[data-theme="light"] .rich-text-content,
+html[data-theme="light"] .rich-text-content p,
+html[data-theme="light"] .rich-text-content span,
+html[data-theme="light"] .rich-text-content li,
+html[data-theme="light"] .rich-text-content div {
+    color: #0f172a;
+}
+
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3,
+html[data-theme="light"] h4,
+html[data-theme="light"] h5,
+html[data-theme="light"] h6 {
+    color: #0f172a !important;
+}
+
+/* SMART COLOR HALAMAN TENTANG KAMI (PERSIS GAMBAR 4) */
+html[data-theme="light"] .tentang-card,
+html[data-theme="light"] .tentang-card p,
+html[data-theme="light"] .tentang-card span,
+html[data-theme="light"] .tentang-card div,
+html[data-theme="light"] .tab-content p,
+html[data-theme="light"] .tab-content span,
+html[data-theme="light"] .tab-content div,
+html[data-theme="light"] .tab-pane p,
+html[data-theme="light"] .tab-pane span,
+html[data-theme="light"] .vm-card p,
+html[data-theme="light"] .vm-card span,
+html[data-theme="light"] .vm-card li {
+    color: #1e293b !important;
+}
+
+/* SMART COLOR HALAMAN BERITA DETAIL (PERSIS GAMBAR 5) */
+html[data-theme="light"] .berita-detail-title,
+html[data-theme="light"] .news-detail-title,
+html[data-theme="light"] .detail-title,
+html[data-theme="light"] .article-title,
+html[data-theme="light"] .detail-card h1,
+html[data-theme="light"] .detail-card h2,
+html[data-theme="light"] .detail-card h3,
+html[data-theme="light"] .detail-card p,
+html[data-theme="light"] .detail-card span,
+html[data-theme="light"] .detail-content,
+html[data-theme="light"] .detail-content p,
+html[data-theme="light"] .detail-content span,
+html[data-theme="light"] .detail-content div {
+    color: #0f172a !important;
+}
+
+html[data-theme="light"] .text-muted {
+    color: #475569 !important;
+}
+
+/* Overwrite Hardcoded Text White in Light Theme */
+html[data-theme="light"] [style*="color: #fff"],
+html[data-theme="light"] [style*="color:#fff"],
+html[data-theme="light"] [style*="color: #ffffff"],
+html[data-theme="light"] [style*="color:#ffffff"],
+html[data-theme="light"] [style*="color: white"],
+html[data-theme="light"] [style*="color:white"],
+html[data-theme="light"] [style*="color: rgb(255, 255, 255)"],
+html[data-theme="light"] [style*="color: rgb(255,255,255)"],
+html[data-theme="light"] [style*="color: #f3f4f6"],
+html[data-theme="light"] [style*="color:#f3f4f6"],
+html[data-theme="light"] [style*="color: #d1d5db"],
+html[data-theme="light"] [style*="color:#d1d5db"],
+html[data-theme="light"] [style*="color: #e5e7eb"],
+html[data-theme="light"] [style*="color:#e5e7eb"] {
+    color: #0f172a !important;
+}
+
+/* Tetap mempertahankan teks putih untuk tombol & badge bertema gelap */
+html[data-theme="light"] .btn-primary,
+html[data-theme="light"] .btn-primary *,
+html[data-theme="light"] .btn-danger,
+html[data-theme="light"] .btn-danger *,
+html[data-theme="light"] .btn-submit-message,
+html[data-theme="light"] .btn-submit-message *,
+html[data-theme="light"] .btn-sidebar-create,
+html[data-theme="light"] .btn-sidebar-create *,
+html[data-theme="light"] .sidebar-badge-dot,
+html[data-theme="light"] .badge-danger,
+html[data-theme="light"] .card-badge,
+html[data-theme="light"] .photo-count,
+html[data-theme="light"] .scroll-to-top-btn,
+html[data-theme="light"] .scroll-to-top-btn svg,
+html[data-theme="light"] .sidebar-logout-btn,
+html[data-theme="light"] .sidebar-logout-btn * {
+    color: inherit;
+}
+html[data-theme="light"] .btn-primary { color: #000000 !important; }
+html[data-theme="light"] .sidebar-logout-btn { color: #dc2626 !important; }
+html[data-theme="light"] .scroll-to-top-btn { color: #ffffff !important; }
+html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
+
 /* OPTIMASI 3: KARTU VISI MISI DENGAN LAZY RENDERING */
 .vm-card {
     background: var(--theme-vm-bg);
@@ -666,27 +770,303 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 @keyframes shimmer { 100% { transform: translateX(100%); } }
 
 /* ==============================================================
-   ADMIN DASHBOARD CORE UI & PANELS
+   SUPER BIG UPGRADE: COLLAPSIBLE ADMIN SIDEBAR (PERSIS GAMBAR 3)
 ============================================================== */
-.dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 25px; margin-bottom: 20px; }
-.admin-info { display: flex; align-items: center; gap: 20px; }
-.admin-icon { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #22c55e; padding: 3px; background: #ffffff; box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
-.admin-icon img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+.admin-dashboard-container {
+    display: flex;
+    gap: 25px;
+    align-items: flex-start;
+    position: relative;
+    width: 100%;
+    margin-top: 0;
+}
 
-.admin-tab-nav { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; border-bottom: 1px solid var(--theme-glass-border); padding-bottom: 15px; overflow-x: auto; }
-.admin-tab-btn { background: rgba(0,0,0,0.05); color: var(--theme-muted); border: 1px solid var(--theme-glass-border); padding: 12px 25px; border-radius: 12px; cursor: pointer; font-weight: 700; white-space: nowrap; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; display: flex; align-items: center; gap: 8px;}
-.admin-tab-btn:hover { background: rgba(0,0,0,0.1); color: var(--theme-heading); }
-.admin-tab-btn.active { background: #22c55e; color: #000; box-shadow: 0 4px 15px rgba(34,197,94,0.3); border-color: #22c55e; }
-.admin-tab-pane { display: none; animation: fadeIn 0.4s ease; }
-.admin-tab-pane.active { display: block; }
+.admin-sidebar-nav {
+    width: 270px;
+    min-width: 270px;
+    background: var(--theme-sidebar-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--theme-glass-border);
+    border-radius: 20px;
+    padding: 20px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: var(--theme-glass-shadow);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    position: sticky;
+    top: 95px;
+    z-index: 25;
+    min-height: calc(100vh - 120px);
+}
 
-.admin-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; align-items: start; }
-.admin-main-content { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
-.admin-sidebar { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
+/* PROFIL ADMIN DI HEADER ATAS SIDEBAR (PERSIS GAMBAR 3) */
+.sidebar-top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--theme-glass-border);
+    gap: 10px;
+    width: 100%;
+}
+.sidebar-admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    overflow: hidden;
+}
+.sidebar-admin-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #22c55e;
+    padding: 2px;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(34, 197, 94, 0.25);
+    flex-shrink: 0;
+}
+.sidebar-admin-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+.sidebar-admin-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+}
+.sidebar-admin-title {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: var(--theme-heading);
+    margin: 0;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.sidebar-admin-desc {
+    font-size: 0.72rem;
+    color: var(--theme-primary);
+    margin: 2px 0 0 0;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.sidebar-collapse-btn {
+    background: rgba(0,0,0,0.04);
+    border: 1px solid var(--theme-glass-border);
+    border-radius: 8px;
+    padding: 6px;
+    color: var(--theme-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+.sidebar-collapse-btn:hover {
+    color: var(--theme-primary);
+    background: rgba(34,197,94,0.1);
+}
+
+.sidebar-action-wrap {
+    margin: 4px 0 8px;
+}
+.btn-sidebar-create {
+    width: 100%;
+    background: #10b981;
+    color: #ffffff !important;
+    border: none;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-start;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+    transition: all 0.25s ease;
+}
+.btn-sidebar-create:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+}
+
+.sidebar-menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+.sidebar-nav-item {
+    appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    color: var(--theme-muted);
+    font-weight: 600;
+    font-size: 0.88rem;
+    text-align: left;
+    transition: all 0.2s ease;
+    position: relative;
+}
+.sidebar-nav-item:hover {
+    color: var(--theme-heading);
+    background: rgba(0,0,0,0.04);
+}
+.sidebar-nav-item.active {
+    color: #0284c7;
+    background: rgba(2, 132, 199, 0.1);
+    font-weight: 700;
+}
+.sidebar-nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: #0284c7;
+    border-radius: 0 4px 4px 0;
+}
+
+.sidebar-nav-icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.sidebar-badge-dot {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: #ef4444;
+    color: #fff !important;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(239,68,68,0.4);
+}
+
+/* TOMBOL LOGOUT DI BAGIAN BAWAH KIRI SIDEBAR (PERSIS GAMBAR 2 & 3) */
+.sidebar-footer-wrap {
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid var(--theme-glass-border);
+    width: 100%;
+}
+.sidebar-logout-btn {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    transition: all 0.25s ease;
+}
+.sidebar-logout-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #dc2626 !important;
+    border-color: #ef4444;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+/* STATE SIDEBAR COLLAPSED (MODE RAMPING ICON-ONLY - PERSIS GBR 3) */
+.admin-dashboard-container.sidebar-collapsed .admin-sidebar-nav {
+    width: 76px;
+    min-width: 76px;
+    padding: 20px 10px;
+    align-items: center;
+}
+.admin-dashboard-container.sidebar-collapsed .sidebar-admin-info,
+.admin-dashboard-container.sidebar-collapsed .sidebar-text {
+    display: none;
+}
+.admin-dashboard-container.sidebar-collapsed .sidebar-top-header {
+    justify-content: center;
+    width: 100%;
+}
+.admin-dashboard-container.sidebar-collapsed .sidebar-admin-profile {
+    display: none;
+}
+.admin-dashboard-container.sidebar-collapsed .btn-sidebar-create {
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 12px;
+}
+.admin-dashboard-container.sidebar-collapsed .sidebar-nav-item,
+.admin-dashboard-container.sidebar-collapsed .sidebar-logout-btn {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 12px;
+}
+.admin-dashboard-container.sidebar-collapsed .sidebar-nav-item.active::before {
+    display: none;
+}
+
+/* PUNCAK SEJAJAR KONTEN UTAMA DENGAN SIDEBAR (PERSIS GAMBAR 3) */
+.admin-main-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-top: 0;
+    padding-top: 0;
+}
+.admin-main-wrap .admin-tab-pane {
+    margin-top: 0;
+}
+.admin-main-wrap .admin-panel:first-child {
+    margin-top: 0;
+}
+
+/* ==============================================================
+   ADMIN PANELS & TABLES
+============================================================== */
+.admin-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px; align-items: start; }
+.admin-main-content { display: flex; flex-direction: column; gap: 25px; min-width: 0; }
+.admin-sidebar { display: flex; flex-direction: column; gap: 25px; min-width: 0; }
 
 .admin-panel { padding: 25px; overflow: hidden; content-visibility: auto; contain-intrinsic-size: 0 400px; }
 .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--theme-glass-border); padding-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-.panel-title { display: flex; align-items: center; gap: 10px; margin: 0; }
+.panel-title { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 1.15rem; }
 .panel-title svg { color: var(--theme-primary); }
 .panel-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 
@@ -753,205 +1133,6 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .filter-tag { padding: 6px 16px; background: rgba(0,0,0,0.05); border: 1px solid var(--theme-glass-border); border-radius: 20px; font-size: 0.85rem; cursor: pointer; color: var(--theme-muted); transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; text-decoration: none; }
 .filter-tag:hover { background: rgba(0,0,0,0.1); color: var(--theme-heading); }
 .filter-tag.active { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: var(--theme-primary); box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-weight: bold; }
-
-/* ==============================================================
-   SUPER BIG UPGRADE: COLLAPSIBLE ADMIN SIDEBAR (PERSIS GBR 2 & 3)
-============================================================== */
-.admin-dashboard-container {
-    display: flex;
-    gap: 25px;
-    align-items: flex-start;
-    position: relative;
-    width: 100%;
-}
-
-.admin-sidebar-nav {
-    width: 260px;
-    min-width: 260px;
-    background: var(--theme-sidebar-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--theme-glass-border);
-    border-radius: 20px;
-    padding: 20px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    box-shadow: var(--theme-glass-shadow);
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    position: sticky;
-    top: 100px;
-    z-index: 25;
-}
-
-.sidebar-top-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--theme-glass-border);
-}
-.sidebar-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 800;
-    font-size: 1.05rem;
-    color: var(--theme-primary);
-}
-.sidebar-brand-icon { width: 22px; height: 22px; color: var(--theme-primary); }
-.sidebar-brand-text { white-space: nowrap; color: var(--theme-heading); }
-
-.sidebar-collapse-btn {
-    background: rgba(0,0,0,0.04);
-    border: 1px solid var(--theme-glass-border);
-    border-radius: 8px;
-    padding: 6px;
-    color: var(--theme-muted);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-.sidebar-collapse-btn:hover {
-    color: var(--theme-primary);
-    background: rgba(34,197,94,0.1);
-}
-
-.sidebar-action-wrap {
-    margin: 4px 0 8px;
-}
-.btn-sidebar-create {
-    width: 100%;
-    background: #10b981;
-    color: #ffffff;
-    border: none;
-    padding: 12px 14px;
-    border-radius: 12px;
-    font-weight: 800;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: flex-start;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
-    transition: all 0.25s ease;
-}
-.btn-sidebar-create:hover {
-    background: #059669;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
-}
-
-.sidebar-menu-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-.sidebar-nav-item {
-    appearance: none;
-    background: transparent;
-    border: none;
-    outline: none;
-    width: 100%;
-    padding: 11px 14px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    color: var(--theme-muted);
-    font-weight: 600;
-    font-size: 0.88rem;
-    text-align: left;
-    transition: all 0.2s ease;
-    position: relative;
-}
-.sidebar-nav-item:hover {
-    color: var(--theme-heading);
-    background: rgba(0,0,0,0.04);
-}
-.sidebar-nav-item.active {
-    color: #0284c7;
-    background: rgba(2, 132, 199, 0.1);
-    font-weight: 700;
-}
-.sidebar-nav-item.active::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 60%;
-    background: #0284c7;
-    border-radius: 0 4px 4px 0;
-}
-
-.sidebar-nav-icon-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.sidebar-badge-dot {
-    position: absolute;
-    top: -6px;
-    right: -8px;
-    background: #ef4444;
-    color: #fff;
-    font-size: 0.65rem;
-    font-weight: 800;
-    padding: 2px 6px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(239,68,68,0.4);
-}
-
-/* STATE SIDEBAR COLLAPSED (MODE RAMPING ICON-ONLY - PERSIS GBR 3) */
-.admin-dashboard-container.sidebar-collapsed .admin-sidebar-nav {
-    width: 76px;
-    min-width: 76px;
-    padding: 20px 10px;
-    align-items: center;
-}
-.admin-dashboard-container.sidebar-collapsed .sidebar-brand-text,
-.admin-dashboard-container.sidebar-collapsed .sidebar-text {
-    display: none;
-}
-.admin-dashboard-container.sidebar-collapsed .sidebar-top-header {
-    justify-content: center;
-    width: 100%;
-}
-.admin-dashboard-container.sidebar-collapsed .sidebar-brand {
-    display: none;
-}
-.admin-dashboard-container.sidebar-collapsed .btn-sidebar-create {
-    width: 46px;
-    height: 46px;
-    padding: 0;
-    justify-content: center;
-    border-radius: 12px;
-}
-.admin-dashboard-container.sidebar-collapsed .sidebar-nav-item {
-    width: 48px;
-    height: 48px;
-    padding: 0;
-    justify-content: center;
-    border-radius: 12px;
-}
-.admin-dashboard-container.sidebar-collapsed .sidebar-nav-item.active::before {
-    display: none;
-}
-
-.admin-main-wrap {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-}
 
 /* ==============================================================
    SUPER BIG UPGRADE: MODERN HOVER-EXPANDING LOGIN CARD (GBR 4)
@@ -1939,20 +2120,22 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
         min-width: 100%;
         position: relative;
         top: 0;
+        min-height: auto;
     }
     .admin-dashboard-container.sidebar-collapsed .admin-sidebar-nav {
         width: 100%;
         min-width: 100%;
     }
-    .admin-dashboard-container.sidebar-collapsed .sidebar-brand-text,
+    .admin-dashboard-container.sidebar-collapsed .sidebar-admin-info,
     .admin-dashboard-container.sidebar-collapsed .sidebar-text {
         display: inline;
     }
-    .admin-dashboard-container.sidebar-collapsed .sidebar-brand {
+    .admin-dashboard-container.sidebar-collapsed .sidebar-admin-profile {
         display: flex;
     }
     .admin-dashboard-container.sidebar-collapsed .btn-sidebar-create,
-    .admin-dashboard-container.sidebar-collapsed .sidebar-nav-item {
+    .admin-dashboard-container.sidebar-collapsed .sidebar-nav-item,
+    .admin-dashboard-container.sidebar-collapsed .sidebar-logout-btn {
         width: 100%;
         height: auto;
         padding: 11px 14px;
