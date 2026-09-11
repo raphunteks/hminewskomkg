@@ -10,16 +10,14 @@
 %>
 
 <!-- ==============================================================
-     LAYOUT DASHBOARD ADMIN DENGAN SIDEBAR COLLAPSIBLE (PERSIS GAMBAR 3)
+     LAYOUT DASHBOARD ADMIN DENGAN SIDEBAR COLLAPSIBLE
 ============================================================== -->
 <div class="admin-dashboard-container" id="adminDashboardContainer">
     
-    <!-- ==============================================================
-         SIDEBAR KIRI (PROFIL DI ATAS & LOGOUT DI BAWAH KIRI)
-    ============================================================== -->
+    <!-- SIDEBAR KIRI -->
     <aside class="admin-sidebar-nav" id="adminSidebarNav">
         
-        <!-- PROFIL DASHBOARD ADMIN DI BAGIAN ATAS SIDEBAR (PERSIS GAMBAR 3) -->
+        <!-- PROFIL DASHBOARD ADMIN -->
         <div class="sidebar-top-header">
             <div class="sidebar-admin-profile">
                 <div class="sidebar-admin-avatar">
@@ -30,13 +28,12 @@
                     <p class="sidebar-admin-desc">HMI KomKGUMI</p>
                 </div>
             </div>
-            <!-- Tombol Toggle Buka/Tutup Sidebar (Persis Icon Gbr 2 & 3) -->
             <button type="button" class="sidebar-collapse-btn" id="sidebarCollapseBtn" onclick="toggleAdminSidebar()" title="Buka/Tutup Sidebar">
                 <i data-lucide="panel-left-close" id="sidebarCollapseIcon"></i>
             </button>
         </div>
 
-        <!-- Tombol Tambah Cepat / Buat Baru (Persis Gbr 2 & 3) -->
+        <!-- Tombol Tambah Berita Baru -->
         <div class="sidebar-action-wrap">
             <button type="button" class="btn-sidebar-create" onclick="openModal('modalBerita')" title="Tambah Berita Baru">
                 <i data-lucide="plus" style="width:20px; height:20px;"></i>
@@ -44,9 +41,8 @@
             </button>
         </div>
 
-        <!-- DAFTAR MENU SIDEBAR LENGKAP -->
+        <!-- DAFTAR MENU SIDEBAR -->
         <div class="sidebar-menu-list">
-            <!-- TAB: PESAN MASUK DARI NARAHUBUNG -->
             <button type="button" class="sidebar-nav-item active" onclick="openAdmTab('adm-pesan', this)" title="Pesan Narahubung">
                 <div class="sidebar-nav-icon-wrap">
                     <i data-lucide="inbox"></i>
@@ -93,7 +89,7 @@
             </button>
         </div>
 
-        <!-- TOMBOL LOGOUT DI BAGIAN BAWAH KIRI SIDEBAR (PERSIS GAMBAR 2 & 3) -->
+        <!-- TOMBOL LOGOUT -->
         <div class="sidebar-footer-wrap">
             <a href="/admin/logout" class="sidebar-logout-btn" title="Logout dari Sistem">
                 <div class="sidebar-nav-icon-wrap">
@@ -104,14 +100,10 @@
         </div>
     </aside>
 
-    <!-- ==============================================================
-         KONTEN UTAMA DASHBOARD ADMIN (TERPISAH KETAT PER TAB)
-    ============================================================== -->
+    <!-- KONTEN UTAMA DASHBOARD -->
     <main class="admin-main-wrap">
 
-        <!-- ==============================================================
-             TAB: OVERVIEW PESAN MASUK DARI NARAHUBUNG (ADM-PESAN)
-        ============================================================== -->
+        <!-- TAB: PESAN MASUK DARI NARAHUBUNG -->
         <div id="adm-pesan" class="admin-tab-pane active" style="display: block;">
             <div class="glass admin-panel" style="margin-bottom:0; border-top: 4px solid #0284c7;">
                 <div class="panel-header">
@@ -199,9 +191,7 @@
             </div>
         </div>
 
-        <!-- ==============================================================
-             TAB 1: KELOLA DATA UTAMA (BERITA, PENGURUS, GALERI, PDF)
-        ============================================================== -->
+        <!-- TAB 1: KELOLA DATA UTAMA (BERITA DENGAN URL SLUG TERPADU) -->
         <div id="adm-kelola" class="admin-tab-pane" style="display: none;">
             <div class="admin-layout">
                 <div class="admin-main-content">
@@ -213,16 +203,34 @@
                         </div>
                         <div class="table-wrapper">
                             <table class="admin-table">
-                                <thead><tr><th>Judul Berita</th><th>Kategori</th><th style="text-align:right;">Aksi</th></tr></thead>
-                                <tbody>
-                                    <% news.forEach(item => { %>
+                                <thead>
                                     <tr>
-                                        <td class="fw-600"><%= item.title %><div style="font-size:0.75rem; color:#16a34a; margin-top:3px;"><%= item.date %></div></td>
+                                        <th>Judul & URL Slug (SEO)</th>
+                                        <th>Kategori</th>
+                                        <th style="text-align:right;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% news.forEach(item => { 
+                                        let itemSlug = item.slug || item.id;
+                                    %>
+                                    <tr>
+                                        <td class="fw-600">
+                                            <span style="color:var(--theme-heading);"><%= item.title %></span>
+                                            <div style="font-size:0.75rem; color:#16a34a; margin-top:3px; display:flex; align-items:center; gap:8px;">
+                                                <span><i data-lucide="calendar" style="width:12px; display:inline;"></i> <%= item.date %></span>
+                                                <span>•</span>
+                                                <a href="/berita/<%= itemSlug %>" target="_blank" style="color:#38bdf8; text-decoration:none; display:inline-flex; align-items:center; gap:3px;">
+                                                    <i data-lucide="link" style="width:12px;"></i> /berita/<%= itemSlug %>
+                                                </a>
+                                            </div>
+                                        </td>
                                         <td><span class="cat-badge"><%= item.category %></span></td>
                                         <td class="td-actions">
                                             <div id="raw-content-<%= item.id %>" style="display: none;"><%- item.content %></div>
+                                            <a href="/berita/<%= itemSlug %>" target="_blank" class="action-btn" style="color:#38bdf8;" title="Lihat Berita Live"><i data-lucide="external-link"></i></a>
                                             <button type="button" class="action-btn" style="color:var(--theme-text);" onclick="openKelolaFotoBerita('<%= item.id %>')" title="Kelola Foto"><i data-lucide="image-plus"></i></button>
-                                            <button type="button" class="action-btn edit" onclick="openEditBeritaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.category %>', '<%= item.date %>')" title="Edit Berita"><i data-lucide="edit"></i></button>
+                                            <button type="button" class="action-btn edit" onclick="openEditBeritaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.category %>', '<%= item.date %>', '<%= (item.slug || '').replace(/'/g, "\\'") %>')" title="Edit Berita"><i data-lucide="edit"></i></button>
                                             <form action="/admin/hapus-berita/<%= item.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus berita?')"><i data-lucide="trash-2"></i></button></form>
                                         </td>
                                     </tr>
@@ -422,9 +430,7 @@
             </div>
         </div>
 
-        <!-- ==============================================================
-             TAB 2: SETELAN HEADER, FOOTER, TENTANG & NARAHUBUNG
-        ============================================================== -->
+        <!-- TAB 2: SETELAN HEADER, FOOTER, TENTANG & NARAHUBUNG -->
         <div id="adm-setelan" class="admin-tab-pane" style="display: none;">
             <div class="grid-2">
                 <div style="display:flex; flex-direction:column; gap:30px;">
@@ -583,13 +589,11 @@
             </div>
         </div>
 
-        <!-- ==============================================================
-             TAB 3: DEDICATED SOSIAL MEDIA MANAGEMENT (IG, FB, DLL)
-        ============================================================== -->
+        <!-- TAB 3: SOSIAL MEDIA MANAGEMENT -->
         <div id="adm-sosmed" class="admin-tab-pane" style="display: none;">
             <div class="glass admin-panel" style="max-width:900px; margin:0 auto; border-top: 4px solid #f59e0b;">
                 <div class="panel-header">
-                    <h3 class="panel-title" style="color: #fbbf24;"><i data-lucide="share-2" style="color: #fbbf24;"></i> Kelola Sosial Media (Instagram, Facebook & Lainnya)</h3>
+                    <h3 class="panel-title" style="color: #fbbf24;"><i data-lucide="share-2" style="color: #fbbf24;"></i> Kelola Sosial Media</h3>
                     <button class="btn btn-primary" onclick="openModal('modalSosmed')" style="background:#f59e0b; border-color:#f59e0b; color:#000; font-weight:bold; padding:8px 15px; font-size:0.85rem;">+ Tambah Sosial Media</button>
                 </div>
                 
@@ -627,9 +631,7 @@
             </div>
         </div>
 
-        <!-- ==============================================================
-             TAB 4: LINK IN BIO
-        ============================================================== -->
+        <!-- TAB 4: LINK IN BIO -->
         <div id="adm-bio" class="admin-tab-pane" style="display: none;">
             <div class="admin-layout">
                 <div class="admin-main-content">
@@ -704,9 +706,7 @@
             </div>
         </div>
 
-        <!-- ==============================================================
-             TAB 5: SHORTLINK CUSTOM
-        ============================================================== -->
+        <!-- TAB 5: SHORTLINK CUSTOM -->
         <div id="adm-shortlink" class="admin-tab-pane" style="display: none;">
             <div class="glass admin-panel" style="max-width:800px; margin:0 auto;">
                 <div class="panel-header">
@@ -736,9 +736,7 @@
             </div>
         </div>
 
-        <!-- ==============================================================
-             TAB 6: DEVELOPER TEAM (OURTEAM)
-        ============================================================== -->
+        <!-- TAB 6: DEVELOPER TEAM -->
         <div id="adm-devteam" class="admin-tab-pane" style="display: none;">
             <div class="glass admin-panel" style="max-width:1000px; margin:0 auto; border-top: 4px solid #3b82f6;">
                 <div class="panel-header">
@@ -780,9 +778,7 @@
             </div>
         </div>
 
-        <!-- ==============================================================
-             TAB 7: ANNOUNCEMENT POP-UP
-        ============================================================== -->
+        <!-- TAB 7: ANNOUNCEMENT POP-UP -->
         <div id="adm-announce" class="admin-tab-pane" style="display: none;">
             <div class="glass admin-panel" style="max-width:800px; margin:0 auto;">
                 <h3 class="panel-title" style="margin-bottom:20px;"><i data-lucide="bell"></i> Setelan Announcement Pop-up</h3>
@@ -845,15 +841,25 @@
 </div>
 
 <!-- ==============================================================
-     MODALS UTUH LAINNYA (BERITA, ALBUM, DATA ANGGOTA, BIO, DLL)
+     MODAL BERITA (DILENGKAPI INPUT SLUG CUSTOM SEO)
 ============================================================== -->
-
 <!-- 1. MODAL TAMBAH BERITA -->
 <div class="modal-overlay" id="modalBerita">
     <div class="modal-content" style="max-width:650px;">
         <div class="modal-header"><h3>Tambah Berita Baru</h3><button type="button" class="close-modal" onclick="closeModal('modalBerita')"><i data-lucide="x"></i></button></div>
         <form action="/admin/tambah-berita" method="POST" enctype="multipart/form-data" onsubmit="syncQuill('editorBeritaTambah', 'contentBeritaTambah')">
-            <div class="form-group"><label>Judul Berita</label><input type="text" name="title" class="input-control" required></div>
+            <div class="form-group">
+                <label>Judul Berita <span style="color:#ef4444;">*</span></label>
+                <input type="text" name="title" id="tambahBeritaTitle" class="input-control" required oninput="autoGenerateSlug('tambahBeritaTitle', 'tambahBeritaSlug')">
+            </div>
+            <div class="form-group">
+                <label>URL Slug SEO (Opsional)</label>
+                <div style="display:flex; align-items:center; background:rgba(0,0,0,0.05); border:1px solid var(--theme-glass-border); border-radius:10px; padding:0 12px;">
+                    <span style="color:#9ca3af; font-size:0.85rem; user-select:none;">/berita/</span>
+                    <input type="text" name="slug" id="tambahBeritaSlug" class="input-control" placeholder="hmi-mengabdi-komkg-umi" style="border:none; background:transparent; padding-left:4px;">
+                </div>
+                <small class="text-muted" style="font-size:0.75rem; margin-top:4px; display:block;">Biarkan kosong untuk otomatis membuat slug ramah SEO dari judul berita.</small>
+            </div>
             <div class="grid-2">
                 <div class="form-group"><label>Kategori</label><input type="text" name="category" class="input-control" placeholder="Terbaru, Opini, Kaderisasi..." required></div>
                 <div class="form-group"><label>Tanggal Rilis</label><input type="text" name="date" class="input-control" placeholder="Contoh: 15 Mei 2026"></div>
@@ -875,6 +881,13 @@
         <div class="modal-header"><h3>Edit Berita</h3><button type="button" class="close-modal" onclick="closeModal('modalEditBerita')"><i data-lucide="x"></i></button></div>
         <form id="formEditBerita" method="POST" enctype="multipart/form-data" onsubmit="syncQuill('editorBeritaEdit', 'contentBeritaEdit')">
             <div class="form-group"><label>Judul Berita</label><input type="text" name="title" id="editBeritaTitle" class="input-control" required></div>
+            <div class="form-group">
+                <label>URL Slug SEO (Custom)</label>
+                <div style="display:flex; align-items:center; background:rgba(0,0,0,0.05); border:1px solid var(--theme-glass-border); border-radius:10px; padding:0 12px;">
+                    <span style="color:#9ca3af; font-size:0.85rem; user-select:none;">/berita/</span>
+                    <input type="text" name="slug" id="editBeritaSlug" class="input-control" placeholder="slug-judul-berita" style="border:none; background:transparent; padding-left:4px;">
+                </div>
+            </div>
             <div class="grid-2">
                 <div class="form-group"><label>Kategori</label><input type="text" name="category" id="editBeritaCategory" class="input-control" required></div>
                 <div class="form-group"><label>Tanggal Rilis</label><input type="text" name="date" id="editBeritaDate" class="input-control"></div>
@@ -1272,10 +1285,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof lucide !== 'undefined') lucide.createIcons();
 
-        // Inisialisasi Tab Awal: pastikan hanya 'adm-pesan' yang terlihat
         openAdmTab('adm-pesan');
 
-        // Cek Preferensi State Sidebar dari localStorage
         const savedSidebarState = localStorage.getItem('hmi_admin_sidebar_collapsed');
         if (savedSidebarState === 'true') {
             const container = document.getElementById('adminDashboardContainer');
@@ -1307,7 +1318,27 @@
         });
     });
 
-    // Toggle Buka/Tutup Sidebar (Persis Gbr 2 & 3)
+    // Helper Auto-Slug Generator saat Mengetik Judul Berita
+    function autoGenerateSlug(sourceInputId, targetInputId) {
+        const source = document.getElementById(sourceInputId);
+        const target = document.getElementById(targetInputId);
+        if (!source || !target) return;
+        
+        // Hanya generate otomatis jika user belum mengubah slug secara manual
+        if (!target.dataset.touched || target.value.trim() === '') {
+            target.value = source.value
+                .toLowerCase()
+                .trim()
+                .replace(/[^\w\s-]/g, '')
+                .replace(/[\s_-]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+    }
+
+    document.getElementById('tambahBeritaSlug')?.addEventListener('input', function() {
+        this.dataset.touched = 'true';
+    });
+
     function toggleAdminSidebar() {
         const container = document.getElementById('adminDashboardContainer');
         const icon = document.getElementById('sidebarCollapseIcon');
@@ -1331,29 +1362,23 @@
         }
     }
 
-    // STRICT TAB ISOLATION (HANYA TAB AKTIF YANG DITAMPILKAN, TAB LAIN BENAR-BENAR DISEMBUNYIKAN)
     function openAdmTab(tabId, btn) {
-        // 1. Sembunyikan secara tegas seluruh tab pane
         document.querySelectorAll('.admin-tab-pane').forEach(tab => {
             tab.classList.remove('active');
             tab.style.display = 'none';
         });
 
-        // 2. Lepaskan class active dari seluruh tombol menu sidebar
         document.querySelectorAll('.sidebar-nav-item').forEach(b => b.classList.remove('active'));
 
-        // 3. Tampilkan HANYA target tab yang diklik
         const target = document.getElementById(tabId);
         if (target) {
             target.classList.add('active');
             target.style.display = 'block';
         }
 
-        // 4. Aktifkan tombol yang bersangkutan
         if (btn) {
             btn.classList.add('active');
         } else {
-            // Jika dipanggil secara programatik tanpa btn element
             const activeBtn = document.querySelector(`.sidebar-nav-item[onclick*="'${tabId}'"]`);
             if (activeBtn) activeBtn.classList.add('active');
         }
@@ -1377,7 +1402,6 @@
         if (el) el.classList.remove('active'); 
     }
 
-    // Modal Baca Detail Pesan Narahubung
     function openDetailPesanModal(id, name, subject, contact, method, docUrl) {
         document.getElementById('modalPesanSender').innerText = "Pesan dari: " + name;
         document.getElementById('modalPesanSubject').innerText = subject;
@@ -1414,10 +1438,12 @@
         openModal('modalDetailPesan');
     }
 
-    function openEditBeritaModal(id, title, category, date) {
+    function openEditBeritaModal(id, title, category, date, slug) {
         document.getElementById('editBeritaTitle').value = title;
         document.getElementById('editBeritaCategory').value = category;
         document.getElementById('editBeritaDate').value = date;
+        document.getElementById('editBeritaSlug').value = slug || '';
+        
         const rawContentEl = document.getElementById('raw-content-' + id);
         if (rawContentEl && quillEdit) {
             quillEdit.root.innerHTML = rawContentEl.innerHTML;
@@ -1625,7 +1651,7 @@
                     canvas.width = width; 
                     canvas.height = height; 
                     const ctx = canvas.getContext('2d'); 
-                    ctx.drawImage(img, 0, 0, width, height);
+                    ctx.drawImage(img, 0, 0, width, height); 
                     resolve(canvas.toDataURL('image/webp', 0.6)); 
                 };
             };
@@ -1638,7 +1664,7 @@
             if (file && file.type.startsWith('image/')) {
                 const submitBtn = input.closest('form').querySelector('.submit-btn');
                 const originalText = submitBtn ? submitBtn.innerText : ''; 
-                if (submitBtn) {
+                if (submitBtn) { 
                     submitBtn.innerText = 'Mengompresi Gambar...'; 
                     submitBtn.disabled = true;
                 }
@@ -1652,7 +1678,7 @@
                     input.parentElement.appendChild(hidden); 
                 }
                 hidden.value = base64; 
-                if (submitBtn) {
+                if (submitBtn) { 
                     submitBtn.innerText = originalText; 
                     submitBtn.disabled = false;
                 }
