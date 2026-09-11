@@ -433,7 +433,7 @@
             </div>
         </div>
 
-        <!-- TAB: APA KATA KADER? (TESTIMONI / KUTIPAN KADER) -->
+        <!-- TAB: APA KATA KADER? (TESTIMONI / KUTIPAN KADER - KHUSUS INSTAGRAM) -->
         <div id="adm-kaderquote" class="admin-tab-pane" style="display: none;">
             <div class="glass admin-panel" style="max-width:1000px; margin:0 auto; border-top: 4px solid #10b981;">
                 <div class="panel-header">
@@ -454,7 +454,7 @@
                                 <th>Foto</th>
                                 <th>Nama & Jabatan</th>
                                 <th>Kutipan (Quote)</th>
-                                <th>Kontak Sosmed</th>
+                                <th>Instagram</th>
                                 <th style="text-align:right;">Aksi</th>
                             </tr>
                         </thead>
@@ -474,13 +474,16 @@
                                     </p>
                                 </td>
                                 <td>
-                                    <div style="display:flex; gap:6px;">
-                                        <% if (q.ig) { %><a href="<%= q.ig %>" target="_blank" class="cat-badge" style="color:#e1306c;"><i data-lucide="instagram" style="width:12px;"></i></a><% } %>
-                                        <% if (q.email) { %><a href="mailto:<%= q.email %>" class="cat-badge" style="color:#0284c7;"><i data-lucide="mail" style="width:12px;"></i></a><% } %>
-                                    </div>
+                                    <% if (q.ig && q.ig.trim() !== '') { %>
+                                        <a href="<%= q.ig %>" target="_blank" class="cat-badge" style="color:#e1306c; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                                            <i data-lucide="instagram" style="width:13px;"></i> Instagram
+                                        </a>
+                                    <% } else { %>
+                                        <span style="color:#9ca3af; font-size:0.8rem;">-</span>
+                                    <% } %>
                                 </td>
                                 <td class="td-actions">
-                                    <button type="button" class="action-btn edit" onclick="openEditKaderQuoteModal('<%= q.id %>', '<%= q.name.replace(/'/g, "\\'") %>', '<%= q.role.replace(/'/g, "\\'") %>', '<%= q.quote.replace(/'/g, "\\'").replace(/\n/g, ' ') %>', '<%= (q.ig || '').replace(/'/g, "\\'") %>', '<%= (q.email || '').replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
+                                    <button type="button" class="action-btn edit" onclick="openEditKaderQuoteModal('<%= q.id %>', '<%= q.name.replace(/'/g, "\\'") %>', '<%= q.role.replace(/'/g, "\\'") %>', '<%= q.quote.replace(/'/g, "\\'").replace(/\n/g, ' ') %>', '<%= (q.ig || '').replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
                                     <form action="/admin/hapus-kader-quote/<%= q.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus kutipan kader ini?')"><i data-lucide="trash-2"></i></button></form>
                                 </td>
                             </tr>
@@ -927,7 +930,6 @@
             </div>
             <div class="form-group">
                 <label>URL Slug SEO (Custom)</label>
-                <!-- KOTAK INPUT SLUG PUTIH BERSIH DENGAN TEKS HITAM PEKAT PERSIS GAMBAR 3 -->
                 <div style="display:flex; align-items:center; background:#ffffff !important; border:1.5px solid #cbd5e1; border-radius:12px; padding:0 14px; overflow:hidden; box-shadow:inset 0 2px 4px rgba(0,0,0,0.06);">
                     <span style="color:#475569; font-size:0.92rem; font-weight:800; user-select:none;">/berita/</span>
                     <input type="text" name="slug" id="tambahBeritaSlug" class="input-control" placeholder="hmi-mengabdi-komkg-umi" style="border:none !important; background:#ffffff !important; color:#0f172a !important; padding:12px 6px !important; font-weight:700; font-size:0.95rem; outline:none !important; box-shadow:none !important;">
@@ -960,7 +962,6 @@
             <div class="form-group"><label>Judul Berita</label><input type="text" name="title" id="editBeritaTitle" class="input-control" required></div>
             <div class="form-group">
                 <label>URL Slug SEO (Custom)</label>
-                <!-- KOTAK INPUT SLUG PUTIH BERSIH DENGAN TEKS HITAM PEKAT PERSIS GAMBAR 3 -->
                 <div style="display:flex; align-items:center; background:#ffffff !important; border:1.5px solid #cbd5e1; border-radius:12px; padding:0 14px; overflow:hidden; box-shadow:inset 0 2px 4px rgba(0,0,0,0.06);">
                     <span style="color:#475569; font-size:0.92rem; font-weight:800; user-select:none;">/berita/</span>
                     <input type="text" name="slug" id="editBeritaSlug" class="input-control" placeholder="slug-judul-berita" style="border:none !important; background:#ffffff !important; color:#0f172a !important; padding:12px 6px !important; font-weight:700; font-size:0.95rem; outline:none !important; box-shadow:none !important;">
@@ -999,7 +1000,7 @@
     </div>
 </div>
 
-<!-- MODAL SECTION: APA KATA KADER? (TAMBAH & EDIT) -->
+<!-- MODAL SECTION: APA KATA KADER? (KHUSUS INSTAGRAM, TANPA EMAIL) -->
 <div class="modal-overlay" id="modalKaderQuote">
     <div class="modal-content" style="max-width:600px; border-color:#10b981;">
         <div class="modal-header">
@@ -1023,15 +1024,9 @@
                 <label>Foto Kader <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span> <span style="color:#ef4444;">*</span></label>
                 <input type="file" name="image" class="input-control file-compress" accept="image/*" required>
             </div>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>Link Instagram (Opsional)</label>
-                    <input type="url" name="ig" class="input-control" placeholder="https://instagram.com/...">
-                </div>
-                <div class="form-group">
-                    <label>Alamat Email (Opsional)</label>
-                    <input type="email" name="email" class="input-control" placeholder="kader@domain.com">
-                </div>
+            <div class="form-group">
+                <label>Link Instagram (Opsional)</label>
+                <input type="url" name="ig" class="input-control" placeholder="https://instagram.com/username">
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('modalKaderQuote')">Batal</button>
@@ -1064,15 +1059,9 @@
                 <label>Ganti Foto (Opsional) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
                 <input type="file" name="image" class="input-control file-compress" accept="image/*">
             </div>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>Link Instagram</label>
-                    <input type="url" name="ig" id="editKaderIg" class="input-control">
-                </div>
-                <div class="form-group">
-                    <label>Alamat Email</label>
-                    <input type="email" name="email" id="editKaderEmail" class="input-control">
-                </div>
+            <div class="form-group">
+                <label>Link Instagram</label>
+                <input type="url" name="ig" id="editKaderIg" class="input-control">
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditKaderQuote')">Batal</button>
@@ -1540,7 +1529,6 @@
         });
     });
 
-    // Helper Auto-Slug Generator saat Mengetik Judul Berita
     function autoGenerateSlug(sourceInputId, targetInputId) {
         const source = document.getElementById(sourceInputId);
         const target = document.getElementById(targetInputId);
@@ -1697,12 +1685,12 @@
         openModal('modalKelolaFotoBerita');
     }
 
-    function openEditKaderQuoteModal(id, name, role, quote, ig, email) {
+    // UPDATE: HANYA MEMPROSES INSTAGRAM, EMAIL DIHAPUS TOTAL
+    function openEditKaderQuoteModal(id, name, role, quote, ig) {
         document.getElementById('editKaderName').value = name;
         document.getElementById('editKaderRole').value = role;
         document.getElementById('editKaderQuote').value = quote;
         document.getElementById('editKaderIg').value = ig || '';
-        document.getElementById('editKaderEmail').value = email || '';
         document.getElementById('formEditKaderQuote').action = '/admin/edit-kader-quote/' + id;
         openModal('modalEditKaderQuote');
     }
