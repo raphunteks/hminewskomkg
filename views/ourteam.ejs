@@ -1,165 +1,880 @@
 <% 
     // ==============================================================
-    // ENTERPRISE SEO & BREADCRUMB INJECTION
+    // FIX ERROR 500 & SEO BREADCRUMB: 
+    // Injeksi variabel SEO secara eksplisit untuk Halaman Narahubung
     // ==============================================================
-    let page = 'ourteam';
-    let pageTitle = 'Developer Team';
-    const defaultAvatar = '/img/logo-hmikomkgumi.png';
+    let page = 'narahubung';
+    let pageTitle = 'Narahubung & Kontak Resmi';
+    let pageDescription = 'Hubungi HMI Komisariat Kedokteran Gigi UMI. Layanan informasi kegiatan, pengajuan kerjasama, surat undangan resmi, dan alamat sekretariat.';
     const seoBaseUrl = 'https://hmikomkgumi.xyz';
+
+    const safeSettings = (typeof siteSettings !== 'undefined' && siteSettings) ? siteSettings : {};
+    const contactAddress = safeSettings.contactAddress || "Jl. Pajonga Dg. Ngalle No. 27 A, Pa'batong, Kec. Mamajang, Kota Makassar, Sulawesi Selatan";
+    const contactEmail = safeSettings.contactEmail || "hmikomkedokgigiumi.190120@gmail.com";
+    const contactWa = safeSettings.contactWa || "+62 853-3892-2586";
+    const contactWaName = safeSettings.contactWaName || "M. Aksa A";
+    const contactMaps = safeSettings.contactMaps || safeSettings.mapsEmbed || '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1986.8184522616118!2d119.41377772579179!3d-5.161978821534889!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dbf1d606370a527%3A0xdb175c222d9d580b!2sUniversitas%20Muslim%20Indonesia%2C%20Fakultas%20Kedokteran%20Gigi!5e0!3m2!1sid!2sid!4v1789058845150!5m2!1sid!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>';
 %>
-<%- include('partials/header', { page: page, pageTitle: pageTitle }) %>
+<%- include('partials/header', { page: page, pageTitle: pageTitle, pageDescription: pageDescription }) %>
 
 <!-- ==============================================================
-     DYNAMIC SCHEMA.ORG INJECTION (ABOUT PAGE & PERSON)
-     Memaksimalkan Indexing Profil Developer di Google Search
+     ADVANCED JSON-LD SCHEMA.ORG (CONTACTPAGE & ORGANIZATION)
 ============================================================== -->
-<script type="application/ld+json" id="dynamic-seo-schema-team">
+<script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "AboutPage",
-      "@id": "<%= seoBaseUrl %>/ourteam/#webpage",
-      "url": "<%= seoBaseUrl %>/ourteam",
-      "name": "Developer Team | HMI KomKG UMI",
-      "description": "Sosok dibalik layar pengembangan Sistem Informasi BEM KBMFKG UMI & HMI KomKG UMI."
-    }
-    <% if(typeof devTeam !== 'undefined' && devTeam && devTeam.length > 0) { %>
-    , {
-      "@type": "ItemList",
-      "name": "Daftar Tim Pengembang",
+      "@type": "ContactPage",
+      "@id": "<%= seoBaseUrl %>/narahubung/#webpage",
+      "url": "<%= seoBaseUrl %>/narahubung",
+      "name": "<%= pageTitle %> | HMI KomKG UMI",
+      "description": "<%= pageDescription %>",
+      "inLanguage": "id-ID",
+      "isPartOf": { "@id": "<%= seoBaseUrl %>/#website" }
+    },
+    {
+      "@type": "Organization",
+      "@id": "<%= seoBaseUrl %>/#organization",
+      "name": "HMI KomKG UMI",
+      "url": "<%= seoBaseUrl %>/",
+      "email": "<%= contactEmail %>",
+      "telephone": "<%= contactWa.replace(/[^0-9+]/g, '') %>",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "<%= contactAddress %>",
+        "addressLocality": "Makassar",
+        "addressRegion": "Sulawesi Selatan",
+        "postalCode": "90131",
+        "addressCountry": "ID"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "<%= seoBaseUrl %>/narahubung/#breadcrumb",
       "itemListElement": [
-        <% devTeam.forEach((member, index) => { 
-            let memberImg = (member.image && member.image.trim() !== '') ? member.image : (seoBaseUrl + defaultAvatar);
-            if (!memberImg.startsWith('http')) {
-                memberImg = seoBaseUrl + (memberImg.startsWith('/') ? '' : '/') + memberImg;
-            }
-        %>
         {
           "@type": "ListItem",
-          "position": <%= index + 1 %>,
-          "item": {
-            "@type": "Person",
-            "name": <%- JSON.stringify(member.name || 'Developer') %>,
-            "jobTitle": <%- JSON.stringify(member.role || 'Contributor') %>,
-            "image": <%- JSON.stringify(memberImg) %>,
-            "affiliation": {
-              "@type": "Organization",
-              "name": "HMI KomKG UMI"
-            },
-            "sameAs": [
-              <%- member.ig ? JSON.stringify(member.ig) : '""' %>
-            ]
-          }
-        }<%= index < devTeam.length - 1 ? ',' : '' %>
-        <% }) %>
+          "position": 1,
+          "name": "Beranda",
+          "item": "<%= seoBaseUrl %>/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Narahubung",
+          "item": "<%= seoBaseUrl %>/narahubung"
+        }
       ]
     }
-    <% } %>
   ]
 }
 </script>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const metaTags = [
-        { name: "description", content: "Kenali Developer Team hebat dibalik layar pengembangan Sistem Informasi HMI KomKG UMI." },
-        { name: "keywords", content: "Developer Team, Programmer HMI, HMI KomKG UMI, Aksa Arsyad, IT HMI" },
-        { property: "og:title", content: "Developer Team | HMI KomKG UMI" },
-        { property: "og:description", content: "Sosok dibalik layar pengembangan Sistem Informasi web HMI KomKG UMI." },
-        { property: "og:type", content: "website" },
-        { property: "og:url", content: "<%= seoBaseUrl %>/ourteam" },
-        { property: "og:image", content: "<%= seoBaseUrl %><%= defaultAvatar %>" }
-    ];
+<style>
+    /* Styling Terpadu Halaman Narahubung Glassmorphism */
+    .narahubung-container {
+        max-width: 1160px;
+        margin: 0 auto 60px auto;
+        padding: 0 16px;
+    }
 
-    metaTags.forEach(tag => {
-        let selector = tag.name ? `meta[name="${tag.name}"]` : `meta[property="${tag.property}"]`;
-        if (!document.head.querySelector(selector)) {
-            let el = document.createElement('meta');
-            if(tag.name) el.name = tag.name;
-            if(tag.property) el.setAttribute('property', tag.property);
-            el.content = tag.content;
-            document.head.appendChild(el);
+    .narahubung-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 28px;
+        align-items: start;
+    }
+
+    .narahubung-card {
+        background: rgba(22, 27, 34, 0.78);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(74, 222, 128, 0.25);
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+        position: relative;
+    }
+
+    .card-headline {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid rgba(74, 222, 128, 0.18);
+    }
+
+    .card-headline h2 {
+        font-size: 1.25rem;
+        color: #4ade80;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .card-icon-emoji {
+        font-size: 1.4rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        font-size: 0.84rem;
+        font-weight: 600;
+        color: #e2e8f0;
+    }
+
+    .input-control {
+        width: 100%;
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(74, 222, 128, 0.22);
+        border-radius: 12px;
+        color: #f8fafc;
+        padding: 12px 16px;
+        font-size: 0.92rem;
+        outline: none;
+        box-sizing: border-box;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        font-family: inherit;
+    }
+
+    .input-control:focus {
+        border-color: #4ade80;
+        box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
+    }
+
+    /* Toggle Balasan WA / Email */
+    .toggle-reply-method {
+        display: flex;
+        gap: 8px;
+        background: rgba(15, 23, 42, 0.7);
+        padding: 4px;
+        border-radius: 12px;
+        border: 1px solid rgba(74, 222, 128, 0.2);
+    }
+
+    .reply-tab-btn {
+        flex: 1;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: none;
+        background: transparent;
+        color: #94a3b8;
+        font-weight: 600;
+        font-size: 0.86rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.25s ease;
+    }
+
+    .reply-tab-btn.active {
+        background: linear-gradient(135deg, #4ade80 0%, #16a34a 100%);
+        color: #052e16;
+        font-weight: 800;
+        box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+    }
+
+    /* Custom File Upload */
+    .custom-file-upload {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(15, 23, 42, 0.7);
+        padding: 8px 14px;
+        border-radius: 12px;
+        border: 1px dashed rgba(74, 222, 128, 0.35);
+        box-sizing: border-box;
+    }
+
+    .file-hidden-input {
+        display: none;
+    }
+
+    .btn-browse-file {
+        background: rgba(74, 222, 128, 0.15);
+        border: 1px solid rgba(74, 222, 128, 0.4);
+        color: #4ade80;
+        font-size: 0.82rem;
+        font-weight: 700;
+        padding: 8px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.2s;
+    }
+
+    .btn-browse-file:hover {
+        background: rgba(74, 222, 128, 0.25);
+    }
+
+    .file-name-label {
+        font-size: 0.84rem;
+        color: #9ca3af;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Tombol Submit */
+    .btn-submit-message {
+        width: 100%;
+        background: linear-gradient(135deg, #4ade80 0%, #16a34a 100%);
+        color: #052e16;
+        font-weight: 800;
+        font-size: 0.96rem;
+        padding: 14px 20px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
+        margin-top: 10px;
+    }
+
+    .btn-submit-message:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 26px rgba(34, 197, 94, 0.45);
+    }
+
+    .btn-submit-message:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Informasi Kontak Sisi Kanan */
+    .contact-info-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .contact-item-card {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        padding: 16px;
+        background: rgba(15, 23, 42, 0.55);
+        border-radius: 14px;
+        border: 1px solid rgba(74, 222, 128, 0.15);
+    }
+
+    .contact-icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: rgba(74, 222, 128, 0.15);
+        color: #4ade80;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .contact-icon-box.wa-box {
+        background: rgba(37, 211, 102, 0.15);
+        color: #25d366;
+    }
+
+    .contact-text-wrap h4 {
+        font-size: 0.92rem;
+        color: #f8fafc;
+        margin-bottom: 4px;
+        font-weight: 700;
+    }
+
+    .contact-text-wrap p {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .contact-link {
+        font-size: 0.88rem;
+        color: #4ade80;
+        text-decoration: none;
+        font-weight: 600;
+        word-break: break-all;
+    }
+
+    .contact-link.wa-highlight {
+        color: #22c55e;
+        font-weight: 700;
+    }
+
+    .badge-person {
+        font-size: 0.76rem;
+        background: rgba(34, 197, 94, 0.2);
+        color: #4ade80;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-weight: 700;
+        margin-left: 4px;
+    }
+
+    .contact-subhint {
+        display: block;
+        font-size: 0.74rem;
+        color: #94a3b8;
+        margin-top: 4px;
+    }
+
+    /* Peta Embed Responsive 16:9 */
+    .map-frame-wrapper {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(74, 222, 128, 0.2);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .map-frame-wrapper iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    /* ==============================================================
+       STYLING ANALYTICS WIDGET (VIEWS TODAY, THIS WEEK, TOTAL VIEWS)
+       PERSIS SEPERTI DI INDEX.EJS
+    ============================================================== */
+    .analytics-section {
+        margin-top: 40px;
+        width: 100%;
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .analytic-card {
+        background: rgba(22, 27, 34, 0.78);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(74, 222, 128, 0.28);
+        border-radius: 18px;
+        padding: 18px 20px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .analytic-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(74, 222, 128, 0.5);
+        box-shadow: 0 12px 32px rgba(74, 222, 128, 0.12);
+    }
+
+    .analytic-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #94a3b8;
+        letter-spacing: 0.8px;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+
+    .analytic-value {
+        font-size: 1.65rem;
+        font-weight: 800;
+        font-family: 'JetBrains Mono', monospace;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+    }
+
+    .stat-today { color: #4ade80; }
+    .stat-week { color: #38bdf8; }
+    .stat-total { color: #fbbf24; }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .spin-icon {
+        animation: spin 1s linear infinite;
+        width: 22px;
+        height: 22px;
+        color: #94a3b8;
+    }
+
+    /* Responsif Mobile Breakpoint */
+    @media (max-width: 860px) {
+        .narahubung-grid {
+            grid-template-columns: 1fr;
+            gap: 22px;
         }
-    });
-});
-</script>
+        .narahubung-card {
+            padding: 22px 18px;
+        }
+        .input-control {
+            font-size: 16px; /* Mencegah auto-zoom di iOS Safari */
+        }
+    }
 
-<section class="container" style="margin-top: 40px; margin-bottom: 80px;">
-    <!-- HEADER CREDITS -->
-    <div class="dev-page-header">
-        <span class="dev-badge">CREDITS</span>
-        <h1 class="dev-main-title">Developer <span class="text-blue-gradient">Team</span></h1>
-        <p class="dev-subtitle">Sosok dibalik layar pengembangan Sistem Informasi HMI KomKG UMI.</p>
-    </div>
+    @media (max-width: 680px) {
+        .analytics-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+    }
+</style>
 
-    <% 
-        // Mengelompokkan tim berdasarkan kategori sesuai urutan desain
-        const categories = [
-            { name: 'FullStack Development', icon: 'server' },
-            { name: 'Backend Development', icon: 'database' },
-            { name: 'Frontend Development', icon: 'layout-template' },
-            { name: 'UI/UX Design (CSS)', icon: 'pen-tool' }
-        ];
+<div class="narahubung-container">
+    
+    <!-- HEADER HALAMAN -->
+    <header class="narahubung-header" style="text-align: center; margin-bottom: 40px;">
+        <span class="badge" style="margin-bottom: 12px;">Pusat Komunikasi & Informasi</span>
+        <h1 style="font-size: clamp(2rem, 4vw, 2.6rem); font-weight: 800; margin-bottom: 10px;">Narahubung Resmi</h1>
+        <p class="text-muted" style="max-width: 650px; margin: 0 auto; font-size: 1rem; line-height: 1.6;">
+            Hubungi pengurus HMI Komisariat Kedokteran Gigi UMI untuk keperluan administrasi, undangan kemahasiswaan, kemitraan, atau konsultasi seputar komisariat.
+        </p>
+    </header>
 
-        const safeTeam = (typeof devTeam !== 'undefined' && Array.isArray(devTeam)) ? devTeam : [];
-    %>
+    <!-- GRID UTAMA 2 KOLOM -->
+    <div class="narahubung-grid">
+        
+        <!-- ==============================================================
+             KOLOM KIRI: FORMULIR KIRIM PESAN KE DATABASE BACKEND
+        ============================================================== -->
+        <div class="glass narahubung-card form-side">
+            <div class="card-headline">
+                <span class="card-icon-emoji">✉️</span>
+                <h2>Kirim Pesan Cepat</h2>
+            </div>
 
-    <% categories.forEach(cat => { %>
-        <% const members = safeTeam.filter(m => m.category === cat.name); %>
-        <% if(members.length > 0) { %>
+            <!-- Banner Notifikasi Status Pengiriman -->
+            <div id="narahubungAlertBox" style="display: none; margin-bottom: 20px;"></div>
             
-            <div class="dev-category-wrap">
-                <!-- JUDUL KATEGORI -->
-                <div class="dev-category-header">
-                    <div class="dev-icon-box">
-                        <i data-lucide="<%= cat.icon %>"></i>
-                    </div>
-                    <h2 class="dev-category-title"><%= cat.name %></h2>
+            <form id="formNarahubung" onsubmit="handleFormSubmit(event)">
+                <!-- 1. Nama Lengkap / Instansi -->
+                <div class="form-group">
+                    <label for="senderName">Nama Lengkap / Instansi <span class="required-star" style="color:#ef4444;">*</span></label>
+                    <input type="text" id="senderName" name="name" class="input-control" placeholder="Masukkan nama atau instansi Anda..." required>
                 </div>
 
-                <!-- GRID CARDS -->
-                <div class="<%= members.length === 1 ? 'grid-dev-1' : 'grid-dev-2' %>">
-                    <% members.forEach(member => { 
-                        // Sanitasi URL Foto: jika kosong / tidak ada, pakai defaultAvatar
-                        let photoSrc = (member.image && member.image.trim() !== '') ? member.image.trim() : defaultAvatar;
-                    %>
-                        <div class="dev-card">
-                            <div class="dev-avatar-wrap">
-                                <img src="<%= photoSrc %>" 
-                                     alt="<%= member.name %>" 
-                                     loading="lazy" 
-                                     decoding="async"
-                                     onerror="this.onerror=null; this.src='<%= defaultAvatar %>';">
-                            </div>
-                            <h3 class="dev-name"><%= member.name %></h3>
-                            <p class="dev-role"><%= member.role %></p>
-                            <p class="dev-dept"><%= member.dept %></p>
-                            
-                            <div class="dev-divider"></div>
-                            
-                            <div class="dev-social">
-                                <% if(member.ig && member.ig.trim() !== '') { %>
-                                    <a href="<%= member.ig %>" target="_blank" rel="noopener noreferrer" aria-label="Instagram <%= member.name %>">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-                                    </a>
-                                <% } else { %>
-                                    <span style="opacity:0.3;" title="Tidak ada Instagram">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-                                    </span>
-                                <% } %>
-                            </div>
+                <!-- 2. Metode Balasan (Toggle WA / Email) -->
+                <div class="form-group">
+                    <label>Metode Balasan <span class="required-star" style="color:#ef4444;">*</span></label>
+                    <div class="toggle-reply-method">
+                        <button type="button" class="reply-tab-btn active" id="btnMethodWA" onclick="switchReplyMethod('wa')">
+                            <i data-lucide="message-circle" style="width: 16px;"></i> WhatsApp
+                        </button>
+                        <button type="button" class="reply-tab-btn" id="btnMethodEmail" onclick="switchReplyMethod('email')">
+                            <i data-lucide="mail" style="width: 16px;"></i> Email
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input Kontak Dinamis (WhatsApp / Email) -->
+                <div class="form-group" id="groupInputWA">
+                    <label for="senderWA">Nomor WhatsApp <span class="required-star" style="color:#ef4444;">*</span></label>
+                    <input type="tel" id="senderWA" class="input-control" placeholder="Nomor WA (Contoh: 0812xxxx)" required>
+                </div>
+
+                <div class="form-group" id="groupInputEmail" style="display: none;">
+                    <label for="senderEmail">Alamat Email <span class="required-star" style="color:#ef4444;">*</span></label>
+                    <input type="email" id="senderEmail" class="input-control" placeholder="Alamat Email (Contoh: nama@domain.com)">
+                </div>
+
+                <!-- 3. Tujuan Pesan -->
+                <div class="form-group">
+                    <label for="messageSubject">Tujuan Pesan <span class="required-star" style="color:#ef4444;">*</span></label>
+                    <select id="messageSubject" name="subject" class="input-control" required>
+                        <option value="" disabled selected>-- Pilih Tujuan Pesan --</option>
+                        <option value="Permohonan Kerjasama & Kemitraan">Permohonan Kerjasama & Kemitraan</option>
+                        <option value="Undangan Kegiatan / Pelatihan">Undangan Kegiatan / Pelatihan</option>
+                        <option value="Informasi Basic Training (LK I)">Informasi Basic Training (LK I)</option>
+                        <option value="Administrasi & Surat Menyurat">Administrasi & Surat Menyurat</option>
+                        <option value="Aspirasi & Konsultasi Mahasiswa">Aspirasi & Konsultasi Mahasiswa</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+
+                <!-- 4. Dokumen Pendukung (Opsional) -->
+                <div class="form-group">
+                    <label for="supportDoc">Dokumen Pendukung (Opsional)</label>
+                    <div class="custom-file-upload">
+                        <input type="file" id="supportDoc" name="supportDoc" class="file-hidden-input" accept=".pdf,image/*" onchange="updateFileName(this)">
+                        <button type="button" class="btn-browse-file" onclick="document.getElementById('supportDoc').click()">Pilih File</button>
+                        <span id="fileNameLabel" class="file-name-label">Tidak ada file yang dipilih</span>
+                    </div>
+                    <small class="text-muted" style="font-size: 0.75rem; margin-top: 4px; display: block;">Format PDF atau Gambar (Maks. 5MB)</small>
+                </div>
+
+                <!-- 5. Isi Pesan -->
+                <div class="form-group">
+                    <label for="messageBody">Isi Pesan <span class="required-star" style="color:#ef4444;">*</span></label>
+                    <textarea id="messageBody" name="message" class="input-control" rows="4" placeholder="Jelaskan maksud pesan atau penawaran Anda secara detail..." required></textarea>
+                </div>
+
+                <!-- Tombol Submit ke Database Backend -->
+                <button type="submit" class="btn-submit-message" id="btnSubmitPesan">
+                    <span id="btnSubmitText">Kirim Pesan Sekarang</span>
+                    <i data-lucide="send" id="btnSubmitIcon" style="width: 18px;"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- ==============================================================
+             KOLOM KANAN: LOKASI & KONTAK RESMI + PETA EMBED
+        ============================================================== -->
+        <div class="narahubung-side-info">
+            
+            <div class="glass narahubung-card">
+                <div class="card-headline">
+                    <span class="card-icon-emoji">📍</span>
+                    <h2>Lokasi & Kontak Resmi</h2>
+                </div>
+
+                <div class="contact-info-list">
+                    
+                    <!-- 1. Sekretariat Utama -->
+                    <div class="contact-item-card">
+                        <div class="contact-icon-box">
+                            <i data-lucide="building-2"></i>
                         </div>
-                    <% }) %>
+                        <div class="contact-text-wrap">
+                            <h4>Sekretariat Utama</h4>
+                            <p><%= contactAddress %></p>
+                        </div>
+                    </div>
+
+                    <!-- 2. Email Resmi -->
+                    <div class="contact-item-card">
+                        <div class="contact-icon-box">
+                            <i data-lucide="mail"></i>
+                        </div>
+                        <div class="contact-text-wrap">
+                            <h4>Email Resmi</h4>
+                            <a href="mailto:<%= contactEmail %>" class="contact-link" title="Kirim Email">
+                                <%= contactEmail %>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 3. Penerangan (WhatsApp) -->
+                    <div class="contact-item-card">
+                        <div class="contact-icon-box wa-box">
+                            <i data-lucide="phone"></i>
+                        </div>
+                        <div class="contact-text-wrap">
+                            <h4>Infocom / Penerangan (WhatsApp)</h4>
+                            <% 
+                                let cleanWaNumber = contactWa.replace(/[^0-9]/g, '');
+                            %>
+                            <a href="https://api.whatsapp.com/send/?phone=<%= cleanWaNumber %>&text=Halo%20Admin%20HMI%20KomKG%20UMI,%20saya%20ingin%20berkonsultasi&type=phone_number&app_absent=0" target="_blank" class="contact-link wa-highlight" title="Chat via WhatsApp">
+                                <%= contactWa %> <span class="badge-person">(<%= contactWaName %>)</span>
+                            </a>
+                            <small class="contact-subhint">*Klik nomor di atas untuk langsung terhubung ke WhatsApp Admin</small>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-        <% } %>
-    <% }) %>
+            <!-- Peta Lokasi Sekretariat / Kampus -->
+            <div class="glass narahubung-card" style="margin-top: 25px;">
+                <div class="card-headline">
+                    <span class="card-icon-emoji">🗺️</span>
+                    <h2>Peta Lokasi Kampus & Sekretariat</h2>
+                </div>
+                <div class="map-frame-wrapper">
+                    <%- contactMaps %>
+                </div>
+            </div>
 
-</section>
+        </div>
 
-<!-- PROTECT INSPECT DEVTOOLS (Memblokir klik kanan, F12, Inspect Element) -->
+    </div>
+
+    <!-- ==============================================================
+         DASHBOARD ANALYTICS WIDGET (PERSIS SEPERTI DI INDEX.EJS)
+    ============================================================== -->
+    <section class="analytics-section" aria-label="Statistik Kunjungan Website">
+        <div class="analytics-grid">
+            <div class="analytic-card">
+                <h4 class="analytic-title">VIEWS TODAY</h4>
+                <div class="analytic-value stat-today" id="val-today">
+                    <i data-lucide="loader-2" class="spin-icon"></i>
+                </div>
+            </div>
+            <div class="analytic-card">
+                <h4 class="analytic-title">THIS WEEK</h4>
+                <div class="analytic-value stat-week" id="val-week">
+                    <i data-lucide="loader-2" class="spin-icon"></i>
+                </div>
+            </div>
+            <div class="analytic-card">
+                <h4 class="analytic-title">TOTAL VIEWS</h4>
+                <div class="analytic-value stat-total" id="val-total">
+                    <i data-lucide="loader-2" class="spin-icon"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ==============================================================
+     LOGIKA JAVASCRIPT: FORM SUBMIT & GOOGLE APPS SCRIPT ANALYTICS
+============================================================== -->
+<script>
+    let activeMethod = 'wa';
+
+    function switchReplyMethod(method) {
+        activeMethod = method;
+        const btnWA = document.getElementById('btnMethodWA');
+        const btnEmail = document.getElementById('btnMethodEmail');
+        const groupWA = document.getElementById('groupInputWA');
+        const groupEmail = document.getElementById('groupInputEmail');
+        const inputWA = document.getElementById('senderWA');
+        const inputEmail = document.getElementById('senderEmail');
+
+        if (method === 'wa') {
+            btnWA.classList.add('active');
+            btnEmail.classList.remove('active');
+            groupWA.style.display = 'block';
+            groupEmail.style.display = 'none';
+            inputWA.required = true;
+            inputEmail.required = false;
+        } else {
+            btnEmail.classList.add('active');
+            btnWA.classList.remove('active');
+            groupWA.style.display = 'none';
+            groupEmail.style.display = 'block';
+            inputEmail.required = true;
+            inputWA.required = false;
+        }
+    }
+
+    function updateFileName(input) {
+        const label = document.getElementById('fileNameLabel');
+        if (input.files && input.files.length > 0) {
+            const file = input.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('error', 'Ukuran file melebihi batas maksimal 5MB.');
+                input.value = '';
+                label.innerText = 'File terlalu besar (Maks. 5MB)';
+                label.style.color = '#ef4444';
+                return;
+            }
+            const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+            label.innerText = `${file.name} (${sizeMb} MB)`;
+            label.style.color = '#4ade80';
+        } else {
+            label.innerText = 'Tidak ada file yang dipilih';
+            label.style.color = '#9ca3af';
+        }
+    }
+
+    // Submit form multipart/form-data ke backend
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+
+        const submitBtn = document.getElementById('btnSubmitPesan');
+        const submitText = document.getElementById('btnSubmitText');
+
+        const name = document.getElementById('senderName').value.trim();
+        const contact = activeMethod === 'wa' ? document.getElementById('senderWA').value.trim() : document.getElementById('senderEmail').value.trim();
+        const subject = document.getElementById('messageSubject').value;
+        const message = document.getElementById('messageBody').value.trim();
+        const fileInput = document.getElementById('supportDoc');
+
+        if (!name || !contact || !subject || !message) {
+            showAlert('error', 'Mohon lengkapi semua kolom wajib bertanda bintang (*).');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('method', activeMethod);
+        formData.append('contact', contact);
+        formData.append('subject', subject);
+        formData.append('message', message);
+
+        if (fileInput.files && fileInput.files[0]) {
+            formData.append('supportDoc', fileInput.files[0]);
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.7';
+        submitText.innerText = 'Mengirim Pesan ke Database...';
+
+        try {
+            const response = await fetch('/api/kirim-pesan-narahubung', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                showAlert('success', 'Pesan Anda berhasil terkirim dan tersimpan di database! Pengurus HMI KomKG UMI akan segera menindaklanjuti pesan Anda.');
+                
+                document.getElementById('formNarahubung').reset();
+                document.getElementById('fileNameLabel').innerText = 'Tidak ada file yang dipilih';
+                document.getElementById('fileNameLabel').style.color = '#9ca3af';
+                switchReplyMethod('wa');
+            } else {
+                showAlert('error', result.message || 'Gagal mengirim pesan. Silakan coba kembali.');
+            }
+        } catch (err) {
+            console.error('Error pengiriman pesan:', err);
+            showAlert('error', 'Terjadi gangguan koneksi ke server. Silakan coba sesaat lagi.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+            submitText.innerText = 'Kirim Pesan Sekarang';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+    }
+
+    function showAlert(type, message) {
+        const alertBox = document.getElementById('narahubungAlertBox');
+        if (!alertBox) return;
+
+        if (type === 'success') {
+            alertBox.innerHTML = `
+                <div style="background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.4); color: #4ade80; padding: 14px 18px; border-radius: 12px; font-size: 0.9rem; display: flex; align-items: flex-start; gap: 10px; line-height: 1.6;">
+                    <i data-lucide="check-circle-2" style="width:20px; height:20px; flex-shrink:0; margin-top:2px;"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+        } else {
+            alertBox.innerHTML = `
+                <div style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: #f87171; padding: 14px 18px; border-radius: 12px; font-size: 0.9rem; display: flex; align-items: flex-start; gap: 10px; line-height: 1.6;">
+                    <i data-lucide="alert-circle" style="width:20px; height:20px; flex-shrink:0; margin-top:2px;"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+        }
+
+        alertBox.style.display = 'block';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // ==============================================================
+    // SCRIPT PENGGERAK API GOOGLE APPS SCRIPT (PERSIS SEPERTI INDEX.EJS)
+    // ==============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbw8MA9YGFK3SIAXhIZAF9m1J4eOGf9LGQD-j4xXjvVSaQ826JrqeEKApPcKJWfJxw/exec";
+
+        let currentStats = { today: -1, week: -1, total: -1 };
+
+        function animateValue(obj, start, end, duration) {
+            if (start === end) return; 
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString('id-ID'); 
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function updateUI(data, speed) {
+            if(data.today !== undefined && data.today !== currentStats.today) {
+                animateValue(document.getElementById('val-today'), Math.max(0, currentStats.today), data.today, speed);
+                currentStats.today = data.today;
+            }
+            if(data.week !== undefined && data.week !== currentStats.week) {
+                animateValue(document.getElementById('val-week'), Math.max(0, currentStats.week), data.week, speed);
+                currentStats.week = data.week;
+            }
+            if(data.total !== undefined && data.total !== currentStats.total) {
+                animateValue(document.getElementById('val-total'), Math.max(0, currentStats.total), data.total, speed);
+                currentStats.total = data.total;
+            }
+        }
+
+        async function fastFetchData() {
+            try {
+                const response = await fetch(GAS_URL + "?t=" + new Date().getTime());
+                const textResponse = await response.text(); 
+                
+                try {
+                    const data = JSON.parse(textResponse);
+                    updateUI(data, 1000);
+                } catch (jsonErr) {
+                    console.warn("GAS Redirect/CORS Error, menggunakan fallback UI.");
+                    setFallbackUI();
+                }
+            } catch (err) {
+                console.warn("Koneksi ke GAS lambat/gagal.", err);
+            }
+        }
+
+        async function recordVisitPost() {
+            try {
+                const ipResponse = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipResponse.json();
+                const clientIP = ipData.ip || 'Unknown';
+
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ ip: clientIP })
+                });
+
+                const textResponse = await response.text(); 
+                
+                try {
+                    const data = JSON.parse(textResponse);
+                    if(data.status === "success") {
+                        updateUI(data, 500);
+                    }
+                } catch (jsonErr) {
+                    // Berjalan secara silent
+                }
+            } catch (error) {
+                // Berjalan secara silent
+            }
+        }
+
+        function setFallbackUI() {
+            if(currentStats.today === -1) {
+                document.getElementById('val-today').innerHTML = "-";
+                document.getElementById('val-week').innerHTML = "-";
+                document.getElementById('val-total').innerHTML = "-";
+            }
+        }
+
+        fastFetchData();
+
+        setTimeout(() => { 
+            recordVisitPost(); 
+        }, 2000);
+
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+</script>
 <script src="/js/protect-devtools.js" defer></script>
 
 <%- include('partials/footer') %>
