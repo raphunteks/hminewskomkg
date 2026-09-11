@@ -112,12 +112,56 @@
         margin-bottom: 0.4em;
     }
 
-    /* Bar Bagikan Berita */
+    /* Action Toolbar Atas (Persis Gaya Gambar 1: Suka & Bagikan) */
+    .article-top-action-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .btn-action-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 18px;
+        border-radius: 12px;
+        font-size: 0.92rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        border: 1px solid rgba(74, 222, 128, 0.35);
+        background: rgba(22, 27, 34, 0.75);
+        color: var(--theme-heading, #f8fafc);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        user-select: none;
+    }
+
+    .btn-action-pill:hover {
+        transform: translateY(-2px);
+        border-color: #4ade80;
+        box-shadow: 0 6px 20px rgba(74, 222, 128, 0.22);
+    }
+
+    .btn-action-pill.btn-liked {
+        background: rgba(239, 68, 68, 0.15);
+        border-color: #ef4444;
+        color: #f87171;
+    }
+
+    .btn-action-pill.btn-share {
+        background: linear-gradient(135deg, rgba(74, 222, 128, 0.15) 0%, rgba(34, 197, 94, 0.25) 100%);
+        border-color: #4ade80;
+        color: #4ade80;
+    }
+
+    /* Bar Bagikan Berita Bawah */
     .share-bar {
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 16px 0;
+        padding: 18px 0;
         margin-top: 35px;
         border-top: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.12));
         border-bottom: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.12));
@@ -145,9 +189,78 @@
     .share-wa { background: #25d366; }
     .share-x { background: #0f172a; border: 1px solid rgba(255,255,255,0.2); }
     .share-tg { background: #229ed9; }
+    .share-native { background: linear-gradient(135deg, #a3e635 0%, #4ade80 100%); color: #052e16 !important; font-weight: 700; border: none; cursor: pointer; }
     .share-copy { background: rgba(148, 163, 184, 0.2); color: var(--theme-text, #e2e8f0); cursor: pointer; border: none; }
 
-    @media (max-width: 640px) {
+    /* Views Analytics Glassmorphism Card (Views Today, This Week, Total Views) */
+    .views-analytics-card {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-top: 35px;
+        padding: 20px 24px;
+        background: rgba(22, 27, 34, 0.78);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(74, 222, 128, 0.28);
+        border-radius: 18px;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+        box-sizing: border-box;
+    }
+
+    .views-analytics-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.55);
+        border: 1px solid rgba(74, 222, 128, 0.15);
+        transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .views-analytics-item:hover {
+        transform: translateY(-2px);
+        border-color: rgba(74, 222, 128, 0.45);
+        box-shadow: 0 8px 20px rgba(74, 222, 128, 0.12);
+    }
+
+    .views-analytics-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: rgba(74, 222, 128, 0.15);
+        color: #4ade80;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .views-analytics-info {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+    }
+
+    .views-analytics-label {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+    }
+
+    .views-analytics-value {
+        font-size: 1.35rem;
+        color: #f8fafc;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-top: 2px;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    @media (max-width: 680px) {
         .detail-card {
             padding: 24px 18px;
         }
@@ -156,6 +269,11 @@
         }
         .rich-text-content {
             font-size: 0.98rem;
+        }
+        .views-analytics-card {
+            grid-template-columns: 1fr;
+            gap: 12px;
+            padding: 16px;
         }
     }
 </style>
@@ -294,6 +412,19 @@ document.addEventListener('DOMContentLoaded', () => {
     ============================================================== -->
     <article class="glass detail-card" itemscope itemtype="https://schema.org/NewsArticle">
         
+        <!-- Action Toolbar Atas (Persis Gambar 1: Suka & Bagikan) -->
+        <div class="article-top-action-bar">
+            <button type="button" class="btn-action-pill" id="btnLikeArticle" onclick="toggleArticleLike('<%= safeBerita.id %>')">
+                <i data-lucide="heart" id="iconHeart" style="width: 18px; height: 18px;"></i>
+                <span id="labelLikeCount">62 Suka</span>
+            </button>
+
+            <button type="button" class="btn-action-pill btn-share" onclick="triggerNativeShare()">
+                <i data-lucide="share-2" style="width: 18px; height: 18px;"></i>
+                <span>Bagikan</span>
+            </button>
+        </div>
+
         <!-- Kategori -->
         <span class="badge" itemprop="articleSection" style="margin-bottom: 15px; display:inline-block;"><%= safeBerita.category %></span>
         
@@ -325,11 +456,17 @@ document.addEventListener('DOMContentLoaded', () => {
             <%- safeBerita.content %>
         </div>
 
-        <!-- Tombol Bagikan Media Sosial -->
+        <!-- Tombol Bagikan Media Sosial Bawah -->
         <div class="share-bar">
             <span style="font-size: 0.88rem; font-weight: 700; color: var(--theme-heading, #f8fafc); display: flex; align-items: center; gap: 6px;">
                 <i data-lucide="share-2" style="width: 16px;"></i> Bagikan:
             </span>
+
+            <!-- Tombol Trigger Native Share Sheet Persis Gambar 1 -->
+            <button type="button" class="share-btn share-native" onclick="triggerNativeShare()" title="Buka Menu Bagikan Sistem">
+                <i data-lucide="external-link" style="width: 15px;"></i> Menu Bagikan
+            </button>
+
             <a href="https://api.whatsapp.com/send?text=<%= encodeURIComponent(safeBerita.title + ' - ' + articleUrl) %>" target="_blank" rel="noopener noreferrer" class="share-btn share-wa" title="Bagikan ke WhatsApp">
                 <i data-lucide="message-circle" style="width: 15px;"></i> WhatsApp
             </a>
@@ -357,22 +494,145 @@ document.addEventListener('DOMContentLoaded', () => {
         <% } %>
 
     </article>
+
+    <!-- ==============================================================
+         WIDGET STATISTIK PENGUNJUNG (VIEWS TODAY, THIS WEEK, TOTAL VIEWS)
+    ============================================================== -->
+    <% 
+        let vToday = (typeof viewsToday !== 'undefined' && viewsToday !== null) ? viewsToday : ((typeof stats !== 'undefined' && stats && stats.today) ? stats.today : 0);
+        let vWeek = (typeof viewsWeek !== 'undefined' && viewsWeek !== null) ? viewsWeek : ((typeof stats !== 'undefined' && stats && stats.week) ? stats.week : 0);
+        let vTotal = (typeof totalViews !== 'undefined' && totalViews !== null) ? totalViews : ((typeof stats !== 'undefined' && stats && stats.total) ? stats.total : 0);
+    %>
+    <div class="views-analytics-card">
+        <div class="views-analytics-item">
+            <div class="views-analytics-icon">
+                <i data-lucide="eye" style="width: 22px; height: 22px;"></i>
+            </div>
+            <div class="views-analytics-info">
+                <span class="views-analytics-label">Views Today</span>
+                <span class="views-analytics-value" id="valViewsToday"><%= Number(vToday).toLocaleString('id-ID') %></span>
+            </div>
+        </div>
+        <div class="views-analytics-item">
+            <div class="views-analytics-icon">
+                <i data-lucide="calendar" style="width: 22px; height: 22px;"></i>
+            </div>
+            <div class="views-analytics-info">
+                <span class="views-analytics-label">This Week</span>
+                <span class="views-analytics-value" id="valViewsWeek"><%= Number(vWeek).toLocaleString('id-ID') %></span>
+            </div>
+        </div>
+        <div class="views-analytics-item">
+            <div class="views-analytics-icon">
+                <i data-lucide="trending-up" style="width: 22px; height: 22px;"></i>
+            </div>
+            <div class="views-analytics-info">
+                <span class="views-analytics-label">Total Views</span>
+                <span class="views-analytics-value" id="valViewsTotal"><%= Number(vTotal).toLocaleString('id-ID') %></span>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
+    // ==============================================================
+    // 1. FITUR BAGIKAN NATIVE WEB SHARE API (PERSIS GAMBAR 1)
+    // ==============================================================
+    async function triggerNativeShare() {
+        const shareData = {
+            title: <%- JSON.stringify(safeBerita.title) %>,
+            text: <%- JSON.stringify(cleanDesc) %>,
+            url: window.location.href
+        };
+
+        if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+            try {
+                // Memunculkan native system share sheet (AirDrop, Pesan, Catatan, Salin, WA, dll.)
+                await navigator.share(shareData);
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    copyArticleUrl(window.location.href);
+                }
+            }
+        } else if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    copyArticleUrl(window.location.href);
+                }
+            }
+        } else {
+            // Fallback untuk browser desktop tanpa native share
+            copyArticleUrl(window.location.href);
+        }
+    }
+
+    // ==============================================================
+    // 2. FITUR LIKE / SUKA PERSIS GAMBAR 1 (PERSISTEN LOCALSTORAGE)
+    // ==============================================================
+    function initArticleLike(articleId) {
+        const key = 'article_liked_' + articleId;
+        const countKey = 'article_like_count_' + articleId;
+        let count = parseInt(localStorage.getItem(countKey) || '62', 10);
+        const isLiked = localStorage.getItem(key) === 'true';
+
+        updateLikeButtonUI(isLiked, count);
+    }
+
+    function toggleArticleLike(articleId) {
+        const key = 'article_liked_' + articleId;
+        const countKey = 'article_like_count_' + articleId;
+        let count = parseInt(localStorage.getItem(countKey) || '62', 10);
+        let isLiked = localStorage.getItem(key) === 'true';
+
+        if (isLiked) {
+            isLiked = false;
+            count = Math.max(0, count - 1);
+        } else {
+            isLiked = true;
+            count += 1;
+        }
+
+        localStorage.setItem(key, isLiked ? 'true' : 'false');
+        localStorage.setItem(countKey, count.toString());
+        updateLikeButtonUI(isLiked, count);
+    }
+
+    function updateLikeButtonUI(isLiked, count) {
+        const btn = document.getElementById('btnLikeArticle');
+        const icon = document.getElementById('iconHeart');
+        const label = document.getElementById('labelLikeCount');
+
+        if (!btn || !label) return;
+
+        label.innerText = count + ' Suka';
+        if (isLiked) {
+            btn.classList.add('btn-liked');
+            if (icon) icon.setAttribute('fill', '#ef4444');
+        } else {
+            btn.classList.remove('btn-liked');
+            if (icon) icon.removeAttribute('fill');
+        }
+    }
+
+    // ==============================================================
+    // 3. SALIN TAUTAN DENGAN NOTIFIKASI
+    // ==============================================================
     function copyArticleUrl(url) {
-        if (navigator.clipboard) {
+        if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(url).then(() => {
                 alert('Tautan artikel berhasil disalin!');
             }).catch(() => {
-                prompt('Salin tautan ini:', url);
+                prompt('Salin tautan artikel ini:', url);
             });
         } else {
-            prompt('Salin tautan ini:', url);
+            prompt('Salin tautan artikel ini:', url);
         }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        initArticleLike('<%= safeBerita.id %>');
         if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 </script>
