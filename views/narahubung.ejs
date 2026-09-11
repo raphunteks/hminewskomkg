@@ -353,72 +353,72 @@
         border: none;
     }
 
-    /* Views Analytics Glassmorphism Card (Views Today, This Week, Total Views) */
-    .views-analytics-card {
+    /* ==============================================================
+       STYLING ANALYTICS WIDGET (VIEWS TODAY, THIS WEEK, TOTAL VIEWS)
+       PERSIS SEPERTI DI INDEX.EJS
+    ============================================================== */
+    .analytics-section {
+        margin-top: 40px;
+        width: 100%;
+    }
+
+    .analytics-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 16px;
-        margin-top: 35px;
-        padding: 20px 24px;
+    }
+
+    .analytic-card {
         background: rgba(22, 27, 34, 0.78);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(74, 222, 128, 0.28);
         border-radius: 18px;
-        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
-        box-sizing: border-box;
-    }
-
-    .views-analytics-item {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 12px 16px;
-        border-radius: 14px;
-        background: rgba(15, 23, 42, 0.55);
-        border: 1px solid rgba(74, 222, 128, 0.15);
+        padding: 18px 20px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
         transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
     }
 
-    .views-analytics-item:hover {
+    .analytic-card:hover {
         transform: translateY(-2px);
-        border-color: rgba(74, 222, 128, 0.45);
-        box-shadow: 0 8px 20px rgba(74, 222, 128, 0.12);
+        border-color: rgba(74, 222, 128, 0.5);
+        box-shadow: 0 12px 32px rgba(74, 222, 128, 0.12);
     }
 
-    .views-analytics-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: rgba(74, 222, 128, 0.15);
-        color: #4ade80;
+    .analytic-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #94a3b8;
+        letter-spacing: 0.8px;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+
+    .analytic-value {
+        font-size: 1.65rem;
+        font-weight: 800;
+        font-family: 'JetBrains Mono', monospace;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
+        min-height: 40px;
     }
 
-    .views-analytics-info {
-        display: flex;
-        flex-direction: column;
-        text-align: left;
+    .stat-today { color: #4ade80; }
+    .stat-week { color: #38bdf8; }
+    .stat-total { color: #fbbf24; }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
     }
 
-    .views-analytics-label {
-        font-size: 0.75rem;
+    .spin-icon {
+        animation: spin 1s linear infinite;
+        width: 22px;
+        height: 22px;
         color: #94a3b8;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-    }
-
-    .views-analytics-value {
-        font-size: 1.35rem;
-        color: #f8fafc;
-        font-weight: 800;
-        line-height: 1.2;
-        margin-top: 2px;
-        font-family: 'JetBrains Mono', monospace;
     }
 
     /* Responsif Mobile Breakpoint */
@@ -436,10 +436,9 @@
     }
 
     @media (max-width: 680px) {
-        .views-analytics-card {
+        .analytics-grid {
             grid-template-columns: 1fr;
             gap: 12px;
-            padding: 16px;
         }
     }
 </style>
@@ -613,46 +612,34 @@
     </div>
 
     <!-- ==============================================================
-         WIDGET STATISTIK PENGUNJUNG (VIEWS TODAY, THIS WEEK, TOTAL VIEWS)
+         DASHBOARD ANALYTICS WIDGET (PERSIS SEPERTI DI INDEX.EJS)
     ============================================================== -->
-    <% 
-        let vToday = (typeof viewsToday !== 'undefined' && viewsToday !== null) ? viewsToday : ((typeof stats !== 'undefined' && stats && stats.today) ? stats.today : 0);
-        let vWeek = (typeof viewsWeek !== 'undefined' && viewsWeek !== null) ? viewsWeek : ((typeof stats !== 'undefined' && stats && stats.week) ? stats.week : 0);
-        let vTotal = (typeof totalViews !== 'undefined' && totalViews !== null) ? totalViews : ((typeof stats !== 'undefined' && stats && stats.total) ? stats.total : 0);
-    %>
-    <div class="views-analytics-card">
-        <div class="views-analytics-item">
-            <div class="views-analytics-icon">
-                <i data-lucide="eye" style="width: 22px; height: 22px;"></i>
+    <section class="analytics-section" aria-label="Statistik Kunjungan Website">
+        <div class="analytics-grid">
+            <div class="analytic-card">
+                <h4 class="analytic-title">VIEWS TODAY</h4>
+                <div class="analytic-value stat-today" id="val-today">
+                    <i data-lucide="loader-2" class="spin-icon"></i>
+                </div>
             </div>
-            <div class="views-analytics-info">
-                <span class="views-analytics-label">Views Today</span>
-                <span class="views-analytics-value" id="valViewsToday"><%= Number(vToday).toLocaleString('id-ID') %></span>
+            <div class="analytic-card">
+                <h4 class="analytic-title">THIS WEEK</h4>
+                <div class="analytic-value stat-week" id="val-week">
+                    <i data-lucide="loader-2" class="spin-icon"></i>
+                </div>
             </div>
-        </div>
-        <div class="views-analytics-item">
-            <div class="views-analytics-icon">
-                <i data-lucide="calendar" style="width: 22px; height: 22px;"></i>
-            </div>
-            <div class="views-analytics-info">
-                <span class="views-analytics-label">This Week</span>
-                <span class="views-analytics-value" id="valViewsWeek"><%= Number(vWeek).toLocaleString('id-ID') %></span>
+            <div class="analytic-card">
+                <h4 class="analytic-title">TOTAL VIEWS</h4>
+                <div class="analytic-value stat-total" id="val-total">
+                    <i data-lucide="loader-2" class="spin-icon"></i>
+                </div>
             </div>
         </div>
-        <div class="views-analytics-item">
-            <div class="views-analytics-icon">
-                <i data-lucide="trending-up" style="width: 22px; height: 22px;"></i>
-            </div>
-            <div class="views-analytics-info">
-                <span class="views-analytics-label">Total Views</span>
-                <span class="views-analytics-value" id="valViewsTotal"><%= Number(vTotal).toLocaleString('id-ID') %></span>
-            </div>
-        </div>
-    </div>
+    </section>
 </div>
 
 <!-- ==============================================================
-     LOGIKA JAVASCRIPT: PENGIRIMAN AJAX KE DATABASE BACKEND
+     LOGIKA JAVASCRIPT: FORM SUBMIT & GOOGLE APPS SCRIPT ANALYTICS
 ============================================================== -->
 <script>
     let activeMethod = 'wa';
@@ -790,7 +777,101 @@
         alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
+    // ==============================================================
+    // SCRIPT PENGGERAK API GOOGLE APPS SCRIPT (PERSIS SEPERTI INDEX.EJS)
+    // ==============================================================
     document.addEventListener('DOMContentLoaded', () => {
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbw8MA9YGFK3SIAXhIZAF9m1J4eOGf9LGQD-j4xXjvVSaQ826JrqeEKApPcKJWfJxw/exec";
+
+        let currentStats = { today: -1, week: -1, total: -1 };
+
+        function animateValue(obj, start, end, duration) {
+            if (start === end) return; 
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString('id-ID'); 
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function updateUI(data, speed) {
+            if(data.today !== undefined && data.today !== currentStats.today) {
+                animateValue(document.getElementById('val-today'), Math.max(0, currentStats.today), data.today, speed);
+                currentStats.today = data.today;
+            }
+            if(data.week !== undefined && data.week !== currentStats.week) {
+                animateValue(document.getElementById('val-week'), Math.max(0, currentStats.week), data.week, speed);
+                currentStats.week = data.week;
+            }
+            if(data.total !== undefined && data.total !== currentStats.total) {
+                animateValue(document.getElementById('val-total'), Math.max(0, currentStats.total), data.total, speed);
+                currentStats.total = data.total;
+            }
+        }
+
+        async function fastFetchData() {
+            try {
+                const response = await fetch(GAS_URL + "?t=" + new Date().getTime());
+                const textResponse = await response.text(); 
+                
+                try {
+                    const data = JSON.parse(textResponse);
+                    updateUI(data, 1000);
+                } catch (jsonErr) {
+                    console.warn("GAS Redirect/CORS Error, menggunakan fallback UI.");
+                    setFallbackUI();
+                }
+            } catch (err) {
+                console.warn("Koneksi ke GAS lambat/gagal.", err);
+            }
+        }
+
+        async function recordVisitPost() {
+            try {
+                const ipResponse = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipResponse.json();
+                const clientIP = ipData.ip || 'Unknown';
+
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ ip: clientIP })
+                });
+
+                const textResponse = await response.text(); 
+                
+                try {
+                    const data = JSON.parse(textResponse);
+                    if(data.status === "success") {
+                        updateUI(data, 500);
+                    }
+                } catch (jsonErr) {
+                    // Berjalan secara silent
+                }
+            } catch (error) {
+                // Berjalan secara silent
+            }
+        }
+
+        function setFallbackUI() {
+            if(currentStats.today === -1) {
+                document.getElementById('val-today').innerHTML = "-";
+                document.getElementById('val-week').innerHTML = "-";
+                document.getElementById('val-total').innerHTML = "-";
+            }
+        }
+
+        fastFetchData();
+
+        setTimeout(() => { 
+            recordVisitPost(); 
+        }, 2000);
+
         if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 </script>
