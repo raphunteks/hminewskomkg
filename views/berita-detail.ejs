@@ -28,258 +28,10 @@
 %>
 <%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
 
-<style>
-    /* Styling Terpadu Detail Artikel & Tipografi Responsif */
-    .article-detail-container {
-        max-width: 860px;
-        margin: 0 auto 60px auto;
-        padding: 0 16px;
-    }
-
-    .detail-card {
-        padding: 38px;
-        border-radius: 20px;
-        border-top: 5px solid #22c55e;
-        position: relative;
-    }
-
-    .detail-img-wrapper {
-        width: 100%;
-        max-height: 480px;
-        overflow: hidden;
-        border-radius: 16px;
-        margin-bottom: 30px;
-        border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.12));
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-        background: rgba(15, 23, 42, 0.4);
-    }
-
-    .detail-img-wrapper img {
-        width: 100%;
-        height: 100%;
-        max-height: 480px;
-        object-fit: cover;
-        display: block;
-    }
-
-    .rich-text-content {
-        font-size: 1.05rem;
-        line-height: 1.8;
-        word-break: break-word;
-    }
-
-    .rich-text-content p {
-        margin-bottom: 1.4em;
-    }
-
-    .rich-text-content h2, 
-    .rich-text-content h3, 
-    .rich-text-content h4 {
-        color: var(--theme-heading, #f8fafc);
-        margin-top: 1.6em;
-        margin-bottom: 0.6em;
-        font-weight: 700;
-        line-height: 1.35;
-    }
-
-    .rich-text-content img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 12px;
-        margin: 1.5em 0;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .rich-text-content blockquote {
-        border-left: 4px solid #22c55e;
-        padding-left: 18px;
-        margin: 1.6em 0;
-        font-style: italic;
-        color: var(--theme-muted, #94a3b8);
-        background: rgba(34, 197, 94, 0.06);
-        padding-top: 8px;
-        padding-bottom: 8px;
-        border-radius: 0 10px 10px 0;
-    }
-
-    .rich-text-content ul, 
-    .rich-text-content ol {
-        margin-left: 24px;
-        margin-bottom: 1.4em;
-    }
-
-    .rich-text-content li {
-        margin-bottom: 0.4em;
-    }
-
-    /* Action Toolbar Atas (Persis Gaya Gambar 1: Suka & Bagikan) */
-    .article-top-action-bar {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 24px;
-        flex-wrap: wrap;
-    }
-
-    .btn-action-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 9px 18px;
-        border-radius: 12px;
-        font-size: 0.92rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        border: 1px solid rgba(74, 222, 128, 0.35);
-        background: rgba(22, 27, 34, 0.75);
-        color: var(--theme-heading, #f8fafc);
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-        user-select: none;
-    }
-
-    .btn-action-pill:hover {
-        transform: translateY(-2px);
-        border-color: #4ade80;
-        box-shadow: 0 6px 20px rgba(74, 222, 128, 0.22);
-    }
-
-    .btn-action-pill.btn-liked {
-        background: rgba(239, 68, 68, 0.15);
-        border-color: #ef4444;
-        color: #f87171;
-    }
-
-    .btn-action-pill.btn-share {
-        background: linear-gradient(135deg, rgba(74, 222, 128, 0.15) 0%, rgba(34, 197, 94, 0.25) 100%);
-        border-color: #4ade80;
-        color: #4ade80;
-    }
-
-    /* Bar Bagikan Berita Bawah */
-    .share-bar {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 18px 0;
-        margin-top: 35px;
-        border-top: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.12));
-        border-bottom: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.12));
-        flex-wrap: wrap;
-    }
-
-    .share-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 14px;
-        border-radius: 10px;
-        font-size: 0.84rem;
-        font-weight: 600;
-        text-decoration: none;
-        color: #ffffff;
-        transition: transform 0.2s ease, opacity 0.2s ease;
-    }
-
-    .share-btn:hover {
-        transform: translateY(-2px);
-        opacity: 0.9;
-    }
-
-    .share-wa { background: #25d366; }
-    .share-x { background: #0f172a; border: 1px solid rgba(255,255,255,0.2); }
-    .share-tg { background: #229ed9; }
-    .share-native { background: linear-gradient(135deg, #a3e635 0%, #4ade80 100%); color: #052e16 !important; font-weight: 700; border: none; cursor: pointer; }
-    .share-copy { background: rgba(148, 163, 184, 0.2); color: var(--theme-text, #e2e8f0); cursor: pointer; border: none; }
-
-    /* ==============================================================
-       STYLING ANALYTICS WIDGET (VIEWS TODAY, THIS WEEK, TOTAL VIEWS)
-       PERSIS SEPERTI DI INDEX.EJS
-    ============================================================== */
-    .analytics-section {
-        margin-top: 40px;
-        width: 100%;
-    }
-
-    .analytics-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-    }
-
-    .analytic-card {
-        background: rgba(22, 27, 34, 0.78);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(74, 222, 128, 0.28);
-        border-radius: 18px;
-        padding: 18px 20px;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-        transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    .analytic-card:hover {
-        transform: translateY(-2px);
-        border-color: rgba(74, 222, 128, 0.5);
-        box-shadow: 0 12px 32px rgba(74, 222, 128, 0.12);
-    }
-
-    .analytic-title {
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: #94a3b8;
-        letter-spacing: 0.8px;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-    }
-
-    .analytic-value {
-        font-size: 1.65rem;
-        font-weight: 800;
-        font-family: 'JetBrains Mono', monospace;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 40px;
-    }
-
-    .stat-today { color: #4ade80; }
-    .stat-week { color: #38bdf8; }
-    .stat-total { color: #fbbf24; }
-
-    @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-
-    .spin-icon {
-        animation: spin 1s linear infinite;
-        width: 22px;
-        height: 22px;
-        color: #94a3b8;
-    }
-
-    @media (max-width: 680px) {
-        .detail-card {
-            padding: 24px 18px;
-        }
-        .detail-img-wrapper {
-            max-height: 280px;
-        }
-        .rich-text-content {
-            font-size: 0.98rem;
-        }
-        .analytics-grid {
-            grid-template-columns: 1fr;
-            gap: 12px;
-        }
-    }
-</style>
-
 <!-- ==============================================================
      SUPER BIG UPGRADE SEO & ANTI-ERROR PRATINJAU (PREVIEW-SAFE)
-     Data server-side ditampung di DOM agar aman diproses peramban
+     Mengubah cara injeksi variabel EJS agar tidak bertabrakan dengan JS Parser.
+     Semua data server-side (EJS) ditampung di dalam HTML DOM terlebih dahulu.
 ============================================================== -->
 <div id="seo-server-data" 
      style="display:none;" 
@@ -294,7 +46,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. MENGAMBIL DATA DARI DOM
+    // 1. MENGAMBIL DATA DARI DOM (Sangat Aman untuk fitur Pratinjau tanpa memicu SyntaxError)
     const seoDataEl = document.getElementById('seo-server-data');
     if(!seoDataEl) return;
     
@@ -327,13 +79,13 @@ document.addEventListener('DOMContentLoaded', () => {
         { property: "twitter:image", content: d_img }
     ];
 
-    // Injeksi Link Canonical
+    // Injeksi Link Canonical untuk Google Search Console
     let canonical = document.createElement('link');
     canonical.rel = 'canonical';
     canonical.href = d_url;
     document.head.appendChild(canonical);
 
-    // Injeksi Meta Tags
+    // Injeksi Meta Tags ke tag <head>
     metaTags.forEach(tag => {
         let selector = tag.name ? `meta[name="${tag.name}"]` : `meta[property="${tag.property}"]`;
         let existingTag = document.head.querySelector(selector);
@@ -349,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==============================================================
-    // 2. INJEKSI JSON-LD (ARTICLE) SECARA DINAMIS
+    // 2. INJEKSI JSON-LD (ARTICLE) SECARA DINAMIS (PREVIEW-SAFE)
     // ==============================================================
     const jsonLdData = {
       "@context": "https://schema.org",
@@ -399,48 +151,36 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 <script src="/js/protect-devtools.js" defer></script>
 
-<div class="article-detail-container">
+<div class="container" style="max-width: 800px; margin-bottom: 50px;">
     
     <!-- Tombol Kembali -->
-    <a href="/" style="color: var(--theme-primary, #4ade80); display:inline-flex; align-items:center; gap:6px; margin-bottom:20px; font-weight:700; text-decoration:none; transition:0.3s ease;">
+    <a href="/" style="color: var(--theme-primary); display:inline-flex; align-items:center; gap:6px; margin-bottom:20px; font-weight:700; transition:0.3s ease;">
         <i data-lucide="arrow-left" style="width:18px;"></i> Kembali ke Beranda
     </a>
 
     <!-- ==============================================================
          SUPER BIG UPGRADE: EXPERT SEO MICRODATA (SCHEMA.ORG)
     ============================================================== -->
-    <article class="glass detail-card" itemscope itemtype="https://schema.org/NewsArticle">
+    <article class="glass" itemscope itemtype="https://schema.org/NewsArticle" style="padding: 40px; border-top: 5px solid #22c55e;">
         
-        <!-- Action Toolbar Atas (Persis Gaya Gambar 1: Suka & Bagikan) -->
-        <div class="article-top-action-bar">
-            <button type="button" class="btn-action-pill" id="btnLikeArticle" onclick="toggleArticleLike('<%= safeBerita.id %>')">
-                <i data-lucide="heart" id="iconHeart" style="width: 18px; height: 18px;"></i>
-                <span id="labelLikeCount">62 Suka</span>
-            </button>
-
-            <button type="button" class="btn-action-pill btn-share" onclick="triggerNativeShare()">
-                <i data-lucide="share-2" style="width: 18px; height: 18px;"></i>
-                <span>Bagikan</span>
-            </button>
-        </div>
-
         <!-- Kategori -->
-        <span class="badge" itemprop="articleSection" style="margin-bottom: 15px; display:inline-block;"><%= safeBerita.category %></span>
+        <span class="badge" itemprop="articleSection" style="margin-bottom: 15px;"><%= safeBerita.category %></span>
         
         <!-- Header Artikel (Judul & Meta) -->
         <header>
-            <h1 itemprop="headline" class="detail-title" style="font-size: clamp(1.6rem, 3.5vw, 2.2rem); margin-bottom: 15px; color: var(--theme-heading, #f8fafc); line-height: 1.3; font-weight: 800;">
+            <!-- SMART COLOR: Adaptif hitam pekat di tema Light, putih bersinar di tema Dark -->
+            <h1 itemprop="headline" class="detail-title" style="font-size: clamp(1.6rem, 3.5vw, 2.2rem); margin-bottom: 15px; color: var(--theme-heading); line-height: 1.3; font-weight: 800;">
                 <%= safeBerita.title %>
             </h1>
             
-            <div style="display:flex; align-items:center; gap:15px; color: var(--theme-muted, #94a3b8); font-size:0.9rem; margin-bottom:25px; border-bottom:1px solid var(--theme-glass-border, rgba(255,255,255,0.12)); padding-bottom:20px; flex-wrap: wrap;">
-                <span style="display:flex; align-items:center; gap:6px;">
+            <div style="display:flex; align-items:center; gap:15px; color: var(--theme-muted); font-size:0.9rem; margin-bottom:30px; border-bottom:1px solid var(--theme-glass-border); padding-bottom:20px; flex-wrap: wrap;">
+                <span style="display:flex; align-items:center; gap:5px;">
                     <i data-lucide="calendar" style="width:16px;"></i> 
                     <time itemprop="datePublished" datetime="<%= safeBerita.date %>"><%= safeBerita.date %></time>
                 </span>
-                <span itemprop="author" itemscope itemtype="https://schema.org/Organization" style="display:flex; align-items:center; gap:6px;">
+                <span itemprop="author" itemscope itemtype="https://schema.org/Organization" style="display:flex; align-items:center; gap:5px;">
                     <i data-lucide="user" style="width:16px;"></i> 
-                    <span itemprop="name">Admin HMI KomKG UMI</span>
+                    <span itemprop="name">Admin HMI KomKGUMI</span>
                 </span>
             </div>
         </header>
@@ -450,42 +190,17 @@ document.addEventListener('DOMContentLoaded', () => {
             <img itemprop="image" src="<%= safeBerita.image %>" alt="Cover Berita: <%= safeBerita.title %>" onerror="this.src='/img/logo-hmikomkgumi.png'">
         </div>
 
-        <!-- Isi/Konten Utama Artikel -->
-        <div class="rich-text-content" itemprop="articleBody" style="color: var(--theme-text, #e2e8f0);">
+        <!-- Isi/Konten Utama Artikel (Smart Color Kontras) -->
+        <div class="rich-text-content" itemprop="articleBody" style="color: var(--theme-text);">
             <%- safeBerita.content %>
-        </div>
-
-        <!-- Tombol Bagikan Media Sosial Bawah -->
-        <div class="share-bar">
-            <span style="font-size: 0.88rem; font-weight: 700; color: var(--theme-heading, #f8fafc); display: flex; align-items: center; gap: 6px;">
-                <i data-lucide="share-2" style="width: 16px;"></i> Bagikan:
-            </span>
-
-            <!-- Tombol Trigger Native Share Sheet Persis Gambar 1 -->
-            <button type="button" class="share-btn share-native" onclick="triggerNativeShare()" title="Buka Menu Bagikan Sistem">
-                <i data-lucide="external-link" style="width: 15px;"></i> Menu Bagikan
-            </button>
-
-            <a href="https://api.whatsapp.com/send?text=<%= encodeURIComponent(safeBerita.title + ' - ' + articleUrl) %>" target="_blank" rel="noopener noreferrer" class="share-btn share-wa" title="Bagikan ke WhatsApp">
-                <i data-lucide="message-circle" style="width: 15px;"></i> WhatsApp
-            </a>
-            <a href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(safeBerita.title) %>&url=<%= encodeURIComponent(articleUrl) %>" target="_blank" rel="noopener noreferrer" class="share-btn share-x" title="Bagikan ke X">
-                <i data-lucide="twitter" style="width: 15px;"></i> X
-            </a>
-            <a href="https://t.me/share/url?url=<%= encodeURIComponent(articleUrl) %>&text=<%= encodeURIComponent(safeBerita.title) %>" target="_blank" rel="noopener noreferrer" class="share-btn share-tg" title="Bagikan ke Telegram">
-                <i data-lucide="send" style="width: 15px;"></i> Telegram
-            </a>
-            <button type="button" class="share-btn share-copy" onclick="copyArticleUrl('<%= articleUrl %>')" title="Salin Tautan">
-                <i data-lucide="link" style="width: 15px;"></i> Salin Link
-            </button>
         </div>
 
         <!-- Dokumentasi Tambahan -->
         <% if(safeBerita.photos && safeBerita.photos.length > 0) { %>
-            <h3 style="margin-top: 35px; margin-bottom: 20px; color: var(--theme-heading, #f8fafc); font-size: 1.25rem; font-weight: 700;">Dokumentasi Tambahan</h3>
-            <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
+            <h3 style="margin-bottom: 20px; border-top: 1px solid var(--theme-glass-border); padding-top: 30px; color: var(--theme-heading);">Dokumentasi Tambahan</h3>
+            <div class="grid-2" style="gap: 15px;">
                 <% safeBerita.photos.forEach(photo => { %>
-                    <div style="width: 100%; height: 200px; overflow: hidden; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border: 1px solid var(--theme-glass-border, rgba(255,255,255,0.12));">
+                    <div style="width: 100%; height: 200px; overflow: hidden; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid var(--theme-glass-border);">
                         <img itemprop="image" src="<%= photo.url %>" alt="Dokumentasi Tambahan: <%= safeBerita.title %>" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                     </div>
                 <% }) %>
@@ -493,228 +208,6 @@ document.addEventListener('DOMContentLoaded', () => {
         <% } %>
 
     </article>
-
-    <!-- ==============================================================
-         DASHBOARD ANALYTICS WIDGET (PERSIS SEPERTI DI INDEX.EJS)
-    ============================================================== -->
-    <section class="analytics-section" aria-label="Statistik Kunjungan Website">
-        <div class="analytics-grid">
-            <div class="analytic-card">
-                <h4 class="analytic-title">VIEWS TODAY</h4>
-                <div class="analytic-value stat-today" id="val-today">
-                    <i data-lucide="loader-2" class="spin-icon"></i>
-                </div>
-            </div>
-            <div class="analytic-card">
-                <h4 class="analytic-title">THIS WEEK</h4>
-                <div class="analytic-value stat-week" id="val-week">
-                    <i data-lucide="loader-2" class="spin-icon"></i>
-                </div>
-            </div>
-            <div class="analytic-card">
-                <h4 class="analytic-title">TOTAL VIEWS</h4>
-                <div class="analytic-value stat-total" id="val-total">
-                    <i data-lucide="loader-2" class="spin-icon"></i>
-                </div>
-            </div>
-        </div>
-    </section>
 </div>
-
-<script>
-    // ==============================================================
-    // 1. FITUR BAGIKAN NATIVE WEB SHARE API (PERSIS GAMBAR 1)
-    // ==============================================================
-    async function triggerNativeShare() {
-        const shareData = {
-            title: <%- JSON.stringify(safeBerita.title) %>,
-            text: <%- JSON.stringify(cleanDesc) %>,
-            url: window.location.href
-        };
-
-        if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-            try {
-                await navigator.share(shareData);
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    copyArticleUrl(window.location.href);
-                }
-            }
-        } else if (navigator.share) {
-            try {
-                await navigator.share(shareData);
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    copyArticleUrl(window.location.href);
-                }
-            }
-        } else {
-            copyArticleUrl(window.location.href);
-        }
-    }
-
-    // ==============================================================
-    // 2. FITUR LIKE / SUKA PERSIS GAMBAR 1 (PERSISTEN LOCALSTORAGE)
-    // ==============================================================
-    function initArticleLike(articleId) {
-        const key = 'article_liked_' + articleId;
-        const countKey = 'article_like_count_' + articleId;
-        let count = parseInt(localStorage.getItem(countKey) || '62', 10);
-        const isLiked = localStorage.getItem(key) === 'true';
-
-        updateLikeButtonUI(isLiked, count);
-    }
-
-    function toggleArticleLike(articleId) {
-        const key = 'article_liked_' + articleId;
-        const countKey = 'article_like_count_' + articleId;
-        let count = parseInt(localStorage.getItem(countKey) || '62', 10);
-        let isLiked = localStorage.getItem(key) === 'true';
-
-        if (isLiked) {
-            isLiked = false;
-            count = Math.max(0, count - 1);
-        } else {
-            isLiked = true;
-            count += 1;
-        }
-
-        localStorage.setItem(key, isLiked ? 'true' : 'false');
-        localStorage.setItem(countKey, count.toString());
-        updateLikeButtonUI(isLiked, count);
-    }
-
-    function updateLikeButtonUI(isLiked, count) {
-        const btn = document.getElementById('btnLikeArticle');
-        const icon = document.getElementById('iconHeart');
-        const label = document.getElementById('labelLikeCount');
-
-        if (!btn || !label) return;
-
-        label.innerText = count + ' Suka';
-        if (isLiked) {
-            btn.classList.add('btn-liked');
-            if (icon) icon.setAttribute('fill', '#ef4444');
-        } else {
-            btn.classList.remove('btn-liked');
-            if (icon) icon.removeAttribute('fill');
-        }
-    }
-
-    // ==============================================================
-    // 3. SALIN TAUTAN DENGAN NOTIFIKASI
-    // ==============================================================
-    function copyArticleUrl(url) {
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(url).then(() => {
-                alert('Tautan artikel berhasil disalin!');
-            }).catch(() => {
-                prompt('Salin tautan artikel ini:', url);
-            });
-        } else {
-            prompt('Salin tautan artikel ini:', url);
-        }
-    }
-
-    // ==============================================================
-    // 4. SCRIPT PENGGERAK API GOOGLE APPS SCRIPT (PERSIS SEPERTI INDEX.EJS)
-    // ==============================================================
-    document.addEventListener('DOMContentLoaded', () => {
-        initArticleLike('<%= safeBerita.id %>');
-
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbw8MA9YGFK3SIAXhIZAF9m1J4eOGf9LGQD-j4xXjvVSaQ826JrqeEKApPcKJWfJxw/exec";
-
-        let currentStats = { today: -1, week: -1, total: -1 };
-
-        function animateValue(obj, start, end, duration) {
-            if (start === end) return; 
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString('id-ID'); 
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        }
-
-        function updateUI(data, speed) {
-            if(data.today !== undefined && data.today !== currentStats.today) {
-                animateValue(document.getElementById('val-today'), Math.max(0, currentStats.today), data.today, speed);
-                currentStats.today = data.today;
-            }
-            if(data.week !== undefined && data.week !== currentStats.week) {
-                animateValue(document.getElementById('val-week'), Math.max(0, currentStats.week), data.week, speed);
-                currentStats.week = data.week;
-            }
-            if(data.total !== undefined && data.total !== currentStats.total) {
-                animateValue(document.getElementById('val-total'), Math.max(0, currentStats.total), data.total, speed);
-                currentStats.total = data.total;
-            }
-        }
-
-        async function fastFetchData() {
-            try {
-                const response = await fetch(GAS_URL + "?t=" + new Date().getTime());
-                const textResponse = await response.text(); 
-                
-                try {
-                    const data = JSON.parse(textResponse);
-                    updateUI(data, 1000);
-                } catch (jsonErr) {
-                    console.warn("GAS Redirect/CORS Error, menggunakan fallback UI.");
-                    setFallbackUI();
-                }
-            } catch (err) {
-                console.warn("Koneksi ke GAS lambat/gagal.", err);
-            }
-        }
-
-        async function recordVisitPost() {
-            try {
-                const ipResponse = await fetch('https://api.ipify.org?format=json');
-                const ipData = await ipResponse.json();
-                const clientIP = ipData.ip || 'Unknown';
-
-                const response = await fetch(GAS_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ ip: clientIP })
-                });
-
-                const textResponse = await response.text(); 
-                
-                try {
-                    const data = JSON.parse(textResponse);
-                    if(data.status === "success") {
-                        updateUI(data, 500);
-                    }
-                } catch (jsonErr) {
-                    // Berjalan secara silent
-                }
-            } catch (error) {
-                // Berjalan secara silent
-            }
-        }
-
-        function setFallbackUI() {
-            if(currentStats.today === -1) {
-                document.getElementById('val-today').innerHTML = "-";
-                document.getElementById('val-week').innerHTML = "-";
-                document.getElementById('val-total').innerHTML = "-";
-            }
-        }
-
-        fastFetchData();
-
-        setTimeout(() => { 
-            recordVisitPost(); 
-        }, 2000);
-
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    });
-</script>
 
 <%- include('partials/footer') %>
