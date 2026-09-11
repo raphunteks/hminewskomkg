@@ -10,18 +10,25 @@
 %>
 
 <!-- ==============================================================
-     LAYOUT DASHBOARD ADMIN DENGAN SIDEBAR COLLAPSIBLE (GAMBAR 2 & 3)
+     LAYOUT DASHBOARD ADMIN DENGAN SIDEBAR COLLAPSIBLE (PERSIS GAMBAR 3)
 ============================================================== -->
 <div class="admin-dashboard-container" id="adminDashboardContainer">
     
     <!-- ==============================================================
-         SIDEBAR KIRI (BISA DIBUKA / DITUTUP SECARA LENGKAP)
+         SIDEBAR KIRI (PROFIL DI ATAS & LOGOUT DI BAWAH KIRI)
     ============================================================== -->
     <aside class="admin-sidebar-nav" id="adminSidebarNav">
+        
+        <!-- PROFIL DASHBOARD ADMIN DI BAGIAN ATAS SIDEBAR (PERSIS GAMBAR 3) -->
         <div class="sidebar-top-header">
-            <div class="sidebar-brand">
-                <i data-lucide="shield-check" class="sidebar-brand-icon"></i>
-                <span class="sidebar-brand-text">Admin Area</span>
+            <div class="sidebar-admin-profile">
+                <div class="sidebar-admin-avatar">
+                    <img src="<%= siteSettings.headerLogo %>" alt="Admin HMI" onerror="this.src='/img/logo-hmikomkgumi.png'">
+                </div>
+                <div class="sidebar-admin-info">
+                    <h2 class="sidebar-admin-title">Dashboard Admin</h2>
+                    <p class="sidebar-admin-desc">HMI KomKGUMI</p>
+                </div>
             </div>
             <!-- Tombol Toggle Buka/Tutup Sidebar (Persis Icon Gbr 2 & 3) -->
             <button type="button" class="sidebar-collapse-btn" id="sidebarCollapseBtn" onclick="toggleAdminSidebar()" title="Buka/Tutup Sidebar">
@@ -39,7 +46,7 @@
 
         <!-- DAFTAR MENU SIDEBAR LENGKAP -->
         <div class="sidebar-menu-list">
-            <!-- TAB BARU: PESAN MASUK DARI NARAHUBUNG -->
+            <!-- TAB: PESAN MASUK DARI NARAHUBUNG -->
             <button class="sidebar-nav-item active" onclick="openAdmTab('adm-pesan', this)" title="Pesan Narahubung">
                 <div class="sidebar-nav-icon-wrap">
                     <i data-lucide="inbox"></i>
@@ -85,27 +92,25 @@
                 <span class="sidebar-text">Announcement</span>
             </button>
         </div>
+
+        <!-- TOMBOL LOGOUT DI BAGIAN BAWAH KIRI SIDEBAR (PERSIS GAMBAR 2 & 3) -->
+        <div class="sidebar-footer-wrap">
+            <a href="/admin/logout" class="sidebar-logout-btn" title="Logout dari Sistem">
+                <div class="sidebar-nav-icon-wrap">
+                    <i data-lucide="log-out"></i>
+                </div>
+                <span class="sidebar-text">Logout</span>
+            </a>
+        </div>
     </aside>
 
     <!-- ==============================================================
-         KONTEN UTAMA DASHBOARD ADMIN (SEBELAH KANAN)
+         KONTEN UTAMA DASHBOARD ADMIN (SEJAJAR DENGAN PUNCAK SIDEBAR)
     ============================================================== -->
     <main class="admin-main-wrap">
-        
-        <!-- HEADER TOP INFO & LOGOUT -->
-        <div class="glass dashboard-header">
-            <div class="admin-info">
-                <div class="admin-icon"><img src="<%= siteSettings.headerLogo %>" alt="Admin HMI" onerror="this.src='/img/logo-hmikomkgumi.png'"></div>
-                <div>
-                    <h2>Dashboard Admin</h2>
-                    <p class="text-muted" style="margin:0;">Kelola Seluruh Konten & Informasi HMI KomKGUMI</p>
-                </div>
-            </div>
-            <a href="/admin/logout" class="btn btn-danger"><i data-lucide="log-out" style="width:18px;"></i> Logout</a>
-        </div>
 
         <!-- ==============================================================
-             TAB BARU: OVERVIEW PESAN MASUK DARI NARAHUBUNG (ADM-PESAN)
+             TAB: OVERVIEW PESAN MASUK DARI NARAHUBUNG (ADM-PESAN)
         ============================================================== -->
         <div id="adm-pesan" class="admin-tab-pane active">
             <div class="glass admin-panel" style="margin-bottom:0; border-top: 4px solid #0284c7;">
@@ -167,7 +172,6 @@
                                     <% } %>
                                 </td>
                                 <td class="td-actions">
-                                    <!-- Hidden Raw Message Content -->
                                     <div id="raw-message-body-<%= msg.id %>" style="display:none;"><%- msg.message %></div>
                                     <button type="button" class="action-btn" style="color:#38bdf8;" onclick="openDetailPesanModal('<%= msg.id %>', '<%= msg.name.replace(/'/g, "\\'") %>', '<%= msg.subject.replace(/'/g, "\\'") %>', '<%= msg.contact %>', '<%= msg.method %>', '<%= msg.docUrl || '' %>')" title="Baca Isi Pesan">
                                         <i data-lucide="eye"></i>
