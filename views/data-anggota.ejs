@@ -59,6 +59,110 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<style>
+    /* Styling Frame Bezel & Multi-Page Continuous Canvas */
+    .native-pdf-bezel-frame {
+        position: relative;
+        width: 100%;
+        height: 82vh;
+        min-height: 600px;
+        background: #2a2d32;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 2px solid rgba(74, 222, 128, 0.4);
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .pdf-continuous-container {
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding: 20px 10px 90px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        box-sizing: border-box;
+    }
+
+    /* Kustomisasi Scrollbar agar persis Gambar 2 */
+    .pdf-continuous-container::-webkit-scrollbar {
+        width: 8px;
+    }
+    .pdf-continuous-container::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.25);
+    }
+    .pdf-continuous-container::-webkit-scrollbar-thumb {
+        background: #4ade80;
+        border-radius: 4px;
+    }
+
+    .pdf-page-canvas {
+        display: block;
+        max-width: 98%;
+        height: auto !important;
+        background: #ffffff;
+        border-radius: 6px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Tombol Floating Buka Full PDF */
+    .btn-buka-full-pdf {
+        position: absolute;
+        bottom: 22px;
+        right: 22px;
+        z-index: 80;
+        background: #84cc16;
+        background: linear-gradient(135deg, #a3e635 0%, #4ade80 100%);
+        color: #052e16;
+        font-weight: 800;
+        font-size: 0.88rem;
+        padding: 12px 20px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        border: 2px solid #14532d;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-buka-full-pdf:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(74, 222, 128, 0.4);
+    }
+
+    .pdf-loading-spinner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #4ade80;
+        font-size: 0.95rem;
+        gap: 12px;
+    }
+
+    .pdf-pulse-loader {
+        width: 42px;
+        height: 42px;
+        border: 4px solid rgba(74, 222, 128, 0.2);
+        border-top-color: #4ade80;
+        border-radius: 50%;
+        animation: pdfSpin 0.9s linear infinite;
+    }
+
+    @keyframes pdfSpin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<!-- Script Resmi Mozilla PDF.js Engine -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
 <div style="max-width: 1000px; margin: 0 auto; text-align: center; margin-bottom: 50px;">
     <h2 style="color:#4ade80; margin-bottom:15px; font-weight:bold; font-size: clamp(1.8rem, 4vw, 2.3rem);">Data Anggota HMI KomKG-UMI</h2>
     <p class="text-muted" style="margin-bottom: 35px; font-size: 1rem;">Database keanggotaan terupdate. Pilih dan baca langsung dokumen PDF di bawah ini.</p>
@@ -138,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     </script>
 
-    <!-- Tab navigation for multiple PDFs -->
+    <!-- Tab Navigasi Dokumen PDF -->
     <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom: 25px;" itemscope itemtype="https://schema.org/ItemList">
         <meta itemprop="name" content="Daftar Dokumen PDF Data Anggota" />
         
@@ -160,23 +264,19 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 
     <!-- ==============================================================
-         NATIVE PDF VIEWER CONTAINER (PERSIS GAMBAR 5)
-         Toolbar native aktif & tombol "BUKA FULL PDF" melayang di pojok kanan bawah
+         NATIVE MULTI-PAGE CONTINUOUS PDF VIEWER (PERSIS GAMBAR 2)
     ============================================================== -->
     <div class="native-pdf-bezel-frame">
         
-        <!-- Iframe PDF Native (Toolbar dibiarkan aktif tanpa #toolbar=0) -->
-        <iframe 
-            id="pdf-viewer" 
-            src="<%= pdfList[0].file %>#view=FitH" 
-            class="native-embed-iframe" 
-            title="Data Anggota PDF Viewer"
-            type="application/pdf">
-            Browser Anda tidak mendukung pratinjau PDF. Silakan 
-            <a href="<%= firstPdfAbsolute %>" target="_blank" style="color:#4ade80; text-decoration:underline;">download PDF ini</a>.
-        </iframe>
+        <!-- Wadah Render Multi-Halaman PDF.js -->
+        <div id="pdf-scroll-container" class="pdf-continuous-container">
+            <div class="pdf-loading-spinner">
+                <div class="pdf-pulse-loader"></div>
+                <span>Memuat dokumen PDF...</span>
+            </div>
+        </div>
 
-        <!-- TOMBOL FLOATING "BUKA FULL PDF" (PERSIS GAYA GAMBAR 5) -->
+        <!-- Tombol Floating BUKA FULL PDF -->
         <a id="btnBukaFullPdf" 
            href="<%= firstPdfAbsolute %>" 
            target="_blank" 
@@ -193,25 +293,95 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     
     <p class="text-muted" style="text-align:center; margin-top:15px; font-size:0.85rem;">
-        <i data-lucide="info" style="width:15px; display:inline; vertical-align:text-bottom;"></i> Gunakan toolbar di bagian atas dokumen untuk mencari teks, zoom, mencetak, atau klik tombol <strong>BUKA FULL PDF</strong> untuk membaca dalam tampilan layar penuh.
+        <i data-lucide="info" style="width:15px; display:inline; vertical-align:text-bottom;"></i> Geser ke bawah untuk membaca seluruh halaman dokumen atau sentuh tombol <strong>BUKA FULL PDF</strong> untuk membuka dokumen asli.
     </p>
 </div>
 
 <script>
-    function changePdf(src, btn, absoluteUrl) {
-        // 1. Update src iframe PDF native
-        const viewer = document.getElementById('pdf-viewer');
-        if (viewer) {
-            viewer.src = src + '#view=FitH';
+    // Konfigurasi Worker Mozilla PDF.js
+    if (typeof pdfjsLib !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    let activePdfDoc = null;
+
+    // Fungsi Render Multi-Halaman Beruntun (Scrollable Tanpa Terpotong)
+    async function renderContinuousPdf(pdfUrl) {
+        const container = document.getElementById('pdf-scroll-container');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="pdf-loading-spinner">
+                <div class="pdf-pulse-loader"></div>
+                <span>Memuat seluruh halaman dokumen...</span>
+            </div>
+        `;
+
+        try {
+            const loadingTask = pdfjsLib.getDocument({
+                url: pdfUrl,
+                cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
+                cMapPacked: true
+            });
+
+            activePdfDoc = await loadingTask.promise;
+            container.innerHTML = ''; // Bersihkan loader setelah siap
+
+            const totalPages = activePdfDoc.numPages;
+            const containerWidth = container.clientWidth - 30;
+
+            for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+                const page = await activePdfDoc.getPage(pageNumber);
+
+                // Hitung skala otomatis agar pas dengan lebar layar HP / Desktop
+                const defaultViewport = page.getViewport({ scale: 1.0 });
+                const calculatedScale = containerWidth > 0 ? (containerWidth / defaultViewport.width) : 1.2;
+                const finalScale = Math.min(Math.max(calculatedScale, 0.75), 2.2);
+                const viewport = page.getViewport({ scale: finalScale });
+
+                // Render Canvas dengan Dukungan Layar Sentuh Retina / HiDPI
+                const canvas = document.createElement('canvas');
+                canvas.className = 'pdf-page-canvas';
+                canvas.id = `pdf-page-${pageNumber}`;
+
+                const pixelRatio = window.devicePixelRatio || 1;
+                canvas.width = Math.floor(viewport.width * pixelRatio);
+                canvas.height = Math.floor(viewport.height * pixelRatio);
+                canvas.style.width = Math.floor(viewport.width) + "px";
+                canvas.style.height = Math.floor(viewport.height) + "px";
+
+                const ctx = canvas.getContext('2d', { alpha: false });
+                const renderContext = {
+                    canvasContext: ctx,
+                    transform: pixelRatio !== 1 ? [pixelRatio, 0, 0, pixelRatio, 0, 0] : null,
+                    viewport: viewport
+                };
+
+                container.appendChild(canvas);
+                await page.render(renderContext).promise;
+            }
+        } catch (err) {
+            console.warn('PDF.js render fallback, beralih ke native frame:', err);
+            container.innerHTML = `
+                <iframe src="${pdfUrl}#view=FitH" style="width:100%; height:100%; border:none;" title="PDF Preview">
+                    Browser Anda tidak mendukung preview. Silakan buka PDF secara langsung.
+                </iframe>
+            `;
         }
+    }
+
+    // Fungsi Penggantian Dokumen via Tab
+    function changePdf(src, btn, absoluteUrl) {
+        // 1. Render ulang dokumen PDF yang dipilih
+        renderContinuousPdf(src);
         
-        // 2. Update tautan tombol floating Buka Full PDF
+        // 2. Perbarui tautan tombol floating Buka Full PDF
         const btnFull = document.getElementById('btnBukaFullPdf');
         if (btnFull) {
             btnFull.href = absoluteUrl;
         }
 
-        // 3. Animasi pergantian status tombol tab
+        // 3. Animasi status tombol tab aktif
         document.querySelectorAll('.tab-pdf-btn').forEach(b => {
             b.classList.remove('btn-primary');
             b.classList.add('btn-secondary');
@@ -219,6 +389,11 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.classList.remove('btn-secondary');
         btn.classList.add('btn-primary');
     }
+
+    // Jalankan render awal saat dokumen dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+        renderContinuousPdf('<%= pdfList[0].file %>');
+    });
 </script>
 <script src="/js/protect-devtools.js" defer></script>
 
