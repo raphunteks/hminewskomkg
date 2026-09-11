@@ -19,7 +19,7 @@ if (!fs.existsSync(uploadDir)) {
     }
 }
 
-// Konfigurasi Multer Memory Storage
+// Konfigurasi Multer Memory Storage (Limit 50MB di buffer, validasi upload spesifik 5MB)
 const upload = multer({ 
     storage: multer.memoryStorage(),
     limits: { fileSize: 50 * 1024 * 1024 } 
@@ -71,7 +71,6 @@ function generateUniqueSlug(title, customSlug, existingNews, currentId = null) {
 
 // ==============================================================
 // SEO-FRIENDLY STORAGE HELPER (NON-BASE64 ENGINE)
-// Mengubah data Base64 / Multer Buffer menjadi URL berkas asli
 // ==============================================================
 async function saveUploadedFile(req, fieldName, prefix = 'hmi') {
     try {
@@ -200,7 +199,6 @@ const defaultSettings = {
     announceImage: "",
     announceTitle: "Latihan Kader I 2025",
     announceContent: "<p>Kala dunia tersihir oleh retorika kosong dan pemikiran instan, kami memilih jalan terjal. Berpikir dalam, bertanya kritis, dan membangun gagasan yang hidup. LK I 2025 bukan sekadar awal; ia adalah dentuman pertama dari revolusi intelektual yang tak akan berhenti di ruang diskusi.</p>",
-    // Data Narahubung & Kontak Resmi
     contactAddress: "Jl. Pajonga Dg. Ngalle No. 27 A, Pa'batong, Kec. Mamajang, Kota Makassar, Sulawesi Selatan",
     contactEmail: "hmikomkedokgigiumi.190120@gmail.com",
     contactWa: "+62 853-3892-2586",
@@ -251,6 +249,23 @@ async function initDefaultData() {
             }
         ]);
     }
+    
+    // Inisialisasi Data Default Section "Apa Kata Kader?"
+    let hasKaderQuotes = await kv.get('kaderQuotesList');
+    if (!hasKaderQuotes || hasKaderQuotes.length === 0) {
+        await kv.set('kaderQuotesList', [
+            {
+                id: 1,
+                name: 'ANDI FAJRIN PERDANA SAM',
+                role: 'Ketua BEM KBMFKG UMI 2023-2024',
+                quote: 'Pemenang yang sesungguhnya adalah ketika kamu mampu melawan amarah dengan kesabaran, dan memaafkan dengan ketulusan. Itulah sifat kader HMI yang sesungguhnya!',
+                image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=80',
+                ig: 'https://www.instagram.com/',
+                email: 'hmikomkedokgigiumi.190120@gmail.com'
+            }
+        ]);
+    }
+
     let hasAlbums = await kv.get('albumsList');
     if (!hasAlbums || hasAlbums.length === 0) {
         await kv.set('albumsList', [
@@ -332,35 +347,52 @@ app.get('/', async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
         let news = await kv.get('newsList') || [];
-        // Pastikan setiap berita memiliki slug
+        
+        // Memastikan seluruh item berita memiliki slug murni
         news = news.map(n => ({
             ...n,
             slug: n.slug || slugify(n.title) || String(n.id)
         }));
+
+        let kaderQuotes = await kv.get('kaderQuotesList') || [];
+
         const filter = req.query.filter; 
         if (filter && filter !== 'Semua') {
             news = news.filter(n => n.category.toLowerCase() === filter.toLowerCase());
         }
-        res.render('index', { page: 'beranda', news, currentFilter: filter || 'Semua', siteSettings, socialMediaList });
+        res.render('index', { 
+            page: 'beranda', 
+            news, 
+            kaderQuotes, 
+            currentFilter: filter || 'Semua', 
+            siteSettings, 
+            socialMediaList 
+        });
     } catch (err) {
-        res.render('index', { page: 'beranda', news: [], currentFilter: 'Semua', siteSettings: defaultSettings, socialMediaList: defaultSocialMedia });
+        res.render('index', { 
+            page: 'beranda', 
+            news: [], 
+            kaderQuotes: [], 
+            currentFilter: 'Semua', 
+            siteSettings: defaultSettings, 
+            socialMediaList: defaultSocialMedia 
+        });
     }
 });
 
-// ROUTE DETAIL BERITA DUAL-MODE (MENDUKUNG SLUG MAUPUN ID ANGKA LAMA)
+// ROUTE DETAIL BERITA (MENDUKUNG PENCARIAN SLUG DAN ID ANGKA LAMA)
 app.get('/berita/:slugOrId', async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
         const newsList = await kv.get('newsList') || [];
         const param = req.params.slugOrId.toString().trim().toLowerCase();
         
-        // Cari berdasarkan slug judul atau ID angka
+        // Cari berita berdasarkan slug atau id lama
         let berita = newsList.find(n => (n.slug && n.slug.toLowerCase() === param) || String(n.id) === param);
         if (!berita) {
             return res.status(404).render('admin-404', { page: '404', siteSettings, socialMediaList });
         }
 
-        // Pastikan slug terisi
         if (!berita.slug) {
             berita.slug = slugify(berita.title) || String(berita.id);
         }
@@ -439,7 +471,6 @@ app.post('/api/kirim-pesan-narahubung', upload.any(), async (req, res) => {
     try {
         let messages = await kv.get('contactMessagesList') || [];
         
-        // Simpan dokumen pendukung (jika dilampirkan)
         let docFileUrl = '';
         if (req.files && Array.isArray(req.files) && req.files.length > 0) {
             docFileUrl = await saveUploadedFile(req, 'supportDoc', 'lampiran-pesan');
@@ -562,10 +593,21 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
         // Data Pesan Masuk Narahubung
         const contactMessages = safeArr(await kv.get('contactMessagesList'));
 
+        // Data Kutipan Kader (Apa Kata Kader?)
+        const kaderQuotes = safeArr(await kv.get('kaderQuotesList')).map(x => ({
+            ...x,
+            name: safeStr(x.name),
+            role: safeStr(x.role),
+            quote: safeStr(x.quote),
+            image: safeStr(x.image),
+            ig: safeStr(x.ig),
+            email: safeStr(x.email)
+        }));
+
         res.render('admin-dashboard', { 
             page: 'admin', news, albums, pengurus, bidang, dataAnggota, 
             kohatiPengurus, kohatiBidang, shortlinks, siteSettings, socialMediaList,
-            bioPages, bioLinks, devTeam, contactMessages
+            bioPages, bioLinks, devTeam, contactMessages, kaderQuotes
         });
     } catch (err) { 
         console.error("Dashboard Render Error:", err);
@@ -678,6 +720,53 @@ app.post('/admin/hapus-foto-berita/:beritaId/:photoId', requireAdmin, async (req
         await kv.set('newsList', news); 
     }
     res.redirect('/admin/dashboard');
+});
+
+// KELOLA KUTIPAN KADER (APA KATA KADER?)
+app.post('/admin/tambah-kader-quote', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = await kv.get('kaderQuotesList') || [];
+        const img = await saveUploadedFile(req, 'image', 'kader-quote') || '/img/logo-hmikomkgumi.png';
+        list.unshift({
+            id: Date.now(),
+            name: (req.body.name || '').trim(),
+            role: (req.body.role || '').trim(),
+            quote: (req.body.quote || '').trim(),
+            image: img,
+            ig: (req.body.ig || '').trim(),
+            email: (req.body.email || '').trim()
+        });
+        await kv.set('kaderQuotesList', list);
+        res.redirect('/admin/dashboard');
+    } catch (e) { res.redirect('/admin/dashboard'); }
+});
+
+app.post('/admin/edit-kader-quote/:id', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = await kv.get('kaderQuotesList') || [];
+        let i = list.findIndex(q => q.id == req.params.id);
+        if (i !== -1) {
+            if (req.body.name) list[i].name = req.body.name.trim();
+            if (req.body.role) list[i].role = req.body.role.trim();
+            if (req.body.quote) list[i].quote = req.body.quote.trim();
+            if (req.body.ig !== undefined) list[i].ig = req.body.ig.trim();
+            if (req.body.email !== undefined) list[i].email = req.body.email.trim();
+
+            const newImg = await saveUploadedFile(req, 'image', 'kader-quote');
+            if (newImg) list[i].image = newImg;
+
+            await kv.set('kaderQuotesList', list);
+        }
+        res.redirect('/admin/dashboard');
+    } catch (e) { res.redirect('/admin/dashboard'); }
+});
+
+app.post('/admin/hapus-kader-quote/:id', requireAdmin, async (req, res) => {
+    try {
+        let list = await kv.get('kaderQuotesList') || [];
+        await kv.set('kaderQuotesList', list.filter(q => q.id != req.params.id));
+        res.redirect('/admin/dashboard');
+    } catch (e) { res.redirect('/admin/dashboard'); }
 });
 
 // SETELAN HEADER & FOOTER
