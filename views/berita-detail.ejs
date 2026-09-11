@@ -1,10 +1,10 @@
 <% 
     // ==============================================================
-    // SUPER BIG UPGRADE: ERROR 500 PREVENTION (BULLETPROOF EJS)
-    // Mencegah server Node.js crash jika ID Berita tidak ditemukan/dihapus
+    // SUPER BIG UPGRADE: ERROR 500 PREVENTION & SEO CANONICAL SLUG
     // ==============================================================
     let safeBerita = (typeof berita !== 'undefined' && berita) ? berita : {
         id: '404',
+        slug: '404',
         title: 'Berita Tidak Ditemukan',
         content: '<p>Mohon maaf, konten berita telah dihapus atau tidak tersedia.</p>',
         image: '/img/logo-hmikomkgumi.png',
@@ -15,23 +15,24 @@
 
     let pageTitle = safeBerita.title;
     
-    // SMART UPGRADE: Membersihkan tag HTML dari konten untuk meta description (max 150 chars)
+    // Pembersihan konten HTML untuk Meta Description (Maks. 150 karakter)
     let rawContent = safeBerita.content || "";
     let cleanDesc = rawContent.replace(/<[^>]+>/g, '').replace(/\n/g, ' ').trim();
     let pageDescription = cleanDesc.length > 150 ? cleanDesc.substring(0, 150) + "..." : (cleanDesc || "Baca informasi terbaru dari HMI KomKG UMI.");
     
-    // Standarisasi Base URL dan URL Gambar Absolute
+    // Standarisasi URL Canonical & Slug Ramah Mesin Pencari
     const seoBaseUrl = 'https://www.hmikomkgumi.xyz';
+    let newsSlug = safeBerita.slug || safeBerita.id;
+    let articleUrl = seoBaseUrl + "/berita/" + newsSlug;
+
+    // Resolusi Gambar Absolut untuk Open Graph WhatsApp / Sosmed
     let rawImage = safeBerita.image || '/img/logo-hmikomkgumi.png';
     let absoluteImage = rawImage.startsWith('http') ? rawImage : seoBaseUrl + (rawImage.startsWith('/') ? '' : '/') + rawImage;
-    let articleUrl = seoBaseUrl + "/berita/" + safeBerita.id;
 %>
 <%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
 
 <!-- ==============================================================
-     SUPER BIG UPGRADE SEO & ANTI-ERROR PRATINJAU (PREVIEW-SAFE)
-     Mengubah cara injeksi variabel EJS agar tidak bertabrakan dengan JS Parser.
-     Semua data server-side (EJS) ditampung di dalam HTML DOM terlebih dahulu.
+     DYNAMIC SEO DATA INJECTION (DOM-SAFE UNTUK PRATINJAU & GSC)
 ============================================================== -->
 <div id="seo-server-data" 
      style="display:none;" 
@@ -46,7 +47,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. MENGAMBIL DATA DARI DOM (Sangat Aman untuk fitur Pratinjau tanpa memicu SyntaxError)
     const seoDataEl = document.getElementById('seo-server-data');
     if(!seoDataEl) return;
     
@@ -60,32 +60,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const metaTags = [
         { name: "description", content: d_desc },
-        { name: "keywords", content: `${d_cat}, Berita HMI, Proker HMI KomKG UMI, Kedokteran Gigi UMI, Organisasi FKG UMI` },
+        { name: "keywords", content: `${d_cat}, Berita HMI, Proker HMI KomKG UMI, Kedokteran Gigi UMI, Organisasi FKG UMI, ${d_title}` },
         { name: "author", content: "Admin HMI KomKG UMI" },
         { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
         
-        // Open Graph (WhatsApp, FB, IG)
+        // Open Graph Metadata (WhatsApp, Facebook, Telegram)
         { property: "og:title", content: d_title + " | HMI KomKG UMI" },
         { property: "og:description", content: d_desc },
         { property: "og:type", content: "article" }, 
         { property: "og:url", content: d_url },
         { property: "og:image", content: d_img },
+        { property: "og:image:secure_url", content: d_img },
+        { property: "og:image:type", content: "image/jpeg" },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
         { property: "og:site_name", content: "HMI KomKG UMI" },
         
-        // Twitter Cards
+        // Twitter Card Metadata
         { property: "twitter:card", content: "summary_large_image" },
         { property: "twitter:title", content: d_title + " | HMI KomKG UMI" },
         { property: "twitter:description", content: d_desc },
         { property: "twitter:image", content: d_img }
     ];
 
-    // Injeksi Link Canonical untuk Google Search Console
+    // Injeksi Canonical Link Tag
     let canonical = document.createElement('link');
     canonical.rel = 'canonical';
     canonical.href = d_url;
     document.head.appendChild(canonical);
 
-    // Injeksi Meta Tags ke tag <head>
+    // Injeksi Meta Tags
     metaTags.forEach(tag => {
         let selector = tag.name ? `meta[name="${tag.name}"]` : `meta[property="${tag.property}"]`;
         let existingTag = document.head.querySelector(selector);
@@ -100,9 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ==============================================================
-    // 2. INJEKSI JSON-LD (ARTICLE) SECARA DINAMIS (PREVIEW-SAFE)
-    // ==============================================================
+    // Injeksi Schema.org JSON-LD (Gold Standard GSC)
     const jsonLdData = {
       "@context": "https://schema.org",
       "@graph": [
@@ -129,16 +131,25 @@ document.addEventListener('DOMContentLoaded', () => {
           "@id": `${d_url}/#article`,
           "headline": d_title,
           "description": d_desc,
-          "image": d_img,
+          "image": [d_img],
           "datePublished": d_date,
-          "author": { "@type": "Organization", "name": "Admin HMI KomKG UMI", "url": d_baseurl },
+          "dateModified": d_date,
+          "mainEntityOfPage": { "@type": "WebPage", "@id": `${d_url}/#webpage` },
+          "articleSection": d_cat,
+          "inLanguage": "id-ID",
+          "author": { 
+              "@type": "Organization", 
+              "name": "Admin HMI KomKG UMI", 
+              "url": d_baseurl 
+          },
           "publisher": { 
               "@type": "Organization", 
               "name": "HMI KomKG UMI", 
-              "logo": { "@type": "ImageObject", "url": `${d_baseurl}/img/logo-hmikomkgumi.png` } 
-          },
-          "mainEntityOfPage": { "@type": "WebPage", "@id": `${d_url}/#webpage` },
-          "articleSection": d_cat
+              "logo": { 
+                  "@type": "ImageObject", 
+                  "url": `${d_baseurl}/img/logo.png` 
+              } 
+          }
         }
       ]
     };
@@ -158,17 +169,14 @@ document.addEventListener('DOMContentLoaded', () => {
         <i data-lucide="arrow-left" style="width:18px;"></i> Kembali ke Beranda
     </a>
 
-    <!-- ==============================================================
-         SUPER BIG UPGRADE: EXPERT SEO MICRODATA (SCHEMA.ORG)
-    ============================================================== -->
+    <!-- Artikel Utama -->
     <article class="glass" itemscope itemtype="https://schema.org/NewsArticle" style="padding: 40px; border-top: 5px solid #22c55e;">
         
-        <!-- Kategori -->
+        <!-- Kategori Berita -->
         <span class="badge" itemprop="articleSection" style="margin-bottom: 15px;"><%= safeBerita.category %></span>
         
-        <!-- Header Artikel (Judul & Meta) -->
+        <!-- Header Berita -->
         <header>
-            <!-- SMART COLOR: Adaptif hitam pekat di tema Light, putih bersinar di tema Dark -->
             <h1 itemprop="headline" class="detail-title" style="font-size: clamp(1.6rem, 3.5vw, 2.2rem); margin-bottom: 15px; color: var(--theme-heading); line-height: 1.3; font-weight: 800;">
                 <%= safeBerita.title %>
             </h1>
@@ -185,31 +193,28 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         </header>
 
-        <!-- Gambar Utama Artikel -->
+        <!-- Cover Gambar Utama -->
         <div class="detail-img-wrapper">
             <img itemprop="image" src="<%= safeBerita.image %>" alt="Cover Berita: <%= safeBerita.title %>" onerror="this.src='/img/logo-hmikomkgumi.png'">
         </div>
 
-        <!-- Isi/Konten Utama Artikel (Smart Color Kontras) -->
+        <!-- Isi Konten Berita -->
         <div class="rich-text-content" itemprop="articleBody" style="color: var(--theme-text);">
             <%- safeBerita.content %>
         </div>
 
-        <!-- ==============================================================
-             UPGRADE: TOMBOL BAGIKAN NATIVE WEB SHARE API (PERSIS GAMBAR 1)
-             Ditempatkan di bawah teks isi berita tanpa tombol salin
-        ============================================================== -->
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--theme-glass-border); display: flex; justify-content: flex-end;">
+        <!-- Tombol Bagikan Native Web Share (Tepat di Bawah Teks Berita) -->
+        <div style="margin-top: 35px; padding-top: 20px; border-top: 1px solid var(--theme-glass-border); display: flex; justify-content: flex-end;">
             <button type="button" 
                     onclick="triggerNativeShare()" 
                     class="btn btn-secondary" 
-                    style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; padding: 10px 20px; border-radius: 12px; cursor: pointer;">
+                    style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; padding: 10px 22px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">
                 <i data-lucide="share-2" style="width: 18px; height: 18px;"></i>
                 <span>Bagikan</span>
             </button>
         </div>
 
-        <!-- Dokumentasi Tambahan -->
+        <!-- Galeri Dokumentasi Tambahan -->
         <% if(safeBerita.photos && safeBerita.photos.length > 0) { %>
             <h3 style="margin-bottom: 20px; border-top: 1px solid var(--theme-glass-border); padding-top: 30px; color: var(--theme-heading);">Dokumentasi Tambahan</h3>
             <div class="grid-2" style="gap: 15px;">
@@ -225,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <!-- ==============================================================
          SUPER BIG UPGRADE: DASHBOARD ANALYTICS WIDGET
-         (STRUKTUR & CLASS PERSIS INDEX.EJS / GAMBAR 1)
+         (STRUKTUR & KELAS PERSIS INDEX.EJS / GAMBAR 1)
     ============================================================== -->
     <section class="analytics-section" aria-label="Statistik Kunjungan Website" style="margin-top: 50px;">
         <div class="analytics-grid">
@@ -255,29 +260,39 @@ document.addEventListener('DOMContentLoaded', () => {
      LOGIKA NATIVE SHARE & GOOGLE APPS SCRIPT ANALYTICS (PERSIS INDEX.EJS)
 ============================================================== -->
 <script>
-    // FUNGSI TRIGGER NATIVE WEB SHARE API (MEMANGGIL SYSTEM SHARE SHEET SEPERTI GAMBAR 1)
+    // Trigger Native Web Share API dengan format teks khusus
     async function triggerNativeShare() {
+        const shareUrl = <%- JSON.stringify(articleUrl) %>;
+        const articleTitle = <%- JSON.stringify(safeBerita.title) %>;
+        const shareMessage = `${shareUrl} Baca artikel menarik ini di Portal Artikel HMI KOMKG UMI: ${articleTitle}`;
+
         const shareData = {
-            title: <%- JSON.stringify(safeBerita.title) %>,
-            text: <%- JSON.stringify(cleanDesc) %>,
-            url: window.location.href
+            title: articleTitle,
+            text: `Baca artikel menarik ini di Portal Artikel HMI KOMKG UMI: ${articleTitle}`,
+            url: shareUrl
         };
 
         if (navigator.share) {
             try {
                 await navigator.share(shareData);
             } catch (err) {
-                // Pengguna membatalkan dialog share (AbortError)
+                // Dialog dibatalkan pengguna (AbortError)
             }
         } else {
-            // Fallback halus tanpa tombol tambahan jika peramban tidak mendukung Web Share API
+            // Fallback salin teks format lengkap ke clipboard jika browser belum mendukung Web Share
             if (navigator.clipboard) {
-                navigator.clipboard.writeText(window.location.href);
+                navigator.clipboard.writeText(shareMessage).then(() => {
+                    alert('Tautan dan deskripsi berita berhasil disalin ke papan klip:\n\n' + shareMessage);
+                }).catch(() => {
+                    prompt('Salin tautan berita ini:', shareMessage);
+                });
+            } else {
+                prompt('Salin tautan berita ini:', shareMessage);
             }
         }
     }
 
-    // SCRIPT PENGGERAK API GOOGLE APPS SCRIPT (PERSIS INDEX.EJS)
+    // Script Penggerak API Google Apps Script untuk Widget Analitik
     document.addEventListener('DOMContentLoaded', () => {
         const GAS_URL = "https://script.google.com/macros/s/AKfycbw8MA9YGFK3SIAXhIZAF9m1J4eOGf9LGQD-j4xXjvVSaQ826JrqeEKApPcKJWfJxw/exec";
 
@@ -312,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // TAHAP 1: FAST FETCH (Memuat data dalam milidetik)
+        // TAHAP 1: Fast Fetch
         async function fastFetchData() {
             try {
                 const response = await fetch(GAS_URL + "?t=" + new Date().getTime());
@@ -330,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // TAHAP 2: SILENT POST (Merekam IP Pengunjung di Latar Belakang)
+        // TAHAP 2: Silent Post IP Pengunjung
         async function recordVisitPost() {
             try {
                 const ipResponse = await fetch('https://api.ipify.org?format=json');
