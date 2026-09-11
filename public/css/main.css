@@ -133,7 +133,7 @@ button, input, textarea, select { font-family: inherit; }
 .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 main { flex-grow: 1; padding-top: 110px; padding-bottom: 60px; position: relative; z-index: 20; }
 
-/* UI UPGRADE 5: DYNAMIC BLOB ANIMATIONS (GPU ACCELERATED - VERY FAST) */
+/* UI UPGRADE 5: DYNAMIC BLOB ANIMATIONS */
 .bg-blob { 
     position: fixed; 
     border-radius: 50%; 
@@ -219,7 +219,7 @@ h1, h2, h3, h4, h5 { color: var(--theme-heading); margin-bottom: 0.5rem; line-he
    UI UPGRADE V2: 7. PULSING NAVIGATION INDICATOR
 ============================================================== */
 .nav-item { 
-    position: relative;
+    position: relative; 
     display: flex; 
     align-items: center; 
     gap: 8px; 
@@ -251,7 +251,7 @@ h1, h2, h3, h4, h5 { color: var(--theme-heading); margin-bottom: 0.5rem; line-he
 .nav-actions { display: flex; align-items: center; gap: 12px; z-index: 52; }
 
 /* ==============================================================
-   THEME SWITCHER TOGGLE (PERSIS GAMBAR 1)
+   THEME SWITCHER TOGGLE
 ============================================================== */
 .theme-switch-wrapper {
     display: flex;
@@ -321,8 +321,7 @@ h1, h2, h3, h4, h5 { color: var(--theme-heading); margin-bottom: 0.5rem; line-he
 }
 
 /* ==============================================================
-   SUPER BIG UPGRADE: ANALYTICS DASHBOARD WIDGET (INDEX.EJS)
-   Versi Super Kompak / Minimalis (Seperti Gbr 1)
+   ANALYTICS DASHBOARD WIDGET (INDEX.EJS)
 ============================================================== */
 .analytics-section {
     width: 100%;
@@ -385,7 +384,6 @@ h1, h2, h3, h4, h5 { color: var(--theme-heading); margin-bottom: 0.5rem; line-he
 /* COMPONENTS BUTTONS */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; border: none; font-size: 0.95rem; outline: none; will-change: transform; }
 
-/* UI UPGRADE 4: PULSING GLOW BUTTON */
 .btn-primary { 
     background: #22c55e; 
     color: #000; 
@@ -408,7 +406,6 @@ h1, h2, h3, h4, h5 { color: var(--theme-heading); margin-bottom: 0.5rem; line-he
 .btn-secondary { background: rgba(0,0,0,0.05); border: 1px solid var(--theme-glass-border); color: var(--theme-text); }
 .btn-secondary:hover { background: rgba(239, 68, 68, 0.1); color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); transform: translateY(-2px); }
 
-/* UI UPGRADE 8: BREATHING BADGE EFFECT */
 @keyframes breathingBadge {
     0% { transform: scale(1); }
     50% { transform: scale(1.03); text-shadow: 0 0 8px rgba(74, 222, 128, 0.5); }
@@ -426,15 +423,12 @@ h1, h2, h3, h4, h5 { color: var(--theme-heading); margin-bottom: 0.5rem; line-he
     animation: breathingBadge 3s ease-in-out infinite;
 }
 
-/* ==============================================================
-   UI UPGRADE V2: 5. MAGNETIC INPUT GLOW
-============================================================== */
 .input-control { width: 100%; padding: 14px; background: var(--theme-input-bg); border: 1px solid var(--theme-input-border); border-radius: 12px; color: var(--theme-input-color); transition: all 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
 .input-control:focus { outline: none; border-color: var(--theme-primary); box-shadow: 0 0 15px rgba(74, 222, 128, 0.3), inset 0 2px 5px rgba(0,0,0,0.05); }
 input[type="file"].input-control { padding: 10px; background: rgba(0,0,0,0.04); color: var(--theme-primary); cursor: pointer; }
 select.input-control option { background: var(--theme-input-bg); color: var(--theme-input-color); }
 
-/* QUILL.JS CUSTOM DARK THEME STYLES */
+/* QUILL.JS DARK THEME STYLES */
 .ql-toolbar.ql-snow { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15) !important; border-top-left-radius: 12px; border-top-right-radius: 12px; }
 .ql-container.ql-snow { border: 1px solid rgba(255,255,255,0.15) !important; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; background: rgba(0,0,0,0.4); font-family: inherit; font-size: 0.95rem; }
 .ql-snow .ql-stroke { stroke: #d1d5db; }
@@ -457,11 +451,7 @@ button.ql-active .ql-fill { fill: #4ade80 !important; }
 .rich-text-content a:hover { color: #22c55e; }
 .rich-text-content blockquote { border-left: 4px solid #22c55e; padding-left: 15px; margin-left: 0; font-style: italic; color: var(--theme-muted); background: rgba(0,0,0,0.03); padding:10px 15px; border-radius: 0 8px 8px 0; }
 
-/* ==============================================================
-   SMART COLOR SYSTEM (AUTO HIGH-CONTRAST LIGHT & DARK ENGINE)
-   Memastikan teks, paragraf, judul, dan konten otomatis hitam pekat
-   di tema Light (default), dan putih bersih bersinar di tema Dark.
-============================================================== */
+/* SMART COLOR SYSTEM */
 html[data-theme="light"] body,
 html[data-theme="light"] main,
 html[data-theme="light"] .container,
@@ -482,7 +472,6 @@ html[data-theme="light"] h6 {
     color: #0f172a !important;
 }
 
-/* SMART COLOR HALAMAN TENTANG KAMI (PERSIS GAMBAR 4) */
 html[data-theme="light"] .tentang-card,
 html[data-theme="light"] .tentang-card p,
 html[data-theme="light"] .tentang-card span,
@@ -498,7 +487,6 @@ html[data-theme="light"] .vm-card li {
     color: #1e293b !important;
 }
 
-/* SMART COLOR HALAMAN BERITA DETAIL (PERSIS GAMBAR 5) */
 html[data-theme="light"] .berita-detail-title,
 html[data-theme="light"] .news-detail-title,
 html[data-theme="light"] .detail-title,
@@ -519,7 +507,6 @@ html[data-theme="light"] .text-muted {
     color: #475569 !important;
 }
 
-/* Overwrite Hardcoded Text White in Light Theme */
 html[data-theme="light"] [style*="color: #fff"],
 html[data-theme="light"] [style*="color:#fff"],
 html[data-theme="light"] [style*="color: #ffffff"],
@@ -537,7 +524,6 @@ html[data-theme="light"] [style*="color:#e5e7eb"] {
     color: #0f172a !important;
 }
 
-/* Tetap mempertahankan teks putih untuk tombol & badge bertema gelap */
 html[data-theme="light"] .btn-primary,
 html[data-theme="light"] .btn-primary *,
 html[data-theme="light"] .btn-danger,
@@ -561,7 +547,6 @@ html[data-theme="light"] .sidebar-logout-btn { color: #dc2626 !important; }
 html[data-theme="light"] .scroll-to-top-btn { color: #ffffff !important; }
 html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 
-/* OPTIMASI 3: KARTU VISI MISI DENGAN LAZY RENDERING */
 .vm-card {
     background: var(--theme-vm-bg);
     border-radius: 20px;
@@ -604,45 +589,134 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 .vm-card .rich-text-content ol li::before { content: counter(misi-counter) "."; position: absolute; left: 0; color: var(--theme-primary); font-weight: 800; font-size: 1.1rem; }
 .vm-card[style*="#f472b6"] .rich-text-content ol li::before { color: #f472b6 !important; }
 
-/* UPGRADE FIX 1: PURE CSS 3D PDF VIEWER RESPONSIVE & SCROLLABLE */
-.css3d-pdf-wrapper { 
-    width: 100%; 
-    height: 75vh; 
-    min-height: 500px;
-    max-height: 800px;
-    position: relative; 
-    perspective: 1200px; 
-    margin: 20px auto; 
-    z-index: 10; 
-}
-.css3d-pdf-frame { 
-    width: 100%; 
-    height: 100%; 
-    background: #e5e7eb; 
-    border-radius: 12px; 
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 15px 0 30px rgba(0,0,0,0.1); 
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    position: relative; 
-    border: 1px solid rgba(255,255,255,0.2); 
-    border-left: 15px solid #22c55e; 
-    transform: rotateX(2deg) rotateY(-2deg); 
-    transition: transform 0.4s ease, box-shadow 0.4s ease; 
-}
-.css3d-pdf-frame:hover { transform: rotateX(0) rotateY(0) scale(1.01); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), inset 10px 0 20px rgba(0,0,0,0.1); }
-.native-pdf-viewer { 
-    width: 100%; 
-    height: 100%; 
-    border: none; 
-    background-color: #ffffff !important; 
-    display: block; 
+/* ==============================================================
+   NATIVE MULTI-PAGE PDF VIEWER ENGINE (PERSIS GAMBAR 2)
+   Mobile, Tablet & Desktop Fully Responsive & Continuous Scroll
+============================================================== */
+.native-pdf-bezel-frame {
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+    height: 78vh;
+    min-height: 560px;
+    max-height: 900px;
+    background: #0f172a;
+    border: 4px solid #0f172a;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+    margin: 25px auto;
 }
 
-/* INSTAGRAM FEED WIDGET SUPPORT */
+.native-embed-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    background: #ffffff;
+}
+
+/* Scroll Viewport Native Multi-Page */
+.pdf-render-viewport {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 24px 16px 85px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    box-sizing: border-box;
+    background: #1e293b;
+}
+
+/* KERTAS HALAMAN PDF: flex-shrink 0 MENCEGAH DOKUMEN MENYUSUT / PIPIH */
+.pdf-page-wrapper {
+    flex-shrink: 0 !important;
+    background: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+.pdf-page-wrapper canvas {
+    display: block !important;
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Loading Overlay Status */
+.pdf-loading-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.92);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    z-index: 40;
+    color: #4ade80;
+    font-size: 0.95rem;
+    font-weight: 700;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+/* Tombol Floating BUKA FULL PDF (Persis Gambar 2 & 5) */
+.btn-buka-full-pdf {
+    position: absolute;
+    bottom: 22px;
+    right: 22px;
+    background: #a3e635;
+    color: #000000 !important;
+    border: 2.5px solid #000000;
+    box-shadow: 3.5px 3.5px 0px #000000;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    z-index: 50;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.btn-buka-full-pdf:hover {
+    background: #bef264;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px #000000;
+    color: #000000 !important;
+}
+
+.btn-buka-full-pdf:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px #000000;
+}
+
+.btn-buka-full-pdf svg {
+    stroke: #000000;
+    display: block;
+}
+
+/* INSTAGRAM FEED */
 .instagram-feed-section { width: 100% !important; max-width: 100% !important; overflow: hidden !important; border-radius: 1.5rem; box-sizing: border-box; content-visibility: auto; contain-intrinsic-size: 0 400px; }
 [class*="elfsight-app"] { width: 100% !important; max-width: 100% !important; overflow: hidden !important; box-sizing: border-box; }
 
-/* FIX SOLUSI MAPS PRESISI & RATIO 100% */
+/* FIX MAPS RATIO 16:9 */
 .ratio { 
     position: relative; 
     width: 100%; 
@@ -668,10 +742,10 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 
-/* CAROUSEL/GRID KEPENGURUSAN (DESKTOP) */
+/* CAROUSEL/GRID KEPENGURUSAN */
 .team-scroll-wrapper { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; width: 100%; padding: 10px 0; }
 
-/* TABS NAVIGATION UMUM */
+/* TABS NAVIGATION */
 .tab-nav { display: flex; overflow-x: auto; gap: 15px; margin-bottom: 40px; border-bottom: 1px solid var(--theme-glass-border); padding-bottom: 15px; scrollbar-width: none; -ms-overflow-style: none; }
 .tab-nav::-webkit-scrollbar { display: none; }
 .tab-btn { 
@@ -697,7 +771,6 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 .tab-btn:hover { color: var(--theme-heading); background: rgba(0,0,0,0.08); }
 .tab-btn.active { color: var(--theme-primary); background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.4); box-shadow: 0 4px 20px rgba(34,197,94,0.2); }
 
-/* UI UPGRADE V2: 4. CINEMATIC TAB TRANSITION */
 .tab-content { display: none; }
 .tab-content.active { 
     display: block; 
@@ -708,7 +781,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     100% { opacity: 1; transform: translateY(0); filter: blur(0); } 
 }
 
-/* 3D MODAL ENTRY (ANNOUNCEMENT POP-UP) */
+/* ANNOUNCEMENT POP-UP */
 .announce-overlay { 
     z-index: 9999999; padding: 20px; display: flex; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); overscroll-behavior: none; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; perspective: 1000px;
 }
@@ -770,7 +843,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 @keyframes shimmer { 100% { transform: translateX(100%); } }
 
 /* ==============================================================
-   SUPER BIG UPGRADE: COLLAPSIBLE ADMIN SIDEBAR (PERSIS GAMBAR 3)
+   COLLAPSIBLE ADMIN SIDEBAR (PERSIS GAMBAR 3)
 ============================================================== */
 .admin-dashboard-container {
     display: flex;
@@ -801,7 +874,6 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     min-height: calc(100vh - 120px);
 }
 
-/* PROFIL ADMIN DI HEADER ATAS SIDEBAR (PERSIS GAMBAR 3) */
 .sidebar-top-header {
     display: flex;
     justify-content: space-between;
@@ -973,7 +1045,6 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     box-shadow: 0 2px 5px rgba(239,68,68,0.4);
 }
 
-/* TOMBOL LOGOUT DI BAGIAN BAWAH KIRI SIDEBAR (PERSIS GAMBAR 2 & 3) */
 .sidebar-footer-wrap {
     margin-top: auto;
     padding-top: 15px;
@@ -1003,7 +1074,6 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 
-/* STATE SIDEBAR COLLAPSED (MODE RAMPING ICON-ONLY - PERSIS GBR 3) */
 .admin-dashboard-container.sidebar-collapsed .admin-sidebar-nav {
     width: 76px;
     min-width: 76px;
@@ -1040,7 +1110,6 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     display: none;
 }
 
-/* PUNCAK SEJAJAR KONTEN UTAMA DENGAN SIDEBAR (PERSIS GAMBAR 3) */
 .admin-main-wrap {
     flex: 1;
     min-width: 0;
@@ -1057,9 +1126,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     margin-top: 0;
 }
 
-/* ==============================================================
-   ADMIN PANELS & TABLES
-============================================================== */
+/* ADMIN PANELS & TABLES */
 .admin-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px; align-items: start; }
 .admin-main-content { display: flex; flex-direction: column; gap: 25px; min-width: 0; }
 .admin-sidebar { display: flex; flex-direction: column; gap: 25px; min-width: 0; }
@@ -1134,9 +1201,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 .filter-tag:hover { background: rgba(0,0,0,0.1); color: var(--theme-heading); }
 .filter-tag.active { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: var(--theme-primary); box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-weight: bold; }
 
-/* ==============================================================
-   SUPER BIG UPGRADE: MODERN HOVER-EXPANDING LOGIN CARD (GBR 4)
-============================================================== */
+/* HOVER-EXPANDING LOGIN CARD */
 .auth-wrapper {
     min-height: 70vh;
     display: flex;
@@ -1296,9 +1361,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     color: var(--theme-primary);
 }
 
-/* ==============================================================
-   SUPER BIG UPGRADE: FIX PRESISI GAMBAR DETAIL BERITA & GALERI
-============================================================== */
+/* GAMBAR DETAIL BERITA & GALERI */
 .detail-img-wrapper {
     position: relative;
     width: 100%;
@@ -1356,9 +1419,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     transform: scale(1.08);
 }
 
-/* ==============================================================
-   SUPER BIG UPGRADE: LIGHTBOX GALERI (FULLSCREEN POP-UP)
-============================================================== */
+/* LIGHTBOX GALERI */
 .lightbox-overlay {
     position: fixed;
     top: 0;
@@ -1470,9 +1531,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     transform: scale(1.05);
 }
 
-/* ==============================================================
-   UI UPGRADE V2: 1. CYBER-SCANLINE IMAGE EFFECT
-============================================================== */
+/* NEWS CARD */
 .news-card { 
     overflow: hidden; 
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease; 
@@ -1507,9 +1566,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 .read-more { color: var(--theme-primary); font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 5px; margin-top: auto; transition: transform 0.3s ease; }
 .news-card:hover .read-more { transform: translateX(5px); }
 
-/* ==============================================================
-   UI UPGRADE V2: 6. HOLOGRAPHIC CARD TILT ILLUSION
-============================================================== */
+/* TEAM CARD */
 .team-card { 
     text-align: center; padding: 25px; 
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; 
@@ -1522,9 +1579,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 .team-name { font-size: 1.1rem; margin-bottom: 5px; position: relative; z-index: 2; color: var(--theme-heading); }
 .team-role { color: var(--theme-primary); font-size: 0.85rem; font-weight: bold; position: relative; z-index: 2; }
 
-/* ==============================================================
-   UI UPGRADE V2: 10. FUTURISTIC IMAGE ZOOM-OUT INSIGHT
-============================================================== */
+/* GALLERY CARD */
 .gallery-card { padding: 15px; text-align: left; display: block; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease; will-change: transform; content-visibility: auto; contain-intrinsic-size: 0 300px; }
 .gallery-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); border-color: rgba(34,197,94,0.3); }
 .gallery-img-box { height: 220px; border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
@@ -1574,15 +1629,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 .social-btn:hover { background: #22c55e; color: #fff; box-shadow: 0 6px 15px rgba(34,197,94,0.4); transform: translateY(-4px); border-color: #22c55e; }
 .footer-bottom { border-top: 1px solid var(--theme-glass-border); padding-top: 25px; display: flex; justify-content: space-between; color: var(--theme-muted); font-size: 0.85rem; flex-wrap: wrap; gap: 15px; }
 
-/* UI UPGRADE V2: 8. SCROLLBAR DATA-STREAM */
-::-webkit-scrollbar { width: 10px; height: 8px; }
-::-webkit-scrollbar-track { background: rgba(17, 24, 39, 0.9); border-left: 1px solid rgba(255,255,255,0.05); }
-::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #059669, #4ade80); border-radius: 10px; border: 2px solid rgba(17, 24, 39, 1); }
-::-webkit-scrollbar-thumb:hover { background: linear-gradient(to bottom, #22c55e, #a7f3d0); box-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
-
-/* ==============================================================
-   SUPER BIG UPGRADE: SOCIAL MEDIA BUTTONS PADA KARTU KEPENGURUSAN
-============================================================== */
+/* SOCIAL MEDIA BUTTONS KEPENGURUSAN */
 .team-socials {
     display: flex;
     justify-content: center;
@@ -1632,9 +1679,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     box-shadow: 0 6px 15px rgba(244,114,182,0.4);
 }
 
-/* ==============================================================
-   SUPER BIG UPGRADE: DEVELOPER TEAM UI (OURTEAM)
-============================================================== */
+/* DEVELOPER TEAM UI */
 .dev-page-header { text-align: center; margin-bottom: 60px; animation: cinematicFadeIn 0.8s ease forwards; }
 .dev-badge { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 5px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; display: inline-block; margin-bottom: 15px; }
 .dev-main-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; color: var(--theme-heading); margin-bottom: 10px; letter-spacing: -0.5px; }
@@ -1700,9 +1745,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     display: block; 
 }
 
-/* ==============================================================
-   SUPER BIG UPGRADE: FLOATING SCROLL TO TOP (PERSIS GAMBAR 2 & 4)
-============================================================== */
+/* FLOATING SCROLL TO TOP */
 .scroll-to-top-btn {
     position: fixed;
     bottom: 95px;
@@ -1739,9 +1782,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     stroke: #ffffff;
 }
 
-/* ==============================================================
-   SUPER BIG UPGRADE: FLOATING WA CHAT POPUP (PERSIS GAMBAR 3)
-============================================================== */
+/* FLOATING WA CHAT POPUP */
 .wa-widget-container {
     position: fixed;
     bottom: 25px;
@@ -1874,9 +1915,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     transform: translateY(-2px);
 }
 
-/* ==============================================================
-   SUPER BIG UPGRADE: HALAMAN NARAHUBUNG (PERSIS GAMBAR 4)
-============================================================== */
+/* HALAMAN NARAHUBUNG */
 .narahubung-container {
     max-width: 1150px;
     margin: 0 auto;
@@ -2054,62 +2093,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 }
 
 /* ==============================================================
-   SUPER BIG UPGRADE: NATIVE PDF BEZEL & "BUKA FULL PDF" (GAMBAR 5)
-============================================================== */
-.native-pdf-bezel-frame {
-    position: relative;
-    width: 100%;
-    height: 78vh;
-    min-height: 550px;
-    max-height: 900px;
-    background: #18181b;
-    border: 8px solid #18181b;
-    border-radius: 18px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
-    overflow: hidden;
-    margin: 20px auto;
-}
-.native-embed-iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
-    background: #ffffff;
-}
-
-.btn-buka-full-pdf {
-    position: absolute;
-    bottom: 22px;
-    right: 22px;
-    background: #a3e635;
-    color: #000000 !important;
-    border: 2.5px solid #000000;
-    box-shadow: 3px 3px 0px #000000;
-    border-radius: 6px;
-    padding: 9px 18px;
-    font-weight: 800;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    z-index: 30;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-}
-.btn-buka-full-pdf:hover {
-    background: #bef264;
-    transform: translate(-2px, -2px);
-    box-shadow: 5px 5px 0px #000000;
-    color: #000000 !important;
-}
-.btn-buka-full-pdf svg {
-    stroke: #000000;
-    display: block;
-}
-
-/* ==============================================================
-   RESPONSIVE MOBILE & LAYOUT FIXES (SIDEBAR DRAWER SWIPE)
+   RESPONSIVE BREAKPOINTS (TABLET & MOBILE)
 ============================================================== */
 @media (max-width: 992px) {
     .admin-dashboard-container {
@@ -2143,7 +2127,6 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     }
 
     .admin-layout { grid-template-columns: 1fr; }
-    
     .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
     .footer-top { grid-template-columns: repeat(2, 1fr); gap: 30px; }
     
@@ -2163,14 +2146,22 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
         min-width: 240px;
     }
     .narahubung-grid { grid-template-columns: 1fr; }
+
+    /* PDF Viewer di Tablet */
+    .native-pdf-bezel-frame {
+        height: 75vh;
+        min-height: 500px;
+    }
+    .pdf-render-viewport {
+        padding: 20px 12px 75px 12px;
+        gap: 18px;
+    }
 }
 
 @media (max-width: 768px) {
     .mobile-menu-btn { display: block; }
     
-    /* ==============================================================
-       SIDEBAR NAVIGASI MOBILE (SWIPE DARI SISI KIRI KE KANAN)
-    ============================================================== */
+    /* NAVIGASI DRAWER MOBILE */
     .nav-links { 
         display: flex; 
         flex-direction: column; 
@@ -2202,12 +2193,10 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     .dashboard-header { flex-direction: column; gap: 20px; text-align: center; }
     .panel-header { flex-direction: column; gap: 15px; text-align: center; }
     
-    /* ==============================================================
-       SUPER BIG UPGRADE: COMPACT FOOTER MOBILE FIX (3 KOLOM PRESISI)
-    ============================================================== */
+    /* COMPACT FOOTER MOBILE */
     .footer-top { 
         display: grid !important; 
-        grid-template-columns: 1.2fr 1fr 1fr !important;
+        grid-template-columns: 1.2fr 1fr 1fr !important; 
         gap: 15px !important; 
         margin-bottom: 20px; 
     }
@@ -2246,7 +2235,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     .footer-links ul li { 
         margin-bottom: 6px !important; 
     }
-    .footer-links ul li a {
+    .footer-links ul li a { 
         font-size: 0.7rem !important; 
     }
     .social-links { 
@@ -2295,18 +2284,6 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     .lightbox-nav.prev { left: 10px; }
     .lightbox-nav.next { right: 10px; }
     .lightbox-img-wrapper { padding: 40px 10px; }
-
-    .css3d-pdf-wrapper {
-        height: 70vh !important;
-        min-height: 450px !important;
-    }
-    .css3d-pdf-frame {
-        transform: none !important;
-        overflow-y: auto !important; 
-    }
-    .native-pdf-viewer {
-        min-height: 100%;
-    }
 
     .announce-wrapper { 
         flex-direction: column !important; 
@@ -2368,11 +2345,27 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     .wa-widget-container { bottom: 18px; right: 18px; }
     .wa-floating-btn { width: 52px; height: 52px; }
     
-    .native-pdf-bezel-frame { height: 68vh; min-height: 420px; border-width: 4px; }
-    .btn-buka-full-pdf { bottom: 14px; right: 14px; padding: 7px 14px; font-size: 0.75rem; }
-}
+    /* PDF VIEWER RESPONSIVE DI PONSEL */
+    .native-pdf-bezel-frame { 
+        height: 72vh; 
+        min-height: 460px; 
+        border-width: 3px; 
+        border-radius: 16px;
+        margin: 15px auto;
+    }
+    .pdf-render-viewport {
+        padding: 14px 6px 75px 6px;
+        gap: 14px;
+    }
+    .btn-buka-full-pdf { 
+        bottom: 14px; 
+        right: 14px; 
+        padding: 8px 14px; 
+        font-size: 0.78rem; 
+        border-width: 2px;
+        box-shadow: 2.5px 2.5px 0px #000000;
+    }
 
-@media (max-width: 768px) {
     .team-social-btn {
         width: 32px;
         height: 32px;
@@ -2381,9 +2374,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
         width: 16px;
         height: 16px;
     }
-}
 
-@media (max-width: 768px) {
     .grid-dev-2 { grid-template-columns: 1fr; }
     .dev-category-title { font-size: 1.3rem; }
     .dev-main-title { font-size: 2.2rem; }
