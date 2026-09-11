@@ -712,6 +712,138 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     display: block;
 }
 
+/* ==============================================================
+   SUPER BIG UPGRADE: SECTION "APA KATA KADER?" (PERSIS GAMBAR 4)
+   Mobile, Tablet & Desktop Friendly (Floating Card on Image)
+============================================================== */
+.kader-quote-section {
+    width: 100%;
+    margin-bottom: 50px;
+}
+
+.kader-quote-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+    max-width: 950px;
+    margin: 0 auto;
+}
+
+.kader-card {
+    width: 100%;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    border: 4px solid #0f172a;
+    background: #0f172a;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+}
+
+.kader-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 25px 60px rgba(16, 185, 129, 0.2);
+}
+
+.kader-img-container {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111827;
+}
+
+.kader-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+    transition: transform 0.6s ease;
+}
+
+.kader-card:hover .kader-photo {
+    transform: scale(1.02);
+}
+
+/* KARTU KUTIPAN GELAP MELAYANG (PERSIS GBR 4) */
+.kader-quote-box {
+    position: absolute;
+    bottom: 35px;
+    left: 35px;
+    max-width: 490px;
+    background: rgba(15, 23, 42, 0.88) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 26px 30px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+    text-align: left;
+    z-index: 5;
+}
+
+.kader-quote-text {
+    color: #f3f4f6 !important;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 18px;
+    font-style: italic;
+    font-weight: 500;
+}
+
+.kader-name {
+    color: #ffffff !important;
+    font-size: 1.25rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.kader-role {
+    color: #4ade80 !important;
+    font-size: 0.88rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.kader-social-links {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.kader-social-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    text-decoration: none;
+}
+
+.kader-social-icon:hover {
+    background: #10b981;
+    color: #000000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.kader-social-icon svg {
+    width: 17px;
+    height: 17px;
+    stroke-width: 2.2;
+}
+
 /* INSTAGRAM FEED */
 .instagram-feed-section { width: 100% !important; max-width: 100% !important; overflow: hidden !important; border-radius: 1.5rem; box-sizing: border-box; content-visibility: auto; contain-intrinsic-size: 0 400px; }
 [class*="elfsight-app"] { width: 100% !important; max-width: 100% !important; overflow: hidden !important; box-sizing: border-box; }
@@ -2099,129 +2231,6 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 }
 
 /* ==============================================================
-   NATIVE MULTI-PAGE PDF VIEWER ENGINE (PERSIS GAMBAR 2)
-   Mobile, Tablet & Desktop Friendly (Smooth Block Vertical Scroll)
-============================================================== */
-.native-pdf-bezel-frame {
-    position: relative;
-    width: 100%;
-    max-width: 960px;
-    height: 78vh;
-    min-height: 560px;
-    max-height: 900px;
-    background: #0f172a;
-    border: 4px solid #0f172a;
-    border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
-    overflow: hidden;
-    margin: 25px auto;
-}
-
-.native-embed-iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
-    background: #ffffff;
-}
-
-/* Viewport Scroll Kontinu Multi-Halaman */
-.pdf-render-viewport {
-    width: 100%;
-    height: 100%;
-    overflow-y: scroll !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-y pinch-zoom !important;
-    padding: 24px 16px 85px 16px;
-    display: block !important;
-    text-align: center;
-    box-sizing: border-box;
-    background: #1e293b;
-}
-
-/* Lembaran Halaman Dokumen PDF */
-.pdf-page-wrapper {
-    display: block !important;
-    margin: 0 auto 20px auto !important;
-    background: #ffffff;
-    border-radius: 4px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-    overflow: hidden;
-    max-width: 100%;
-    box-sizing: border-box;
-    flex-shrink: 0 !important;
-}
-
-/* Canvas Gambar: pointer-events none agar gesture scroll tidak tertahan di kanvas */
-.pdf-page-wrapper canvas {
-    display: block !important;
-    max-width: 100% !important;
-    height: auto !important;
-    pointer-events: none !important;
-}
-
-/* Loading Overlay Status */
-.pdf-loading-indicator {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(15, 23, 42, 0.92);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    z-index: 40;
-    color: #4ade80;
-    font-size: 0.95rem;
-    font-weight: 700;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-}
-
-/* Tombol Floating BUKA FULL PDF */
-.btn-buka-full-pdf {
-    position: absolute;
-    bottom: 22px;
-    right: 22px;
-    background: #a3e635;
-    color: #000000 !important;
-    border: 2.5px solid #000000;
-    box-shadow: 3.5px 3.5px 0px #000000;
-    border-radius: 8px;
-    padding: 10px 18px;
-    font-weight: 800;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    z-index: 50;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-}
-
-.btn-buka-full-pdf:hover {
-    background: #bef264;
-    transform: translate(-2px, -2px);
-    box-shadow: 5px 5px 0px #000000;
-    color: #000000 !important;
-}
-
-.btn-buka-full-pdf:active {
-    transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0px #000000;
-}
-
-.btn-buka-full-pdf svg {
-    stroke: #000000;
-    display: block;
-}
-
-/* ==============================================================
    RESPONSIVE BREAKPOINTS (TABLET & MOBILE)
 ============================================================== */
 @media (max-width: 992px) {
@@ -2283,6 +2292,23 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     }
     .pdf-render-viewport {
         padding: 20px 12px 75px 12px;
+    }
+
+    /* KUTIPAN KADER TABLET */
+    .kader-img-container {
+        height: 500px;
+    }
+    .kader-quote-box {
+        bottom: 25px;
+        left: 25px;
+        max-width: 420px;
+        padding: 22px 24px;
+    }
+    .kader-name {
+        font-size: 1.15rem;
+    }
+    .kader-quote-text {
+        font-size: 0.92rem;
     }
 }
 
@@ -2494,6 +2520,43 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
         font-size: 0.78rem; 
         border-width: 2px;
         box-shadow: 2.5px 2.5px 0px #000000;
+    }
+
+    /* KUTIPAN KADER MOBILE RESPONSIVE (PERSIS GAMBAR 4) */
+    .kader-card {
+        border-radius: 20px;
+        border-width: 3px;
+    }
+    .kader-img-container {
+        height: 520px;
+    }
+    .kader-quote-box {
+        bottom: 14px;
+        left: 12px;
+        right: 12px;
+        max-width: none;
+        padding: 18px 20px;
+        border-radius: 16px;
+    }
+    .kader-quote-text {
+        font-size: 0.86rem;
+        line-height: 1.6;
+        margin-bottom: 12px;
+    }
+    .kader-name {
+        font-size: 1.05rem;
+    }
+    .kader-role {
+        font-size: 0.78rem;
+        margin-bottom: 10px;
+    }
+    .kader-social-icon {
+        width: 32px;
+        height: 32px;
+    }
+    .kader-social-icon svg {
+        width: 15px;
+        height: 15px;
     }
 
     .team-social-btn {
