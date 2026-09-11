@@ -158,6 +158,82 @@ document.addEventListener('DOMContentLoaded', () => {
     @keyframes pdfSpin {
         to { transform: rotate(360deg); }
     }
+
+    /* Views Analytics Glassmorphism Card (Views Today, This Week, Total Views) */
+    .views-analytics-card {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-top: 35px;
+        padding: 20px 24px;
+        background: rgba(22, 27, 34, 0.78);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(74, 222, 128, 0.28);
+        border-radius: 18px;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+        box-sizing: border-box;
+    }
+
+    .views-analytics-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.55);
+        border: 1px solid rgba(74, 222, 128, 0.15);
+        transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .views-analytics-item:hover {
+        transform: translateY(-2px);
+        border-color: rgba(74, 222, 128, 0.45);
+        box-shadow: 0 8px 20px rgba(74, 222, 128, 0.12);
+    }
+
+    .views-analytics-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: rgba(74, 222, 128, 0.15);
+        color: #4ade80;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .views-analytics-info {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+    }
+
+    .views-analytics-label {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+    }
+
+    .views-analytics-value {
+        font-size: 1.35rem;
+        color: #f8fafc;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-top: 2px;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    @media (max-width: 680px) {
+        .views-analytics-card {
+            grid-template-columns: 1fr;
+            gap: 12px;
+            padding: 16px;
+        }
+    }
 </style>
 
 <!-- Script Resmi Mozilla PDF.js Engine -->
@@ -272,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div id="pdf-scroll-container" class="pdf-continuous-container">
             <div class="pdf-loading-spinner">
                 <div class="pdf-pulse-loader"></div>
-                <span>Memuat dokumen PDF...</span>
+                <span>Memuat seluruh halaman dokumen...</span>
             </div>
         </div>
 
@@ -295,6 +371,44 @@ document.addEventListener('DOMContentLoaded', () => {
     <p class="text-muted" style="text-align:center; margin-top:15px; font-size:0.85rem;">
         <i data-lucide="info" style="width:15px; display:inline; vertical-align:text-bottom;"></i> Geser ke bawah untuk membaca seluruh halaman dokumen atau sentuh tombol <strong>BUKA FULL PDF</strong> untuk membuka dokumen asli.
     </p>
+
+    <!-- ==============================================================
+         WIDGET STATISTIK PENGUNJUNG (VIEWS TODAY, THIS WEEK, TOTAL VIEWS)
+    ============================================================== -->
+    <% 
+        let vToday = (typeof viewsToday !== 'undefined' && viewsToday !== null) ? viewsToday : ((typeof stats !== 'undefined' && stats && stats.today) ? stats.today : 0);
+        let vWeek = (typeof viewsWeek !== 'undefined' && viewsWeek !== null) ? viewsWeek : ((typeof stats !== 'undefined' && stats && stats.week) ? stats.week : 0);
+        let vTotal = (typeof totalViews !== 'undefined' && totalViews !== null) ? totalViews : ((typeof stats !== 'undefined' && stats && stats.total) ? stats.total : 0);
+    %>
+    <div class="views-analytics-card">
+        <div class="views-analytics-item">
+            <div class="views-analytics-icon">
+                <i data-lucide="eye" style="width: 22px; height: 22px;"></i>
+            </div>
+            <div class="views-analytics-info">
+                <span class="views-analytics-label">Views Today</span>
+                <span class="views-analytics-value" id="valViewsToday"><%= Number(vToday).toLocaleString('id-ID') %></span>
+            </div>
+        </div>
+        <div class="views-analytics-item">
+            <div class="views-analytics-icon">
+                <i data-lucide="calendar" style="width: 22px; height: 22px;"></i>
+            </div>
+            <div class="views-analytics-info">
+                <span class="views-analytics-label">This Week</span>
+                <span class="views-analytics-value" id="valViewsWeek"><%= Number(vWeek).toLocaleString('id-ID') %></span>
+            </div>
+        </div>
+        <div class="views-analytics-item">
+            <div class="views-analytics-icon">
+                <i data-lucide="trending-up" style="width: 22px; height: 22px;"></i>
+            </div>
+            <div class="views-analytics-info">
+                <span class="views-analytics-label">Total Views</span>
+                <span class="views-analytics-value" id="valViewsTotal"><%= Number(vTotal).toLocaleString('id-ID') %></span>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -393,6 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Jalankan render awal saat dokumen dimuat
     document.addEventListener('DOMContentLoaded', () => {
         renderContinuousPdf('<%= pdfList[0].file %>');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 </script>
 <script src="/js/protect-devtools.js" defer></script>
