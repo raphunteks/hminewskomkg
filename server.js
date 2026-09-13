@@ -93,6 +93,52 @@ function toAbsoluteUrl(urlPath, baseUrl = 'https://www.hmikomkgumi.xyz') {
 }
 
 // ==============================================================
+// DYNAMIC SITEMAP INDEX (GOLD STANDARD GSC - MASTER SITEMAP)
+// Mendaftarkan semua sitemap anak ke GSC sekaligus
+// ==============================================================
+app.get('/sitemap-index.xml', async (req, res) => {
+    try {
+        const baseUrl = 'https://www.hmikomkgumi.xyz';
+        const now = new Date().toISOString();
+
+        let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+        xml += `<!-- ============================================================ -->\n`;
+        xml += `<!-- Gold Standard Sitemap Index - HMI KomKG UMI                  -->\n`;
+        xml += `<!-- Submit URL INI ke GSC: Penyusunan Indeks > Peta Situs         -->\n`;
+        xml += `<!-- ============================================================ -->\n`;
+        xml += `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n`;
+        xml += `              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n`;
+        xml += `              xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9\n`;
+        xml += `              http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">\n\n`;
+
+        // 1. Sitemap Utama (Halaman Statis + Galeri + Bio)
+        xml += `    <!-- Sitemap Utama: Halaman Statis, Galeri, Bio -->\n`;
+        xml += `    <sitemap>\n`;
+        xml += `        <loc>${baseUrl}/sitemap.xml</loc>\n`;
+        xml += `        <lastmod>${now}</lastmod>\n`;
+        xml += `    </sitemap>\n\n`;
+
+        // 2. Sitemap Berita/News (Google News Extension)
+        xml += `    <!-- Sitemap Berita: Artikel & Kajian (Google News Discover) -->\n`;
+        xml += `    <sitemap>\n`;
+        xml += `        <loc>${baseUrl}/sitemap_news.xml</loc>\n`;
+        xml += `        <lastmod>${now}</lastmod>\n`;
+        xml += `    </sitemap>\n\n`;
+
+        xml += `</sitemapindex>`;
+
+        res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+        res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+        res.setHeader('X-Robots-Tag', 'noindex');
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        res.status(200).send(xml);
+    } catch (err) {
+        console.error('Error membuat sitemap-index.xml:', err);
+        res.status(500).send('Error generating sitemap index');
+    }
+});
+
+// ==============================================================
 // DYNAMIC SITEMAP.XML GENERATOR (100% SSR - GOLD STANDARD GSC)
 // ==============================================================
 app.get('/sitemap.xml', async (req, res) => {
@@ -271,7 +317,8 @@ app.get('/sitemap.xml', async (req, res) => {
         xml += `</urlset>`;
 
         res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-        res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+        res.setHeader('Cache-Control', 'public, s-maxage=1800, stale-while-revalidate=3600');
+        res.setHeader('X-Robots-Tag', 'noindex');
         res.setHeader('X-Content-Type-Options', 'nosniff');
         res.status(200).send(xml);
     } catch (err) {
@@ -281,7 +328,119 @@ app.get('/sitemap.xml', async (req, res) => {
 });
 
 // ==============================================================
+// DYNAMIC SITEMAP_NEWS.XML — GOOGLE NEWS SITEMAP (GOLD STANDARD)
+// Khusus artikel berita 48 jam terakhir → Google Discover & News
+// ==============================================================
+app.get('/sitemap_news.xml', async (req, res) => {
+    try {
+        const baseUrl = 'https://www.hmikomkgumi.xyz';
+        const { siteSettings } = await getSiteData();
+        const pubName = (siteSettings.headerTitle ? (siteSettings.headerTitle + ' ' + (siteSettings.headerHighlight || '')).trim() : 'HMI KomKG UMI');
+
+        let newsList = [];
+        try {
+            newsList = await kv.get('newsList') || [];
+        } catch (e) { console.warn('Gagal memuat newsList untuk sitemap_news:', e); }
+
+        // Filter: hanya 48 jam terakhir (Google News Standard)
+        // Fallback: tampilkan 10 terbaru jika tidak ada dalam 48 jam
+        const now = Date.now();
+        const ms48h = 48 * 60 * 60 * 1000;
+        let recentNews = newsList.filter(item => {
+            try {
+                const d = new Date(item.date);
+                return !isNaN(d.getTime()) && (now - d.getTime()) <= ms48h;
+            } catch (e) { return false; }
+        });
+
+        // Fallback: 10 artikel terbaru jika tidak ada yang dalam 48 jam
+        if (recentNews.length === 0) {
+            recentNews = [...newsList]
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 10);
+        }
+
+        let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+        xml += `<!-- ============================================================ -->\n`;
+        xml += `<!-- Gold Standard Google News Sitemap - HMI KomKG UMI            -->\n`;
+        xml += `<!-- Artikel terbaru untuk Google Discover & Google News           -->\n`;
+        xml += `<!-- ============================================================ -->\n`;
+        xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n`;
+        xml += `        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"\n`;
+        xml += `        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"\n`;
+        xml += `        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n`;
+        xml += `        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9\n`;
+        xml += `        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd\n`;
+        xml += `        http://www.google.com/schemas/sitemap-news/0.9\n`;
+        xml += `        http://www.google.com/schemas/sitemap-news/0.9/sitemap-news.xsd">\n\n`;
+
+        if (recentNews.length > 0) {
+            recentNews.forEach(item => {
+                const slug = item.slug || slugify(item.title) || String(item.id);
+                const loc = `${baseUrl}/berita/${encodeURIComponent(slug)}`;
+                const pubDate = formatW3CDate(item.date);
+                const itemImg = toAbsoluteUrl(item.image || siteSettings.headerLogo || '/img/logo-hmikomkgumi.png', baseUrl);
+                const safeTitle = xmlEscape(item.title || 'Berita HMI KomKG UMI');
+                const safeCategory = xmlEscape(item.category || 'Berita');
+                const safePubName = xmlEscape(pubName);
+
+                xml += `    <url>\n`;
+                xml += `        <loc>${loc}</loc>\n`;
+                xml += `        <lastmod>${pubDate}</lastmod>\n`;
+                xml += `        <changefreq>never</changefreq>\n`;
+                xml += `        <priority>0.9</priority>\n`;
+                // Google News Extension
+                xml += `        <news:news>\n`;
+                xml += `            <news:publication>\n`;
+                xml += `                <news:name>${safePubName}</news:name>\n`;
+                xml += `                <news:language>id</news:language>\n`;
+                xml += `            </news:publication>\n`;
+                xml += `            <news:publication_date>${pubDate}</news:publication_date>\n`;
+                xml += `            <news:title>${safeTitle}</news:title>\n`;
+                xml += `            <news:keywords>${xmlEscape(safeCategory + ', HMI KomKG UMI, Berita HMI, ' + (item.tags || ''))}</news:keywords>\n`;
+                xml += `        </news:news>\n`;
+                // Image Extension
+                xml += `        <image:image>\n`;
+                xml += `            <image:loc>${xmlEscape(itemImg)}</image:loc>\n`;
+                xml += `            <image:title>${safeTitle}</image:title>\n`;
+                xml += `            <image:caption>${xmlEscape('Berita: ' + (item.category || 'HMI KomKG UMI'))}</image:caption>\n`;
+                xml += `        </image:image>\n`;
+                // Foto tambahan dari artikel
+                if (Array.isArray(item.photos)) {
+                    item.photos.slice(0, 3).forEach(photo => {
+                        const pUrl = typeof photo === 'string' ? photo : (photo && photo.url);
+                        if (pUrl) {
+                            xml += `        <image:image>\n`;
+                            xml += `            <image:loc>${xmlEscape(toAbsoluteUrl(pUrl, baseUrl))}</image:loc>\n`;
+                            xml += `            <image:title>${safeTitle}</image:title>\n`;
+                            xml += `        </image:image>\n`;
+                        }
+                    });
+                }
+                xml += `    </url>\n`;
+            });
+        } else {
+            // Placeholder jika tidak ada berita sama sekali
+            xml += `    <!-- Belum ada artikel berita yang dipublikasikan -->\n`;
+        }
+
+        xml += `</urlset>`;
+
+        res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+        // Cache lebih pendek untuk sitemap_news (update cepat = Discover lebih cepat)
+        res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
+        res.setHeader('X-Robots-Tag', 'noindex');
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        res.status(200).send(xml);
+    } catch (err) {
+        console.error('Error saat membuat dynamic sitemap_news.xml:', err);
+        res.status(500).setHeader('Content-Type', 'text/plain').send('Error generating news sitemap');
+    }
+});
+
+// ==============================================================
 // DYNAMIC ROBOTS.TXT GENERATOR (100% SSR - GOLD STANDARD GSC)
+// Referensikan ketiga sitemap untuk crawl discovery maksimal
 // ==============================================================
 app.get('/robots.txt', (req, res) => {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
@@ -291,7 +450,9 @@ app.get('/robots.txt', (req, res) => {
         '# ==============================================================',
         '# Gold Standard robots.txt - HMI KomKG UMI',
         '# Mengizinkan Googlebot, Bingbot, dan seluruh spider pencarian',
+        '# Update: Referensi sitemap-index + sitemap_news (GSC Gold Standard)',
         '# ==============================================================',
+        '',
         'User-agent: *',
         'Allow: /',
         '',
@@ -300,16 +461,45 @@ app.get('/robots.txt', (req, res) => {
         'Allow: /css/',
         'Allow: /js/',
         'Allow: /img/',
+        'Allow: /sitemap.xml',
+        'Allow: /sitemap-index.xml',
+        'Allow: /sitemap_news.xml',
+        '',
+        '# Izinkan Googlebot akses semua jenis berkas penting',
+        'Allow: /*.js$',
+        'Allow: /*.css$',
+        'Allow: /*.png$',
+        'Allow: /*.jpg$',
+        'Allow: /*.gif$',
+        'Allow: /*.svg$',
         '',
         '# Blokir perayapan area sensitif & formulir internal',
         'Disallow: /admin',
         'Disallow: /admin/',
         'Disallow: /admin/*',
         'Disallow: /api/kirim-pesan-narahubung',
+        'Disallow: /api/analytics',
         'Disallow: /*?*filter=',
         '',
-        '# Lokasi Peta Situs Dinamis Realtime (SSR)',
+        '# Aturan khusus Googlebot (diprioritaskan untuk indexing)',
+        'User-agent: Googlebot',
+        'Allow: /',
+        'Allow: /sitemap-index.xml',
+        'Allow: /sitemap.xml',
+        'Allow: /sitemap_news.xml',
+        '',
+        '# Aturan khusus Googlebot-Image (Google Images Indexing)',
+        'User-agent: Googlebot-Image',
+        'Allow: /api/upload/',
+        'Allow: /img/',
+        '',
+        '# ==============================================================',
+        '# SITEMAP INDEX — Submit URL ini ke GSC: Penyusunan Indeks > Peta Situs',
+        '# ==============================================================',
+        'Sitemap: https://www.hmikomkgumi.xyz/sitemap-index.xml',
         'Sitemap: https://www.hmikomkgumi.xyz/sitemap.xml',
+        'Sitemap: https://www.hmikomkgumi.xyz/sitemap_news.xml',
+        '',
         'Host: https://www.hmikomkgumi.xyz'
     ].join('\n');
     
