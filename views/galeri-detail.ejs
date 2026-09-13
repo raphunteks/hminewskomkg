@@ -1,55 +1,49 @@
 <% 
     // ==============================================================
-    // FIX ERROR 500 & SEO BREADCRUMB: 
-    // Injeksi variabel SEO secara eksplisit sebelum memanggil header
+    // 100% DYNAMIC SSR SEO: Detail Galeri Dokumentasi
     // ==============================================================
-    let pageTitle = typeof album !== 'undefined' && album ? 'Galeri: ' + album.title : 'Detail Galeri';
-    
-    // ==============================================================
-    // SUPER BIG UPGRADE: DYNAMIC META & BILINGUAL SEO
-    // Otomatis men-generate deskripsi dan gambar OpenGraph untuk GSC & Sosmed
-    // ==============================================================
+    let page = 'galeri';
     let albumTitleClean = typeof album !== 'undefined' && album ? album.title : 'Galeri Kegiatan';
-    let pageDescription = `Dokumentasi dan foto kegiatan ${albumTitleClean} HMI Komisariat Kedokteran Gigi UMI. Explore the photo gallery and event documentation for ${albumTitleClean}.`;
+    let pageTitle = 'Galeri: ' + albumTitleClean;
+    let pageDescription = `Dokumentasi dan arsip foto kegiatan ${albumTitleClean} HMI Komisariat Kedokteran Gigi UMI pada ${typeof album !== 'undefined' && album && album.date ? album.date : ''}.`;
     let pageImage = typeof album !== 'undefined' && album && album.cover ? album.cover : '/img/logo-hmikomkgumi.png';
-    let baseUrl = "https://hmikomkgumi.xyz"; // Domain resmi komisariat
+    let baseUrl = "https://www.hmikomkgumi.xyz";
 
-    // ==============================================================
-    // DYNAMIC SEO SCHEMA GENERATOR (ENTERPRISE LEVEL)
-    // Men-generate Schema SEO "ImageObject" secara otomatis untuk setiap foto
-    // ==============================================================
+    // DYNAMIC IMAGEOBJECT GENERATOR
     let imageNodes = [];
     if (typeof album !== 'undefined' && album) {
         if (album.cover) {
+            let coverUrl = album.cover.startsWith('http') ? album.cover : baseUrl + (album.cover.startsWith('/') ? '' : '/') + album.cover;
             imageNodes.push({
                 "@type": "ImageObject",
-                "url": album.cover.startsWith('http') ? album.cover : baseUrl + album.cover,
+                "url": coverUrl,
                 "name": "Cover: " + album.title
             });
         }
         if (album.photos && album.photos.length > 0) {
             album.photos.forEach((p, index) => {
-                if(p && p.url) {
+                let pUrl = typeof p === 'string' ? p : (p && p.url);
+                if(pUrl) {
+                    let absPhotoUrl = pUrl.startsWith('http') ? pUrl : baseUrl + (pUrl.startsWith('/') ? '' : '/') + pUrl;
                     imageNodes.push({
                         "@type": "ImageObject",
-                        "url": p.url.startsWith('http') ? p.url : baseUrl + p.url,
-                        "name": album.title + " - Dokumentasi " + (index + 1)
+                        "url": absPhotoUrl,
+                        "name": album.title + " - Foto " + (index + 1)
                     });
                 }
             });
         }
     }
 %>
-<%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription, pageImage: pageImage }) %>
+<%- include('partials/header', { page: page, album: album, pageTitle: pageTitle, pageDescription: pageDescription, pageImage: pageImage }) %>
 
 <!-- ==============================================================
-     SMART GUARD: Mencegah Error 500 jika Album tidak ditemukan
+     SMART GUARD: Mencegah Error jika Album tidak ditemukan
 ============================================================== -->
 <% if (typeof album !== 'undefined' && album) { %>
 
 <!-- ==============================================================
-     ADVANCED JSON-LD SCHEMA.ORG (@graph) - SERVER SIDE RENDERED
-     Mendikte Google bahwa halaman ini adalah "ImageGallery" utuh.
+     GOLD STANDARD GSC: IMAGEGALLERY SCHEMA.ORG (@graph)
 ============================================================== -->
 <script type="application/ld+json">
 {
@@ -59,36 +53,13 @@
       "@type": "ImageGallery",
       "@id": "<%= baseUrl %>/galeri/<%= album.id || '' %>/#webpage",
       "url": "<%= baseUrl %>/galeri/<%= album.id || '' %>",
-      "name": "<%= pageTitle %>",
-      "description": "<%= pageDescription %>",
+      "name": "<%= pageTitle.replace(/"/g, '\\"') %>",
+      "description": "<%= pageDescription.replace(/"/g, '\\"') %>",
       "inLanguage": ["id-ID", "en-US"],
+      "isPartOf": { "@id": "<%= baseUrl %>/#website" },
       "publisher": { "@id": "<%= baseUrl %>/#organization" },
       "datePublished": "<%= album.date || '' %>",
       "image": <%- JSON.stringify(imageNodes) %>
-    },
-    {
-      "@type": "BreadcrumbList",
-      "@id": "<%= baseUrl %>/galeri/<%= album.id || '' %>/#breadcrumb",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Beranda",
-          "item": "<%= baseUrl %>/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Galeri",
-          "item": "<%= baseUrl %>/galeri"
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": "<%= albumTitleClean %>",
-          "item": "<%= baseUrl %>/galeri/<%= album.id || '' %>"
-        }
-      ]
     }
   ]
 }
@@ -133,7 +104,7 @@
         <!-- Render Foto-Foto Tambahan -->
         <% if(album.photos && album.photos.length > 0) { %>
             <% album.photos.forEach((photo, index) => { %>
-                <figure class="gallery-detail-item gallery-clickable" onclick="openLightbox(<%= album.cover ? index + 1 : index %>)" itemprop="image" itemscope itemtype="https://schema.org/ImageObject" style="margin:0;">
+                <figure class="gallery-detail-item gallery-clickable" data-index="<%= album.cover ? index + 1 : index %>" onclick="openLightbox(Number(this.dataset.index))" itemprop="image" itemscope itemtype="https://schema.org/ImageObject" style="margin:0;">
                     <img itemprop="contentUrl" src="<%= photo.url %>" alt="Dokumentasi <%= album.title %> - <%= index + 1 %>" onerror="this.src='/img/logo-hmikomkgumi.png'">
                     <meta itemprop="name" content="Dokumentasi <%= index + 1 %>">
                 </figure>
@@ -282,42 +253,11 @@
 </div>
 <% } %>
 
-<!-- ==============================================================
-     SUPER BIG UPGRADE: ANALYTICS DASHBOARD WIDGET (PERSIS GAMBAR)
-============================================================== -->
-<section class="analytics-section" aria-label="Statistik Pengunjung" style="margin-top: 50px;">
-    <div class="analytics-grid">
-        <div class="analytic-card">
-            <div class="analytic-title">VIEWS TODAY</div>
-            <div class="analytic-value stat-today" id="viewsToday">6</div>
-        </div>
-        <div class="analytic-card">
-            <div class="analytic-title">THIS WEEK</div>
-            <div class="analytic-value stat-week" id="viewsWeek">14</div>
-        </div>
-        <div class="analytic-card">
-            <div class="analytic-title">TOTAL VIEWS</div>
-            <div class="analytic-value stat-total" id="viewsTotal">130</div>
-        </div>
-    </div>
-</section>
+<%- include('partials/analytics') %>
 
 <script>
-    async function loadVisitorStats() {
-        try {
-            const res = await fetch('/api/analytics');
-            if (res.ok) {
-                const data = await res.json();
-                if (data.today && document.getElementById('viewsToday')) document.getElementById('viewsToday').innerText = data.today;
-                if (data.week && document.getElementById('viewsWeek')) document.getElementById('viewsWeek').innerText = data.week;
-                if (data.total && document.getElementById('viewsTotal')) document.getElementById('viewsTotal').innerText = data.total;
-            }
-        } catch(e) {}
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
         if (typeof lucide !== 'undefined') lucide.createIcons();
-        loadVisitorStats();
     });
 </script>
 
