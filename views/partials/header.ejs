@@ -16,202 +16,229 @@
         })();
     </script>
 
+    <!-- CORE CSS - DITARUH DI AWAL HEAD AGAR DITERAPKAN INSTAN TANPA FOUC / UNSTYLED HTML -->
+    <link rel="stylesheet" href="/css/main.css">
+
+    <!-- PRECONNECT & FONTS -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+
     <meta name="google-site-verification" content="lV4veWnfsXOsnHBVIUxj7uQUA_jdJIQ6Guk4bPGFGHc" />
 
     <% 
-    // BASE URL: Wajib untuk memastikan OG Image terbaca oleh sistem Social Media
-    const baseUrl = 'https://hmikomkgumi.xyz';
-    
-    // SAFE OBJECT DESTRUCTURING: Mencegah crash jika siteSettings tidak termuat
+    // ==============================================================
+    // 100% DYNAMIC SSR SEO ENGINE - GOLD STANDARD GOOGLE SEARCH CONSOLE
+    // ==============================================================
+    const baseUrl = 'https://www.hmikomkgumi.xyz';
     const safeSettings = typeof siteSettings !== 'undefined' && siteSettings ? siteSettings : {};
     
-    // Default SEO Fallback (Dari Setelan Admin Dashboard)
-    let finalTitle = safeSettings.webTitle || 'HMI KomKG UMI';
-    let finalDesc = safeSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI';
-    let finalImage = safeSettings.seoImage || safeSettings.headerLogo || '';
+    const siteBrand = (safeSettings.headerTitle ? (safeSettings.headerTitle + ' ' + (safeSettings.headerHighlight || '')).trim() : 'HMI KomKG UMI') || 'HMI KomKG UMI';
+    const defaultSiteTitle = safeSettings.heroTitle || safeSettings.webTitle || siteBrand;
+    
+    // Default SEO Fallbacks
+    let finalTitle = defaultSiteTitle;
+    let finalDesc = safeSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam (HMI) Komisariat Kedokteran Gigi Universitas Muslim Indonesia. Wadah kader insan akademis, pencipta, dan pengabdi bernafaskan Islam.';
+    let finalImage = safeSettings.seoImage || safeSettings.headerLogo || '/img/logo-hmikomkgumi.png';
     let finalType = 'website';
-    let finalUrl = typeof currentUrl !== 'undefined' && currentUrl ? currentUrl : baseUrl;
-    let finalDate = new Date().toISOString(); // Default date
-    let finalCategory = 'Organisasi';
+    let finalUrl = baseUrl + '/';
+    let finalDate = new Date().toISOString();
+    let finalCategory = 'Organisasi Mahasiswa';
+    let isNoIndex = (typeof noIndex !== 'undefined' && noIndex === true) || (typeof page !== 'undefined' && (page === 'admin' || page === '404'));
 
-    // Pastikan URL Halaman adalah Absolute URL
-    if (finalUrl.startsWith('/')) {
-        finalUrl = baseUrl + finalUrl;
-    }
+    // Breadcrumb state tracker
+    let breadcrumbName = 'Beranda';
+    let hasBreadcrumbParent = false;
+    let breadcrumbParentName = '';
+    let breadcrumbParentUrl = '';
 
-    // AUTO-DETEKSI: Jika halaman sedang membuka DETAIL BERITA
-    if (typeof berita !== 'undefined' && berita) {
-        finalTitle = (berita.title || 'Berita') + ' - ' + (safeSettings.webTitle || 'HMI');
-        // Membersihkan tag HTML secara aman
+    // 1. AUTO-DETEKSI DETAIL BERITA (SSR ARTICLE)
+    if (typeof berita !== 'undefined' && berita && berita.title) {
+        finalTitle = berita.title + ' | ' + siteBrand;
         if (berita.content) {
-            finalDesc = berita.content.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').substring(0, 160) + '...';
+            finalDesc = berita.content.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+            if (finalDesc.length > 155) {
+                finalDesc = finalDesc.substring(0, 155) + '...';
+            }
         }
         if (berita.image) finalImage = berita.image;
         finalType = 'article';
         finalDate = berita.date || finalDate;
-        finalCategory = berita.category || 'Berita';
+        finalCategory = berita.category || 'Berita & Informasi';
+        const bSlug = berita.slug || berita.id;
+        finalUrl = baseUrl + '/berita/' + encodeURIComponent(bSlug);
+
+        hasBreadcrumbParent = true;
+        breadcrumbParentName = 'Berita';
+        breadcrumbParentUrl = baseUrl + '/';
+        breadcrumbName = berita.title;
     } 
-    // AUTO-DETEKSI: Jika halaman sedang membuka DETAIL GALERI
-    else if (typeof album !== 'undefined' && album) {
-        finalTitle = 'Galeri: ' + (album.title || '') + ' - ' + (safeSettings.webTitle || 'HMI');
-        finalDesc = 'Dokumentasi kegiatan ' + (album.title || '') + ' HMI Komisariat Kedokteran Gigi UMI pada ' + (album.date || '') + '.';
+    // 2. AUTO-DETEKSI DETAIL GALERI (SSR IMAGE GALLERY)
+    else if (typeof album !== 'undefined' && album && album.title) {
+        finalTitle = 'Galeri: ' + album.title + ' | ' + siteBrand;
+        finalDesc = 'Dokumentasi foto kegiatan ' + album.title + ' HMI Komisariat Kedokteran Gigi UMI pada ' + (album.date || '') + '. Lihat seluruh momen kader di sini.';
         if (album.cover) finalImage = album.cover;
         finalType = 'article';
         finalDate = album.date || finalDate;
         finalCategory = 'Galeri Kegiatan';
+        finalUrl = baseUrl + '/galeri/' + album.id;
+
+        hasBreadcrumbParent = true;
+        breadcrumbParentName = 'Galeri';
+        breadcrumbParentUrl = baseUrl + '/galeri';
+        breadcrumbName = album.title;
     } 
-    // DETEKSI VARIABEL MANUAL (Jika di-set secara spesifik dari backend)
+    // 3. AUTO-DETEKSI PARAMETER MANUAL (DARI VIEW TENTANG, GALERI, DATA-ANGGOTA, DLL)
     else if (typeof pageTitle !== 'undefined' && pageTitle) {
-        finalTitle = pageTitle + ' - ' + (safeSettings.webTitle || 'HMI');
+        finalTitle = pageTitle + ' | ' + siteBrand;
         if (typeof pageDescription !== 'undefined' && pageDescription) finalDesc = pageDescription;
         if (typeof pageImage !== 'undefined' && pageImage) finalImage = pageImage;
         if (typeof pageType !== 'undefined' && pageType) finalType = pageType;
+        
+        if (typeof page !== 'undefined' && page && page !== 'beranda') {
+            finalUrl = baseUrl + '/' + page;
+            breadcrumbName = pageTitle;
+        }
+    } else if (typeof page !== 'undefined' && page && page !== 'beranda') {
+        const capitalized = page.charAt(0).toUpperCase() + page.slice(1);
+        finalTitle = capitalized + ' | ' + siteBrand;
+        finalUrl = baseUrl + '/' + page;
+        breadcrumbName = capitalized;
     }
 
-    // KONVERSI GAMBAR KE ABSOLUTE URL (VITAL UNTUK PREVIEW SOSMED BESAR)
-    if (finalImage && !finalImage.startsWith('http')) {
-        if (!finalImage.startsWith('/')) finalImage = '/' + finalImage;
-        finalImage = baseUrl + finalImage;
+    // Override Canonical URL jika diberikan eksplisit
+    if (typeof canonicalUrl !== 'undefined' && canonicalUrl) {
+        finalUrl = canonicalUrl;
     }
-    
-    // Logo Absolute untuk Schema Publisher
-    let absoluteLogo = safeSettings.headerLogo || '';
-    if (absoluteLogo && !absoluteLogo.startsWith('http')) {
-        if (!absoluteLogo.startsWith('/')) absoluteLogo = '/' + absoluteLogo;
-        absoluteLogo = baseUrl + absoluteLogo;
+
+    // Standardisasi URL Kanonikal
+    if (finalUrl.startsWith('/')) {
+        finalUrl = baseUrl + finalUrl;
+    }
+
+    // Standardisasi URL Gambar Absolut (Kunci Utama Pratinjau WhatsApp, FB, X/Twitter Besar)
+    // Crawler sosial (WA, FB, Twitter) WAJIB menerima URL HTTP/HTTPS publik, bukan Base64 data:
+    // WA memiliki batas ketat maksimal 300KB agar gambar pratinjau muncul di chat.
+    // Kami sediakan og-image.png (152 KB, 500x500) yang 100% kompatibel di semua sosial media.
+    const defaultOgImage = baseUrl + '/img/og-image.png';
+    if (!finalImage || finalImage.startsWith('data:') || finalImage.includes('logo-hmikomkgumi.png')) {
+        finalImage = defaultOgImage;
+    } else if (!finalImage.startsWith('http')) {
+        finalImage = baseUrl + (finalImage.startsWith('/') ? '' : '/') + finalImage;
+    }
+
+    // Standardisasi Kata Kunci Dinamis
+    let finalKeywords = safeSettings.seoKeywords || 'hmi komkg umi, hmikomkgumi, hmi, hmi kom kg umi, hmi kedokteran gigi umi, fkg umi makassar, yakusa, yakin usaha sampai, hmi cabang makassar';
+    if (typeof pageKeywords !== 'undefined' && pageKeywords) {
+        finalKeywords = pageKeywords + ', ' + finalKeywords;
+    } else if (finalType === 'article') {
+        finalKeywords = finalCategory + ', Berita HMI, Kegiatan HMI KomKG UMI, ' + finalKeywords;
     }
     %>
 
+    <!-- 1. PRIMARY META TAGS (SSR DINAMIS 100%) -->
     <title><%= finalTitle %></title>
-    
+    <meta name="title" content="<%= finalTitle %>">
     <meta name="description" content="<%= finalDesc %>">
-    <link rel="icon" type="image/png" href="<%= safeSettings.headerLogo || '/favicon.ico' %>">
+    <meta name="keywords" content="<%= finalKeywords %>">
+    <meta name="author" content="<%= siteBrand %>">
 
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-    
-    <meta name="keywords" content="<%= typeof pageKeywords !== 'undefined' && pageKeywords ? pageKeywords : (safeSettings.seoKeywords || 'hmi komkg umi, hmikomkgumi, hmi, hmi kom kg umi, hmicabmakassar, yakusa') %>">
-    <meta name="author" content="<%= safeSettings.headerTitle || 'HMI KomKG UMI' %>">
-    <link rel="canonical" href="<%= finalUrl %>" />
+    <!-- FAVICON & APP ICONS (COMPATIBLE LOCALHOST & PRODUCTION, GOLD STANDARD W3C) -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <meta name="theme-color" content="#064e3b">
 
+    <!-- 2. ROBOTS & CRAWLER DIRECTIVES (GOLD STANDARD GSC) -->
+    <% if (isNoIndex) { %>
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta name="googlebot" content="noindex, nofollow, noarchive">
+    <% } else { %>
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <% } %>
+
+    <!-- 3. CANONICAL & HREFLANG -->
+    <link rel="canonical" href="<%= finalUrl %>">
+    <link rel="alternate" hreflang="id" href="<%= finalUrl %>">
+    <link rel="alternate" hreflang="x-default" href="<%= finalUrl %>">
+
+    <!-- 4. OPEN GRAPH / FACEBOOK / WHATSAPP / INSTAGRAM / TELEGRAM / LINKEDIN -->
     <meta property="og:locale" content="id_ID">
     <meta property="og:type" content="<%= finalType %>">
     <meta property="og:title" content="<%= finalTitle %>">
     <meta property="og:description" content="<%= finalDesc %>">
     <meta property="og:url" content="<%= finalUrl %>">
-    <meta property="og:site_name" content="<%= safeSettings.webTitle || 'HMI KomKG UMI' %>">
-    
-    <% if (finalType === 'article') { %>
-        <meta property="article:published_time" content="<%= finalDate %>">
-        <meta property="article:author" content="Admin HMI KomKG UMI">
-        <meta property="article:section" content="<%= finalCategory %>">
-    <% } %>
-
+    <meta property="og:site_name" content="<%= siteBrand %>">
     <meta property="og:image" content="<%= finalImage %>">
     <meta property="og:image:secure_url" content="<%= finalImage %>">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Cover <%= finalTitle %>">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="500">
+    <meta property="og:image:height" content="500">
+    <meta property="og:image:alt" content="Logo Resmi <%= siteBrand %>">
 
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:domain" content="hmikomkgumi.xyz">
+    <% if (finalType === 'article') { %>
+    <meta property="article:published_time" content="<%= finalDate %>">
+    <meta property="article:modified_time" content="<%= finalDate %>">
+    <meta property="article:author" content="<%= siteBrand %>">
+    <meta property="article:section" content="<%= finalCategory %>">
+    <meta property="article:tag" content="<%= finalCategory %>">
+    <% } %>
+
+    <!-- 5. TWITTER CARDS (X) -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:domain" content="www.hmikomkgumi.xyz">
     <meta name="twitter:url" content="<%= finalUrl %>">
     <meta name="twitter:title" content="<%= finalTitle %>">
     <meta name="twitter:description" content="<%= finalDesc %>">
     <meta name="twitter:image" content="<%= finalImage %>">
+    <meta name="twitter:image:alt" content="Logo Resmi <%= siteBrand %>">
 
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "<%= finalType === 'article' ? 'NewsArticle' : 'WebSite' %>",
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "<%= finalUrl %>"
-      },
-      "headline": "<%= finalTitle.replace(/"/g, '\\"') %>",
-      "image": [
-        "<%= finalImage %>"
-      ],
-      <% if (finalType === 'article') { %>
-      "datePublished": "<%= finalDate %>",
-      "dateModified": "<%= finalDate %>",
-      "author": {
-        "@type": "Organization",
-        "name": "HMI KomKG UMI",
-        "url": "<%= baseUrl %>"
-      },
-      <% } %>
-      "publisher": {
-        "@type": "Organization",
-        "name": "<%= (safeSettings.webTitle || 'HMI').replace(/"/g, '\\"') %>",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "<%= absoluteLogo %>"
-        }
-      },
-      "description": "<%= finalDesc.replace(/"/g, '\\"') %>"
-    }
-    </script>
-
+    <!-- 6. GOLD STANDARD GSC: BREADCRUMBLIST SCHEMA (DYNAMIC SSR) -->
+    <% if (!isNoIndex) { %>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
+      "@id": "<%= finalUrl %>#breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",
           "position": 1,
           "name": "Beranda",
-          "item": "<%= baseUrl %>"
-        }
-        <% if (typeof berita !== 'undefined' && berita) { %>
-        ,{
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Berita",
           "item": "<%= baseUrl %>/"
-        },{
-          "@type": "ListItem",
-          "position": 3,
-          "name": "<%= (berita.title || '').replace(/"/g, '\\"') %>",
-          "item": "<%= finalUrl %>"
         }
-        <% } else if (typeof album !== 'undefined' && album) { %>
+        <% if (hasBreadcrumbParent) { %>
         ,{
           "@type": "ListItem",
           "position": 2,
-          "name": "Galeri",
-          "item": "<%= baseUrl %>/galeri"
-        },{
+          "name": "<%= breadcrumbParentName.replace(/"/g, '\\"') %>",
+          "item": "<%= breadcrumbParentUrl %>"
+        },
+        {
           "@type": "ListItem",
           "position": 3,
-          "name": "<%= (album.title || '').replace(/"/g, '\\"') %>",
+          "name": "<%= breadcrumbName.replace(/"/g, '\\"') %>",
           "item": "<%= finalUrl %>"
         }
         <% } else if (typeof page !== 'undefined' && page !== 'beranda') { %>
         ,{
           "@type": "ListItem",
           "position": 2,
-          "name": "<%= typeof pageTitle !== 'undefined' && pageTitle ? pageTitle.replace(/"/g, '\\"') : (page.charAt(0).toUpperCase() + page.slice(1)) %>",
+          "name": "<%= breadcrumbName.replace(/"/g, '\\"') %>",
           "item": "<%= finalUrl %>"
         }
         <% } %>
       ]
     }
     </script>
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://unpkg.com" crossorigin>
-    
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"></noscript>
-    
-    <link rel="preload" as="style" href="/css/main.css">
-    <link rel="stylesheet" href="/css/main.css">
+    <% } %>
 
     <script src="https://unpkg.com/lucide@latest" defer></script>
 
@@ -219,6 +246,8 @@
         window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
     </script>
     <script src="/_vercel/speed-insights/script.js" defer></script>
+
+    <!-- 7. CORE STRUCTURED DATA (ORGANIZATION, WEBSITE, SITELINKS NAVIGATION) -->
     <%- include('schema') %>
 </head>
 <body>
@@ -234,7 +263,7 @@
 
             <a href="/" class="logo-area" aria-label="Ke Beranda">
                 <div class="logo-box" style="width:45px; height:45px;">
-                    <img src="<%= safeSettings.headerLogo %>" alt="Logo" class="logo-img" width="45" height="45" style="width:100%; max-width:45px; object-fit:contain;" fetchpriority="high">
+                    <img src="<%= safeSettings.headerLogo || '/img/logo-hmikomkgumi.png' %>" alt="Logo" class="logo-img" width="45" height="45" style="width:100%; max-width:45px; object-fit:contain;" fetchpriority="high">
                 </div>
                 <div class="logo-text">
                     <h1><%= safeSettings.headerTitle || 'HMI' %><span class="text-primary"><%= safeSettings.headerHighlight || '' %></span></h1>
@@ -292,7 +321,7 @@
             const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
 
             // Set state awal tombol switch
-            if (currentTheme === 'dark') {
+            if (currentTheme === 'dark' && themeBtn) {
                 themeBtn.classList.add('active-dark');
             }
 
