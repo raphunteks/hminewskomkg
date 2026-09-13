@@ -153,6 +153,19 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <meta name="theme-color" content="#064e3b">
+    <meta name="application-name" content="HMI KomKG UMI">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="HMI KomKG UMI">
+
+    <!-- ==============================================================
+         GOLD STANDARD GSC: SITEMAP DISCOVERY TAGS
+         Membantu Googlebot menemukan sitemap secara otomatis
+         tanpa harus bergantung hanya pada robots.txt
+    ============================================================== -->
+    <link rel="sitemap" type="application/xml" title="Sitemap Index" href="https://www.hmikomkgumi.xyz/sitemap-index.xml">
+    <link rel="sitemap" type="application/xml" title="Sitemap Utama" href="https://www.hmikomkgumi.xyz/sitemap.xml">
+    <link rel="sitemap" type="application/xml" title="Sitemap Berita" href="https://www.hmikomkgumi.xyz/sitemap_news.xml">
 
     <!-- 2. ROBOTS & CRAWLER DIRECTIVES (GOLD STANDARD GSC) -->
     <% if (isNoIndex) { %>
@@ -191,8 +204,9 @@
     <meta property="article:tag" content="<%= finalCategory %>">
     <% } %>
 
-    <!-- 5. TWITTER CARDS (X) -->
-    <meta name="twitter:card" content="summary">
+    <!-- 5. TWITTER CARDS (X) — UPGRADED: summary_large_image untuk preview lebih besar -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@hmi_komkgumi">
     <meta name="twitter:domain" content="www.hmikomkgumi.xyz">
     <meta name="twitter:url" content="<%= finalUrl %>">
     <meta name="twitter:title" content="<%= finalTitle %>">
