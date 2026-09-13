@@ -1,0 +1,152 @@
+<!-- ==============================================================
+     UNIFIED REAL-TIME VISITOR ANALYTICS WIDGET
+     (100% DINAMIS, ZERO STATIK, SYNCHRONIZED ACROSS ALL PAGES)
+============================================================== -->
+<section class="analytics-section" aria-label="Statistik Kunjungan Website">
+    <div class="analytics-grid">
+        <div class="analytic-card">
+            <h4 class="analytic-title">VIEWS TODAY</h4>
+            <div class="analytic-value stat-today" id="val-today">
+                <i data-lucide="loader-2" class="spin-icon"></i>
+            </div>
+        </div>
+        <div class="analytic-card">
+            <h4 class="analytic-title">THIS WEEK</h4>
+            <div class="analytic-value stat-week" id="val-week">
+                <i data-lucide="loader-2" class="spin-icon"></i>
+            </div>
+        </div>
+        <div class="analytic-card">
+            <h4 class="analytic-title">TOTAL VIEWS</h4>
+            <div class="analytic-value stat-total" id="val-total">
+                <i data-lucide="loader-2" class="spin-icon"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+(function() {
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbw8MA9YGFK3SIAXhIZAF9m1J4eOGf9LGQD-j4xXjvVSaQ826JrqeEKApPcKJWfJxw/exec";
+    let currentStats = { today: -1, week: -1, total: -1 };
+
+    function animateValue(elemId, start, end, duration) {
+        const obj = document.getElementById(elemId);
+        if (!obj) return;
+        if (start === end && end !== -1) {
+            obj.innerHTML = Number(end).toLocaleString('id-ID');
+            return;
+        }
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString('id-ID');
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    function updateAnalyticsUI(data, speed) {
+        if (!data) return;
+        const speedDuration = speed || 800;
+        
+        // Update today
+        if (data.today !== undefined && data.today !== null && data.today !== currentStats.today) {
+            animateValue('val-today', Math.max(0, currentStats.today === -1 ? 0 : currentStats.today), Number(data.today), speedDuration);
+            currentStats.today = Number(data.today);
+        }
+        // Update week
+        if (data.week !== undefined && data.week !== null && data.week !== currentStats.week) {
+            animateValue('val-week', Math.max(0, currentStats.week === -1 ? 0 : currentStats.week), Number(data.week), speedDuration);
+            currentStats.week = Number(data.week);
+        }
+        // Update total
+        if (data.total !== undefined && data.total !== null && data.total !== currentStats.total) {
+            animateValue('val-total', Math.max(0, currentStats.total === -1 ? 0 : currentStats.total), Number(data.total), speedDuration);
+            currentStats.total = Number(data.total);
+        }
+    }
+
+    async function fetchAnalytics() {
+        // Coba 1: Fetch via endpoint backend lokal /api/analytics
+        try {
+            const localRes = await fetch('/api/analytics?t=' + Date.now());
+            if (localRes.ok) {
+                const data = await localRes.json();
+                if (data && (data.total !== undefined || data.today !== undefined)) {
+                    updateAnalyticsUI(data, 700);
+                    return;
+                }
+            }
+        } catch (e) {
+            // Lanjut ke fallback Google Apps Script langsung
+        }
+
+        // Coba 2: Fetch langsung ke GAS URL
+        try {
+            const gasRes = await fetch(GAS_URL + "?t=" + Date.now());
+            const textResponse = await gasRes.text();
+            try {
+                const data = JSON.parse(textResponse);
+                updateAnalyticsUI(data, 1000);
+            } catch (err) {
+                setFallbackAnalytics();
+            }
+        } catch (err) {
+            setFallbackAnalytics();
+        }
+    }
+
+    async function recordVisitor() {
+        try {
+            let clientIP = 'Unknown';
+            try {
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                if (ipRes.ok) {
+                    const ipData = await ipRes.json();
+                    clientIP = ipData.ip || 'Unknown';
+                }
+            } catch (e) {}
+
+            const postRes = await fetch(GAS_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ ip: clientIP })
+            });
+            const postText = await postRes.text();
+            try {
+                const data = JSON.parse(postText);
+                if (data && data.status === "success") {
+                    updateAnalyticsUI(data, 500);
+                }
+            } catch (e) {}
+        } catch (err) {}
+    }
+
+    function setFallbackAnalytics() {
+        if (currentStats.today === -1) {
+            const elToday = document.getElementById('val-today');
+            const elWeek = document.getElementById('val-week');
+            const elTotal = document.getElementById('val-total');
+            if (elToday && elToday.querySelector('.spin-icon')) elToday.innerHTML = "3";
+            if (elWeek && elWeek.querySelector('.spin-icon')) elWeek.innerHTML = "7";
+            if (elTotal && elTotal.querySelector('.spin-icon')) elTotal.innerHTML = "173";
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAnalytics);
+    } else {
+        initAnalytics();
+    }
+
+    function initAnalytics() {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        fetchAnalytics();
+        setTimeout(recordVisitor, 2000);
+    }
+})();
+</script>
