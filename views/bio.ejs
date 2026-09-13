@@ -3,17 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link - <%= bioPage.bio %></title>
-    <link rel="icon" type="image/png" href="<%= bioPage.profileImage %>">
-    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <% 
+        const baseUrl = 'https://www.hmikomkgumi.xyz';
+        const cleanTitle = (bioPage.bio || 'Link Bio').replace(/<[^>]+>/g, '').trim();
+        const fullTitle = cleanTitle + ' | HMI KomKG UMI';
+        const fullDesc = (bioPage.title ? bioPage.title.replace(/<[^>]+>/g, '').trim() : '') || ('Kumpulan tautan resmi ' + cleanTitle + ' HMI Komisariat Kedokteran Gigi UMI.');
+        const pagePath = (bioPage.path || '').replace(/^\/+/, '');
+        const canonicalUrl = baseUrl + '/' + encodeURIComponent(pagePath);
+        
+        let profileImg = bioPage.profileImage || '/img/og-image.png';
+        let ogImg = profileImg;
+        if (profileImg && !profileImg.startsWith('http') && !profileImg.startsWith('data:')) {
+            profileImg = baseUrl + (profileImg.startsWith('/') ? '' : '/') + profileImg;
+            ogImg = profileImg;
+        } else if (profileImg && (profileImg.startsWith('data:') || profileImg.includes('logo-hmikomkgumi.png'))) {
+            ogImg = baseUrl + '/img/og-image.png';
+        }
+
+        const bgType = bioPage.bgType || 'gradient';
+        const rawBgVal = bioPage.bgValue || '#064e3b';
+        const finalBgAttr = bgType === 'image' ? ('url(' + rawBgVal + ')') : (rawBgVal || '#064e3b');
+    %>
+
+    <title><%= fullTitle %></title>
+    <meta name="title" content="<%= fullTitle %>">
+    <meta name="description" content="<%= fullDesc %>">
+    <link rel="canonical" href="<%= canonicalUrl %>">
+
+    <!-- FAVICON & APP ICONS (COMPATIBLE LOCALHOST & PRODUCTION) -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+
+    <!-- OPEN GRAPH -->
+    <meta property="og:type" content="profile">
+    <meta property="og:title" content="<%= fullTitle %>">
+    <meta property="og:description" content="<%= fullDesc %>">
+    <meta property="og:url" content="<%= canonicalUrl %>">
+    <meta property="og:image" content="<%= ogImg %>">
+    <meta property="og:image:secure_url" content="<%= ogImg %>">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="500">
+    <meta property="og:image:height" content="500">
+    <meta property="og:site_name" content="HMI KomKG UMI">
+
+    <!-- TWITTER CARD -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="<%= fullTitle %>">
+    <meta name="twitter:description" content="<%= fullDesc %>">
+    <meta name="twitter:image" content="<%= ogImg %>">
+
+    <!-- PROFILEPAGE SCHEMA JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfilePage",
+      "@id": "<%= canonicalUrl %>/#webpage",
+      "url": "<%= canonicalUrl %>",
+      "name": "<%= fullTitle.replace(/"/g, '\\"') %>",
+      "description": "<%= fullDesc.replace(/"/g, '\\"') %>",
+      "isPartOf": { "@id": "<%= baseUrl %>/#website" },
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "url": "<%= ogImg %>"
+      }
+    }
+    </script>
+
+    <!-- CORE CSS -->
     <link rel="stylesheet" href="/css/bio.css">
+    <script src="https://unpkg.com/lucide@latest" defer></script>
 </head>
-<!-- LOGIKA BACKGROUND: Membedakan tipe Image atau Gradient secara otomatis -->
-<body style="<% if(bioPage.bgType === 'image') { %> background-image: url('<%= bioPage.bgValue %>'); <% } else { %> background: <%= bioPage.bgValue %>; <% } %>">
+<body class="bio-body" data-bg="<%= finalBgAttr %>">
+    <!-- CONTROLLER LATAR BELAKANG (100% PURE JAVASCRIPT - BEBAS LINTER ERROR) -->
+    <script>
+        (function() {
+            var b = document.currentScript ? document.currentScript.parentElement : document.body;
+            if (b && b.dataset && b.dataset.bg) {
+                b.style.setProperty('--bio-bg-custom', b.dataset.bg);
+                b.style.background = b.dataset.bg;
+                b.style.backgroundSize = 'cover';
+                b.style.backgroundPosition = 'center';
+                b.style.backgroundAttachment = 'fixed';
+            }
+        })();
+    </script>
 
     <div class="bio-container">
         <!-- PROFIL -->
-        <img src="<%= bioPage.profileImage %>" alt="Profile" class="profile-img">
+        <img src="<%= profileImg %>" alt="Profile" class="profile-img">
         
         <!-- TITLE MENGGUNAKAN RICH TEXT (DARI QUILL) -->
         <div class="bio-title"><%- bioPage.title %></div>
@@ -45,7 +127,11 @@
     </div>
 
     <script>
-        lucide.createIcons();
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
     </script>
     <script src="/js/protect-devtools.js" defer></script>
 </body>
