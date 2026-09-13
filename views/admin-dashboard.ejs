@@ -1,4 +1,9 @@
-<%- include('partials/header') %>
+<% 
+    let noIndex = true; 
+    let page = 'admin'; 
+    let pageTitle = 'Dashboard Administrator'; 
+%>
+<%- include('partials/header', { page: page, pageTitle: pageTitle, noIndex: noIndex }) %>
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -7,6 +12,11 @@
 <% 
     let safeMessages = (typeof contactMessages !== 'undefined' && Array.isArray(contactMessages)) ? contactMessages : [];
     let safeKaderQuotes = (typeof kaderQuotes !== 'undefined' && Array.isArray(kaderQuotes)) ? kaderQuotes : [];
+    let safePillars = (typeof homePillars !== 'undefined' && Array.isArray(homePillars)) ? homePillars : [];
+    let safePrograms = (typeof homePrograms !== 'undefined' && Array.isArray(homePrograms)) ? homePrograms : [];
+    let safeMilestones = (typeof homeMilestones !== 'undefined' && Array.isArray(homeMilestones)) ? homeMilestones : [];
+    let safeTimeline = (typeof homeTimeline !== 'undefined' && Array.isArray(homeTimeline)) ? homeTimeline : [];
+    let safeFaq = (typeof homeFaq !== 'undefined' && Array.isArray(homeFaq)) ? homeFaq : [];
 %>
 
 <!-- ==============================================================
@@ -43,7 +53,7 @@
 
         <!-- DAFTAR MENU SIDEBAR -->
         <div class="sidebar-menu-list">
-            <button type="button" class="sidebar-nav-item active" onclick="openAdmTab('adm-pesan', this)" title="Pesan Narahubung">
+            <button type="button" class="sidebar-nav-item active" data-tab-target="adm-pesan" onclick="openAdmTab('adm-pesan', this)" title="Pesan Narahubung">
                 <div class="sidebar-nav-icon-wrap">
                     <i data-lucide="inbox"></i>
                     <% if (safeMessages.length > 0) { %>
@@ -53,42 +63,47 @@
                 <span class="sidebar-text">Pesan Narahubung</span>
             </button>
 
-            <button type="button" class="sidebar-nav-item" onclick="openAdmTab('adm-kelola', this)" title="Kelola Data">
+            <button type="button" class="sidebar-nav-item" data-tab-target="adm-kelola" onclick="openAdmTab('adm-kelola', this)" title="Kelola Data">
                 <div class="sidebar-nav-icon-wrap"><i data-lucide="database"></i></div>
                 <span class="sidebar-text">Kelola Data</span>
             </button>
 
-            <button type="button" class="sidebar-nav-item" onclick="openAdmTab('adm-kaderquote', this)" title="Apa Kata Kader?">
+            <button type="button" class="sidebar-nav-item" data-tab-target="adm-kaderquote" onclick="openAdmTab('adm-kaderquote', this)" title="Apa Kata Kader?">
                 <div class="sidebar-nav-icon-wrap"><i data-lucide="quote"></i></div>
                 <span class="sidebar-text">Apa Kata Kader?</span>
             </button>
 
-            <button type="button" class="sidebar-nav-item" onclick="openAdmTab('adm-setelan', this)" title="Header, Footer, Tentang & Narahubung">
+            <button type="button" class="sidebar-nav-item" data-tab-target="adm-beranda-sections" onclick="openAdmTab('adm-beranda-sections', this)" title="Section Beranda (Pilar, Proker, Milestones, Timeline, FAQ)">
+                <div class="sidebar-nav-icon-wrap"><i data-lucide="layout-template"></i></div>
+                <span class="sidebar-text">Section Beranda</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" data-tab-target="adm-setelan" onclick="openAdmTab('adm-setelan', this)" title="Header, Footer, Tentang & Narahubung">
                 <div class="sidebar-nav-icon-wrap"><i data-lucide="settings"></i></div>
                 <span class="sidebar-text">Setelan Web & Kontak</span>
             </button>
 
-            <button type="button" class="sidebar-nav-item" onclick="openAdmTab('adm-sosmed', this)" title="Sosial Media">
+            <button type="button" class="sidebar-nav-item" data-tab-target="adm-sosmed" onclick="openAdmTab('adm-sosmed', this)" title="Sosial Media">
                 <div class="sidebar-nav-icon-wrap"><i data-lucide="share-2"></i></div>
                 <span class="sidebar-text">Sosial Media</span>
             </button>
 
-            <button type="button" class="sidebar-nav-item" onclick="openAdmTab('adm-bio', this)" title="Link in Bio">
+            <button type="button" class="sidebar-nav-item" data-tab-target="adm-bio" onclick="openAdmTab('adm-bio', this)" title="Link in Bio">
                 <div class="sidebar-nav-icon-wrap"><i data-lucide="smartphone"></i></div>
                 <span class="sidebar-text">Link in Bio</span>
             </button>
 
-            <button type="button" class="sidebar-nav-item" onclick="openAdmTab('adm-shortlink', this)" title="Shortlink Custom">
+            <button type="button" class="sidebar-nav-item" data-tab-target="adm-shortlink" onclick="openAdmTab('adm-shortlink', this)" title="Shortlink Custom">
                 <div class="sidebar-nav-icon-wrap"><i data-lucide="link"></i></div>
                 <span class="sidebar-text">Shortlink Custom</span>
             </button>
 
-            <button type="button" class="sidebar-nav-item" onclick="openAdmTab('adm-devteam', this)" title="Developer Team">
+            <button type="button" class="sidebar-nav-item" data-tab-target="adm-devteam" onclick="openAdmTab('adm-devteam', this)" title="Developer Team">
                 <div class="sidebar-nav-icon-wrap"><i data-lucide="code"></i></div>
                 <span class="sidebar-text">Developer Team</span>
             </button>
 
-            <button type="button" class="sidebar-nav-item" onclick="openAdmTab('adm-announce', this)" title="Announcement Pop-up">
+            <button type="button" class="sidebar-nav-item" data-tab-target="adm-announce" onclick="openAdmTab('adm-announce', this)" title="Announcement Pop-up">
                 <div class="sidebar-nav-icon-wrap"><i data-lucide="bell"></i></div>
                 <span class="sidebar-text">Announcement</span>
             </button>
@@ -104,6 +119,69 @@
             </a>
         </div>
     </aside>
+
+    <!-- ==============================================================
+         NAVIGASI KHUSUS MOBILE & TABLET (RINGKAS & ANTI-KEPANJANGAN)
+    ============================================================== -->
+    <div class="admin-mobile-nav-container">
+        <!-- 1. MOBILE ADMIN CONTROL BAR -->
+        <div class="admin-mobile-control-bar glass">
+            <div class="mobile-admin-info">
+                <div class="mobile-admin-avatar">
+                    <img src="<%= siteSettings.headerLogo %>" alt="Admin" onerror="this.src='/img/logo-hmikomkgumi.png'">
+                </div>
+                <div>
+                    <strong class="mobile-admin-title">Dashboard Admin</strong>
+                    <span class="mobile-tab-indicator" id="mobileActiveTabLabel">Pesan Masuk</span>
+                </div>
+            </div>
+            <div class="mobile-admin-actions">
+                <button type="button" class="mobile-btn-action" onclick="openModal('modalBerita')" title="Tambah Berita">
+                    <i data-lucide="plus"></i> <span>Berita</span>
+                </button>
+                <a href="/admin/logout" class="mobile-btn-logout" title="Logout">
+                    <i data-lucide="log-out"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 2. STICKY HORIZONTAL SWIPEABLE PILLS TAB BAR -->
+        <div class="admin-mobile-pills-bar">
+            <div class="admin-mobile-pills-scroll" id="adminMobilePillsScroll">
+                <button type="button" class="mobile-tab-pill active" data-tab-target="adm-pesan" onclick="openAdmTab('adm-pesan', this)">
+                    <i data-lucide="inbox"></i> Pesan
+                    <% if (safeMessages.length > 0) { %><span class="pill-badge"><%= safeMessages.length %></span><% } %>
+                </button>
+                <button type="button" class="mobile-tab-pill" data-tab-target="adm-kelola" onclick="openAdmTab('adm-kelola', this)">
+                    <i data-lucide="database"></i> Kelola Data
+                </button>
+                <button type="button" class="mobile-tab-pill" data-tab-target="adm-kaderquote" onclick="openAdmTab('adm-kaderquote', this)">
+                    <i data-lucide="quote"></i> Apa Kata Kader?
+                </button>
+                <button type="button" class="mobile-tab-pill" data-tab-target="adm-beranda-sections" onclick="openAdmTab('adm-beranda-sections', this)">
+                    <i data-lucide="layout-template"></i> Section Beranda
+                </button>
+                <button type="button" class="mobile-tab-pill" data-tab-target="adm-setelan" onclick="openAdmTab('adm-setelan', this)">
+                    <i data-lucide="settings"></i> Setelan Web
+                </button>
+                <button type="button" class="mobile-tab-pill" data-tab-target="adm-sosmed" onclick="openAdmTab('adm-sosmed', this)">
+                    <i data-lucide="share-2"></i> Sosmed
+                </button>
+                <button type="button" class="mobile-tab-pill" data-tab-target="adm-bio" onclick="openAdmTab('adm-bio', this)">
+                    <i data-lucide="smartphone"></i> Link Bio
+                </button>
+                <button type="button" class="mobile-tab-pill" data-tab-target="adm-shortlink" onclick="openAdmTab('adm-shortlink', this)">
+                    <i data-lucide="link"></i> Shortlink
+                </button>
+                <button type="button" class="mobile-tab-pill" data-tab-target="adm-devteam" onclick="openAdmTab('adm-devteam', this)">
+                    <i data-lucide="code"></i> Dev Team
+                </button>
+                <button type="button" class="mobile-tab-pill" data-tab-target="adm-announce" onclick="openAdmTab('adm-announce', this)">
+                    <i data-lucide="bell"></i> Pengumuman
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- KONTEN UTAMA DASHBOARD -->
     <main class="admin-main-wrap">
@@ -124,6 +202,7 @@
                     Daftar formulir pesan masuk yang dikirimkan langsung oleh pengunjung melalui halaman <strong>/narahubung</strong>. Anda dapat melihat dokumen pendukung, membaca pesan lengkap, membalas ke WhatsApp/Email pengirim, atau menghapus arsip.
                 </p>
 
+                <div class="table-scroll-hint"><i data-lucide="chevrons-left-right"></i> Geser tabel ke samping untuk melihat seluruh kolom & aksi</div>
                 <div class="table-wrapper">
                     <table class="admin-table">
                         <thead>
@@ -170,7 +249,7 @@
                                 </td>
                                 <td class="td-actions">
                                     <div id="raw-message-body-<%= msg.id %>" style="display:none;"><%- msg.message %></div>
-                                    <button type="button" class="action-btn" style="color:#0284c7;" onclick="openDetailPesanModal('<%= msg.id %>', '<%= msg.name.replace(/'/g, "\\'") %>', '<%= msg.subject.replace(/'/g, "\\'") %>', '<%= msg.contact %>', '<%= msg.method %>', '<%= msg.docUrl || '' %>')" title="Baca Isi Pesan">
+                                    <button type="button" class="action-btn" style="color:#0284c7;" onclick="openDetailPesanModal('<%= msg.id %>')" title="Baca Isi Pesan">
                                         <i data-lucide="eye"></i>
                                     </button>
                                     <form action="/admin/hapus-pesan/<%= msg.id %>" method="POST" class="form-inline">
@@ -233,7 +312,7 @@
                                             <div id="raw-content-<%= item.id %>" style="display: none;"><%- item.content %></div>
                                             <a href="/berita/<%= item.slug %>" target="_blank" class="action-btn" style="color:#38bdf8;" title="Lihat Berita Live"><i data-lucide="external-link"></i></a>
                                             <button type="button" class="action-btn" style="color:var(--theme-text);" onclick="openKelolaFotoBerita('<%= item.id %>')" title="Kelola Foto"><i data-lucide="image-plus"></i></button>
-                                            <button type="button" class="action-btn edit" onclick="openEditBeritaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.category %>', '<%= item.date %>', '<%= (item.slug || '').replace(/'/g, "\\'") %>')" title="Edit Berita"><i data-lucide="edit"></i></button>
+                                            <button type="button" class="action-btn edit" onclick="openEditBeritaModal('<%= item.id %>')" title="Edit Berita"><i data-lucide="edit"></i></button>
                                             <form action="/admin/hapus-berita/<%= item.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus berita?')"><i data-lucide="trash-2"></i></button></form>
                                         </td>
                                     </tr>
@@ -265,7 +344,7 @@
                                         <td class="fw-600"><%= person.name %></td>
                                         <td style="color:#16a34a; font-size:0.85rem;"><%= person.role %></td>
                                         <td class="td-actions">
-                                            <button type="button" class="action-btn edit" onclick="openEditDynamic('<%= person.id %>', '<%= person.name.replace(/'/g, "\\'") %>', '<%= person.role.replace(/'/g, "\\'") %>', '/admin/edit-pengurus/', '<%= person.ig ? person.ig.replace(/'/g, "\\'") : '' %>', '<%= person.fb ? person.fb.replace(/'/g, "\\'") : '' %>', '<%= person.twitter ? person.twitter.replace(/'/g, "\\'") : '' %>', '<%= person.linkedin ? person.linkedin.replace(/'/g, "\\'") : '' %>', '<%= person.tiktok ? person.tiktok.replace(/'/g, "\\'") : '' %>')"><i data-lucide="edit"></i></button>
+                                            <button type="button" class="action-btn edit" onclick="openEditDynamic('<%= person.id %>', '', '', '/admin/edit-pengurus/')"><i data-lucide="edit"></i></button>
                                             <form action="/admin/hapus-pengurus/<%= person.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Yakin?')"><i data-lucide="trash-2"></i></button></form>
                                         </td>
                                     </tr>
@@ -281,10 +360,10 @@
                                         <div class="bidang-header">
                                             <div style="display:flex; align-items:center; gap:10px;">
                                                 <h5 class="bidang-title"><%= b.name %></h5>
-                                                <button class="action-btn edit" style="padding:4px; border:none; background:none;" onclick="openEditBidangModal('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>', '/admin/edit-bidang/')"><i data-lucide="edit"></i></button>
+                                                <button class="action-btn edit" style="padding:4px; border:none; background:none;" onclick="openEditBidangModal('<%= b.id %>', '', '/admin/edit-bidang/')"><i data-lucide="edit"></i></button>
                                             </div>
                                             <div>
-                                                <button type="button" class="btn btn-primary" style="padding:4px 10px; font-size:0.75rem;" onclick="openModalAnggotaBidang('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>', '/admin/tambah-anggota-bidang/')">+ Anggota</button>
+                                                <button type="button" class="btn btn-primary" style="padding:4px 10px; font-size:0.75rem;" onclick="openModalAnggotaBidang('<%= b.id %>', '', '/admin/tambah-anggota-bidang/')">+ Anggota</button>
                                                 <form action="/admin/hapus-bidang/<%= b.id %>" method="POST" class="form-inline" style="margin-left:5px;"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus seluruh bidang?')"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></form>
                                             </div>
                                         </div>
@@ -294,7 +373,7 @@
                                                     <img src="<%= m.image %>" onerror="this.src='/img/logo-hmikomkgumi.png'" class="member-avatar">
                                                     <p class="member-name"><%= m.name %></p>
                                                     <p style="font-size:0.75rem; color:#16a34a; margin-top:3px; font-weight:bold;"><%= m.role || '' %></p>
-                                                    <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '<%= (m.role || '').replace(/'/g, "\\'") %>', '/admin/edit-anggota-bidang/', '<%= m.ig ? m.ig.replace(/'/g, "\\'") : '' %>', '<%= m.fb ? m.fb.replace(/'/g, "\\'") : '' %>', '<%= m.twitter ? m.twitter.replace(/'/g, "\\'") : '' %>', '<%= m.linkedin ? m.linkedin.replace(/'/g, "\\'") : '' %>', '<%= m.tiktok ? m.tiktok.replace(/'/g, "\\'") : '' %>')"><i data-lucide="edit" style="width:12px;"></i></button>
+                                                    <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '', '', '/admin/edit-anggota-bidang/')"><i data-lucide="edit" style="width:12px;"></i></button>
                                                     <form action="/admin/hapus-anggota-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota?')"><i data-lucide="x"></i></button></form>
                                                 </div>
                                             <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
@@ -324,7 +403,7 @@
                                         <td class="fw-600"><%= person.name %></td>
                                         <td style="color:#f472b6; font-size:0.85rem;"><%= person.role %></td>
                                         <td class="td-actions">
-                                            <button type="button" class="action-btn edit" onclick="openEditDynamic('<%= person.id %>', '<%= person.name.replace(/'/g, "\\'") %>', '<%= person.role.replace(/'/g, "\\'") %>', '/admin/edit-kohati-pengurus/', '<%= person.ig ? person.ig.replace(/'/g, "\\'") : '' %>', '<%= person.fb ? person.fb.replace(/'/g, "\\'") : '' %>', '<%= person.twitter ? person.twitter.replace(/'/g, "\\'") : '' %>', '<%= person.linkedin ? person.linkedin.replace(/'/g, "\\'") : '' %>', '<%= person.tiktok ? person.tiktok.replace(/'/g, "\\'") : '' %>')"><i data-lucide="edit"></i></button>
+                                            <button type="button" class="action-btn edit" onclick="openEditDynamic('<%= person.id %>', '', '', '/admin/edit-kohati-pengurus/')"><i data-lucide="edit"></i></button>
                                             <form action="/admin/hapus-kohati-pengurus/<%= person.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus pengurus kohati?')"><i data-lucide="trash-2"></i></button></form>
                                         </td>
                                     </tr>
@@ -340,10 +419,10 @@
                                         <div class="bidang-header">
                                             <div style="display:flex; align-items:center; gap:10px;">
                                                 <h5 class="bidang-title" style="color:#f472b6;"><%= b.name %></h5>
-                                                <button class="action-btn edit" style="padding:4px; border:none; background:none;" onclick="openEditBidangModal('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>', '/admin/edit-kohati-bidang/')"><i data-lucide="edit"></i></button>
+                                                <button class="action-btn edit" style="padding:4px; border:none; background:none;" onclick="openEditBidangModal('<%= b.id %>', '', '/admin/edit-kohati-bidang/')"><i data-lucide="edit"></i></button>
                                             </div>
                                             <div>
-                                                <button type="button" class="btn" style="background:#f472b6; color:#fff; padding:4px 10px; font-size:0.75rem;" onclick="openModalAnggotaBidang('<%= b.id %>', '<%= b.name.replace(/'/g, "\\'") %>', '/admin/tambah-anggota-kohati-bidang/')">+ Anggota</button>
+                                                <button type="button" class="btn" style="background:#f472b6; color:#fff; padding:4px 10px; font-size:0.75rem;" onclick="openModalAnggotaBidang('<%= b.id %>', '', '/admin/tambah-anggota-kohati-bidang/')">+ Anggota</button>
                                                 <form action="/admin/hapus-kohati-bidang/<%= b.id %>" method="POST" class="form-inline" style="margin-left:5px;"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus seluruh bidang?')"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button></form>
                                             </div>
                                         </div>
@@ -353,7 +432,7 @@
                                                     <img src="<%= m.image %>" onerror="this.src='/img/logo-hmikomkgumi.png'" class="member-avatar" style="border-color:rgba(244,114,182,0.5);">
                                                     <p class="member-name"><%= m.name %></p>
                                                     <p style="font-size:0.75rem; color:#f472b6; margin-top:3px; font-weight:bold;"><%= m.role || '' %></p>
-                                                    <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '<%= m.name.replace(/'/g, "\\'") %>', '<%= (m.role || '').replace(/'/g, "\\'") %>', '/admin/edit-anggota-kohati-bidang/', '<%= m.ig ? m.ig.replace(/'/g, "\\'") : '' %>', '<%= m.fb ? m.fb.replace(/'/g, "\\'") : '' %>', '<%= m.twitter ? m.twitter.replace(/'/g, "\\'") : '' %>', '<%= m.linkedin ? m.linkedin.replace(/'/g, "\\'") : '' %>', '<%= m.tiktok ? m.tiktok.replace(/'/g, "\\'") : '' %>')"><i data-lucide="edit" style="width:12px;"></i></button>
+                                                    <button type="button" class="action-btn edit" style="position:absolute; top:5px; left:5px; padding:2px; background:rgba(96,165,250,0.2); border:none;" onclick="openEditAnggotaBidangModal('<%= b.id %>', '<%= m.id %>', '', '', '/admin/edit-anggota-kohati-bidang/')"><i data-lucide="edit" style="width:12px;"></i></button>
                                                     <form action="/admin/hapus-anggota-kohati-bidang/<%= b.id %>/<%= m.id %>" method="POST" class="member-delete-btn"><button type="submit" style="background:transparent; border:none; color:inherit; cursor:pointer;" onclick="return confirm('Hapus anggota kohati?')"><i data-lucide="x"></i></button></form>
                                                 </div>
                                             <% }) } else { %><p class="empty-member">Belum ada anggota.</p><% } %>
@@ -376,7 +455,7 @@
                                 <span class="list-item-title"><strong><%= album.title %></strong><br><small style="color:#16a34a;"><%= album.date %></small></span>
                                 <div style="display:flex; gap:5px;">
                                     <button type="button" class="action-btn" style="color:var(--theme-text);" onclick="openKelolaFotoAlbum('<%= album.id %>')" title="Kelola Foto Album"><i data-lucide="image-plus"></i></button>
-                                    <button type="button" class="action-btn edit" onclick="openEditAlbumModal('<%= album.id %>', '<%= album.title.replace(/'/g, "\\'") %>', '<%= album.date %>')" title="Edit Album"><i data-lucide="edit"></i></button>
+                                    <button type="button" class="action-btn edit" onclick="openEditAlbumModal('<%= album.id %>')" title="Edit Album"><i data-lucide="edit"></i></button>
                                     <form action="/admin/hapus-album/<%= album.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus album?')"><i data-lucide="trash-2"></i></button></form>
                                 </div>
                             </div>
@@ -403,7 +482,7 @@
 
                         <div class="album-list">
                             <% safeDataAnggota.forEach((item, index) => { %>
-                            <div class="list-item-album" style="<%= index === 0 ? 'border-left: 4px solid #16a34a;' : '' %>">
+                            <div class="list-item-album" <% if (index === 0) { %>style="border-left: 4px solid #16a34a;"<% } %>>
                                 <span class="list-item-title">
                                     <strong><%= item.title %></strong>
                                     <% if(index === 0) { %><span class="badge" style="font-size:0.6rem; padding:2px 6px; margin-left:5px;">Aktif di Web</span><% } %>
@@ -411,7 +490,7 @@
                                 </span>
                                 <div style="display:flex; gap:5px;">
                                     <button type="button" class="action-btn" style="color:var(--theme-text);" onclick="window.open('<%= item.file %>', '_blank')" title="Lihat PDF"><i data-lucide="eye"></i></button>
-                                    <button type="button" class="action-btn edit" onclick="openEditDataAnggotaModal('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>', '<%= item.date %>')" title="Edit Data"><i data-lucide="edit"></i></button>
+                                    <button type="button" class="action-btn edit" onclick="openEditDataAnggotaModal('<%= item.id %>')" title="Edit Data"><i data-lucide="edit"></i></button>
                                     <form action="/admin/hapus-data-anggota/<%= item.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus PDF ini?')" title="Hapus Data"><i data-lucide="trash-2"></i></button></form>
                                 </div>
                             </div>
@@ -447,6 +526,7 @@
                     Kutipan dan foto kader ini ditampilkan di Beranda sebelum section Berita & Informasi dengan kartu melayang (floating card) bergaya modern persis Gambar 4.
                 </p>
 
+                <div class="table-scroll-hint"><i data-lucide="chevrons-left-right"></i> Geser tabel ke samping untuk melihat seluruh kolom & aksi</div>
                 <div class="table-wrapper">
                     <table class="admin-table">
                         <thead>
@@ -469,7 +549,7 @@
                                     <small style="color:#10b981; font-weight:700;"><%= q.role %></small>
                                 </td>
                                 <td>
-                                    <p style="font-size:0.82rem; color:var(--theme-muted); max-width:320px; line-height:1.5; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                                    <p style="font-size:0.82rem; color:var(--theme-muted); max-width:320px; line-height:1.5; margin:0; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
                                         “<%= q.quote %>”
                                     </p>
                                 </td>
@@ -483,7 +563,7 @@
                                     <% } %>
                                 </td>
                                 <td class="td-actions">
-                                    <button type="button" class="action-btn edit" onclick="openEditKaderQuoteModal('<%= q.id %>', '<%= q.name.replace(/'/g, "\\'") %>', '<%= q.role.replace(/'/g, "\\'") %>', '<%= q.quote.replace(/'/g, "\\'").replace(/\n/g, ' ') %>', '<%= (q.ig || '').replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
+                                    <button type="button" class="action-btn edit" onclick="openEditKaderQuoteModal('<%= q.id %>')"><i data-lucide="edit"></i></button>
                                     <form action="/admin/hapus-kader-quote/<%= q.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus kutipan kader ini?')"><i data-lucide="trash-2"></i></button></form>
                                 </td>
                             </tr>
@@ -495,6 +575,269 @@
                     </table>
                 </div>
             </div>
+        </div>
+
+        <!-- ==============================================================
+             TAB: KELOLA 5 SECTION MODERN BERANDA (INDEX.EJS)
+        ============================================================== -->
+        <div id="adm-beranda-sections" class="admin-tab-pane" style="display: none;">
+            
+            <!-- SUB SECTION 1: PROGRAM KERJA UNGGULAN -->
+            <div class="glass admin-panel" style="margin-bottom:30px; border-top: 4px solid #38bdf8;">
+                <div class="panel-header">
+                    <h3 class="panel-title" style="color:#38bdf8;"><i data-lucide="layers" style="color:#38bdf8;"></i> Program Kerja Unggulan (Bento Grid)</h3>
+                    <div class="panel-actions">
+                        <button type="button" class="btn btn-primary" onclick="openModal('modalTambahHomeProgram')" style="padding:8px 16px; font-size:0.85rem; background:#0284c7; border-color:#38bdf8;">+ Tambah Program Kerja</button>
+                    </div>
+                </div>
+                <p class="text-muted" style="font-size:0.85rem; margin-bottom: 20px;">
+                    Daftar agenda strategis dan program kerja unggulan komisariat yang ditampilkan pada Beranda dengan gaya Bento Grid modern.
+                </p>
+                <div class="table-scroll-hint"><i data-lucide="chevrons-left-right"></i> Geser tabel ke samping untuk melihat seluruh kolom & aksi</div>
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Cover</th>
+                                <th>Nama Program & Kategori</th>
+                                <th>Status</th>
+                                <th>Jadwal / Waktu</th>
+                                <th>Deskripsi</th>
+                                <th style="text-align:right;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% safePrograms.forEach(p => { %>
+                            <tr>
+                                <td>
+                                    <img src="<%= p.image || 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80' %>" onerror="this.src='/img/logo-hmikomkgumi.png'" style="width:56px; height:42px; border-radius:8px; object-fit:cover; border:1px solid #38bdf8;">
+                                </td>
+                                <td>
+                                    <strong style="color:var(--theme-heading);"><%= p.title %></strong><br>
+                                    <small style="color:#38bdf8; font-weight:700;"><%= p.category %></small>
+                                </td>
+                                <td>
+                                    <span class="cat-badge" style="font-size:0.75rem; background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.3);">
+                                        <%= p.status %>
+                                    </span>
+                                </td>
+                                <td><small style="color:var(--theme-text);"><%= p.date %></small></td>
+                                <td>
+                                    <p style="font-size:0.82rem; color:var(--theme-muted); max-width:260px; line-height:1.4; margin:0; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                                        <%= p.description %>
+                                    </p>
+                                </td>
+                                <td class="td-actions">
+                                    <button type="button" class="action-btn edit" onclick="openEditHomeProgramModal('<%= p.id %>')"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-home-program/<%= p.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus program kerja ini?')"><i data-lucide="trash-2"></i></button></form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                            <% if (safePrograms.length === 0) { %>
+                                <tr><td colspan="6" style="text-align:center; padding:25px; opacity:0.6;">Belum ada data program kerja.</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SUB SECTION 2: PILAR NILAI INSAN CITA -->
+            <div class="glass admin-panel" style="margin-bottom:30px; border-top: 4px solid #10b981;">
+                <div class="panel-header">
+                    <h3 class="panel-title" style="color:#10b981;"><i data-lucide="compass" style="color:#10b981;"></i> Pilar Insan Cita & Nilai Perjuangan</h3>
+                    <div class="panel-actions">
+                        <button type="button" class="btn btn-primary" onclick="openModal('modalTambahHomePillar')" style="padding:8px 16px; font-size:0.85rem;">+ Tambah Pilar Nilai</button>
+                    </div>
+                </div>
+                <p class="text-muted" style="font-size:0.85rem; margin-bottom: 20px;">
+                    Nilai-nilai dasar perjuangan dan pilar karakter mahasiswa kedokteran gigi muslim yang ditampilkan dengan kartu kaca holografik.
+                </p>
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Ikon</th>
+                                <th>Nama Pilar & Subtitle</th>
+                                <th>Deskripsi Nilai</th>
+                                <th>Urutan</th>
+                                <th style="text-align:right;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% safePillars.forEach(pi => { %>
+                            <tr>
+                                <td>
+                                    <div style="width:36px; height:36px; border-radius:10px; background:rgba(16,185,129,0.15); display:flex; align-items:center; justify-content:center; color:#10b981;">
+                                        <i data-lucide="<%= pi.icon || 'star' %>" style="width:18px; height:18px;"></i>
+                                    </div>
+                                </td>
+                                <td>
+                                    <strong style="color:var(--theme-heading);"><%= pi.title %></strong><br>
+                                    <small style="color:#10b981; font-weight:700;"><%= pi.subtitle %></small>
+                                </td>
+                                <td>
+                                    <p style="font-size:0.82rem; color:var(--theme-muted); max-width:320px; line-height:1.4; margin:0; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                                        <%= pi.description %>
+                                    </p>
+                                </td>
+                                <td><span class="badge"><%= pi.order || '-' %></span></td>
+                                <td class="td-actions">
+                                    <button type="button" class="action-btn edit" onclick="openEditHomePillarModal('<%= pi.id %>')"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-home-pillar/<%= pi.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus pilar nilai ini?')"><i data-lucide="trash-2"></i></button></form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                            <% if (safePillars.length === 0) { %>
+                                <tr><td colspan="5" style="text-align:center; padding:25px; opacity:0.6;">Belum ada pilar nilai.</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SUB SECTION 3: STATISTIK PRESTASI & MILESTONES -->
+            <div class="glass admin-panel" style="margin-bottom:30px; border-top: 4px solid #f59e0b;">
+                <div class="panel-header">
+                    <h3 class="panel-title" style="color:#f59e0b;"><i data-lucide="award" style="color:#f59e0b;"></i> Statistik Prestasi & Dampak Organisasi</h3>
+                    <div class="panel-actions">
+                        <button type="button" class="btn btn-primary" onclick="openModal('modalTambahHomeMilestone')" style="padding:8px 16px; font-size:0.85rem; background:#d97706; border-color:#f59e0b;">+ Tambah Milestone</button>
+                    </div>
+                </div>
+                <p class="text-muted" style="font-size:0.85rem; margin-bottom: 20px;">
+                    Angka capaian nyata, rekam jejak kaderisasi, dan dampak pengabdian yang memukau calon kader dan mitra.
+                </p>
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Ikon</th>
+                                <th>Angka / Metrik</th>
+                                <th>Label Capaian</th>
+                                <th>Keterangan / Konteks</th>
+                                <th style="text-align:right;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% safeMilestones.forEach(m => { %>
+                            <tr>
+                                <td>
+                                    <div style="width:36px; height:36px; border-radius:10px; background:rgba(245,158,11,0.15); display:flex; align-items:center; justify-content:center; color:#f59e0b;">
+                                        <i data-lucide="<%= m.icon || 'award' %>" style="width:18px; height:18px;"></i>
+                                    </div>
+                                </td>
+                                <td><strong style="color:#f59e0b; font-size:1.15rem;"><%= m.number %></strong></td>
+                                <td><strong style="color:var(--theme-heading);"><%= m.label %></strong></td>
+                                <td><small style="color:var(--theme-muted);"><%= m.context %></small></td>
+                                <td class="td-actions">
+                                    <button type="button" class="action-btn edit" onclick="openEditHomeMilestoneModal('<%= m.id %>')"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-home-milestone/<%= m.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus milestone ini?')"><i data-lucide="trash-2"></i></button></form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                            <% if (safeMilestones.length === 0) { %>
+                                <tr><td colspan="5" style="text-align:center; padding:25px; opacity:0.6;">Belum ada data milestone.</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SUB SECTION 4: TIMELINE PERJALANAN GERAKAN -->
+            <div class="glass admin-panel" style="margin-bottom:30px; border-top: 4px solid #8b5cf6;">
+                <div class="panel-header">
+                    <h3 class="panel-title" style="color:#8b5cf6;"><i data-lucide="milestone" style="color:#8b5cf6;"></i> Jejak Langkah & Timeline Gerakan</h3>
+                    <div class="panel-actions">
+                        <button type="button" class="btn btn-primary" onclick="openModal('modalTambahHomeTimeline')" style="padding:8px 16px; font-size:0.85rem; background:#7c3aed; border-color:#8b5cf6;">+ Tambah Timeline</button>
+                    </div>
+                </div>
+                <p class="text-muted" style="font-size:0.85rem; margin-bottom: 20px;">
+                    Tonggak sejarah dan fase tahapan kepengurusan yang disajikan dalam garis waktu visual bercahaya (*glowing timeline*).
+                </p>
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Periode</th>
+                                <th>Judul Tahapan</th>
+                                <th>Deskripsi Catatan</th>
+                                <th>Status</th>
+                                <th style="text-align:right;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% safeTimeline.forEach(t => { %>
+                            <tr>
+                                <td><span class="badge" style="background:rgba(139,92,246,0.15); color:#8b5cf6; border-color:rgba(139,92,246,0.3);"><%= t.period %></span></td>
+                                <td><strong style="color:var(--theme-heading);"><%= t.title %></strong></td>
+                                <td>
+                                    <p style="font-size:0.82rem; color:var(--theme-muted); max-width:320px; line-height:1.4; margin:0; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                                        <%= t.description %>
+                                    </p>
+                                </td>
+                                <td>
+                                    <small class="timeline-status-badge status-text-<%= t.status === 'Selesai' ? 'selesai' : (t.status === 'Berjalan' ? 'berjalan' : 'mendatang') %>">
+                                        <%= t.status %>
+                                    </small>
+                                </td>
+                                <td class="td-actions">
+                                    <button type="button" class="action-btn edit" onclick="openEditHomeTimelineModal('<%= t.id %>')"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-home-timeline/<%= t.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus timeline ini?')"><i data-lucide="trash-2"></i></button></form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                            <% if (safeTimeline.length === 0) { %>
+                                <tr><td colspan="5" style="text-align:center; padding:25px; opacity:0.6;">Belum ada catatan timeline.</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SUB SECTION 5: FAQ CALON KADER -->
+            <div class="glass admin-panel" style="margin-bottom:0; border-top: 4px solid #ec4899;">
+                <div class="panel-header">
+                    <h3 class="panel-title" style="color:#ec4899;"><i data-lucide="help-circle" style="color:#ec4899;"></i> F.A.Q & Pusat Bantuan Calon Kader</h3>
+                    <div class="panel-actions">
+                        <button type="button" class="btn btn-primary" onclick="openModal('modalTambahHomeFaq')" style="padding:8px 16px; font-size:0.85rem; background:#db2777; border-color:#ec4899;">+ Tambah FAQ</button>
+                    </div>
+                </div>
+                <p class="text-muted" style="font-size:0.85rem; margin-bottom: 20px;">
+                    Daftar pertanyaan yang paling sering diajukan oleh calon kader seputar pendaftaran LK-1, akademik kedokteran gigi, dan keorganisasian.
+                </p>
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Kategori</th>
+                                <th>Pertanyaan</th>
+                                <th>Jawaban</th>
+                                <th style="text-align:right;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% safeFaq.forEach(f => { %>
+                            <tr>
+                                <td><span class="badge" style="background:rgba(236,72,153,0.15); color:#ec4899; border-color:rgba(236,72,153,0.3);"><%= f.category %></span></td>
+                                <td><strong style="color:var(--theme-heading);"><%= f.question %></strong></td>
+                                <td>
+                                    <p style="font-size:0.82rem; color:var(--theme-muted); max-width:340px; line-height:1.4; margin:0; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                                        <%= f.answer %>
+                                    </p>
+                                </td>
+                                <td class="td-actions">
+                                    <button type="button" class="action-btn edit" onclick="openEditHomeFaqModal('<%= f.id %>')"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-home-faq/<%= f.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus FAQ ini?')"><i data-lucide="trash-2"></i></button></form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                            <% if (safeFaq.length === 0) { %>
+                                <tr><td colspan="4" style="text-align:center; padding:25px; opacity:0.6;">Belum ada item FAQ.</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
 
         <!-- TAB 2: SETELAN HEADER, FOOTER, TENTANG & NARAHUBUNG -->
@@ -690,7 +1033,7 @@
                                 <td class="fw-600"><%= soc.name %></td>
                                 <td style="font-size:0.85rem;"><a href="<%= soc.url %>" target="_blank" style="color:#0284c7; text-decoration:underline;"><%= soc.url %></a></td>
                                 <td class="td-actions">
-                                    <button type="button" class="action-btn edit" onclick="openEditSosmedModal('<%= soc.id %>', '<%= soc.name.replace(/'/g, "\\'") %>', '<%= soc.url.replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
+                                    <button type="button" class="action-btn edit" onclick="openEditSosmedModal('<%= soc.id %>')"><i data-lucide="edit"></i></button>
                                     <form action="/admin/hapus-sosmed/<%= soc.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus tautan sosial media ini?')"><i data-lucide="trash-2"></i></button></form>
                                 </td>
                             </tr>
@@ -724,7 +1067,7 @@
                                         <td class="td-actions">
                                             <div id="raw-bio-title-<%= p.id %>" style="display:none;"><%- p.title %></div>
                                             <button type="button" class="action-btn" style="color:var(--theme-text);" onclick="window.open('/<%= p.path %>', '_blank')"><i data-lucide="eye"></i></button>
-                                            <button type="button" class="action-btn edit" onclick="openEditBioPageModal('<%= p.id %>', '<%= p.path %>', '<%= p.bio.replace(/'/g, "\\'") %>', '<%= p.bgType %>', '<%= p.bgValue.replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
+                                            <button type="button" class="action-btn edit" onclick="openEditBioPageModal('<%= p.id %>')"><i data-lucide="edit"></i></button>
                                             <form action="/admin/hapus-bio-page/<%= p.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus halaman bio?')"><i data-lucide="trash-2"></i></button></form>
                                         </td>
                                     </tr>
@@ -754,7 +1097,7 @@
                                             <td class="fw-600"><%- l.title.replace(/<[^>]+>/g, '') %></td>
                                             <td class="td-actions">
                                                 <div id="raw-link-title-<%= l.id %>" style="display:none;"><%- l.title %></div>
-                                                <button type="button" class="action-btn edit" onclick="openEditBioLinkModal('<%= l.id %>', '<%= l.bioPageId %>', '<%= l.url.replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
+                                                <button type="button" class="action-btn edit" onclick="openEditBioLinkModal('<%= l.id %>')"><i data-lucide="edit"></i></button>
                                                 <form action="/admin/hapus-biolink/<%= l.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus tombol link ini?')"><i data-lucide="trash-2"></i></button></form>
                                             </td>
                                         </tr>
@@ -795,7 +1138,7 @@
                                 <td class="fw-600"><%= l.title %></td><td style="color:#16a34a;">/<%= l.path %></td>
                                 <td style="font-size:0.8rem;"><a href="<%= l.originalUrl %>" target="_blank" style="color:#0284c7;"><%= l.originalUrl %></a></td>
                                 <td class="td-actions">
-                                    <button type="button" class="action-btn edit" onclick="openEditShortlinkModal('<%= l.id %>', '<%= l.title.replace(/'/g, "\\'") %>', '<%= l.path.replace(/'/g, "\\'") %>', '<%= l.originalUrl.replace(/'/g, "\\'") %>')"><i data-lucide="edit"></i></button>
+                                    <button type="button" class="action-btn edit" onclick="openEditShortlinkModal('<%= l.id %>')"><i data-lucide="edit"></i></button>
                                     <form action="/admin/hapus-shortlink/<%= l.id %>" method="POST" class="form-inline"><button type="submit" class="action-btn delete" onclick="return confirm('Hapus shortlink ini?')"><i data-lucide="trash-2"></i></button></form>
                                 </td>
                             </tr>
@@ -837,8 +1180,8 @@
                                 <td><span class="cat-badge" style="background:rgba(59,130,246,0.1); color:#0284c7; border:1px solid rgba(59,130,246,0.3);"><%= dev.category %></span></td>
                                 <td class="td-actions">
                                     <% const isProtected = (dev.id == 1 || dev.name.includes('Aksa Arsyad')) ? 'true' : 'false'; %>
-                                    <button type="button" class="action-btn edit" onclick="openEditDevTeamModal('<%= dev.id %>', '<%= dev.name.replace(/'/g, "\\'") %>', '<%= dev.role.replace(/'/g, "\\'") %>', '<%= (dev.dept || '').replace(/'/g, "\\'") %>', '<%= dev.category %>', '<%= (dev.ig || '').replace(/'/g, "\\'") %>', <%= isProtected %>)"><i data-lucide="edit"></i></button>
-                                    <form action="/admin/hapus-devteam/<%= dev.id %>" method="POST" class="form-inline" onsubmit="return handleProtectedDelete(event, <%= isProtected %>)"><button type="submit" class="action-btn delete"><i data-lucide="trash-2"></i></button></form>
+                                    <button type="button" class="action-btn edit" onclick="openEditDevTeamModal('<%= dev.id %>')"><i data-lucide="edit"></i></button>
+                                    <form action="/admin/hapus-devteam/<%= dev.id %>" method="POST" class="form-inline" data-protected="<%= isProtected %>" onsubmit="return handleProtectedDelete(event, this.dataset.protected === 'true')"><button type="submit" class="action-btn delete"><i data-lucide="trash-2"></i></button></form>
                                 </td>
                             </tr>
                             <% }) %>
@@ -1066,6 +1409,375 @@
             <div class="modal-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditKaderQuote')">Batal</button>
                 <button type="submit" class="btn btn-primary submit-btn">Update Kutipan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==============================================================
+     MODAL-MODAL SECTION BERANDA (5 SECTION MODERN)
+============================================================== -->
+
+<!-- 1. MODAL PROGRAM KERJA UNGGULAN -->
+<div class="modal-overlay" id="modalTambahHomeProgram">
+    <div class="modal-content" style="max-width:600px; border-color:#38bdf8;">
+        <div class="modal-header">
+            <h3 style="color:#38bdf8;">Tambah Program Kerja Unggulan</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalTambahHomeProgram')"><i data-lucide="x"></i></button>
+        </div>
+        <form action="/admin/tambah-home-program" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Nama / Judul Program <span style="color:#ef4444;">*</span></label>
+                <input type="text" name="title" class="input-control" placeholder="Contoh: Basic Training LK-1" required>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Kategori / Bidang <span style="color:#ef4444;">*</span></label>
+                    <input type="text" name="category" class="input-control" placeholder="Contoh: Kaderisasi Utama" required>
+                </div>
+                <div class="form-group">
+                    <label>Status Badge <span style="color:#ef4444;">*</span></label>
+                    <select name="status" class="input-control">
+                        <option value="Terlaksana">Terlaksana</option>
+                        <option value="Sedang Berjalan" selected>Sedang Berjalan</option>
+                        <option value="Akan Datang">Akan Datang</option>
+                        <option value="Program Unggulan">Program Unggulan</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Jadwal / Waktu Pelaksanaan</label>
+                <input type="text" name="date" class="input-control" placeholder="Contoh: Periode Kepengurusan / Agenda Bulanan">
+            </div>
+            <div class="form-group">
+                <label>Foto Cover Program <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="image" class="input-control file-compress" accept="image/*">
+            </div>
+            <div class="form-group">
+                <label>Deskripsi Singkat Program <span style="color:#ef4444;">*</span></label>
+                <textarea name="description" class="input-control" rows="3" placeholder="Jelaskan tujuan dan gambaran kegiatan..." required></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalTambahHomeProgram')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Simpan Program</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEditHomeProgram">
+    <div class="modal-content" style="max-width:600px; border-color:#38bdf8;">
+        <div class="modal-header">
+            <h3 style="color:#38bdf8;">Edit Program Kerja Unggulan</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalEditHomeProgram')"><i data-lucide="x"></i></button>
+        </div>
+        <form id="formEditHomeProgram" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Nama / Judul Program</label>
+                <input type="text" name="title" id="editProgramTitle" class="input-control" required>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Kategori / Bidang</label>
+                    <input type="text" name="category" id="editProgramCategory" class="input-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Status Badge</label>
+                    <select name="status" id="editProgramStatus" class="input-control">
+                        <option value="Terlaksana">Terlaksana</option>
+                        <option value="Sedang Berjalan">Sedang Berjalan</option>
+                        <option value="Akan Datang">Akan Datang</option>
+                        <option value="Program Unggulan">Program Unggulan</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Jadwal / Waktu Pelaksanaan</label>
+                <input type="text" name="date" id="editProgramDate" class="input-control">
+            </div>
+            <div class="form-group">
+                <label>Ganti Foto Cover (Opsional) <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">(Batas Upload Image Maks. 5 MB)</span></label>
+                <input type="file" name="image" class="input-control file-compress" accept="image/*">
+            </div>
+            <div class="form-group">
+                <label>Deskripsi Singkat Program</label>
+                <textarea name="description" id="editProgramDesc" class="input-control" rows="3" required></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditHomeProgram')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Update Program</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 2. MODAL PILAR NILAI INSAN CITA -->
+<div class="modal-overlay" id="modalTambahHomePillar">
+    <div class="modal-content" style="max-width:560px; border-color:#10b981;">
+        <div class="modal-header">
+            <h3 style="color:#10b981;">Tambah Pilar Nilai Insan Cita</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalTambahHomePillar')"><i data-lucide="x"></i></button>
+        </div>
+        <form action="/admin/tambah-home-pillar" method="POST">
+            <div class="form-group">
+                <label>Nama Pilar <span style="color:#ef4444;">*</span></label>
+                <input type="text" name="title" class="input-control" placeholder="Contoh: Insan Akademis" required>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Subjudul / Tagline <span style="color:#ef4444;">*</span></label>
+                    <input type="text" name="subtitle" class="input-control" placeholder="Contoh: Keilmuan & Riset" required>
+                </div>
+                <div class="form-group">
+                    <label>Ikon Lucide</label>
+                    <input type="text" name="icon" class="input-control" placeholder="Contoh: graduation-cap, lightbulb, heart-handshake, star" value="star">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Nomor Urutan Tampil</label>
+                <input type="number" name="order" class="input-control" placeholder="1" value="1">
+            </div>
+            <div class="form-group">
+                <label>Deskripsi Nilai <span style="color:#ef4444;">*</span></label>
+                <textarea name="description" class="input-control" rows="3" placeholder="Uraikan esensi nilai pilar ini..." required></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalTambahHomePillar')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Simpan Pilar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEditHomePillar">
+    <div class="modal-content" style="max-width:560px; border-color:#10b981;">
+        <div class="modal-header">
+            <h3 style="color:#10b981;">Edit Pilar Nilai Insan Cita</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalEditHomePillar')"><i data-lucide="x"></i></button>
+        </div>
+        <form id="formEditHomePillar" method="POST">
+            <div class="form-group">
+                <label>Nama Pilar</label>
+                <input type="text" name="title" id="editPillarTitle" class="input-control" required>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Subjudul / Tagline</label>
+                    <input type="text" name="subtitle" id="editPillarSubtitle" class="input-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Ikon Lucide</label>
+                    <input type="text" name="icon" id="editPillarIcon" class="input-control" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Nomor Urutan Tampil</label>
+                <input type="number" name="order" id="editPillarOrder" class="input-control">
+            </div>
+            <div class="form-group">
+                <label>Deskripsi Nilai</label>
+                <textarea name="description" id="editPillarDesc" class="input-control" rows="3" required></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditHomePillar')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Update Pilar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 3. MODAL STATISTIK PRESTASI & MILESTONES -->
+<div class="modal-overlay" id="modalTambahHomeMilestone">
+    <div class="modal-content" style="max-width:560px; border-color:#f59e0b;">
+        <div class="modal-header">
+            <h3 style="color:#f59e0b;">Tambah Milestone Prestasi</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalTambahHomeMilestone')"><i data-lucide="x"></i></button>
+        </div>
+        <form action="/admin/tambah-home-milestone" method="POST">
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Angka / Metrik <span style="color:#ef4444;">*</span></label>
+                    <input type="text" name="number" class="input-control" placeholder="Contoh: 450+ / 100%" required>
+                </div>
+                <div class="form-group">
+                    <label>Ikon Lucide</label>
+                    <input type="text" name="icon" class="input-control" placeholder="Contoh: users, map-pin, award, book-open" value="award">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Label Capaian <span style="color:#ef4444;">*</span></label>
+                <input type="text" name="label" class="input-control" placeholder="Contoh: Kader Terbina" required>
+            </div>
+            <div class="form-group">
+                <label>Keterangan / Konteks Capaian</label>
+                <input type="text" name="context" class="input-control" placeholder="Contoh: Alumni & Kader Aktif FKG UMI">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalTambahHomeMilestone')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Simpan Milestone</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEditHomeMilestone">
+    <div class="modal-content" style="max-width:560px; border-color:#f59e0b;">
+        <div class="modal-header">
+            <h3 style="color:#f59e0b;">Edit Milestone Prestasi</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalEditHomeMilestone')"><i data-lucide="x"></i></button>
+        </div>
+        <form id="formEditHomeMilestone" method="POST">
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Angka / Metrik</label>
+                    <input type="text" name="number" id="editMilestoneNumber" class="input-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Ikon Lucide</label>
+                    <input type="text" name="icon" id="editMilestoneIcon" class="input-control" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Label Capaian</label>
+                <input type="text" name="label" id="editMilestoneLabel" class="input-control" required>
+            </div>
+            <div class="form-group">
+                <label>Keterangan / Konteks Capaian</label>
+                <input type="text" name="context" id="editMilestoneContext" class="input-control">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditHomeMilestone')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Update Milestone</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 4. MODAL TIMELINE PERJALANAN GERAKAN -->
+<div class="modal-overlay" id="modalTambahHomeTimeline">
+    <div class="modal-content" style="max-width:560px; border-color:#8b5cf6;">
+        <div class="modal-header">
+            <h3 style="color:#8b5cf6;">Tambah Tahapan Timeline</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalTambahHomeTimeline')"><i data-lucide="x"></i></button>
+        </div>
+        <form action="/admin/tambah-home-timeline" method="POST">
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Periode / Waktu <span style="color:#ef4444;">*</span></label>
+                    <input type="text" name="period" class="input-control" placeholder="Contoh: Awal Kepengurusan" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status" class="input-control">
+                        <option value="Selesai">Selesai</option>
+                        <option value="Berjalan" selected>Berjalan</option>
+                        <option value="Mendatang">Mendatang</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Judul Tahapan <span style="color:#ef4444;">*</span></label>
+                <input type="text" name="title" class="input-control" placeholder="Contoh: Pelantikan & Raker" required>
+            </div>
+            <div class="form-group">
+                <label>Deskripsi Ringkas Catatan</label>
+                <textarea name="description" class="input-control" rows="3" placeholder="Tuliskan ringkasan tonggak capaian..." required></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalTambahHomeTimeline')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Simpan Timeline</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEditHomeTimeline">
+    <div class="modal-content" style="max-width:560px; border-color:#8b5cf6;">
+        <div class="modal-header">
+            <h3 style="color:#8b5cf6;">Edit Tahapan Timeline</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalEditHomeTimeline')"><i data-lucide="x"></i></button>
+        </div>
+        <form id="formEditHomeTimeline" method="POST">
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Periode / Waktu</label>
+                    <input type="text" name="period" id="editTimelinePeriod" class="input-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status" id="editTimelineStatus" class="input-control">
+                        <option value="Selesai">Selesai</option>
+                        <option value="Berjalan">Berjalan</option>
+                        <option value="Mendatang">Mendatang</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Judul Tahapan</label>
+                <input type="text" name="title" id="editTimelineTitle" class="input-control" required>
+            </div>
+            <div class="form-group">
+                <label>Deskripsi Ringkas Catatan</label>
+                <textarea name="description" id="editTimelineDesc" class="input-control" rows="3" required></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditHomeTimeline')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Update Timeline</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 5. MODAL FAQ CALON KADER -->
+<div class="modal-overlay" id="modalTambahHomeFaq">
+    <div class="modal-content" style="max-width:560px; border-color:#ec4899;">
+        <div class="modal-header">
+            <h3 style="color:#ec4899;">Tambah F.A.Q Calon Kader</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalTambahHomeFaq')"><i data-lucide="x"></i></button>
+        </div>
+        <form action="/admin/tambah-home-faq" method="POST">
+            <div class="form-group">
+                <label>Kategori FAQ <span style="color:#ef4444;">*</span></label>
+                <input type="text" name="category" class="input-control" placeholder="Contoh: Keanggotaan, Akademik & Waktu, Pendaftaran" required>
+            </div>
+            <div class="form-group">
+                <label>Pertanyaan <span style="color:#ef4444;">*</span></label>
+                <input type="text" name="question" class="input-control" placeholder="Tuliskan pertanyaan umum yang sering diajukan..." required>
+            </div>
+            <div class="form-group">
+                <label>Jawaban Lengkap <span style="color:#ef4444;">*</span></label>
+                <textarea name="answer" class="input-control" rows="4" placeholder="Tuliskan jawaban informatif dan lugas..." required></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalTambahHomeFaq')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Simpan FAQ</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEditHomeFaq">
+    <div class="modal-content" style="max-width:560px; border-color:#ec4899;">
+        <div class="modal-header">
+            <h3 style="color:#ec4899;">Edit F.A.Q Calon Kader</h3>
+            <button type="button" class="close-modal" onclick="closeModal('modalEditHomeFaq')"><i data-lucide="x"></i></button>
+        </div>
+        <form id="formEditHomeFaq" method="POST">
+            <div class="form-group">
+                <label>Kategori FAQ</label>
+                <input type="text" name="category" id="editFaqCategory" class="input-control" required>
+            </div>
+            <div class="form-group">
+                <label>Pertanyaan</label>
+                <input type="text" name="question" id="editFaqQuestion" class="input-control" required>
+            </div>
+            <div class="form-group">
+                <label>Jawaban Lengkap</label>
+                <textarea name="answer" id="editFaqAnswer" class="input-control" rows="4" required></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditHomeFaq')">Batal</button>
+                <button type="submit" class="btn btn-primary submit-btn">Update FAQ</button>
             </div>
         </form>
     </div>
@@ -1467,6 +2179,19 @@
 <script id="bioLinksJson" type="application/json"><%- typeof bioLinks !== 'undefined' ? JSON.stringify(bioLinks).replace(/</g, '\\u003c') : '[]' %></script>
 <script id="contactMessagesJson" type="application/json"><%- JSON.stringify(safeMessages).replace(/</g, '\\u003c') %></script>
 <script id="kaderQuotesJson" type="application/json"><%- JSON.stringify(safeKaderQuotes).replace(/</g, '\\u003c') %></script>
+<script id="pengurusDataJson" type="application/json"><%- typeof pengurus !== 'undefined' ? JSON.stringify(pengurus).replace(/</g, '\\u003c') : '[]' %></script>
+<script id="bidangDataJson" type="application/json"><%- typeof bidang !== 'undefined' ? JSON.stringify(bidang).replace(/</g, '\\u003c') : '[]' %></script>
+<script id="kohatiPengurusDataJson" type="application/json"><%- typeof kohatiPengurus !== 'undefined' ? JSON.stringify(kohatiPengurus).replace(/</g, '\\u003c') : '[]' %></script>
+<script id="kohatiBidangDataJson" type="application/json"><%- typeof kohatiBidang !== 'undefined' ? JSON.stringify(kohatiBidang).replace(/</g, '\\u003c') : '[]' %></script>
+<script id="dataAnggotaDataJson" type="application/json"><%- typeof safeDataAnggota !== 'undefined' ? JSON.stringify(safeDataAnggota).replace(/</g, '\\u003c') : (typeof dataAnggota !== 'undefined' ? JSON.stringify(dataAnggota).replace(/</g, '\\u003c') : '[]') %></script>
+<script id="socialMediaListDataJson" type="application/json"><%- typeof socialMediaList !== 'undefined' ? JSON.stringify(socialMediaList).replace(/</g, '\\u003c') : '[]' %></script>
+<script id="shortlinksDataJson" type="application/json"><%- typeof shortlinks !== 'undefined' ? JSON.stringify(shortlinks).replace(/</g, '\\u003c') : '[]' %></script>
+<script id="devTeamDataJson" type="application/json"><%- typeof devTeam !== 'undefined' ? JSON.stringify(devTeam).replace(/</g, '\\u003c') : '[]' %></script>
+<script id="homePillarsJson" type="application/json"><%- JSON.stringify(safePillars).replace(/</g, '\\u003c') %></script>
+<script id="homeProgramsJson" type="application/json"><%- JSON.stringify(safePrograms).replace(/</g, '\\u003c') %></script>
+<script id="homeMilestonesJson" type="application/json"><%- JSON.stringify(safeMilestones).replace(/</g, '\\u003c') %></script>
+<script id="homeTimelineJson" type="application/json"><%- JSON.stringify(safeTimeline).replace(/</g, '\\u003c') %></script>
+<script id="homeFaqJson" type="application/json"><%- JSON.stringify(safeFaq).replace(/</g, '\\u003c') %></script>
 
 <script>
     let albumsData = []; 
@@ -1475,28 +2200,66 @@
     let bioLinksData = [];
     let contactMessagesData = [];
     let kaderQuotesData = [];
+    let pengurusData = [];
+    let bidangData = [];
+    let kohatiPengurusData = [];
+    let kohatiBidangData = [];
+    let dataAnggotaData = [];
+    let socialMediaListData = [];
+    let shortlinksData = [];
+    let devTeamData = [];
+    let homePillarsData = [];
+    let homeProgramsData = [];
+    let homeMilestonesData = [];
+    let homeTimelineData = [];
+    let homeFaqData = [];
 
-    try {
-        const rawAlbums = document.getElementById('albumsDataJson').textContent;
-        const rawNews = document.getElementById('newsDataJson').textContent;
-        const rawBioPages = document.getElementById('bioPagesJson').textContent;
-        const rawBioLinks = document.getElementById('bioLinksJson').textContent;
-        const rawMessages = document.getElementById('contactMessagesJson').textContent;
-        const rawQuotes = document.getElementById('kaderQuotesJson').textContent;
+    function parseJsonScript(scriptId) {
+        try {
+            const el = document.getElementById(scriptId);
+            if (!el) return [];
+            const raw = el.textContent;
+            if (raw && raw.trim() !== '' && !raw.includes('<' + '%')) {
+                return JSON.parse(raw);
+            }
+        } catch(e) {
+            console.warn('Parsing ' + scriptId + ' failed:', e);
+        }
+        return [];
+    }
 
-        if (rawAlbums && rawAlbums.trim() !== '' && !rawAlbums.includes('<' + '%')) albumsData = JSON.parse(rawAlbums);
-        if (rawNews && rawNews.trim() !== '' && !rawNews.includes('<' + '%')) newsData = JSON.parse(rawNews);
-        if (rawBioPages && rawBioPages.trim() !== '' && !rawBioPages.includes('<' + '%')) bioPagesData = JSON.parse(rawBioPages);
-        if (rawBioLinks && rawBioLinks.trim() !== '' && !rawBioLinks.includes('<' + '%')) bioLinksData = JSON.parse(rawBioLinks);
-        if (rawMessages && rawMessages.trim() !== '' && !rawMessages.includes('<' + '%')) contactMessagesData = JSON.parse(rawMessages);
-        if (rawQuotes && rawQuotes.trim() !== '' && !rawQuotes.includes('<' + '%')) kaderQuotesData = JSON.parse(rawQuotes);
-    } catch(e) { console.warn('Parsing EJS data failed:', e); }
+    albumsData = parseJsonScript('albumsDataJson');
+    newsData = parseJsonScript('newsDataJson');
+    bioPagesData = parseJsonScript('bioPagesJson');
+    bioLinksData = parseJsonScript('bioLinksJson');
+    contactMessagesData = parseJsonScript('contactMessagesJson');
+    kaderQuotesData = parseJsonScript('kaderQuotesJson');
+    pengurusData = parseJsonScript('pengurusDataJson');
+    bidangData = parseJsonScript('bidangDataJson');
+    kohatiPengurusData = parseJsonScript('kohatiPengurusDataJson');
+    kohatiBidangData = parseJsonScript('kohatiBidangDataJson');
+    dataAnggotaData = parseJsonScript('dataAnggotaDataJson');
+    socialMediaListData = parseJsonScript('socialMediaListDataJson');
+    shortlinksData = parseJsonScript('shortlinksDataJson');
+    devTeamData = parseJsonScript('devTeamDataJson');
+    homePillarsData = parseJsonScript('homePillarsJson');
+    homeProgramsData = parseJsonScript('homeProgramsJson');
+    homeMilestonesData = parseJsonScript('homeMilestonesJson');
+    homeTimelineData = parseJsonScript('homeTimelineJson');
+    homeFaqData = parseJsonScript('homeFaqJson');
 
     let quillTambah, quillEdit;
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof lucide !== 'undefined') lucide.createIcons();
 
-        openAdmTab('adm-pesan');
+        // Cek URL parameter tab untuk auto-buka tab yang dituju
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetTab = urlParams.get('tab');
+        if (targetTab && document.getElementById(targetTab)) {
+            openAdmTab(targetTab);
+        } else {
+            openAdmTab('adm-pesan');
+        }
 
         const savedSidebarState = localStorage.getItem('hmi_admin_sidebar_collapsed');
         if (savedSidebarState === 'true') {
@@ -1524,7 +2287,14 @@
 
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', function(e) {
-                if (e.target === this) this.classList.remove('active');
+                if (e.target === this) {
+                    this.classList.remove('active');
+                    const anyActive = document.querySelector('.modal-overlay.active');
+                    if (!anyActive) {
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                    }
+                }
             });
         });
     });
@@ -1571,13 +2341,27 @@
         }
     }
 
+    const tabLabels = {
+        'adm-pesan': 'Pesan Masuk',
+        'adm-kelola': 'Kelola Data Organisasi',
+        'adm-kaderquote': 'Kutipan Kader',
+        'adm-beranda-sections': 'Section Beranda',
+        'adm-setelan': 'Setelan Web & Kontak',
+        'adm-sosmed': 'Sosial Media',
+        'adm-bio': 'Link Bio',
+        'adm-shortlink': 'Shortlink',
+        'adm-devteam': 'Developer Team',
+        'adm-announce': 'Pengumuman Pop-up'
+    };
+
     function openAdmTab(tabId, btn) {
         document.querySelectorAll('.admin-tab-pane').forEach(tab => {
             tab.classList.remove('active');
             tab.style.display = 'none';
         });
 
-        document.querySelectorAll('.sidebar-nav-item').forEach(b => b.classList.remove('active'));
+        // Hapus status active dari tombol desktop dan pills mobile
+        document.querySelectorAll('.sidebar-nav-item, .mobile-tab-pill').forEach(b => b.classList.remove('active'));
 
         const target = document.getElementById(tabId);
         if (target) {
@@ -1585,11 +2369,26 @@
             target.style.display = 'block';
         }
 
-        if (btn) {
-            btn.classList.add('active');
-        } else {
-            const activeBtn = document.querySelector(`.sidebar-nav-item[onclick*="'${tabId}'"]`);
-            if (activeBtn) activeBtn.classList.add('active');
+        // Sinkronisasi status active ke seluruh tombol yang menarget tab ini (desktop & mobile)
+        document.querySelectorAll(`[data-tab-target="${tabId}"]`).forEach(b => b.classList.add('active'));
+
+        // Update indikator teks aktif di Mobile Control Bar
+        const labelEl = document.getElementById('mobileActiveTabLabel');
+        if (labelEl && tabLabels[tabId]) {
+            labelEl.innerText = tabLabels[tabId];
+        }
+
+        // Simpan ke URL query param agar state tab tetap terjaga saat reload
+        try {
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('tab', tabId);
+            window.history.replaceState({}, '', currentUrl);
+        } catch (e) {}
+
+        // Geser pill aktif ke tengah pandangan di bar horizontal mobile
+        const activePill = document.querySelector(`.mobile-tab-pill[data-tab-target="${tabId}"]`);
+        if (activePill) {
+            activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         }
 
         if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -1600,6 +2399,8 @@
         const el = document.getElementById(modalId);
         if (el) {
             el.classList.add('active');
+            document.body.classList.add('modal-open');
+            document.body.style.overflow = 'hidden';
             if (typeof lucide !== 'undefined') lucide.createIcons();
         } else {
             console.error('Modal tidak ditemukan: ' + modalId);
@@ -1608,12 +2409,28 @@
 
     function closeModal(modalId) { 
         const el = document.getElementById(modalId);
-        if (el) el.classList.remove('active'); 
+        if (el) {
+            el.classList.remove('active');
+            const anyActive = document.querySelector('.modal-overlay.active');
+            if (!anyActive) {
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+            }
+        }
     }
 
     function openDetailPesanModal(id, name, subject, contact, method, docUrl) {
-        document.getElementById('modalPesanSender').innerText = "Pesan dari: " + name;
-        document.getElementById('modalPesanSubject').innerText = subject;
+        const msg = contactMessagesData.find(m => String(m.id) === String(id));
+        if (msg) {
+            name = msg.name || name || '';
+            subject = msg.subject || subject || '';
+            contact = msg.contact || contact || '';
+            method = msg.method || method || 'email';
+            docUrl = msg.docUrl || docUrl || '';
+        }
+
+        document.getElementById('modalPesanSender').innerText = "Pesan dari: " + (name || '');
+        document.getElementById('modalPesanSubject').innerText = subject || '';
         
         const contactWrap = document.getElementById('modalPesanContact');
         const replyBtn = document.getElementById('modalPesanReplyBtn');
@@ -1622,20 +2439,22 @@
 
         if (method === 'wa') {
             contactWrap.innerHTML = `<span style="color:#16a34a;"><i data-lucide="message-circle" style="width:13px; vertical-align:middle;"></i> ${contact}</span>`;
-            replyBtn.href = `https://api.whatsapp.com/send/?phone=${contact.replace(/[^0-9]/g, '')}&text=Halo%20${encodeURIComponent(name)},%20kami%20dari%20Admin%20HMI%20KomKG%20UMI%20ingin%20menanggapi%20pesan%20Anda%20mengenai%20${encodeURIComponent(subject)}`;
+            replyBtn.href = `https://api.whatsapp.com/send/?phone=${(contact || '').replace(/[^0-9]/g, '')}&text=Halo%20${encodeURIComponent(name || '')},%20kami%20dari%20Admin%20HMI%20KomKG%20UMI%20ingin%20menanggapi%20pesan%20Anda%20mengenai%20${encodeURIComponent(subject || '')}`;
             replyBtn.style.background = '#16a34a';
             replyBtn.style.borderColor = '#16a34a';
             replyBtn.innerHTML = `<i data-lucide="message-circle"></i> Balas WhatsApp`;
         } else {
             contactWrap.innerHTML = `<span style="color:#0284c7;"><i data-lucide="mail" style="width:13px; vertical-align:middle;"></i> ${contact}</span>`;
-            replyBtn.href = `mailto:${contact}?subject=Tanggapan:%20${encodeURIComponent(subject)}`;
+            replyBtn.href = `mailto:${contact}?subject=Tanggapan:%20${encodeURIComponent(subject || '')}`;
             replyBtn.style.background = '#0284c7';
             replyBtn.style.borderColor = '#0284c7';
             replyBtn.innerHTML = `<i data-lucide="mail"></i> Balas Email`;
         }
 
         const rawBody = document.getElementById('raw-message-body-' + id);
-        document.getElementById('modalPesanContent').innerText = rawBody ? rawBody.innerText.trim() : '-';
+        let msgBody = rawBody ? rawBody.innerText.trim() : '';
+        if (!msgBody && msg && msg.message) msgBody = msg.message;
+        document.getElementById('modalPesanContent').innerText = msgBody || '-';
 
         if (docUrl && docUrl.length > 5) {
             docWrap.style.display = 'block';
@@ -1644,18 +2463,28 @@
             docWrap.style.display = 'none';
         }
 
+        if (typeof lucide !== 'undefined') lucide.createIcons();
         openModal('modalDetailPesan');
     }
 
     function openEditBeritaModal(id, title, category, date, slug) {
-        document.getElementById('editBeritaTitle').value = title;
-        document.getElementById('editBeritaCategory').value = category;
-        document.getElementById('editBeritaDate').value = date;
+        const item = newsData.find(n => String(n.id) === String(id));
+        if (item) {
+            title = item.title || title || '';
+            category = item.category || category || '';
+            date = item.date || date || '';
+            slug = item.slug || slug || '';
+        }
+        document.getElementById('editBeritaTitle').value = title || '';
+        document.getElementById('editBeritaCategory').value = category || '';
+        document.getElementById('editBeritaDate').value = date || '';
         document.getElementById('editBeritaSlug').value = slug || '';
         
         const rawContentEl = document.getElementById('raw-content-' + id);
         if (rawContentEl && quillEdit) {
             quillEdit.root.innerHTML = rawContentEl.innerHTML;
+        } else if (item && item.content && quillEdit) {
+            quillEdit.root.innerHTML = item.content;
         }
         document.getElementById('formEditBerita').action = '/admin/edit-berita/' + id;
         openModal('modalEditBerita');
@@ -1687,17 +2516,93 @@
 
     // UPDATE: HANYA MEMPROSES INSTAGRAM, EMAIL DIHAPUS TOTAL
     function openEditKaderQuoteModal(id, name, role, quote, ig) {
-        document.getElementById('editKaderName').value = name;
-        document.getElementById('editKaderRole').value = role;
-        document.getElementById('editKaderQuote').value = quote;
+        const q = kaderQuotesData.find(x => String(x.id) === String(id));
+        if (q) {
+            name = q.name || name || '';
+            role = q.role || role || '';
+            quote = q.quote || quote || '';
+            ig = q.ig || ig || '';
+        }
+        document.getElementById('editKaderName').value = name || '';
+        document.getElementById('editKaderRole').value = role || '';
+        document.getElementById('editKaderQuote').value = quote || '';
         document.getElementById('editKaderIg').value = ig || '';
         document.getElementById('formEditKaderQuote').action = '/admin/edit-kader-quote/' + id;
         openModal('modalEditKaderQuote');
     }
 
+    // ==============================================================
+    // FUNGSI MODAL EDIT 5 SECTION MODERN BERANDA
+    // ==============================================================
+    function openEditHomeProgramModal(id) {
+        const item = homeProgramsData.find(p => String(p.id) === String(id));
+        if (item) {
+            document.getElementById('formEditHomeProgram').action = '/admin/edit-home-program/' + item.id;
+            document.getElementById('editProgramTitle').value = item.title || '';
+            document.getElementById('editProgramCategory').value = item.category || '';
+            document.getElementById('editProgramStatus').value = item.status || 'Sedang Berjalan';
+            document.getElementById('editProgramDate').value = item.date || '';
+            document.getElementById('editProgramDesc').value = item.description || '';
+            openModal('modalEditHomeProgram');
+        }
+    }
+
+    function openEditHomePillarModal(id) {
+        const item = homePillarsData.find(p => String(p.id) === String(id));
+        if (item) {
+            document.getElementById('formEditHomePillar').action = '/admin/edit-home-pillar/' + item.id;
+            document.getElementById('editPillarTitle').value = item.title || '';
+            document.getElementById('editPillarSubtitle').value = item.subtitle || '';
+            document.getElementById('editPillarIcon').value = item.icon || 'star';
+            document.getElementById('editPillarOrder').value = item.order || 1;
+            document.getElementById('editPillarDesc').value = item.description || '';
+            openModal('modalEditHomePillar');
+        }
+    }
+
+    function openEditHomeMilestoneModal(id) {
+        const item = homeMilestonesData.find(m => String(m.id) === String(id));
+        if (item) {
+            document.getElementById('formEditHomeMilestone').action = '/admin/edit-home-milestone/' + item.id;
+            document.getElementById('editMilestoneNumber').value = item.number || '';
+            document.getElementById('editMilestoneLabel').value = item.label || '';
+            document.getElementById('editMilestoneContext').value = item.context || '';
+            document.getElementById('editMilestoneIcon').value = item.icon || 'award';
+            openModal('modalEditHomeMilestone');
+        }
+    }
+
+    function openEditHomeTimelineModal(id) {
+        const item = homeTimelineData.find(t => String(t.id) === String(id));
+        if (item) {
+            document.getElementById('formEditHomeTimeline').action = '/admin/edit-home-timeline/' + item.id;
+            document.getElementById('editTimelinePeriod').value = item.period || '';
+            document.getElementById('editTimelineStatus').value = item.status || 'Berjalan';
+            document.getElementById('editTimelineTitle').value = item.title || '';
+            document.getElementById('editTimelineDesc').value = item.description || '';
+            openModal('modalEditHomeTimeline');
+        }
+    }
+
+    function openEditHomeFaqModal(id) {
+        const item = homeFaqData.find(f => String(f.id) === String(id));
+        if (item) {
+            document.getElementById('formEditHomeFaq').action = '/admin/edit-home-faq/' + item.id;
+            document.getElementById('editFaqCategory').value = item.category || '';
+            document.getElementById('editFaqQuestion').value = item.question || '';
+            document.getElementById('editFaqAnswer').value = item.answer || '';
+            openModal('modalEditHomeFaq');
+        }
+    }
+
     function openEditAlbumModal(id, title, date) {
-        document.getElementById('editAlbumTitle').value = title;
-        document.getElementById('editAlbumDate').value = date;
+        const a = albumsData.find(x => String(x.id) === String(id));
+        if (a) {
+            title = a.title || title || '';
+            date = a.date || date || '';
+        }
+        document.getElementById('editAlbumTitle').value = title || '';
+        document.getElementById('editAlbumDate').value = date || '';
         document.getElementById('formEditAlbum').action = '/admin/edit-album/' + id;
         openModal('modalEditAlbum');
     }
@@ -1727,66 +2632,112 @@
     }
 
     function openEditDataAnggotaModal(id, title, date) {
-        document.getElementById('editDataAnggotaTitle').value = title;
-        document.getElementById('editDataAnggotaDate').value = date;
+        const da = dataAnggotaData.find(x => String(x.id) === String(id));
+        if (da) {
+            title = da.title || title || '';
+            date = da.date || date || '';
+        }
+        document.getElementById('editDataAnggotaTitle').value = title || '';
+        document.getElementById('editDataAnggotaDate').value = date || '';
         document.getElementById('formEditDataAnggota').action = '/admin/edit-data-anggota/' + id;
         openModal('modalEditDataAnggota');
     }
 
     function openEditBioPageModal(id, path, bio, bgType, bgValue) {
-        document.getElementById('editBioPath').value = path;
+        const p = bioPagesData.find(x => String(x.id) === String(id));
+        if (p) {
+            path = p.path || path || '';
+            bio = p.bio || bio || '';
+            bgType = p.bgType || bgType || 'gradient';
+            bgValue = p.bgValue || bgValue || '';
+        }
+        document.getElementById('editBioPath').value = path || '';
         const rawTitle = document.getElementById('raw-bio-title-' + id);
-        document.getElementById('editBioTitle').value = rawTitle ? rawTitle.innerText.trim() : '';
-        document.getElementById('editBioDesc').value = bio;
+        document.getElementById('editBioTitle').value = rawTitle ? rawTitle.innerText.trim() : (p && p.title ? p.title.replace(/<[^>]+>/g, '') : '');
+        document.getElementById('editBioDesc').value = bio || '';
         document.getElementById('editBioBgGradient').value = bgType === 'gradient' ? bgValue : 'linear-gradient(135deg, #064e3b 0%, #111827 100%)';
         document.getElementById('formEditBioPage').action = '/admin/edit-bio-page/' + id;
         openModal('modalEditBioPage');
     }
 
     function openEditBioLinkModal(id, bioPageId, url) {
-        document.getElementById('editBioLinkPageId').value = bioPageId;
+        const l = bioLinksData.find(x => String(x.id) === String(id));
+        if (l) {
+            bioPageId = l.bioPageId || bioPageId || '';
+            url = l.url || url || '';
+        }
+        document.getElementById('editBioLinkPageId').value = bioPageId || '';
         const rawTitle = document.getElementById('raw-link-title-' + id);
-        document.getElementById('editBioLinkTitle').value = rawTitle ? rawTitle.innerText.trim() : '';
-        document.getElementById('editBioLinkUrl').value = url;
+        document.getElementById('editBioLinkTitle').value = rawTitle ? rawTitle.innerText.trim() : (l && l.title ? l.title.replace(/<[^>]+>/g, '') : '');
+        document.getElementById('editBioLinkUrl').value = url || '';
         document.getElementById('formEditBioLink').action = '/admin/edit-biolink/' + id;
         openModal('modalEditBioLink');
     }
 
     function openEditShortlinkModal(id, title, path, originalUrl) {
-        document.getElementById('editShortlinkTitle').value = title;
-        document.getElementById('editShortlinkPath').value = path;
-        document.getElementById('editShortlinkOriginalUrl').value = originalUrl;
+        const s = shortlinksData.find(x => String(x.id) === String(id));
+        if (s) {
+            title = s.title || title || '';
+            path = s.path || path || '';
+            originalUrl = s.originalUrl || originalUrl || '';
+        }
+        document.getElementById('editShortlinkTitle').value = title || '';
+        document.getElementById('editShortlinkPath').value = path || '';
+        document.getElementById('editShortlinkOriginalUrl').value = originalUrl || '';
         document.getElementById('formEditShortlink').action = '/admin/edit-shortlink/' + id;
         openModal('modalEditShortlink');
     }
 
     function openEditSosmedModal(id, name, url) {
-        document.getElementById('editSosmedName').value = name;
-        document.getElementById('editSosmedUrl').value = url;
+        const s = socialMediaListData.find(x => String(x.id) === String(id));
+        if (s) {
+            name = s.name || name || '';
+            url = s.url || url || '';
+        }
+        document.getElementById('editSosmedName').value = name || '';
+        document.getElementById('editSosmedUrl').value = url || '';
         document.getElementById('formEditSosmed').action = '/admin/edit-sosmed/' + id;
         openModal('modalEditSosmed');
     }
 
     function openEditDynamic(id, name, role, actionPath, ig='', fb='', twitter='', linkedin='', tiktok='') {
-        document.getElementById('editDynamicName').value = name;
-        document.getElementById('editDynamicRole').value = role;
-        document.getElementById('editDynamicIg').value = ig;
-        document.getElementById('editDynamicFb').value = fb;
-        document.getElementById('editDynamicTwitter').value = twitter;
-        document.getElementById('editDynamicLinkedin').value = linkedin;
-        document.getElementById('editDynamicTiktok').value = tiktok;
+        const person = pengurusData.find(p => String(p.id) === String(id)) || kohatiPengurusData.find(p => String(p.id) === String(id));
+        if (person) {
+            name = person.name || name || '';
+            role = person.role || role || '';
+            ig = person.ig || ig || '';
+            fb = person.fb || fb || '';
+            twitter = person.twitter || twitter || '';
+            linkedin = person.linkedin || linkedin || '';
+            tiktok = person.tiktok || tiktok || '';
+        }
+        document.getElementById('editDynamicName').value = name || '';
+        document.getElementById('editDynamicRole').value = role || '';
+        document.getElementById('editDynamicIg').value = ig || '';
+        document.getElementById('editDynamicFb').value = fb || '';
+        document.getElementById('editDynamicTwitter').value = twitter || '';
+        document.getElementById('editDynamicLinkedin').value = linkedin || '';
+        document.getElementById('editDynamicTiktok').value = tiktok || '';
         document.getElementById('formEditDynamic').action = actionPath + id;
         openModal('modalEditDynamic');
     }
 
     function openEditBidangModal(id, name, actionPath) { 
-        document.getElementById('editBidangName').value = name; 
+        const b = bidangData.find(x => String(x.id) === String(id)) || kohatiBidangData.find(x => String(x.id) === String(id));
+        if (b) {
+            name = b.name || name || '';
+        }
+        document.getElementById('editBidangName').value = name || ''; 
         document.getElementById('formEditBidang').action = actionPath + id; 
         openModal('modalEditBidang'); 
     }
     
     function openModalAnggotaBidang(bidangId, bidangName, actionPath) { 
-        document.getElementById('anggotaBidangTitle').innerText = "Tambah Anggota: " + bidangName; 
+        const b = bidangData.find(x => String(x.id) === String(bidangId)) || kohatiBidangData.find(x => String(x.id) === String(bidangId));
+        if (b) {
+            bidangName = b.name || bidangName || '';
+        }
+        document.getElementById('anggotaBidangTitle').innerText = "Tambah Anggota: " + (bidangName || ''); 
         document.getElementById('editAnggotaBidangName').value = "";
         document.getElementById('editAnggotaBidangRole').value = ""; 
         document.getElementById('editAnggotaBidangIg').value = "";
@@ -1799,24 +2750,49 @@
     }
     
     function openEditAnggotaBidangModal(bidangId, memberId, name, role, actionPath, ig='', fb='', twitter='', linkedin='', tiktok='') { 
+        const b = bidangData.find(x => String(x.id) === String(bidangId)) || kohatiBidangData.find(x => String(x.id) === String(bidangId));
+        let member = null;
+        if (b && b.members) {
+            member = b.members.find(m => String(m.id) === String(memberId));
+        }
+        if (member) {
+            name = member.name || name || '';
+            role = member.role || role || '';
+            ig = member.ig || ig || '';
+            fb = member.fb || fb || '';
+            twitter = member.twitter || twitter || '';
+            linkedin = member.linkedin || linkedin || '';
+            tiktok = member.tiktok || tiktok || '';
+        }
         document.getElementById('anggotaBidangTitle').innerText = "Edit Anggota"; 
-        document.getElementById('editAnggotaBidangName').value = name; 
-        document.getElementById('editAnggotaBidangRole').value = role; 
-        document.getElementById('editAnggotaBidangIg').value = ig;
-        document.getElementById('editAnggotaBidangFb').value = fb;
-        document.getElementById('editAnggotaBidangTwitter').value = twitter;
-        document.getElementById('editAnggotaBidangLinkedin').value = linkedin;
-        document.getElementById('editAnggotaBidangTiktok').value = tiktok;
+        document.getElementById('editAnggotaBidangName').value = name || ''; 
+        document.getElementById('editAnggotaBidangRole').value = role || ''; 
+        document.getElementById('editAnggotaBidangIg').value = ig || ''; 
+        document.getElementById('editAnggotaBidangFb').value = fb || ''; 
+        document.getElementById('editAnggotaBidangTwitter').value = twitter || ''; 
+        document.getElementById('editAnggotaBidangLinkedin').value = linkedin || ''; 
+        document.getElementById('editAnggotaBidangTiktok').value = tiktok || ''; 
         document.getElementById('formAnggotaBidang').action = actionPath + bidangId + "/" + memberId; 
         openModal('modalAnggotaBidang'); 
     }
 
     function openEditDevTeamModal(id, name, role, dept, category, ig, isProtected) {
-        document.getElementById('editDevName').value = name;
-        document.getElementById('editDevRole').value = role;
-        document.getElementById('editDevDept').value = dept;
-        document.getElementById('editDevCategory').value = category;
-        document.getElementById('editDevIg').value = ig;
+        const dev = devTeamData.find(x => String(x.id) === String(id));
+        if (dev) {
+            name = dev.name || name || '';
+            role = dev.role || role || '';
+            dept = dev.dept || dept || '';
+            category = dev.category || category || '';
+            ig = dev.ig || ig || '';
+            if (isProtected === undefined) {
+                isProtected = (dev.id == 1 || (dev.name && dev.name.includes('Aksa Arsyad')));
+            }
+        }
+        document.getElementById('editDevName').value = name || '';
+        document.getElementById('editDevRole').value = role || '';
+        document.getElementById('editDevDept').value = dept || '';
+        document.getElementById('editDevCategory').value = category || '';
+        document.getElementById('editDevIg').value = ig || '';
         
         const pinGroup = document.getElementById('pinGroupDev');
         const pinInput = document.getElementById('editDevPin');
