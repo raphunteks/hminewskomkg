@@ -1,6 +1,6 @@
 <% 
     // ==============================================================
-    // SUPER BIG UPGRADE: ERROR 500 PREVENTION & SEO CANONICAL SLUG
+    // 100% DYNAMIC SSR SEO: Detail Berita & Informasi Resmi
     // ==============================================================
     let safeBerita = (typeof berita !== 'undefined' && berita) ? berita : {
         id: '404',
@@ -15,150 +15,81 @@
 
     let pageTitle = safeBerita.title;
     
-    // Pembersihan konten HTML untuk Meta Description (Maks. 150 karakter)
+    // Pembersihan konten HTML untuk Meta Description (Maks. 155 karakter)
     let rawContent = safeBerita.content || "";
-    let cleanDesc = rawContent.replace(/<[^>]+>/g, '').replace(/\n/g, ' ').trim();
-    let pageDescription = cleanDesc.length > 150 ? cleanDesc.substring(0, 150) + "..." : (cleanDesc || "Baca informasi terbaru dari HMI KomKG UMI.");
+    let cleanDesc = rawContent.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+    let pageDescription = cleanDesc.length > 155 ? cleanDesc.substring(0, 155) + "..." : (cleanDesc || "Baca informasi dan artikel terbaru dari HMI Komisariat Kedokteran Gigi UMI.");
     
     // Standarisasi URL Canonical & Slug Ramah Mesin Pencari
     const seoBaseUrl = 'https://www.hmikomkgumi.xyz';
     let newsSlug = safeBerita.slug || safeBerita.id;
-    let articleUrl = seoBaseUrl + "/berita/" + newsSlug;
+    let articleUrl = seoBaseUrl + "/berita/" + encodeURIComponent(newsSlug);
 
     // Resolusi Gambar Absolut untuk Open Graph WhatsApp / Sosmed
     let rawImage = safeBerita.image || '/img/logo-hmikomkgumi.png';
     let absoluteImage = rawImage.startsWith('http') ? rawImage : seoBaseUrl + (rawImage.startsWith('/') ? '' : '/') + rawImage;
+    let articleKeywords = `${safeBerita.category}, Berita HMI, Proker HMI KomKG UMI, Kedokteran Gigi UMI, FKG UMI, ${safeBerita.title}`;
 %>
-<%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
+<%- include('partials/header', { 
+    page: 'berita', 
+    berita: safeBerita, 
+    pageTitle: pageTitle, 
+    pageDescription: pageDescription, 
+    pageImage: absoluteImage, 
+    pageKeywords: articleKeywords,
+    canonicalUrl: articleUrl 
+}) %>
 
 <!-- ==============================================================
-     DYNAMIC SEO DATA INJECTION (DOM-SAFE UNTUK PRATINJAU & GSC)
+     GOLD STANDARD GSC: NEWSARTICLE SCHEMA.ORG (100% SSR)
 ============================================================== -->
-<div id="seo-server-data" 
-     style="display:none;" 
-     data-title="<%= pageTitle %>" 
-     data-desc="<%= pageDescription %>" 
-     data-url="<%= articleUrl %>" 
-     data-img="<%= absoluteImage %>" 
-     data-cat="<%= safeBerita.category %>" 
-     data-date="<%= safeBerita.date %>"
-     data-baseurl="<%= seoBaseUrl %>">
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const seoDataEl = document.getElementById('seo-server-data');
-    if(!seoDataEl) return;
-    
-    const d_title = seoDataEl.getAttribute('data-title');
-    const d_desc = seoDataEl.getAttribute('data-desc');
-    const d_url = seoDataEl.getAttribute('data-url');
-    const d_img = seoDataEl.getAttribute('data-img');
-    const d_cat = seoDataEl.getAttribute('data-cat');
-    const d_date = seoDataEl.getAttribute('data-date');
-    const d_baseurl = seoDataEl.getAttribute('data-baseurl');
-
-    const metaTags = [
-        { name: "description", content: d_desc },
-        { name: "keywords", content: `${d_cat}, Berita HMI, Proker HMI KomKG UMI, Kedokteran Gigi UMI, Organisasi FKG UMI, ${d_title}` },
-        { name: "author", content: "Admin HMI KomKG UMI" },
-        { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
-        
-        // Open Graph Metadata (WhatsApp, Facebook, Telegram)
-        { property: "og:title", content: d_title + " | HMI KomKG UMI" },
-        { property: "og:description", content: d_desc },
-        { property: "og:type", content: "article" }, 
-        { property: "og:url", content: d_url },
-        { property: "og:image", content: d_img },
-        { property: "og:image:secure_url", content: d_img },
-        { property: "og:image:type", content: "image/jpeg" },
-        { property: "og:image:width", content: "1200" },
-        { property: "og:image:height", content: "630" },
-        { property: "og:site_name", content: "HMI KomKG UMI" },
-        
-        // Twitter Card Metadata
-        { property: "twitter:card", content: "summary_large_image" },
-        { property: "twitter:title", content: d_title + " | HMI KomKG UMI" },
-        { property: "twitter:description", content: d_desc },
-        { property: "twitter:image", content: d_img }
-    ];
-
-    // Injeksi Canonical Link Tag
-    let canonical = document.createElement('link');
-    canonical.rel = 'canonical';
-    canonical.href = d_url;
-    document.head.appendChild(canonical);
-
-    // Injeksi Meta Tags
-    metaTags.forEach(tag => {
-        let selector = tag.name ? `meta[name="${tag.name}"]` : `meta[property="${tag.property}"]`;
-        let existingTag = document.head.querySelector(selector);
-        if (!existingTag) {
-            let el = document.createElement('meta');
-            if(tag.name) el.name = tag.name;
-            if(tag.property) el.setAttribute('property', tag.property);
-            el.content = tag.content;
-            document.head.appendChild(el);
-        } else {
-            existingTag.content = tag.content;
-        }
-    });
-
-    // Injeksi Schema.org JSON-LD (Gold Standard GSC)
-    const jsonLdData = {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "WebPage",
-          "@id": `${d_url}/#webpage`,
-          "url": d_url,
-          "name": `${d_title} | HMI KomKG UMI`,
-          "description": d_desc,
-          "inLanguage": "id-ID",
-          "isPartOf": { "@id": `${d_baseurl}/#website` }
-        },
-        {
-          "@type": "BreadcrumbList",
-          "@id": `${d_url}/#breadcrumb`,
-          "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "Beranda", "item": `${d_baseurl}/` },
-            { "@type": "ListItem", "position": 2, "name": "Berita & Informasi", "item": `${d_baseurl}/#news-list` },
-            { "@type": "ListItem", "position": 3, "name": d_title, "item": d_url }
-          ]
-        },
-        {
-          "@type": "NewsArticle",
-          "@id": `${d_url}/#article`,
-          "headline": d_title,
-          "description": d_desc,
-          "image": [d_img],
-          "datePublished": d_date,
-          "dateModified": d_date,
-          "mainEntityOfPage": { "@type": "WebPage", "@id": `${d_url}/#webpage` },
-          "articleSection": d_cat,
-          "inLanguage": "id-ID",
-          "author": { 
-              "@type": "Organization", 
-              "name": "Admin HMI KomKG UMI", 
-              "url": d_baseurl 
-          },
-          "publisher": { 
-              "@type": "Organization", 
-              "name": "HMI KomKG UMI", 
-              "logo": { 
-                  "@type": "ImageObject", 
-                  "url": `${d_baseurl}/img/logo.png` 
-              } 
-          }
-        }
-      ]
-    };
-
-    const jsonLdScript = document.createElement('script');
-    jsonLdScript.type = 'application/ld+json';
-    jsonLdScript.textContent = JSON.stringify(jsonLdData);
-    document.head.appendChild(jsonLdScript);
-});
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "<%= articleUrl %>/#webpage",
+      "url": "<%= articleUrl %>",
+      "name": "<%= pageTitle.replace(/"/g, '\\"') %> | HMI KomKG UMI",
+      "description": "<%= pageDescription.replace(/"/g, '\\"') %>",
+      "inLanguage": "id-ID",
+      "isPartOf": { "@id": "<%= seoBaseUrl %>/#website" }
+    },
+    {
+      "@type": "NewsArticle",
+      "@id": "<%= articleUrl %>/#article",
+      "headline": "<%= pageTitle.replace(/"/g, '\\"') %>",
+      "description": "<%= pageDescription.replace(/"/g, '\\"') %>",
+      "image": [
+        "<%= absoluteImage %>"
+        <% if (Array.isArray(safeBerita.photos) && safeBerita.photos.length > 0) { %>
+          <% safeBerita.photos.forEach(p => { 
+              let pUrl = typeof p === 'string' ? p : (p && p.url);
+              if (pUrl) {
+                  let pAbs = pUrl.startsWith('http') ? pUrl : seoBaseUrl + (pUrl.startsWith('/') ? '' : '/') + pUrl;
+          %>
+          , "<%= pAbs %>"
+          <%   } 
+             }); %>
+        <% } %>
+      ],
+      "datePublished": "<%= safeBerita.date %>",
+      "dateModified": "<%= safeBerita.date %>",
+      "mainEntityOfPage": { "@type": "WebPage", "@id": "<%= articleUrl %>/#webpage" },
+      "articleSection": "<%= safeBerita.category %>",
+      "inLanguage": "id-ID",
+      "author": { 
+          "@type": "Organization", 
+          "name": "HMI KomKG UMI", 
+          "url": "<%= seoBaseUrl %>/" 
+      },
+      "publisher": { 
+          "@id": "<%= seoBaseUrl %>/#organization"
+      }
+    }
+  ]
+}
 </script>
 <script src="/js/protect-devtools.js" defer></script>
 
@@ -256,14 +187,17 @@ document.addEventListener('DOMContentLoaded', () => {
     </section>
 </div>
 
+<div id="shareDataContainer" data-url="<%= articleUrl %>" data-title="<%= safeBerita.title %>" style="display:none;" aria-hidden="true"></div>
+
 <!-- ==============================================================
      LOGIKA NATIVE SHARE & GOOGLE APPS SCRIPT ANALYTICS (PERSIS INDEX.EJS)
 ============================================================== -->
 <script>
     // Trigger Native Web Share API dengan format teks khusus
     async function triggerNativeShare() {
-        const shareUrl = <%- JSON.stringify(articleUrl) %>;
-        const articleTitle = <%- JSON.stringify(safeBerita.title) %>;
+        const shareEl = document.getElementById('shareDataContainer');
+        const shareUrl = shareEl ? shareEl.getAttribute('data-url') : window.location.href;
+        const articleTitle = shareEl ? shareEl.getAttribute('data-title') : document.title;
         const shareMessage = `${shareUrl} Baca artikel menarik ini di Portal Artikel HMI KOMKG UMI: ${articleTitle}`;
 
         const shareData = {
