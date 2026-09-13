@@ -1,58 +1,170 @@
 <%
     // ==============================================================
-    // EXPERT SEO: GOOGLE SITE NAME & KNOWLEDGE PANEL FORCER
+    // GOLD STANDARD GOOGLE SEARCH CONSOLE - STRUCTURED DATA SCHEMAS
+    // WebSite, Organization, Knowledge Panel, SiteNavigationElement (Sitelinks)
     // ==============================================================
-    // Wajib menggunakan www jika canonical website Anda menggunakan www (Sesuai Gbr 1)
     const schemaBaseUrl = 'https://www.hmikomkgumi.xyz';
     const schemaSafeSettings = typeof siteSettings !== 'undefined' && siteSettings ? siteSettings : {};
-    let schemaLogo = schemaSafeSettings.headerLogo || schemaBaseUrl + '/favicon.ico';
     
-    // Pastikan Logo menggunakan Absolute URL
+    // Resolusi Logo Absolut untuk Skema Google (Wajib URL HTTP/HTTPS bersih, bukan data URI Base64)
+    let schemaLogo = (schemaSafeSettings.headerLogo && !schemaSafeSettings.headerLogo.startsWith('data:')) 
+        ? schemaSafeSettings.headerLogo 
+        : '/img/logo-hmikomkgumi.png';
     if (schemaLogo && !schemaLogo.startsWith('http')) {
-        if (!schemaLogo.startsWith('/')) schemaLogo = '/' + schemaLogo;
-        schemaLogo = schemaBaseUrl + schemaLogo;
+        schemaLogo = schemaBaseUrl + (schemaLogo.startsWith('/') ? '' : '/') + schemaLogo;
     }
+
+    // Resolusi Social Media Links Dinamis dari Database KV
+    let socialSameAs = [
+        "https://www.instagram.com/hmi_komkgumi",
+        "https://www.facebook.com/hmi_komkgumi",
+        "https://www.tiktok.com/@hmi_komkgumi"
+    ];
+    if (typeof socialMediaList !== 'undefined' && Array.isArray(socialMediaList) && socialMediaList.length > 0) {
+        const dbSocials = socialMediaList.map(s => s.url).filter(u => u && u.startsWith('http'));
+        if (dbSocials.length > 0) {
+            socialSameAs = Array.from(new Set([...socialSameAs, ...dbSocials]));
+        }
+    }
+
+    const orgPhone = schemaSafeSettings.contactWa || '+6285338922586';
+    const cleanPhone = orgPhone.replace(/[^0-9+]/g, '');
+    const orgEmail = schemaSafeSettings.contactEmail || 'hmikomkedokgigiumi.190120@gmail.com';
+    const orgAddress = schemaSafeSettings.contactAddress || "Jl. Pajonga Dg. Ngalle No. 27 A, Pa'batong, Kec. Mamajang, Kota Makassar, Sulawesi Selatan 90131";
 %>
 
-<!-- 1. EXPERT SEO: Organization Schema (Untuk Panel Samping Google) -->
+<!-- 1. GOLD STANDARD GSC: Organization Schema (Panel Pengetahuan Google / Knowledge Panel) -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "HMI KOMKG UMI",
+  "@id": "<%= schemaBaseUrl %>/#organization",
+  "name": "<%= schemaSafeSettings.headerTitle ? (schemaSafeSettings.headerTitle + ' ' + (schemaSafeSettings.headerHighlight || '')).trim() : 'HMI KOMKG UMI' %>",
   "alternateName": [
+    "HMI KOMKG UMI",
+    "HMI KomKG-UMI",
     "Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi UMI",
-    "HMI KomKG-UMI"
+    "HMI Komisariat Kedokteran Gigi UMI Cabang Makassar"
   ],
   "url": "<%= schemaBaseUrl %>/",
-  "logo": "<%= schemaLogo %>",
-  "sameAs": [
-    "https://www.instagram.com/hmi_komkgumi",
-    "https://www.tiktok.com/@hmi_komkgumi"
+  "logo": {
+    "@type": "ImageObject",
+    "@id": "<%= schemaBaseUrl %>/#logo",
+    "url": "<%= schemaLogo %>",
+    "caption": "Logo Resmi HMI KomKG UMI",
+    "inLanguage": "id-ID"
+  },
+  "image": "<%= schemaLogo %>",
+  "description": "<%= (schemaSafeSettings.footerDesc || 'Himpunan Mahasiswa Islam Komisariat Kedokteran Gigi Universitas Muslim Indonesia. Wadah kader insan akademis, pencipta, dan pengabdi bernafaskan Islam.').replace(/"/g, '\\"') %>",
+  "sameAs": <%- JSON.stringify(socialSameAs) %>,
+  "contactPoint": [
+    {
+      "@type": "ContactPoint",
+      "telephone": "<%= cleanPhone %>",
+      "contactType": "customer service",
+      "contactOption": "TollFree",
+      "areaServed": "ID",
+      "availableLanguage": ["Indonesian", "English"]
+    },
+    {
+      "@type": "ContactPoint",
+      "email": "<%= orgEmail %>",
+      "contactType": "public relations",
+      "areaServed": "ID",
+      "availableLanguage": ["Indonesian", "English"]
+    }
   ],
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "contactType": "customer service",
-    "url": "<%= schemaBaseUrl %>/"
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "<%= orgAddress.replace(/"/g, '\\"') %>",
+    "addressLocality": "Makassar",
+    "addressRegion": "Sulawesi Selatan",
+    "postalCode": "90131",
+    "addressCountry": "ID"
   }
 }
 </script>
 
-<!-- 2. EXPERT SEO: WebSite Schema (KUNCI UTAMA UNTUK MENGUBAH NAMA SITUS DI GBR 1) -->
+<!-- 2. GOLD STANDARD GSC: WebSite Schema & Sitelinks Searchbox -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "HMI KOMKG UMI",
-  "alternateName": "HMI KomKG-UMI",
+  "@id": "<%= schemaBaseUrl %>/#website",
   "url": "<%= schemaBaseUrl %>/",
+  "name": "<%= (schemaSafeSettings.heroTitle || schemaSafeSettings.webTitle || 'HMI KOMKG UMI').replace(/"/g, '\\"') %>",
+  "alternateName": [
+    "HMI KomKG-UMI",
+    "HMI Kedokteran Gigi UMI",
+    "HMI KOMKG UMI Official"
+  ],
+  "description": "<%= (schemaSafeSettings.seoDescription || 'Website Resmi Himpunan Mahasiswa Islam (HMI) Komisariat Kedokteran Gigi Universitas Muslim Indonesia Makassar.').replace(/"/g, '\\"') %>",
+  "inLanguage": "id-ID",
+  "publisher": {
+    "@id": "<%= schemaBaseUrl %>/#organization"
+  },
   "potentialAction": {
     "@type": "SearchAction",
     "target": {
       "@type": "EntryPoint",
-      "urlTemplate": "<%= schemaBaseUrl %>/?q={search_term_string}"
+      "urlTemplate": "<%= schemaBaseUrl %>/?filter={search_term_string}"
     },
     "query-input": "required name=search_term_string"
   }
+}
+</script>
+
+<!-- 3. GOLD STANDARD GSC: SiteNavigationElement (Sitelinks Navigation Google Search Result) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "@id": "<%= schemaBaseUrl %>/#sitelinks-navigation",
+  "name": "Navigasi Portal Resmi HMI KomKG UMI",
+  "description": "Daftar navigasi langsung halaman utama HMI Komisariat Kedokteran Gigi UMI untuk Google Sitelinks",
+  "itemListElement": [
+    {
+      "@type": "SiteNavigationElement",
+      "position": 1,
+      "name": "Beranda",
+      "description": "Pusat informasi terbaru, proker, dan refleksi kader HMI KomKG UMI",
+      "url": "<%= schemaBaseUrl %>/"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 2,
+      "name": "Tentang Kami",
+      "description": "Profil sejarah, visi, misi, struktur pengurus harian, bidang, dan KOHATI",
+      "url": "<%= schemaBaseUrl %>/tentang"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 3,
+      "name": "Galeri Kegiatan",
+      "description": "Dokumentasi visual foto kegiatan dan album kader HMI KomKG UMI",
+      "url": "<%= schemaBaseUrl %>/galeri"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 4,
+      "name": "Data Anggota",
+      "description": "Database keanggotaan dan arsip dokumen kader HMI KomKG UMI",
+      "url": "<%= schemaBaseUrl %>/data-anggota"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 5,
+      "name": "Narahubung",
+      "description": "Layanan kontak, sekretariat, pengajuan kemitraan dan surat undangan",
+      "url": "<%= schemaBaseUrl %>/narahubung"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 6,
+      "name": "Developer Team",
+      "description": "Sosok dibalik perancangan dan pengembangan website HMI KomKG UMI",
+      "url": "<%= schemaBaseUrl %>/ourteam"
+    }
+  ]
 }
 </script>
