@@ -20,7 +20,7 @@
 
         <div class="announce-right">
             <!-- ID ini dihubungkan dengan aria-labelledby di atas -->
-            <h2 class="announce-title" id="announceTitle"><%= siteSettings.announceTitle || 'Pengumuman' %></h2>
+            <h2 class="announce-title" id="announceTitle" style="color: #ffffff !important; text-shadow: 0 2px 8px rgba(0,0,0,0.6);"><%= siteSettings.announceTitle || 'Pengumuman' %></h2>
             <div class="announce-divider"></div>
             
             <!-- ==============================================================
@@ -28,7 +28,7 @@
                  ruang kosong (newline) berlebihan di atas/bawah teks yang 
                  membuat garis border memanjang ke atas tidak proporsional.
             ============================================================== -->
-            <div class="rich-text-content announce-text">
+            <div class="rich-text-content announce-text" style="color: #f3f4f6 !important; text-shadow: 0 1px 4px rgba(0,0,0,0.5);">
                 <%- (siteSettings.announceContent || '').trim() %>
             </div>
 
