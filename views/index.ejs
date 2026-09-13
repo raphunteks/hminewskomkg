@@ -1,82 +1,85 @@
 <% 
     // ==============================================================
-    // FIX ERROR 500 & SEO BREADCRUMB: 
-    // Injeksi variabel SEO secara eksplisit untuk Halaman Beranda
+    // 100% DYNAMIC SSR SEO: Halaman Beranda Resmi
     // ==============================================================
     let page = 'beranda';
-    let pageTitle = 'Beranda';
     let quotesList = (typeof kaderQuotes !== 'undefined' && Array.isArray(kaderQuotes)) ? kaderQuotes : [];
+    let pillarsList = (typeof homePillars !== 'undefined' && Array.isArray(homePillars)) ? homePillars : [];
+    let programsList = (typeof homePrograms !== 'undefined' && Array.isArray(homePrograms)) ? homePrograms : [];
+    let milestonesList = (typeof homeMilestones !== 'undefined' && Array.isArray(homeMilestones)) ? homeMilestones : [];
+    let timelineList = (typeof homeTimeline !== 'undefined' && Array.isArray(homeTimeline)) ? homeTimeline : [];
+    let faqList = (typeof homeFaq !== 'undefined' && Array.isArray(homeFaq)) ? homeFaq : [];
+    const seoBaseUrl = 'https://www.hmikomkgumi.xyz';
 %>
-<%- include('partials/header', { page: page, pageTitle: pageTitle }) %>
+<%- include('partials/header', { page: page }) %>
 
 <!-- ==============================================================
-     SUPER BIG UPGRADE: ADVANCED SEO & DYNAMIC SCHEMA.ORG INJECTION
-     Otomatis mengindeks Berita & Kutipan Kader ke Google Search Console
+     GOLD STANDARD GSC: DYNAMIC ITEMLIST SCHEMA (NEWS & KADER QUOTES)
 ============================================================== -->
-<script type="application/ld+json" id="dynamic-seo-schema">
+<% if((typeof news !== 'undefined' && news.length > 0) || (quotesList.length > 0)) { %>
+<script type="application/ld+json" id="dynamic-seo-schema-beranda">
 {
   "@context": "https://schema.org",
   "@graph": [
-    {
-      "@type": "WebSite",
-      "@id": "https://hmikomkgumi.xyz/#website",
-      "url": "https://hmikomkgumi.xyz/",
-      "name": "<%= typeof siteSettings !== 'undefined' ? (siteSettings.heroTitle || siteSettings.webTitle || 'HMI KomKG UMI') : 'HMI KomKG UMI' %>",
-      "description": "Website Resmi Himpunan Mahasiswa Islam (HMI) Komisariat Kedokteran Gigi Universitas Muslim Indonesia. Mewujudkan insan akademis, pencipta, pengabdi yang bernafaskan Islam.",
-      "inLanguage": "id-ID"
-    },
-    {
-      "@type": "Organization",
-      "@id": "https://hmikomkgumi.xyz/#organization",
-      "name": "HMI KomKG UMI",
-      "url": "https://hmikomkgumi.xyz/",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://hmikomkgumi.xyz/img/logo.png"
-      }
-    }
-    <% if(typeof news !== 'undefined' && news.length > 0) { %>,
+    <% if(typeof news !== 'undefined' && news.length > 0) { %>
     {
       "@type": "ItemList",
-      "@id": "https://hmikomkgumi.xyz/#news-list",
-      "name": "Update Berita dan Kajian Terbaru",
+      "@id": "<%= seoBaseUrl %>/#news-list",
+      "name": "Update Berita dan Kajian Terbaru HMI KomKG UMI",
+      "description": "Daftar publikasi artikel berita, kajian keislaman, dan warta kegiatan HMI KomKG UMI",
       "itemListElement": [
-        <% news.forEach((item, index) => { %>
+        <% news.forEach((item, index) => { 
+            const itemSlug = item.slug || item.id;
+            const itemUrl = `${seoBaseUrl}/berita/${encodeURIComponent(itemSlug)}`;
+            let itemImg = item.image || '/img/logo-hmikomkgumi.png';
+            if (!itemImg.startsWith('http')) itemImg = seoBaseUrl + (itemImg.startsWith('/') ? '' : '/') + itemImg;
+        %>
         {
           "@type": "ListItem",
           "position": <%= index + 1 %>,
-          "url": "https://hmikomkgumi.xyz/berita/<%= item.slug %>",
+          "url": "<%= itemUrl %>",
           "item": {
             "@type": "NewsArticle",
             "headline": <%- JSON.stringify(item.title) %>,
-            "image": <%- JSON.stringify(item.image) %>,
+            "image": "<%= itemImg %>",
             "datePublished": <%- JSON.stringify(item.date) %>,
-            "url": "https://hmikomkgumi.xyz/berita/<%= item.slug %>",
+            "url": "<%= itemUrl %>",
             "author": {
               "@type": "Organization",
-              "name": "Admin HMI KomKG UMI"
+              "name": "HMI KomKG UMI",
+              "url": "<%= seoBaseUrl %>/"
+            },
+            "publisher": {
+              "@id": "<%= seoBaseUrl %>/#organization"
             }
           }
         }<%= index < news.length - 1 ? ',' : '' %>
         <% }) %>
       ]
-    }
+    }<%= quotesList.length > 0 ? ',' : '' %>
     <% } %>
-    <% if(quotesList.length > 0) { %>,
+    <% if(quotesList.length > 0) { %>
     {
       "@type": "ItemList",
-      "@id": "https://hmikomkgumi.xyz/#kader-quotes",
+      "@id": "<%= seoBaseUrl %>/#kader-quotes",
       "name": "Apa Kata Kader - Inspirasi dan Refleksi Kader HMI KomKG UMI",
+      "description": "Untaian refleksi, kutipan inspiratif, dan gagasan kader HMI KomKG UMI",
       "itemListElement": [
-        <% quotesList.forEach((q, qIndex) => { %>
+        <% quotesList.forEach((q, qIndex) => { 
+            let qImg = q.image || '/img/logo-hmikomkgumi.png';
+            if (!qImg.startsWith('http')) qImg = seoBaseUrl + (qImg.startsWith('/') ? '' : '/') + qImg;
+        %>
         {
           "@type": "ListItem",
           "position": <%= qIndex + 1 %>,
           "item": {
             "@type": "Person",
             "name": <%- JSON.stringify(q.name) %>,
-            "jobTitle": <%- JSON.stringify(q.role) %>,
-            "image": <%- JSON.stringify(q.image || 'https://hmikomkgumi.xyz/img/logo-hmikomkgumi.png') %>,
+            "jobTitle": <%- JSON.stringify(q.role || 'Kader HMI') %>,
+            "image": "<%= qImg %>",
+            "affiliation": {
+              "@id": "<%= seoBaseUrl %>/#organization"
+            },
             <% if (q.ig && q.ig.trim() !== '') { %>
             "sameAs": [<%- JSON.stringify(q.ig) %>],
             <% } %>
@@ -85,40 +88,31 @@
         }<%= qIndex < quotesList.length - 1 ? ',' : '' %>
         <% }) %>
       ]
+    }<%= (faqList.length > 0) ? ',' : '' %>
+    <% } %>
+    <% if(faqList.length > 0) { %>
+    {
+      "@type": "FAQPage",
+      "@id": "<%= seoBaseUrl %>/#faq",
+      "mainEntity": [
+        <% faqList.forEach((faqItem, fIdx) => { %>
+        {
+          "@type": "Question",
+          "name": <%- JSON.stringify(faqItem.question) %>,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": <%- JSON.stringify(faqItem.answer) %>
+          }
+        }<%= fIdx < faqList.length - 1 ? ',' : '' %>
+        <% }) %>
+      ]
     }
     <% } %>
   ]
 }
 </script>
+<% } %>
 <script src="/js/protect-devtools.js" defer></script>
-
-<script>
-// DYNAMIC META TAGS INJECTION (OPEN GRAPH & TWITTER)
-document.addEventListener('DOMContentLoaded', () => {
-    const metaTags = [
-        { name: "description", content: "Website Resmi HMI Komisariat Kedokteran Gigi UMI. Update terbaru seputar kegiatan, proker, dan informasi komisariat." },
-        { name: "keywords", content: "HMI KomKG UMI, HMI, Kedokteran Gigi UMI, Organisasi Mahasiswa Makassar, Yakusa, Yakin Usaha Sampai, Proker HMI" },
-        { name: "author", content: "Admin HMI KomKG UMI" },
-        { property: "og:title", content: "Beranda | HMI KomKG UMI" },
-        { property: "og:description", content: "Website Resmi HMI Komisariat Kedokteran Gigi UMI. Wadah pengembangan akademik, keislaman, dan sosial kemasyarakatan." },
-        { property: "og:type", content: "website" },
-        { property: "og:url", content: "https://hmikomkgumi.xyz/" },
-        { property: "twitter:card", content: "summary_large_image" },
-        { property: "twitter:title", content: "Beranda | HMI KomKG UMI" }
-    ];
-
-    metaTags.forEach(tag => {
-        let selector = tag.name ? `meta[name="${tag.name}"]` : `meta[property="${tag.property}"]`;
-        if (!document.head.querySelector(selector)) {
-            let el = document.createElement('meta');
-            if(tag.name) el.name = tag.name;
-            if(tag.property) el.setAttribute('property', tag.property);
-            el.content = tag.content;
-            document.head.appendChild(el);
-        }
-    });
-});
-</script>
 
 <!-- POPUP PENGUMUMAN HORIZONTAL -->
 <% if (typeof siteSettings !== 'undefined' && (siteSettings.announceActive === 'true' || siteSettings.announceActive === true)) { %>
@@ -133,6 +127,34 @@ document.addEventListener('DOMContentLoaded', () => {
     <p itemprop="description">Kami adalah sebuah organisasi mahasiswa yang terdiri dari para mahasiswa kedokteran gigi yang memiliki komitmen untuk meningkatkan kualitas diri dan mengembangkan potensi dalam bidang akademik, keislaman, sosial, dan kemanusiaan.</p>
     <a href="/tentang" class="btn btn-primary" aria-label="Kenali Kami Lebih Dekat">Kenali Kami Lebih Dekat</a>
 </header>
+
+<!-- ==============================================================
+     SECTION 1: PILAR NILAI INSAN CITA & TRI DHARMA
+     (HOLOGRAPHIC GLASS SPOTLIGHT - 100% RESPONSIVE & DYNAMIC SSR)
+============================================================== -->
+<% if (pillarsList.length > 0) { %>
+<section class="home-section-container" aria-label="Pilar Insan Cita dan Nilai Perjuangan">
+    <div class="genz-header-center">
+        <span class="genz-badge-pill">
+            <i data-lucide="compass" style="width:14px; height:14px;"></i> NILAI & IDENTITAS
+        </span>
+        <h2 class="genz-section-title">Pilar <span class="text-gradient">Insan Cita</span></h2>
+        <p class="genz-section-subtitle">Arah langkah dan integritas perjuangan kader kedokteran gigi muslim</p>
+    </div>
+    <div class="holo-pillar-grid">
+        <% pillarsList.forEach(pi => { %>
+            <div class="holo-pillar-card">
+                <div class="holo-pillar-icon-box">
+                    <i data-lucide="<%= pi.icon || 'star' %>" style="width:28px; height:28px;"></i>
+                </div>
+                <span class="holo-pillar-tag"><%= pi.subtitle %></span>
+                <h3 class="holo-pillar-title"><%= pi.title %></h3>
+                <p class="holo-pillar-desc"><%= pi.description %></p>
+            </div>
+        <% }) %>
+    </div>
+</section>
+<% } %>
 
 <!-- ==============================================================
      SUPER BIG UPGRADE: SECTION "APA KATA KADER?" 
@@ -182,6 +204,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 </article>
             <% }) %>
         </div>
+    </div>
+</section>
+<% } %>
+
+<!-- ==============================================================
+     SECTION 2: PROGRAM KERJA UNGGULAN & AGENDA STRATEGIS
+     (INTERACTIVE BENTO GRID - STATUS PILL, DYNAMIC SSR)
+============================================================== -->
+<% if (programsList.length > 0) { %>
+<section class="home-section-container" aria-label="Program Kerja Unggulan">
+    <div class="genz-header-center">
+        <span class="genz-badge-pill">
+            <i data-lucide="layers" style="width:14px; height:14px;"></i> DEDIKASI NYATA
+        </span>
+        <h2 class="genz-section-title">Program Kerja <span class="text-gradient">Unggulan</span></h2>
+        <p class="genz-section-subtitle">Agenda strategis dan kontribusi konkrit bagi mahasiswa & masyarakat</p>
+    </div>
+    <div class="bento-programs-grid">
+        <% programsList.forEach(prog => { 
+            let statusClass = 'status-berjalan';
+            if (prog.status === 'Terlaksana') statusClass = 'status-terlaksana';
+            else if (prog.status === 'Akan Datang') statusClass = 'status-mendatang';
+        %>
+            <article class="bento-program-card">
+                <div class="bento-program-thumb-wrap">
+                    <img src="<%= prog.image || '/img/logo-hmikomkgumi.png' %>" alt="<%= prog.title %>" class="bento-program-thumb" onerror="this.src='/img/logo-hmikomkgumi.png'" loading="lazy">
+                    <span class="bento-program-status-pill <%= statusClass %>"><%= prog.status %></span>
+                </div>
+                <div class="bento-program-body">
+                    <div class="bento-program-meta">
+                        <i data-lucide="calendar" style="width:14px; height:14px;"></i>
+                        <span><%= prog.date || 'Agenda Rutin' %></span>
+                        <span style="margin-left:auto; opacity:0.85; font-size:0.75rem;"><%= prog.category %></span>
+                    </div>
+                    <h3 class="bento-program-title"><%= prog.title %></h3>
+                    <p class="bento-program-desc"><%= prog.description %></p>
+                </div>
+            </article>
+        <% }) %>
     </div>
 </section>
 <% } %>
@@ -255,129 +316,126 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 </section>
 
+<!-- ==============================================================
+     SECTION 3: STATISTIK PRESTASI & REKAM JEJAK DAMPAK
+     (NEUMORPHIC IMPACT COUNTERS - DYNAMIC SSR)
+============================================================== -->
+<% if (milestonesList.length > 0) { %>
+<section class="home-section-container" aria-label="Statistik Prestasi Organisasi">
+    <div class="genz-header-center">
+        <span class="genz-badge-pill">
+            <i data-lucide="award" style="width:14px; height:14px;"></i> REKAM JEJAK
+        </span>
+        <h2 class="genz-section-title">Jejak & <span class="text-gradient">Prestasi</span></h2>
+        <p class="genz-section-subtitle">Dedikasi berkesinambungan mencetak insan akademis, pencipta, dan pengabdi</p>
+    </div>
+    <div class="milestones-neo-grid">
+        <% milestonesList.forEach(m => { %>
+            <div class="milestone-neo-card">
+                <div class="milestone-icon-circle">
+                    <i data-lucide="<%= m.icon || 'award' %>" style="width:24px; height:24px;"></i>
+                </div>
+                <div class="milestone-number"><%= m.number %></div>
+                <h3 class="milestone-label"><%= m.label %></h3>
+                <p class="milestone-context"><%= m.context %></p>
+            </div>
+        <% }) %>
+    </div>
+</section>
+<% } %>
+
 <%- include('partials/instagram-feed') %>
 
-<!-- DASHBOARD ANALYTICS WIDGET -->
-<section class="analytics-section" aria-label="Statistik Kunjungan Website">
-    <div class="analytics-grid">
-        <div class="analytic-card">
-            <h4 class="analytic-title">VIEWS TODAY</h4>
-            <div class="analytic-value stat-today" id="val-today">
-                <i data-lucide="loader-2" class="spin-icon"></i>
+<!-- ==============================================================
+     SECTION 4: JEJAK LANGKAH & TIMELINE DINAMIKA KEPENGURUSAN
+     (GLOWING GLASS TIMELINE - DYNAMIC SSR)
+============================================================== -->
+<% if (timelineList.length > 0) { %>
+<section class="home-section-container" aria-label="Timeline Dinamika Kepengurusan">
+    <div class="genz-header-center">
+        <span class="genz-badge-pill">
+            <i data-lucide="milestone" style="width:14px; height:14px;"></i> ROADMAP GERAKAN
+        </span>
+        <h2 class="genz-section-title">Timeline <span class="text-gradient">Perjalanan</span></h2>
+        <p class="genz-section-subtitle">Tahapan dinamika kepengurusan dari awal konsolidasi hingga akhir khidmat</p>
+    </div>
+    <div class="timeline-glass-wrapper">
+        <% timelineList.forEach(t => { %>
+            <div class="timeline-glass-item">
+                <div class="timeline-glass-dot"></div>
+                <div class="timeline-glass-card">
+                    <div class="timeline-glass-header">
+                        <span class="timeline-period-badge">
+                            <i data-lucide="clock" style="width:12px; height:12px;"></i> <%= t.period %>
+                        </span>
+                        <span class="timeline-status-badge status-text-<%= t.status === 'Selesai' ? 'selesai' : (t.status === 'Berjalan' ? 'berjalan' : 'mendatang') %>">
+                            <%= t.status %>
+                        </span>
+                    </div>
+                    <h3 class="timeline-card-title"><%= t.title %></h3>
+                    <p class="timeline-card-desc"><%= t.description %></p>
+                </div>
             </div>
-        </div>
-        <div class="analytic-card">
-            <h4 class="analytic-title">THIS WEEK</h4>
-            <div class="analytic-value stat-week" id="val-week">
-                <i data-lucide="loader-2" class="spin-icon"></i>
+        <% }) %>
+    </div>
+</section>
+<% } %>
+
+<!-- ==============================================================
+     SECTION 5: F.A.Q CALON KADER & PUSAT BANTUAN
+     (INTERACTIVE GLASS ACCORDION + WHATSAPP CTA - DYNAMIC SSR)
+============================================================== -->
+<% if (faqList.length > 0) { %>
+<section class="home-section-container" aria-label="Pertanyaan Umum Seputar HMI KomKG UMI">
+    <div class="genz-header-center">
+        <span class="genz-badge-pill">
+            <i data-lucide="help-circle" style="width:14px; height:14px;"></i> PUSAT BANTUAN
+        </span>
+        <h2 class="genz-section-title">Pertanyaan <span class="text-gradient">Umum (FAQ)</span></h2>
+        <p class="genz-section-subtitle">Informasi penting yang paling sering ditanyakan oleh calon kader</p>
+    </div>
+    <div class="faq-neo-wrapper">
+        <% faqList.forEach((faq, fIdx) => { %>
+            <div class="faq-neo-item <%= fIdx === 0 ? 'active' : '' %>">
+                <button type="button" class="faq-neo-question" onclick="toggleFaq(this)" aria-expanded="<%= fIdx === 0 ? 'true' : 'false' %>">
+                    <span><%= faq.question %></span>
+                    <i data-lucide="chevron-down" class="faq-chevron"></i>
+                </button>
+                <div class="faq-neo-answer">
+                    <%= faq.answer %>
+                </div>
             </div>
-        </div>
-        <div class="analytic-card">
-            <h4 class="analytic-title">TOTAL VIEWS</h4>
-            <div class="analytic-value stat-total" id="val-total">
-                <i data-lucide="loader-2" class="spin-icon"></i>
-            </div>
-        </div>
+        <% }) %>
+    </div>
+    <div class="faq-cta-box">
+        <h4 style="color:var(--theme-heading); margin:0; font-size:1.15rem; font-weight:800;">Masih Punya Pertanyaan Lain?</h4>
+        <p style="color:var(--theme-text); margin:0; font-size:0.9rem;">Admin dan pengurus kami siap membantu menjawab pertanyaanmu secara langsung.</p>
+        <a href="https://api.whatsapp.com/send/?phone=6285338922586&text=Halo%20Admin%20HMI%20KomKG%20UMI,%20saya%20ingin%20bertanya%20seputar%20informasi%20kegiatan%20atau%20pendaftaran%20LK-1.&type=phone_number&app_absent=0" target="_blank" rel="noopener noreferrer" class="faq-cta-btn">
+            <i data-lucide="message-circle" style="width:18px; height:18px;"></i>
+            <span>Tanya Langsung ke Admin WhatsApp</span>
+        </a>
     </div>
 </section>
 
-<!-- SCRIPT PENGGERAK API GOOGLE APPS SCRIPT -->
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbw8MA9YGFK3SIAXhIZAF9m1J4eOGf9LGQD-j4xXjvVSaQ826JrqeEKApPcKJWfJxw/exec";
-
-    let currentStats = { today: -1, week: -1, total: -1 };
-
-    function animateValue(obj, start, end, duration) {
-        if (start === end) return; 
-        let startTimestamp = null;
-        const step = (timestamp) => {
-            if (!startTimestamp) startTimestamp = timestamp;
-            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString('id-ID'); 
-            if (progress < 1) {
-                window.requestAnimationFrame(step);
-            }
-        };
-        window.requestAnimationFrame(step);
+function toggleFaq(btn) {
+    const item = btn.closest('.faq-neo-item');
+    const isActive = item.classList.contains('active');
+    document.querySelectorAll('.faq-neo-item').forEach(el => {
+        el.classList.remove('active');
+        const b = el.querySelector('.faq-neo-question');
+        if (b) b.setAttribute('aria-expanded', 'false');
+    });
+    if (!isActive) {
+        item.classList.add('active');
+        btn.setAttribute('aria-expanded', 'true');
     }
-
-    function updateUI(data, speed) {
-        if(data.today !== undefined && data.today !== currentStats.today) {
-            animateValue(document.getElementById('val-today'), Math.max(0, currentStats.today), data.today, speed);
-            currentStats.today = data.today;
-        }
-        if(data.week !== undefined && data.week !== currentStats.week) {
-            animateValue(document.getElementById('val-week'), Math.max(0, currentStats.week), data.week, speed);
-            currentStats.week = data.week;
-        }
-        if(data.total !== undefined && data.total !== currentStats.total) {
-            animateValue(document.getElementById('val-total'), Math.max(0, currentStats.total), data.total, speed);
-            currentStats.total = data.total;
-        }
-    }
-
-    async function fastFetchData() {
-        try {
-            const response = await fetch(GAS_URL + "?t=" + new Date().getTime());
-            const textResponse = await response.text(); 
-            
-            try {
-                const data = JSON.parse(textResponse);
-                updateUI(data, 1000);
-            } catch (jsonErr) {
-                console.warn("GAS Redirect/CORS Error, menggunakan fallback UI.");
-                setFallbackUI();
-            }
-        } catch (err) {
-            console.warn("Koneksi ke GAS lambat/gagal.", err);
-        }
-    }
-
-    async function recordVisitPost() {
-        try {
-            const ipResponse = await fetch('https://api.ipify.org?format=json');
-            const ipData = await ipResponse.json();
-            const clientIP = ipData.ip || 'Unknown';
-
-            const response = await fetch(GAS_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ ip: clientIP })
-            });
-
-            const textResponse = await response.text(); 
-            
-            try {
-                const data = JSON.parse(textResponse);
-                if(data.status === "success") {
-                    updateUI(data, 500);
-                }
-            } catch (jsonErr) {
-                // Abaikan error parsing HTML
-            }
-        } catch (error) {
-            // Berjalan secara silent
-        }
-    }
-
-    function setFallbackUI() {
-        if(currentStats.today === -1) {
-            document.getElementById('val-today').innerHTML = "-";
-            document.getElementById('val-week').innerHTML = "-";
-            document.getElementById('val-total').innerHTML = "-";
-        }
-    }
-
-    fastFetchData();
-
-    setTimeout(() => { 
-        recordVisitPost(); 
-    }, 2000);
-
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-});
+}
 </script>
+<% } %>
+
+<!-- UNIFIED REAL-TIME ANALYTICS WIDGET -->
+<%- include('partials/analytics') %>
 
 <!-- FLOATING WHATSAPP CHAT POPUP WIDGET -->
 <div class="wa-widget-container" id="waWidgetContainer">
