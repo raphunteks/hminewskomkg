@@ -40,7 +40,7 @@
       ]
     },
     {
-      "source": "/sitemap.xml",
+      "source": "/sitemap-index.xml",
       "headers": [
         {
           "key": "Content-Type",
@@ -49,6 +49,44 @@
         {
           "key": "Cache-Control",
           "value": "public, s-maxage=3600, stale-while-revalidate=86400"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=1800, stale-while-revalidate=3600"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/sitemap_news.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=600, stale-while-revalidate=1200"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
         }
       ]
     },
@@ -95,7 +133,15 @@
   ],
   "routes": [
     {
+      "src": "/sitemap-index.xml",
+      "dest": "/server.js"
+    },
+    {
       "src": "/sitemap.xml",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/sitemap_news.xml",
       "dest": "/server.js"
     },
     {
