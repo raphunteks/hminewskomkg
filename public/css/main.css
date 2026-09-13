@@ -131,14 +131,14 @@ button, input, textarea, select { font-family: inherit; }
 
 /* LAYOUT (Z-INDEX FIXED) */
 .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-main { flex-grow: 1; padding-top: 110px; padding-bottom: 60px; position: relative; z-index: 20; }
+main { flex-grow: 1; padding-top: 110px; padding-bottom: 60px; position: relative; }
 
 /* UI UPGRADE 5: DYNAMIC BLOB ANIMATIONS */
 .bg-blob { 
     position: fixed; 
     border-radius: 50%; 
     filter: blur(100px); 
-    z-index: 1; 
+    z-index: 0; 
     opacity: var(--theme-blob-opacity); 
     pointer-events: none; 
     will-change: transform; 
@@ -162,6 +162,7 @@ main { flex-grow: 1; padding-top: 110px; padding-bottom: 60px; position: relativ
 .text-gradient { 
     background: linear-gradient(to right, #16a34a, #059669, #4ade80, #a7f3d0); 
     -webkit-background-clip: text; 
+    background-clip: text;
     color: transparent; 
     background-size: 300% auto;
     animation: textShine 4s linear infinite;
@@ -1136,6 +1137,24 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 .announce-btn { align-self: flex-start; padding: 12px 28px; font-size: 1rem; border-radius: 10px; font-weight: bold; background: transparent; border: 2px solid #4ade80; color: #4ade80; cursor: pointer; transition: all 0.3s ease; margin-top: auto; margin-bottom: 10px; outline: none; }
 .announce-btn:hover { background: #4ade80; color: #000; box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4); transform: translateY(-2px); }
 
+/* POPUP ANNOUNCE: HIGH-SPECIFICITY OVERRIDES (ALWAYS WHITE CONTRAST) */
+#announceModal .announce-title,
+html[data-theme="light"] #announceModal .announce-title,
+html[data-theme="dark"] #announceModal .announce-title {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+#announceModal .announce-text,
+#announceModal .announce-text *,
+html[data-theme="light"] #announceModal .announce-text,
+html[data-theme="light"] #announceModal .announce-text *,
+html[data-theme="dark"] #announceModal .announce-text,
+html[data-theme="dark"] #announceModal .announce-text * {
+    color: #f3f4f6 !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
 /* ==============================================================
    COLLAPSIBLE ADMIN SIDEBAR
 ============================================================== */
@@ -1420,6 +1439,213 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     margin-top: 0;
 }
 
+/* ==============================================================
+   ADMIN DASHBOARD MOBILE NAVIGATION (PILLS & CONTROL BAR)
+============================================================== */
+.admin-mobile-nav-container {
+    display: none; /* Tersembunyi di desktop */
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.admin-mobile-control-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    background: var(--theme-glass-bg);
+    border: 1px solid var(--theme-glass-border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-admin-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mobile-admin-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--theme-primary);
+    background: #fff;
+    flex-shrink: 0;
+}
+
+.mobile-admin-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.mobile-admin-title {
+    font-size: 0.95rem;
+    color: var(--theme-heading);
+    display: block;
+    line-height: 1.2;
+}
+
+.mobile-tab-indicator {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--theme-primary);
+    display: inline-block;
+}
+
+.mobile-admin-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mobile-btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: var(--theme-primary);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(16, 185, 129, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.mobile-btn-action:active {
+    transform: scale(0.95);
+}
+
+.mobile-btn-action svg {
+    width: 14px;
+    height: 14px;
+}
+
+.mobile-btn-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.mobile-btn-logout:active {
+    background: #ef4444;
+    color: #fff;
+}
+
+.mobile-btn-logout svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* STICKY HORIZONTAL SWIPEABLE PILLS TAB BAR */
+.admin-mobile-pills-bar {
+    position: sticky;
+    top: 85px;
+    z-index: 35;
+    background: var(--theme-header-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 8px 6px;
+    border-radius: 16px;
+    border: 1px solid var(--theme-glass-border);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+}
+
+.admin-mobile-pills-scroll {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 2px 4px;
+}
+
+.admin-mobile-pills-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.mobile-tab-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    border-radius: 30px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--theme-muted);
+    border: 1px solid var(--theme-glass-border);
+    cursor: pointer;
+    flex-shrink: 0;
+    scroll-snap-align: center;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-tab-pill svg {
+    width: 15px;
+    height: 15px;
+    stroke-width: 2.2;
+}
+
+.mobile-tab-pill .pill-badge {
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 800;
+}
+
+.mobile-tab-pill.active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff !important;
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+    transform: scale(1.02);
+}
+
+.mobile-tab-pill.active svg {
+    color: #ffffff !important;
+}
+
+.table-scroll-hint {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--theme-muted);
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    background: rgba(16, 185, 129, 0.08);
+    border-radius: 8px;
+    border-left: 3px solid #10b981;
+}
+
+.table-scroll-hint svg {
+    width: 14px;
+    height: 14px;
+    color: #10b981;
+}
+
 /* ADMIN PANELS & TABLES */
 .admin-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px; align-items: start; }
 .admin-main-content { display: flex; flex-direction: column; gap: 25px; min-width: 0; }
@@ -1473,10 +1699,37 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 .upload-icon-box svg { color: var(--theme-primary); width: 30px; height: 30px; }
 
 /* MODALS */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); z-index: 999999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; padding: 20px; overscroll-behavior: none; }
+.modal-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.78); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); 
+    z-index: 999999 !important; display: flex; align-items: center; justify-content: center; 
+    opacity: 0; visibility: hidden; transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+    padding: 20px; overscroll-behavior: contain; 
+}
 .modal-overlay.active { opacity: 1; visibility: visible; }
-.modal-content { background: #111827; color: #f3f4f6; border: 1px solid rgba(255,255,255,0.2); border-radius: 1.5rem; width: 100%; max-width: 600px; padding: 30px; transform: translateY(20px); transition: transform 0.3s ease; max-height: 90vh; overflow-y: auto; box-shadow: 0 15px 40px rgba(0,0,0,0.4); position: relative; will-change: transform; }
-.modal-overlay.active .modal-content { transform: translateY(0); }
+.modal-content { 
+    background: #111827; color: #f3f4f6; border: 1px solid rgba(255,255,255,0.2); 
+    border-radius: 1.5rem; width: 100%; max-width: 600px; padding: 30px; margin: auto;
+    transform: translateY(20px) scale(0.98); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+    max-height: calc(100vh - 40px); overflow-y: auto; overscroll-behavior: contain; 
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.1); 
+    position: relative; will-change: transform; z-index: 1000000;
+}
+.modal-overlay.active .modal-content { transform: translateY(0) scale(1); }
+
+/* MULTI-LAYER STACKING CONTEXT PROTECTION */
+body.modal-open .glass-header,
+body:has(.modal-overlay.active) .glass-header,
+body:has(.announce-overlay.active) .glass-header {
+    z-index: 40 !important;
+}
+
+body:has(.modal-overlay.active) main,
+body:has(.announce-overlay.active) main,
+main:has(.modal-overlay.active),
+main:has(.announce-overlay.active) {
+    z-index: 999999 !important;
+}
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
 .close-modal { background: none; border: none; color: #9ca3af; cursor: pointer; transition: transform 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; } .close-modal:hover { color: #ef4444; transform: scale(1.1) rotate(90deg); }
 .form-group { margin-bottom: 20px; text-align: left; }
@@ -1850,7 +2103,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 .card-meta { font-size: 0.8rem; color: var(--theme-primary); display: flex; align-items: center; gap: 5px; margin-bottom: 10px; }
 .card-title { font-size: clamp(1.1rem, 2vw, 1.25rem); margin-bottom: 15px; color: var(--theme-heading); transition: color 0.3s ease; }
 .news-card:hover .card-title { color: var(--theme-primary); }
-.card-text { font-size: 0.85rem; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; color: var(--theme-muted); flex-grow: 1; line-height: 1.6; }
+.card-text { font-size: 0.85rem; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; color: var(--theme-muted); flex-grow: 1; line-height: 1.6; }
 .read-more { color: var(--theme-primary); font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 5px; margin-top: auto; transition: transform 0.3s ease; }
 .news-card:hover .read-more { transform: translateX(5px); }
 
@@ -1977,7 +2230,7 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 .dev-page-header { text-align: center; margin-bottom: 60px; animation: cinematicFadeIn 0.8s ease forwards; }
 .dev-badge { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 5px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; display: inline-block; margin-bottom: 15px; }
 .dev-main-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; color: var(--theme-heading); margin-bottom: 10px; letter-spacing: -0.5px; }
-.text-blue-gradient { background: linear-gradient(135deg, #3b82f6, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.text-blue-gradient { background: linear-gradient(135deg, #3b82f6, #60a5fa); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 .dev-subtitle { color: var(--theme-muted); font-size: 0.95rem; max-width: 500px; margin: 0 auto; }
 
 .dev-category-wrap { margin-bottom: 50px; }
@@ -2392,32 +2645,35 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
 @media (max-width: 992px) {
     .admin-dashboard-container {
         flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
     }
+    /* Sembunyikan sidebar vertikal 700px di mobile/tablet agar tidak kepanjangan */
     .admin-sidebar-nav {
+        display: none !important;
+    }
+    /* Tampilkan Navigasi Khusus Mobile */
+    .admin-mobile-nav-container {
+        display: block !important;
+    }
+    .admin-main-wrap {
         width: 100%;
-        min-width: 100%;
-        position: relative;
-        top: 0;
-        min-height: auto;
+        max-width: 100%;
+        min-width: 0;
     }
-    .admin-dashboard-container.sidebar-collapsed .admin-sidebar-nav {
-        width: 100%;
-        min-width: 100%;
-    }
-    .admin-dashboard-container.sidebar-collapsed .sidebar-admin-info,
-    .admin-dashboard-container.sidebar-collapsed .sidebar-text {
-        display: inline;
-    }
-    .admin-dashboard-container.sidebar-collapsed .sidebar-admin-profile {
+    .table-scroll-hint {
         display: flex;
     }
-    .admin-dashboard-container.sidebar-collapsed .btn-sidebar-create,
-    .admin-dashboard-container.sidebar-collapsed .sidebar-nav-item,
-    .admin-dashboard-container.sidebar-collapsed .sidebar-logout-btn {
+    .table-wrapper {
         width: 100%;
-        height: auto;
-        padding: 11px 14px;
-        justify-content: flex-start;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 12px;
+    }
+    .admin-table {
+        min-width: 640px;
     }
 
     .admin-layout { grid-template-columns: 1fr; }
@@ -2482,9 +2738,31 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     .nav-item { width: 100%; justify-content: flex-start; padding: 14px 18px; border-radius: 12px; background: rgba(0,0,0,0.03) !important; }
     .nav-item.active { border-left: 4px solid var(--theme-primary); background: rgba(34,197,94,0.15) !important; border-radius: 8px; }
     
+    /* ANTI-OFFSIDE TOTAL DI HP (MAX-WIDTH 768PX) */
+    html, body {
+        overflow-x: hidden;
+        width: 100%;
+    }
+    .container {
+        padding: 0 10px !important;
+    }
+    .admin-panel {
+        padding: 18px 12px !important;
+        border-radius: 16px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+    .admin-table th, .admin-table td {
+        padding: 12px 8px !important;
+        font-size: 0.84rem !important;
+    }
+    
     .section-header { flex-direction: column; align-items: flex-start; gap: 15px; }
     .dashboard-header { flex-direction: column; gap: 20px; text-align: center; }
-    .panel-header { flex-direction: column; gap: 15px; text-align: center; }
+    .panel-header { flex-direction: column; align-items: flex-start !important; text-align: left !important; gap: 12px; }
+    .panel-actions { width: 100%; justify-content: flex-start; }
     
     /* KUTIPAN KADER MOBILE RESPONSIVE (5 ORANG STREAMING SCROLL) */
     .kader-stream-wrapper {
@@ -2722,4 +3000,521 @@ html[data-theme="light"] .sidebar-badge-dot { color: #ffffff !important; }
     .grid-dev-2 { grid-template-columns: 1fr; }
     .dev-category-title { font-size: 1.3rem; }
     .dev-main-title { font-size: 2.2rem; }
+}
+
+/* ==============================================================
+   5 SUPER MODERN SECTIONS: GLASSMORPHISM + NEUMORPHISM + HOLOGRAPHIC
+   (100% RESPONSIVE: MOBILE, TABLET, DESKTOP)
+============================================================== */
+
+/* Section Common Container */
+.home-section-container {
+    max-width: 1200px;
+    margin: 80px auto 0 auto;
+    padding: 0 20px;
+    position: relative;
+}
+
+/* 1. PILAR INSAN CITA & NILAI PERJUANGAN (HOLOGRAPHIC GLASS) */
+.holo-pillar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 35px;
+}
+
+.holo-pillar-card {
+    background: var(--theme-card-bg);
+    border: 1px solid var(--theme-glass-border);
+    border-radius: 24px;
+    padding: 30px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+}
+
+.holo-pillar-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, #10b981, #38bdf8, #f59e0b);
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.holo-pillar-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 20px 40px rgba(16, 185, 129, 0.2), 0 0 20px rgba(56, 189, 248, 0.15);
+}
+
+.holo-pillar-icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(56, 189, 248, 0.1));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #10b981;
+    margin-bottom: 20px;
+    transition: transform 0.4s ease;
+}
+
+.holo-pillar-card:hover .holo-pillar-icon-box {
+    transform: rotate(10deg) scale(1.1);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(56, 189, 248, 0.25));
+}
+
+.holo-pillar-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    margin-bottom: 12px;
+    align-self: flex-start;
+}
+
+.holo-pillar-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--theme-heading);
+    margin: 0 0 12px 0;
+    line-height: 1.3;
+}
+
+.holo-pillar-desc {
+    font-size: 0.92rem;
+    color: var(--theme-text);
+    line-height: 1.7;
+    margin: 0;
+    flex-grow: 1;
+}
+
+/* 2. PROGRAM KERJA UNGGULAN (BENTO GRID FLAGSHIPS) */
+.bento-programs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+    margin-top: 35px;
+}
+
+.bento-program-card {
+    background: var(--theme-card-bg);
+    border: 1px solid var(--theme-glass-border);
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.bento-program-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(56, 189, 248, 0.5);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25), 0 0 20px rgba(56, 189, 248, 0.2);
+}
+
+.bento-program-thumb-wrap {
+    width: 100%;
+    height: 210px;
+    position: relative;
+    overflow: hidden;
+    background: rgba(0,0,0,0.2);
+}
+
+.bento-program-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.bento-program-card:hover .bento-program-thumb {
+    transform: scale(1.08);
+}
+
+.bento-program-status-pill {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 14px;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.25);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.status-terlaksana {
+    background: rgba(16, 185, 129, 0.85);
+    color: #ffffff;
+}
+
+.status-berjalan {
+    background: rgba(56, 189, 248, 0.85);
+    color: #ffffff;
+}
+
+.status-mendatang {
+    background: rgba(245, 158, 11, 0.85);
+    color: #ffffff;
+}
+
+.bento-program-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.bento-program-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.8rem;
+    color: #10b981;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.bento-program-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--theme-heading);
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+}
+
+.bento-program-desc {
+    font-size: 0.9rem;
+    color: var(--theme-text);
+    line-height: 1.65;
+    margin: 0;
+    flex-grow: 1;
+}
+
+/* 3. STATISTIK PRESTASI & DAMPAK ORGANISASI (NEUMORPHIC COUNTERS) */
+.milestones-neo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 22px;
+    margin-top: 35px;
+}
+
+.milestone-neo-card {
+    background: var(--theme-card-bg);
+    border: 1px solid var(--theme-glass-border);
+    border-radius: 24px;
+    padding: 28px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.06), 0 10px 25px rgba(0,0,0,0.15);
+    transition: all 0.35s ease;
+}
+
+.milestone-neo-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 15px 35px rgba(16, 185, 129, 0.15);
+}
+
+.milestone-icon-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin: 0 auto 15px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: #10b981;
+}
+
+.milestone-number {
+    font-size: clamp(2rem, 3.5vw, 2.7rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #10b981 0%, #34d399 50%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.milestone-label {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--theme-heading);
+    margin: 0 0 6px 0;
+}
+
+.milestone-context {
+    font-size: 0.82rem;
+    color: var(--theme-text);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* 4. TIMELINE JEJAK PERJALANAN GERAKAN (GLOWING GLASS TIMELINE) */
+.timeline-glass-wrapper {
+    position: relative;
+    max-width: 860px;
+    margin: 40px auto 0 auto;
+    padding: 10px 0;
+}
+
+.timeline-glass-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 24px;
+    width: 3px;
+    background: linear-gradient(180deg, #10b981, #38bdf8, #10b981);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+    border-radius: 3px;
+}
+
+.timeline-glass-item {
+    position: relative;
+    padding-left: 65px;
+    margin-bottom: 35px;
+}
+
+.timeline-glass-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-glass-dot {
+    position: absolute;
+    left: 14px;
+    top: 10px;
+    width: 23px;
+    height: 23px;
+    border-radius: 50%;
+    background: #10b981;
+    border: 4px solid var(--theme-bg);
+    box-shadow: 0 0 14px #10b981;
+    z-index: 2;
+    transition: transform 0.3s ease;
+}
+
+.timeline-glass-item:hover .timeline-glass-dot {
+    transform: scale(1.25);
+    background: #38bdf8;
+    box-shadow: 0 0 18px #38bdf8;
+}
+
+.timeline-glass-card {
+    background: var(--theme-card-bg);
+    border: 1px solid var(--theme-glass-border);
+    border-radius: 20px;
+    padding: 22px 24px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: all 0.35s ease;
+}
+
+.timeline-glass-item:hover .timeline-glass-card {
+    transform: translateX(6px);
+    border-color: rgba(16, 185, 129, 0.4);
+}
+
+.timeline-glass-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.timeline-period-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.timeline-card-title {
+    font-size: 1.18rem;
+    font-weight: 800;
+    color: var(--theme-heading);
+    margin: 0;
+}
+
+.timeline-card-desc {
+    font-size: 0.9rem;
+    color: var(--theme-text);
+    line-height: 1.65;
+    margin: 0;
+}
+
+.timeline-status-badge {
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-block;
+}
+.status-text-selesai { color: #10b981 !important; }
+.status-text-berjalan { color: #38bdf8 !important; }
+.status-text-mendatang { color: #f59e0b !important; }
+
+/* 5. F.A.Q CALON KADER & PUSAT BANTUAN (GLASS ACCORDION) */
+.faq-neo-wrapper {
+    max-width: 860px;
+    margin: 40px auto 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.faq-neo-item {
+    background: var(--theme-card-bg);
+    border: 1px solid var(--theme-glass-border);
+    border-radius: 18px;
+    overflow: hidden;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.faq-neo-item.active {
+    border-color: rgba(16, 185, 129, 0.45);
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15);
+}
+
+.faq-neo-question {
+    width: 100%;
+    padding: 20px 24px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    text-align: left;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--theme-heading);
+    transition: color 0.3s ease;
+}
+
+.faq-neo-question:hover {
+    color: #10b981;
+}
+
+.faq-chevron {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: #10b981;
+    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.faq-neo-item.active .faq-chevron {
+    transform: rotate(180deg);
+}
+
+.faq-neo-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), padding 0.3s ease;
+    padding: 0 24px;
+    color: var(--theme-text);
+    font-size: 0.93rem;
+    line-height: 1.7;
+}
+
+.faq-neo-item.active .faq-neo-answer {
+    max-height: 600px;
+    padding: 0 24px 22px 24px;
+    transition: max-height 0.5s ease-in-out, padding 0.3s ease;
+}
+
+.faq-cta-box {
+    margin-top: 35px;
+    text-align: center;
+    padding: 25px 20px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(56, 189, 248, 0.08));
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+.faq-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 26px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    background: #10b981;
+    color: #ffffff;
+    text-decoration: none;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+    transition: all 0.3s ease;
+}
+
+.faq-cta-btn:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.5);
+    color: #ffffff;
+}
+
+/* Responsive Overrides */
+@media (max-width: 768px) {
+    .home-section-container { margin-top: 60px; padding: 0 15px; }
+    .bento-programs-grid { grid-template-columns: 1fr; }
+    .milestones-neo-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .milestone-neo-card { padding: 20px 12px; }
+    .milestone-number { font-size: 2rem; }
+    .timeline-glass-wrapper::before { left: 16px; }
+    .timeline-glass-dot { left: 7px; width: 19px; height: 19px; }
+    .timeline-glass-item { padding-left: 45px; }
+    .faq-neo-question { font-size: 0.96rem; padding: 16px 18px; }
+    .faq-neo-answer { font-size: 0.88rem; padding: 0 18px; }
+    .faq-neo-item.active .faq-neo-answer { padding: 0 18px 18px 18px; }
+}
+
+@media (max-width: 480px) {
+    .milestones-neo-grid { grid-template-columns: 1fr; }
 }
