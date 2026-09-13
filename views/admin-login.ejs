@@ -1,13 +1,13 @@
 <% 
     // ==============================================================
-    // FIX ERROR 500 & SEO BREADCRUMB
-    // Injeksi variabel SEO secara eksplisit untuk Halaman Login Admin
+    // ADMIN AUTHENTICATION: Proteksi NoIndex dari Mesin Pencari
     // ==============================================================
     let page = 'admin';
     let pageTitle = 'Login Administrator';
     let pageDescription = 'Halaman login otentikasi resmi pengelola website HMI Komisariat Kedokteran Gigi UMI.';
+    let noIndex = true;
 %>
-<%- include('partials/header', { page: page, pageTitle: pageTitle, pageDescription: pageDescription }) %>
+<%- include('partials/header', { page: page, pageTitle: pageTitle, pageDescription: pageDescription, noIndex: noIndex }) %>
 
 <!-- ==============================================================
      CONTAINER AUTENTIKASI DENGAN EFEK HOVER-EXPANDING (PERSIS GAMBAR 4)
