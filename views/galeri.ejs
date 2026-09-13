@@ -1,25 +1,36 @@
 <% 
     // ==============================================================
-    // FIX ERROR 500 & SEO BREADCRUMB: 
-    // Injeksi variabel SEO secara eksplisit untuk Halaman Galeri Utama
+    // 100% DYNAMIC SSR SEO: Halaman Galeri Kegiatan
     // ==============================================================
+    let page = 'galeri';
     let pageTitle = "Galeri Kegiatan";
-    let pageDescription = "Dokumentasi kegiatan dan momen inspiratif kader HMI Komisariat Kedokteran Gigi UMI.";
+    let pageDescription = "Dokumentasi arsip foto kegiatan, pelatihan kader, bakti sosial, dan momen inspiratif HMI Komisariat Kedokteran Gigi UMI.";
+    const seoBaseUrl = 'https://www.hmikomkgumi.xyz';
 %>
-<%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
+<%- include('partials/header', { page: page, pageTitle: pageTitle, pageDescription: pageDescription }) %>
 
 <!-- ==============================================================
-     EXPERT SEO UPGRADE: Semantic CollectionPage Header
+     GOLD STANDARD GSC: COLLECTIONPAGE SCHEMA (IMAGE GALLERIES)
 ============================================================== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": "<%= seoBaseUrl %>/galeri/#webpage",
+  "url": "<%= seoBaseUrl %>/galeri",
+  "name": "<%= pageTitle %> | HMI KomKG UMI",
+  "description": "<%= pageDescription %>",
+  "inLanguage": "id-ID",
+  "isPartOf": { "@id": "<%= seoBaseUrl %>/#website" }
+}
+</script>
+
+<!-- Semantic CollectionPage Header -->
 <header style="text-align: center; margin-bottom: 40px;" itemscope itemtype="https://schema.org/CollectionPage">
     <h1 itemprop="name" style="font-size:2rem; margin-bottom:10px; color: var(--theme-heading);">Galeri Kegiatan</h1>
     <p class="text-muted" itemprop="description">Dokumentasi kegiatan dan momen inspiratif kader HMI KomKG-UMI</p>
 </header>
 
-<!-- ==============================================================
-     EXPERT SEO UPGRADE: ItemList Microdata
-     (Didesain dengan display:contents agar layout Grid tidak rusak)
-============================================================== -->
 <section class="grid-3" itemscope itemtype="https://schema.org/ItemList">
     <meta itemprop="itemListOrder" content="https://schema.org/ItemListOrderDescending" />
     
@@ -28,9 +39,9 @@
     <article itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" style="display:contents;">
         <meta itemprop="position" content="<%= index + 1 %>" />
         
-        <!-- SEKARANG BISA DI-KLIK UNTUK MENUJU HALAMAN DETAIL -->
+        <!-- LINK MENUJU HALAMAN DETAIL -->
         <a href="/galeri/<%= album.id %>" class="glass gallery-card" style="display:block; cursor:pointer;" itemprop="item" itemscope itemtype="https://schema.org/ImageGallery">
-            <meta itemprop="url" content="https://hmikomkgumi.xyz/galeri/<%= album.id %>">
+            <meta itemprop="url" content="<%= seoBaseUrl %>/galeri/<%= album.id %>">
             <meta itemprop="author" content="Admin HMI KomKG UMI">
             <meta itemprop="datePublished" content="<%= album.date %>">
             
@@ -58,45 +69,11 @@
     <% } %>
 </section>
 
-<!-- ==============================================================
-     SUPER BIG UPGRADE: ANALYTICS DASHBOARD WIDGET (PERSIS GAMBAR)
-============================================================== -->
-<section class="analytics-section" aria-label="Statistik Pengunjung" style="margin-top: 50px;">
-    <div class="analytics-grid">
-        <div class="analytic-card">
-            <div class="analytic-title">VIEWS TODAY</div>
-            <div class="analytic-value stat-today" id="viewsToday">6</div>
-        </div>
-        <div class="analytic-card">
-            <div class="analytic-title">THIS WEEK</div>
-            <div class="analytic-value stat-week" id="viewsWeek">14</div>
-        </div>
-        <div class="analytic-card">
-            <div class="analytic-title">TOTAL VIEWS</div>
-            <div class="analytic-value stat-total" id="viewsTotal">130</div>
-        </div>
-    </div>
-</section>
+<%- include('partials/analytics') %>
 
 <script>
-    // Auto Loader Statistik Pengunjung Dinamis
-    async function loadVisitorStats() {
-        try {
-            const res = await fetch('/api/analytics');
-            if (res.ok) {
-                const data = await res.json();
-                if (data.today && document.getElementById('viewsToday')) document.getElementById('viewsToday').innerText = data.today;
-                if (data.week && document.getElementById('viewsWeek')) document.getElementById('viewsWeek').innerText = data.week;
-                if (data.total && document.getElementById('viewsTotal')) document.getElementById('viewsTotal').innerText = data.total;
-            }
-        } catch(e) {
-            // Tetap mempertahankan angka display bawaan jika offline/API pending
-        }
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
         if (typeof lucide !== 'undefined') lucide.createIcons();
-        loadVisitorStats();
     });
 </script>
 <script src="/js/protect-devtools.js" defer></script>
