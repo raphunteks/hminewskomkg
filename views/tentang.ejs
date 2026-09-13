@@ -1,26 +1,24 @@
 <% 
     // ==============================================================
-    // FIX ERROR 500 & SEO BREADCRUMB: 
-    // Injeksi variabel SEO secara eksplisit sebelum memanggil header
+    // 100% DYNAMIC SSR SEO: Halaman Tentang Kami
     // ==============================================================
+    let page = 'tentang';
     let pageTitle = "Tentang Kami";
     
     // BILINGUAL SEO UPGRADE: Menggabungkan ID & EN untuk menjaring lebih banyak kata kunci
-    let pageDescription = "Profil, Visi Misi, dan Struktur Kepengurusan HMI Komisariat Kedokteran Gigi UMI. About us, vision, mission, and organizational structure of HMI Dentistry UMI.";
-    let orgName = typeof siteSettings !== 'undefined' ? (siteSettings.headerTitle + ' ' + (siteSettings.headerHighlight || '')) : 'HMI KomKG UMI';
+    let pageDescription = "Profil resmi, visi misi, sejarah, struktur kepengurusan, dan Korps HMI-Wati (KOHATI) HMI Komisariat Kedokteran Gigi UMI. About us, vision, and organizational structure of HMI Dentistry UMI.";
+    let orgName = typeof siteSettings !== 'undefined' ? (siteSettings.headerTitle + ' ' + (siteSettings.headerHighlight || '')).trim() : 'HMI KomKG UMI';
     
     // ==============================================================
-    // SUPER BIG UPGRADE: DYNAMIC SEO SCHEMA GENERATOR (ENTERPRISE LEVEL)
-    // Men-generate Schema SEO "Person" secara otomatis setiap ada data pengurus baru
+    // DYNAMIC SEO SCHEMA GENERATOR (ENTERPRISE PERSON SCHEMAS)
     // ==============================================================
     let personsSchema = [];
-    let baseUrl = "https://hmikomkgumi.xyz"; // Domain resmi komisariat
+    let baseUrl = "https://www.hmikomkgumi.xyz";
     
-    // Fungsi Auto-Builder Schema
     function addMemberToSchema(member, department) {
         if(!member) return;
         let igLink = member.ig || baseUrl + "/tentang";
-        let imgUrl = member.image ? (member.image.startsWith('http') ? member.image : baseUrl + member.image) : baseUrl + "/img/default.png";
+        let imgUrl = member.image ? (member.image.startsWith('http') ? member.image : baseUrl + (member.image.startsWith('/') ? '' : '/') + member.image) : baseUrl + "/img/logo-hmikomkgumi.png";
         
         personsSchema.push({
             "@type": "Person",
@@ -47,7 +45,7 @@
     // 3. Auto-Generate SEO untuk KOHATI
     if (typeof siteSettings !== 'undefined' && String(siteSettings.kohatiActive) === 'true') {
         if(typeof kohatiPengurus !== 'undefined') {
-            kohatiPengurus.forEach(p => addMemberToSchema(p, "Pengurus Harian KOHATI (Women's Division Board)"));
+            kohatiPengurus.forEach(p => addMemberToSchema(p, "Pengurus Harian KOHATI"));
         }
         if(typeof kohatiBidang !== 'undefined') {
             kohatiBidang.forEach(b => {
@@ -56,11 +54,10 @@
         }
     }
 %>
-<%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
+<%- include('partials/header', { page: page, pageTitle: pageTitle, pageDescription: pageDescription }) %>
 
 <!-- ==============================================================
      ADVANCED JSON-LD SCHEMA.ORG (@graph) - SERVER SIDE RENDERED
-     Google akan memanen ribuan meta data ini dalam hitungan milidetik.
 ============================================================== -->
 <script type="application/ld+json">
 {
@@ -73,37 +70,7 @@
       "name": "<%= pageTitle %> | <%= orgName %>",
       "description": "<%= pageDescription %>",
       "inLanguage": ["id-ID", "en-US"],
-      "publisher": { "@id": "<%= baseUrl %>/#organization" }
-    },
-    {
-      "@type": "Organization",
-      "@id": "<%= baseUrl %>/#organization",
-      "name": "<%= orgName %>",
-      "alternateName": "Islamic Association of University Students - Dentistry Commissariat UMI",
-      "url": "<%= baseUrl %>/",
-      "description": "Organisasi mahasiswa Islam tingkat fakultas kedokteran gigi. Islamic student organization at the faculty of dentistry level.",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "<%= baseUrl %>/img/logo-hmikomkgumi.png"
-      }
-    },
-    {
-      "@type": "BreadcrumbList",
-      "@id": "<%= baseUrl %>/tentang/#breadcrumb",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Beranda (Home)",
-          "item": "<%= baseUrl %>/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Tentang Kami (About Us)",
-          "item": "<%= baseUrl %>/tentang"
-        }
-      ]
+      "isPartOf": { "@id": "<%= baseUrl %>/#website" }
     }
     <% if (personsSchema.length > 0) { %>,
     <%- JSON.stringify(personsSchema).slice(1, -1) %>
@@ -400,25 +367,7 @@
 
 </article>
 
-<!-- ==============================================================
-     SUPER BIG UPGRADE: ANALYTICS DASHBOARD WIDGET (PERSIS GAMBAR)
-============================================================== -->
-<section class="analytics-section" aria-label="Statistik Pengunjung">
-    <div class="analytics-grid">
-        <div class="analytic-card">
-            <div class="analytic-title">VIEWS TODAY</div>
-            <div class="analytic-value stat-today" id="viewsToday">6</div>
-        </div>
-        <div class="analytic-card">
-            <div class="analytic-title">THIS WEEK</div>
-            <div class="analytic-value stat-week" id="viewsWeek">14</div>
-        </div>
-        <div class="analytic-card">
-            <div class="analytic-title">TOTAL VIEWS</div>
-            <div class="analytic-value stat-total" id="viewsTotal">130</div>
-        </div>
-    </div>
-</section>
+<%- include('partials/analytics') %>
 
 <script>
     function openTab(tabId) {
@@ -430,25 +379,9 @@
             event.currentTarget.classList.add('active');
         }
     }
-    
-    // Auto Loader Statistik Pengunjung Dinamis
-    async function loadVisitorStats() {
-        try {
-            const res = await fetch('/api/analytics');
-            if (res.ok) {
-                const data = await res.json();
-                if (data.today && document.getElementById('viewsToday')) document.getElementById('viewsToday').innerText = data.today;
-                if (data.week && document.getElementById('viewsWeek')) document.getElementById('viewsWeek').innerText = data.week;
-                if (data.total && document.getElementById('viewsTotal')) document.getElementById('viewsTotal').innerText = data.total;
-            }
-        } catch(e) {
-            // Mempertahankan angka display bawaan jika offline/API pending
-        }
-    }
 
     document.addEventListener('DOMContentLoaded', () => {
-        if(typeof lucide !== 'undefined') lucide.createIcons();
-        loadVisitorStats();
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 </script>
 <script src="/js/protect-devtools.js" defer></script>
