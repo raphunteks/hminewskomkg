@@ -1,17 +1,17 @@
 <% 
     // ==============================================================
-    // ENTERPRISE SEO & BREADCRUMB INJECTION
+    // 100% DYNAMIC SSR SEO: Developer Team Credits
     // ==============================================================
     let page = 'ourteam';
     let pageTitle = 'Developer Team';
+    let pageDescription = 'Sosok dibalik layar perancangan dan pengembangan Sistem Informasi website HMI Komisariat Kedokteran Gigi UMI.';
     const defaultAvatar = '/img/logo-hmikomkgumi.png';
-    const seoBaseUrl = 'https://hmikomkgumi.xyz';
+    const seoBaseUrl = 'https://www.hmikomkgumi.xyz';
 %>
-<%- include('partials/header', { page: page, pageTitle: pageTitle }) %>
+<%- include('partials/header', { page: page, pageTitle: pageTitle, pageDescription: pageDescription }) %>
 
 <!-- ==============================================================
-     DYNAMIC SCHEMA.ORG INJECTION (ABOUT PAGE & PERSON)
-     Memaksimalkan Indexing Profil Developer di Google Search
+     GOLD STANDARD GSC: ABOUTPAGE & PERSON ITEMLIST SCHEMA (SSR)
 ============================================================== -->
 <script type="application/ld+json" id="dynamic-seo-schema-team">
 {
@@ -22,15 +22,17 @@
       "@id": "<%= seoBaseUrl %>/ourteam/#webpage",
       "url": "<%= seoBaseUrl %>/ourteam",
       "name": "Developer Team | HMI KomKG UMI",
-      "description": "Sosok dibalik layar pengembangan Sistem Informasi BEM KBMFKG UMI & HMI KomKG UMI."
+      "description": "<%= pageDescription %>",
+      "isPartOf": { "@id": "<%= seoBaseUrl %>/#website" }
     }
     <% if(typeof devTeam !== 'undefined' && devTeam && devTeam.length > 0) { %>
     , {
       "@type": "ItemList",
+      "@id": "<%= seoBaseUrl %>/ourteam/#team-list",
       "name": "Daftar Tim Pengembang",
       "itemListElement": [
         <% devTeam.forEach((member, index) => { 
-            let memberImg = (member.image && member.image.trim() !== '') ? member.image : (seoBaseUrl + defaultAvatar);
+            let memberImg = (member.image && member.image.trim() !== '') ? member.image : defaultAvatar;
             if (!memberImg.startsWith('http')) {
                 memberImg = seoBaseUrl + (memberImg.startsWith('/') ? '' : '/') + memberImg;
             }
@@ -42,10 +44,9 @@
             "@type": "Person",
             "name": <%- JSON.stringify(member.name || 'Developer') %>,
             "jobTitle": <%- JSON.stringify(member.role || 'Contributor') %>,
-            "image": <%- JSON.stringify(memberImg) %>,
+            "image": "<%= memberImg %>",
             "affiliation": {
-              "@type": "Organization",
-              "name": "HMI KomKG UMI"
+              "@id": "<%= seoBaseUrl %>/#organization"
             },
             "sameAs": [
               <%- member.ig ? JSON.stringify(member.ig) : '""' %>
@@ -58,31 +59,6 @@
     <% } %>
   ]
 }
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const metaTags = [
-        { name: "description", content: "Kenali Developer Team hebat dibalik layar pengembangan Sistem Informasi HMI KomKG UMI." },
-        { name: "keywords", content: "Developer Team, Programmer HMI, HMI KomKG UMI, Aksa Arsyad, IT HMI" },
-        { property: "og:title", content: "Developer Team | HMI KomKG UMI" },
-        { property: "og:description", content: "Sosok dibalik layar pengembangan Sistem Informasi web HMI KomKG UMI." },
-        { property: "og:type", content: "website" },
-        { property: "og:url", content: "<%= seoBaseUrl %>/ourteam" },
-        { property: "og:image", content: "<%= seoBaseUrl %><%= defaultAvatar %>" }
-    ];
-
-    metaTags.forEach(tag => {
-        let selector = tag.name ? `meta[name="${tag.name}"]` : `meta[property="${tag.property}"]`;
-        if (!document.head.querySelector(selector)) {
-            let el = document.createElement('meta');
-            if(tag.name) el.name = tag.name;
-            if(tag.property) el.setAttribute('property', tag.property);
-            el.content = tag.content;
-            document.head.appendChild(el);
-        }
-    });
-});
 </script>
 
 <section class="container" style="margin-top: 40px; margin-bottom: 80px;">
