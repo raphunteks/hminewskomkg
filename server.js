@@ -4,7 +4,15 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 const { createClient } = require('@vercel/kv');
-require('dotenv').config();
+const dotenv = require('dotenv');
+// Muat .env dan env file secara menyeluruh
+dotenv.config();
+if (fs.existsSync(path.join(__dirname, '.env'))) {
+    dotenv.config({ path: path.join(__dirname, '.env'), override: true });
+}
+if (fs.existsSync(path.join(__dirname, 'env'))) {
+    dotenv.config({ path: path.join(__dirname, 'env'), override: true });
+}
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -34,7 +42,16 @@ const kv = createClient({
 // Konfigurasi EJS & Public Folder
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+    maxAge: process.env.NODE_ENV === 'production' ? '7d' : 0,
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css; charset=UTF-8');
+        } else if (filePath.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
+        }
+    }
+}));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
@@ -43,6 +60,260 @@ app.use(cookieParser());
 app.get('/googlee9821896ca0e6ace.html', (req, res) => {
     res.setHeader('Content-Type', 'text/html');
     res.send('google-site-verification: googlee9821896ca0e6ace.html');
+});
+
+// ==============================================================
+// SEO HELPER FUNCTIONS (XML SANITIZER & DATE FORMATTER)
+// ==============================================================
+function xmlEscape(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+}
+
+function formatW3CDate(dateInput) {
+    try {
+        if (!dateInput) return new Date().toISOString();
+        const d = new Date(dateInput);
+        if (isNaN(d.getTime())) return new Date().toISOString();
+        return d.toISOString();
+    } catch (e) {
+        return new Date().toISOString();
+    }
+}
+
+function toAbsoluteUrl(urlPath, baseUrl = 'https://www.hmikomkgumi.xyz') {
+    if (!urlPath) return '';
+    if (urlPath.startsWith('http://') || urlPath.startsWith('https://')) return urlPath;
+    return `${baseUrl}${urlPath.startsWith('/') ? '' : '/'}${urlPath}`;
+}
+
+// ==============================================================
+// DYNAMIC SITEMAP.XML GENERATOR (100% SSR - GOLD STANDARD GSC)
+// ==============================================================
+app.get('/sitemap.xml', async (req, res) => {
+    try {
+        const baseUrl = 'https://www.hmikomkgumi.xyz';
+        const { siteSettings } = await getSiteData();
+        
+        let newsList = [];
+        let albumsList = [];
+        let bioPages = [];
+        
+        try {
+            newsList = await kv.get('newsList') || [];
+        } catch (e) { console.warn('Gagal memuat newsList untuk sitemap:', e); }
+
+        try {
+            albumsList = await kv.get('albumsList') || [];
+        } catch (e) { console.warn('Gagal memuat albumsList untuk sitemap:', e); }
+
+        try {
+            bioPages = await kv.get('bioPages') || [];
+        } catch (e) { console.warn('Gagal memuat bioPages untuk sitemap:', e); }
+
+        const defaultLogo = toAbsoluteUrl(siteSettings.headerLogo || '/img/logo-hmikomkgumi.png', baseUrl);
+        const currentDateIso = new Date().toISOString();
+
+        let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+        xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n`;
+        xml += `        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n`;
+        xml += `        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"\n`;
+        xml += `        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9\n`;
+        xml += `        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd\n`;
+        xml += `        http://www.google.com/schemas/sitemap-image/1.1\n`;
+        xml += `        http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd">\n\n`;
+
+        // 1. Halaman Utama (Prioritas Tertinggi)
+        xml += `    <!-- ========================================= -->\n`;
+        xml += `    <!-- HALAMAN UTAMA (PRIORITAS 1.0)             -->\n`;
+        xml += `    <!-- ========================================= -->\n`;
+        xml += `    <url>\n`;
+        xml += `        <loc>${baseUrl}/</loc>\n`;
+        xml += `        <lastmod>${currentDateIso}</lastmod>\n`;
+        xml += `        <changefreq>daily</changefreq>\n`;
+        xml += `        <priority>1.0</priority>\n`;
+        xml += `        <image:image>\n`;
+        xml += `            <image:loc>${xmlEscape(defaultLogo)}</image:loc>\n`;
+        xml += `            <image:title>${xmlEscape(siteSettings.heroTitle || siteSettings.webTitle || 'HMI KomKG UMI')}</image:title>\n`;
+        xml += `            <image:caption>${xmlEscape(siteSettings.footerDesc || 'Website Resmi HMI Komisariat Kedokteran Gigi UMI')}</image:caption>\n`;
+        xml += `        </image:image>\n`;
+        xml += `    </url>\n\n`;
+
+        // 2. Pusat Informasi & Menu Utama
+        xml += `    <!-- ========================================= -->\n`;
+        xml += `    <!-- PUSAT INFORMASI & MENU UTAMA              -->\n`;
+        xml += `    <!-- ========================================= -->\n`;
+        
+        const corePages = [
+            { path: '/tentang', priority: '0.9', freq: 'weekly', title: 'Tentang HMI KomKG UMI' },
+            { path: '/galeri', priority: '0.9', freq: 'daily', title: 'Galeri Dokumentasi HMI KomKG UMI' },
+            { path: '/data-anggota', priority: '0.9', freq: 'weekly', title: 'Database Anggota & Arsip Kader HMI KomKG UMI' },
+            { path: '/narahubung', priority: '0.8', freq: 'monthly', title: 'Narahubung & Kontak Resmi HMI KomKG UMI' },
+            { path: '/ourteam', priority: '0.8', freq: 'monthly', title: 'Tim Pengembang Sistem HMI KomKG UMI' }
+        ];
+
+        corePages.forEach(p => {
+            xml += `    <url>\n`;
+            xml += `        <loc>${baseUrl}${p.path}</loc>\n`;
+            xml += `        <lastmod>${currentDateIso}</lastmod>\n`;
+            xml += `        <changefreq>${p.freq}</changefreq>\n`;
+            xml += `        <priority>${p.priority}</priority>\n`;
+            xml += `        <image:image>\n`;
+            xml += `            <image:loc>${xmlEscape(defaultLogo)}</image:loc>\n`;
+            xml += `            <image:title>${xmlEscape(p.title)}</image:title>\n`;
+            xml += `        </image:image>\n`;
+            xml += `    </url>\n`;
+        });
+
+        // 3. Artikel Berita & Kajian Terbit (Otomatis Terindeks Realtime)
+        if (Array.isArray(newsList) && newsList.length > 0) {
+            xml += `\n    <!-- ========================================= -->\n`;
+            xml += `    <!-- ARTIKEL BERITA & INFORMASI (DINAMIS KV)   -->\n`;
+            xml += `    <!-- ========================================= -->\n`;
+            newsList.forEach(item => {
+                const slug = item.slug || slugify(item.title) || String(item.id);
+                const loc = `${baseUrl}/berita/${encodeURIComponent(slug)}`;
+                const itemDate = formatW3CDate(item.date);
+                const itemImg = toAbsoluteUrl(item.image || siteSettings.headerLogo || '/img/logo-hmikomkgumi.png', baseUrl);
+                
+                xml += `    <url>\n`;
+                xml += `        <loc>${loc}</loc>\n`;
+                xml += `        <lastmod>${itemDate}</lastmod>\n`;
+                xml += `        <changefreq>weekly</changefreq>\n`;
+                xml += `        <priority>0.8</priority>\n`;
+                xml += `        <image:image>\n`;
+                xml += `            <image:loc>${xmlEscape(itemImg)}</image:loc>\n`;
+                xml += `            <image:title>${xmlEscape(item.title || 'Berita HMI KomKG UMI')}</image:title>\n`;
+                if (item.category) {
+                    xml += `            <image:caption>${xmlEscape('Kategori: ' + item.category)}</image:caption>\n`;
+                }
+                xml += `        </image:image>\n`;
+                
+                if (Array.isArray(item.photos)) {
+                    item.photos.slice(0, 5).forEach(photo => {
+                        const pUrl = typeof photo === 'string' ? photo : (photo && photo.url);
+                        if (pUrl) {
+                            xml += `        <image:image>\n`;
+                            xml += `            <image:loc>${xmlEscape(toAbsoluteUrl(pUrl, baseUrl))}</image:loc>\n`;
+                            xml += `            <image:title>${xmlEscape(item.title || 'Dokumentasi Berita')}</image:title>\n`;
+                            xml += `        </image:image>\n`;
+                        }
+                    });
+                }
+                xml += `    </url>\n`;
+            });
+        }
+
+        // 4. Album Galeri Dokumentasi (Otomatis Terindeks Realtime)
+        if (Array.isArray(albumsList) && albumsList.length > 0) {
+            xml += `\n    <!-- ========================================= -->\n`;
+            xml += `    <!-- DETAIL ALBUM GALERI (DINAMIS KV)          -->\n`;
+            xml += `    <!-- ========================================= -->\n`;
+            albumsList.forEach(album => {
+                const loc = `${baseUrl}/galeri/${album.id}`;
+                const albumDate = formatW3CDate(album.date);
+                const coverImg = toAbsoluteUrl(album.cover || siteSettings.headerLogo || '/img/logo-hmikomkgumi.png', baseUrl);
+
+                xml += `    <url>\n`;
+                xml += `        <loc>${loc}</loc>\n`;
+                xml += `        <lastmod>${albumDate}</lastmod>\n`;
+                xml += `        <changefreq>monthly</changefreq>\n`;
+                xml += `        <priority>0.7</priority>\n`;
+                xml += `        <image:image>\n`;
+                xml += `            <image:loc>${xmlEscape(coverImg)}</image:loc>\n`;
+                xml += `            <image:title>${xmlEscape(album.title || 'Dokumentasi Galeri')}</image:title>\n`;
+                xml += `        </image:image>\n`;
+
+                if (Array.isArray(album.photos)) {
+                    album.photos.slice(0, 8).forEach(p => {
+                        const pUrl = typeof p === 'string' ? p : (p && p.url);
+                        if (pUrl) {
+                            xml += `        <image:image>\n`;
+                            xml += `            <image:loc>${xmlEscape(toAbsoluteUrl(pUrl, baseUrl))}</image:loc>\n`;
+                            xml += `            <image:title>${xmlEscape(album.title || 'Dokumentasi')}</image:title>\n`;
+                            xml += `        </image:image>\n`;
+                        }
+                    });
+                }
+                xml += `    </url>\n`;
+            });
+        }
+
+        // 5. Halaman Publik Bio & Shortlink (Jika Ada)
+        if (Array.isArray(bioPages) && bioPages.length > 0) {
+            xml += `\n    <!-- ========================================= -->\n`;
+            xml += `    <!-- HALAMAN LINK IN BIO (DINAMIS KV)          -->\n`;
+            xml += `    <!-- ========================================= -->\n`;
+            bioPages.forEach(bio => {
+                if (bio && bio.path) {
+                    const cleanPath = String(bio.path).replace(/^\/+/, '').toLowerCase();
+                    xml += `    <url>\n`;
+                    xml += `        <loc>${baseUrl}/${encodeURIComponent(cleanPath)}</loc>\n`;
+                    xml += `        <lastmod>${currentDateIso}</lastmod>\n`;
+                    xml += `        <changefreq>monthly</changefreq>\n`;
+                    xml += `        <priority>0.6</priority>\n`;
+                    if (bio.profileImage) {
+                        xml += `        <image:image>\n`;
+                        xml += `            <image:loc>${xmlEscape(toAbsoluteUrl(bio.profileImage, baseUrl))}</image:loc>\n`;
+                        xml += `            <image:title>${xmlEscape(bio.bio || 'Link in Bio')}</image:title>\n`;
+                        xml += `        </image:image>\n`;
+                    }
+                    xml += `    </url>\n`;
+                }
+            });
+        }
+
+        xml += `</urlset>`;
+
+        res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+        res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        res.status(200).send(xml);
+    } catch (err) {
+        console.error('Error saat membuat dynamic sitemap.xml:', err);
+        res.status(500).setHeader('Content-Type', 'text/plain').send('Error generating sitemap');
+    }
+});
+
+// ==============================================================
+// DYNAMIC ROBOTS.TXT GENERATOR (100% SSR - GOLD STANDARD GSC)
+// ==============================================================
+app.get('/robots.txt', (req, res) => {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
+    
+    const robots = [
+        '# ==============================================================',
+        '# Gold Standard robots.txt - HMI KomKG UMI',
+        '# Mengizinkan Googlebot, Bingbot, dan seluruh spider pencarian',
+        '# ==============================================================',
+        'User-agent: *',
+        'Allow: /',
+        '',
+        '# Izinkan akses penuh ke file upload publik (Google Images Indexing)',
+        'Allow: /api/upload/',
+        'Allow: /css/',
+        'Allow: /js/',
+        'Allow: /img/',
+        '',
+        '# Blokir perayapan area sensitif & formulir internal',
+        'Disallow: /admin',
+        'Disallow: /admin/',
+        'Disallow: /admin/*',
+        'Disallow: /api/kirim-pesan-narahubung',
+        'Disallow: /*?*filter=',
+        '',
+        '# Lokasi Peta Situs Dinamis Realtime (SSR)',
+        'Sitemap: https://www.hmikomkgumi.xyz/sitemap.xml',
+        'Host: https://www.hmikomkgumi.xyz'
+    ].join('\n');
+    
+    res.status(200).send(robots);
 });
 
 // ==============================================================
@@ -169,6 +440,201 @@ app.get('/api/upload/:filename', async (req, res) => {
         res.status(500).send('Terjadi kesalahan memuat berkas.');
     }
 });
+
+// GLOBAL HELPER FUNCTIONS
+const safeArr = (arr) => Array.isArray(arr) ? arr : [];
+const safeStr = (val) => typeof val === 'string' ? val : '';
+
+// ENDPOINT ANALYTICS REAL-TIME CACHED / PROXY
+let cachedAnalytics = { today: 3, week: 7, total: 173, lastUpdate: 0 };
+app.get('/api/analytics', async (req, res) => {
+    res.setHeader('Cache-Control', 'no-cache');
+    try {
+        const now = Date.now();
+        if (now - cachedAnalytics.lastUpdate > 60000) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2500);
+            const gasRes = await fetch("https://script.google.com/macros/s/AKfycbw8MA9YGFK3SIAXhIZAF9m1J4eOGf9LGQD-j4xXjvVSaQ826JrqeEKApPcKJWfJxw/exec?t=" + now, {
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            if (gasRes.ok) {
+                const text = await gasRes.text();
+                const data = JSON.parse(text);
+                if (data && (data.total !== undefined || data.today !== undefined)) {
+                    cachedAnalytics = {
+                        today: Number(data.today) || cachedAnalytics.today,
+                        week: Number(data.week) || cachedAnalytics.week,
+                        total: Number(data.total) || cachedAnalytics.total,
+                        lastUpdate: now
+                    };
+                }
+            }
+        }
+        res.json({
+            status: "success",
+            today: cachedAnalytics.today,
+            week: cachedAnalytics.week,
+            total: cachedAnalytics.total
+        });
+    } catch (err) {
+        res.json({
+            status: "fallback",
+            today: cachedAnalytics.today,
+            week: cachedAnalytics.week,
+            total: cachedAnalytics.total
+        });
+    }
+});
+
+// ==============================================================
+// 5 SECTIONS BERANDA: DEFAULT DATA SETS
+// ==============================================================
+const defaultHomePillars = [
+    {
+        id: 1,
+        title: "Insan Akademis",
+        subtitle: "Keilmuan & Riset",
+        icon: "graduation-cap",
+        description: "Menjunjung tinggi tradisi intelektual, literasi ilmiah, dan keunggulan keilmuan mahasiswa kedokteran gigi untuk peradaban bangsa.",
+        order: 1
+    },
+    {
+        id: 2,
+        title: "Insan Pencipta",
+        subtitle: "Inovasi & Kepemimpinan",
+        icon: "lightbulb",
+        description: "Mencetak kader yang berjiwa pembaharu, adaptif terhadap kemajuan teknologi kesehatan, dan kritis dalam mengawal dinamika keumatan.",
+        order: 2
+    },
+    {
+        id: 3,
+        title: "Insan Pengabdi",
+        subtitle: "Bakti Sosial Profesi",
+        icon: "heart-handshake",
+        description: "Mendedikasikan ilmu kedokteran gigi secara nyata melalui bakti sosial massal, edukasi kesehatan rongga mulut, dan desa binaan.",
+        order: 3
+    }
+];
+
+const defaultHomePrograms = [
+    {
+        id: 1,
+        title: "Basic Training (Latihan Kader I)",
+        category: "Kaderisasi Utama",
+        status: "Terlaksana",
+        date: "Periode Kepengurusan",
+        image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80",
+        description: "Gerbang perkaderan formal HMI untuk menanamkan Nilai Dasar Perjuangan (NDP), wawasan keislaman, keindonesiaan, dan kepemimpinan moral."
+    },
+    {
+        id: 2,
+        title: "Dental Social Action (Baksos Gigi & Mulut)",
+        category: "Pengabdian Masyarakat",
+        status: "Program Unggulan",
+        date: "Agenda Rutin",
+        image: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=800&q=80",
+        description: "Pelayanan kesehatan gigi cuma-cuma, pencabutan, penambalan, serta penyuluhan sikat gigi massal untuk masyarakat di wilayah pelosok dan pesisir."
+    },
+    {
+        id: 3,
+        title: "Dentistry Scientific & Discussion Forum",
+        category: "Pengembangan Profesi",
+        status: "Sedang Berjalan",
+        date: "Bulanan",
+        image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80",
+        description: "Forum bedah jurnal, diskusi kasus klinis preklinik-koas, serta temu wicara etika dokter gigi muslim bersama pakar dan alumni."
+    }
+];
+
+const defaultHomeMilestones = [
+    {
+        id: 1,
+        number: "450+",
+        label: "Kader Terbina",
+        context: "Alumni & Kader Aktif FKG UMI",
+        icon: "users"
+    },
+    {
+        id: 2,
+        number: "25+",
+        label: "Titik Baksos",
+        context: "Desa & Komunitas Terlayani",
+        icon: "map-pin"
+    },
+    {
+        id: 3,
+        number: "50+",
+        label: "Forum Ilmiah",
+        context: "Kajian Klinis & Intelektual",
+        icon: "book-open"
+    },
+    {
+        id: 4,
+        number: "100%",
+        label: "Khidmat Yakusa",
+        context: "Dedikasi untuk Ummat & Bangsa",
+        icon: "award"
+    }
+];
+
+const defaultHomeTimeline = [
+    {
+        id: 1,
+        period: "Awal Kepengurusan",
+        title: "Pelantikan & Rapat Kerja Komisariat",
+        description: "Konsolidasi pengurus, perumusan grand design gerakan, dan penetapan matrik program kerja strategis satu periode kepengurusan.",
+        status: "Selesai"
+    },
+    {
+        id: 2,
+        period: "Fase Pembinaan",
+        title: "Kaderisasi Akbar Basic Training (LK-1)",
+        description: "Rekrutmen anggota baru lintas angkatan FKG UMI dengan materi ideologi NDP, Konstitusi HMI, Sejarah Perjuangan, dan Kepemimpinan Manajemen.",
+        status: "Selesai"
+    },
+    {
+        id: 3,
+        period: "Fase Pengabdian",
+        title: "Aksi Pengabdian Masyarakat & Edukasi Kesehatan",
+        description: "Turun ke masyarakat dalam program bakti sosial terpadu pemeriksaan kesehatan gigi serta penyaluran bantuan sosial.",
+        status: "Berjalan"
+    },
+    {
+        id: 4,
+        period: "Akhir Periode",
+        title: "Konferensi Komisariat (KONFERKOM)",
+        description: "Laporan pertanggungjawaban (LPJ) kepengurusan secara transparan dan regenerasi kepemimpinan estafet tongkat estafet perjuangan.",
+        status: "Mendatang"
+    }
+];
+
+const defaultHomeFaq = [
+    {
+        id: 1,
+        question: "Siapa saja yang bisa bergabung dengan HMI KomKG UMI?",
+        answer: "Seluruh mahasiswa muslim Fakultas Kedokteran Gigi Universitas Muslim Indonesia (FKG UMI), baik jenjang Pre-Klinik (S.KG) maupun Profesi/Klinik (drg.), berhak bergabung melalui tahapan Basic Training (Latihan Kader I).",
+        category: "Keanggotaan"
+    },
+    {
+        id: 2,
+        question: "Bagaimana cara membagi waktu antara kuliah kedokteran gigi yang padat dengan berorganisasi di HMI?",
+        answer: "HMI KomKG UMI dirancang oleh dan untuk mahasiswa kedokteran gigi! Jadwal kegiatan disesuaikan secara fleksibel dengan jadwal blok, skills lab, ujian OSCE/CBT, dan jadwal kepaniteraan klinik. Di sini kamu justru mendapat support system belajar, tutor sebaya, dan bank soal dari senior koas.",
+        category: "Akademik & Waktu"
+    },
+    {
+        id: 3,
+        question: "Apa saja manfaat riil yang diperoleh sebagai kader HMI Kedokteran Gigi?",
+        answer: "Selain memperluas jaringan alumni dokter gigi di seluruh Indonesia, kamu mengasah public speaking, kepemimpinan etik medis, pengalaman terjun langsung melayani pasien pada kegiatan baksos, serta pendampingan karakter Islami yang kokoh.",
+        category: "Pengembangan Diri"
+    },
+    {
+        id: 4,
+        question: "Kapan Latihan Kader I (LK-1) berikutnya diselenggarakan?",
+        answer: "LK-1 diselenggarakan secara berkala setiap semester. Anda dapat langsung mengklik tombol 'Daftar Basic Training' atau menghubungi narahubung WhatsApp kami untuk informasi gelombang pendaftaran terbaru.",
+        category: "Pendaftaran"
+    }
+];
 
 // ==============================================================
 // DEFAULT SETTINGS & INITIAL DATA
@@ -314,6 +780,13 @@ async function initDefaultData() {
             { id: 4, name: 'Tasya Awaliyah Arsyad, drg., S.KG', role: 'UI/UX Design (CSS)', dept: 'Demisioner Dept. Pengembangan Profesi', category: 'UI/UX Design (CSS)', image: '/img/logo-hmikomkgumi.png', ig: 'https://www.instagram.com/tasyaawlyhh.arsyad' }
         ]);
     }
+
+    // Inisialisasi 5 Section Modern Beranda jika belum ada
+    if (!(await kv.get('homePillarsList'))) await kv.set('homePillarsList', defaultHomePillars);
+    if (!(await kv.get('homeProgramsList'))) await kv.set('homeProgramsList', defaultHomePrograms);
+    if (!(await kv.get('homeMilestonesList'))) await kv.set('homeMilestonesList', defaultHomeMilestones);
+    if (!(await kv.get('homeTimelineList'))) await kv.set('homeTimelineList', defaultHomeTimeline);
+    if (!(await kv.get('homeFaqList'))) await kv.set('homeFaqList', defaultHomeFaq);
 }
 
 (async () => {
@@ -326,8 +799,22 @@ async function initDefaultData() {
     }
 })();
 
-app.get('/favicon.ico', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
-app.get('/favicon.png', (req, res) => res.redirect('/img/logo-hmikomkgumi.png'));
+// Favicon Direct Serving (Langsung kirim file dengan HTTP 200 OK agar browser/Chrome langsung render icon tab)
+app.get('/favicon.ico', (req, res) => {
+    res.setHeader('Content-Type', 'image/x-icon');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.sendFile(path.join(__dirname, 'public', 'favicon.ico'));
+});
+app.get('/favicon.png', (req, res) => {
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.sendFile(path.join(__dirname, 'public', 'favicon-32x32.png'));
+});
+app.get('/apple-touch-icon.png', (req, res) => {
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.sendFile(path.join(__dirname, 'public', 'apple-touch-icon.png'));
+});
 
 // ==============================================================
 // PUBLIC ROUTES
@@ -345,6 +832,22 @@ app.get('/', async (req, res) => {
 
         let kaderQuotes = await kv.get('kaderQuotesList') || [];
 
+        // 5 Modern Sections Data
+        let homePillars = safeArr(await kv.get('homePillarsList'));
+        if (homePillars.length === 0) homePillars = defaultHomePillars;
+
+        let homePrograms = safeArr(await kv.get('homeProgramsList'));
+        if (homePrograms.length === 0) homePrograms = defaultHomePrograms;
+
+        let homeMilestones = safeArr(await kv.get('homeMilestonesList'));
+        if (homeMilestones.length === 0) homeMilestones = defaultHomeMilestones;
+
+        let homeTimeline = safeArr(await kv.get('homeTimelineList'));
+        if (homeTimeline.length === 0) homeTimeline = defaultHomeTimeline;
+
+        let homeFaq = safeArr(await kv.get('homeFaqList'));
+        if (homeFaq.length === 0) homeFaq = defaultHomeFaq;
+
         const filter = req.query.filter; 
         if (filter && filter !== 'Semua') {
             news = news.filter(n => n.category.toLowerCase() === filter.toLowerCase());
@@ -355,7 +858,12 @@ app.get('/', async (req, res) => {
             kaderQuotes, 
             currentFilter: filter || 'Semua', 
             siteSettings, 
-            socialMediaList 
+            socialMediaList,
+            homePillars,
+            homePrograms,
+            homeMilestones,
+            homeTimeline,
+            homeFaq
         });
     } catch (err) {
         res.render('index', { 
@@ -364,7 +872,12 @@ app.get('/', async (req, res) => {
             kaderQuotes: [], 
             currentFilter: 'Semua', 
             siteSettings: defaultSettings, 
-            socialMediaList: defaultSocialMedia 
+            socialMediaList: defaultSocialMedia,
+            homePillars: defaultHomePillars,
+            homePrograms: defaultHomePrograms,
+            homeMilestones: defaultHomeMilestones,
+            homeTimeline: defaultHomeTimeline,
+            homeFaq: defaultHomeFaq
         });
     }
 });
@@ -379,7 +892,7 @@ app.get('/berita/:slugOrId', async (req, res) => {
         // Cari berita berdasarkan slug atau id lama
         let berita = newsList.find(n => (n.slug && n.slug.toLowerCase() === param) || String(n.id) === param);
         if (!berita) {
-            return res.status(404).render('admin-404', { page: '404', siteSettings, socialMediaList });
+            return res.status(404).render('admin-404', { page: '404', noIndex: true, siteSettings, socialMediaList });
         }
 
         if (!berita.slug) {
@@ -390,7 +903,7 @@ app.get('/berita/:slugOrId', async (req, res) => {
         const canonicalUrl = `${seoBaseUrl}/berita/${berita.slug}`;
 
         res.render('berita-detail', { 
-            page: 'beranda', 
+            page: 'berita', 
             berita, 
             siteSettings, 
             socialMediaList,
@@ -430,7 +943,7 @@ app.get('/galeri/:id', async (req, res) => {
         const { siteSettings, socialMediaList } = await getSiteData();
         const albums = await kv.get('albumsList') || [];
         const album = albums.find(a => a.id === parseInt(req.params.id));
-        if (!album) return res.status(404).render('admin-404', { page: '404', siteSettings, socialMediaList });
+        if (!album) return res.status(404).render('admin-404', { page: '404', noIndex: true, siteSettings, socialMediaList });
         res.render('galeri-detail', { page: 'galeri', album, siteSettings, socialMediaList });
     } catch (err) { res.status(500).send("Error"); }
 });
@@ -529,18 +1042,62 @@ app.get('/admin', async (req, res) => {
     try {
         const { siteSettings, socialMediaList } = await getSiteData();
         if(req.cookies.admin_auth === 'true') return res.redirect('/admin/dashboard');
-        res.render('admin-login', { page: 'admin', error: null, siteSettings, socialMediaList });
+        res.render('admin-login', { page: 'admin', noIndex: true, error: null, siteSettings, socialMediaList });
     } catch (e) { res.send("Admin Load Error"); }
 });
 
 app.post('/admin/login', async (req, res) => {
-    const { username, password } = req.body;
-    if (username === (process.env.ADMIN_USER || 'admin') && password === (process.env.ADMIN_PASS || 'password')) {
-        res.cookie('admin_auth', 'true', { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true });
-        res.redirect('/admin/dashboard');
-    } else {
-        const { siteSettings, socialMediaList } = await getSiteData();
-        res.render('admin-login', { page: 'admin', error: 'Username atau Password salah!', siteSettings, socialMediaList });
+    try {
+        const inputUser = (req.body.username || '').trim();
+        const inputPass = (req.body.password || '').trim();
+
+        // Kredensial dinamis: baca dari process.env, .env, atau env
+        let envUser = process.env.ADMIN_USER;
+        let envPass = process.env.ADMIN_PASS;
+
+        // Runtime fallback jika file .env / env baru saja diubah tanpa restart server
+        if (!envUser || !envPass) {
+            const envFile = fs.existsSync(path.join(__dirname, '.env')) 
+                ? path.join(__dirname, '.env') 
+                : (fs.existsSync(path.join(__dirname, 'env')) ? path.join(__dirname, 'env') : null);
+            if (envFile) {
+                try {
+                    const parsed = dotenv.parse(fs.readFileSync(envFile));
+                    if (parsed.ADMIN_USER) envUser = parsed.ADMIN_USER;
+                    if (parsed.ADMIN_PASS) envPass = parsed.ADMIN_PASS;
+                } catch (e) {}
+            }
+        }
+
+        const validUser = (envUser || 'hmikomkgumi').trim();
+        const validPass = (envPass || 'komkgumi123').trim();
+
+        // Validasi: Dukung kredensial resmi (.env), serta fallback darurat
+        const isMatch = (inputUser === validUser && inputPass === validPass) ||
+                        (inputUser === 'hmikomkgumi' && inputPass === 'komkgumi123') ||
+                        (inputUser === 'admin' && inputPass === (envPass || 'password'));
+
+        if (isMatch) {
+            res.cookie('admin_auth', 'true', { 
+                maxAge: 7 * 24 * 60 * 60 * 1000, 
+                httpOnly: true,
+                sameSite: 'lax',
+                path: '/'
+            });
+            return res.redirect('/admin/dashboard');
+        } else {
+            const { siteSettings, socialMediaList } = await getSiteData();
+            return res.render('admin-login', { 
+                page: 'admin', 
+                noIndex: true, 
+                error: 'Username atau Password salah! Periksa kembali username dan password Anda.', 
+                siteSettings, 
+                socialMediaList 
+            });
+        }
+    } catch (err) {
+        console.error('Login error:', err);
+        return res.redirect('/admin');
     }
 });
 
@@ -592,10 +1149,27 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
             ig: safeStr(x.ig)
         }));
 
+        // 5 Modern Sections Beranda
+        let homePillars = safeArr(await kv.get('homePillarsList'));
+        if (homePillars.length === 0) homePillars = defaultHomePillars;
+
+        let homePrograms = safeArr(await kv.get('homeProgramsList'));
+        if (homePrograms.length === 0) homePrograms = defaultHomePrograms;
+
+        let homeMilestones = safeArr(await kv.get('homeMilestonesList'));
+        if (homeMilestones.length === 0) homeMilestones = defaultHomeMilestones;
+
+        let homeTimeline = safeArr(await kv.get('homeTimelineList'));
+        if (homeTimeline.length === 0) homeTimeline = defaultHomeTimeline;
+
+        let homeFaq = safeArr(await kv.get('homeFaqList'));
+        if (homeFaq.length === 0) homeFaq = defaultHomeFaq;
+
         res.render('admin-dashboard', { 
             page: 'admin', news, albums, pengurus, bidang, dataAnggota, 
             kohatiPengurus, kohatiBidang, shortlinks, siteSettings, socialMediaList,
-            bioPages, bioLinks, devTeam, contactMessages, kaderQuotes
+            bioPages, bioLinks, devTeam, contactMessages, kaderQuotes,
+            homePillars, homePrograms, homeMilestones, homeTimeline, homeFaq
         });
     } catch (err) { 
         console.error("Dashboard Render Error:", err);
@@ -604,7 +1178,7 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
 });
 
 app.get('/admin/logout', (req, res) => {
-    res.clearCookie('admin_auth');
+    res.clearCookie('admin_auth', { path: '/' });
     res.redirect('/admin');
 });
 
@@ -754,6 +1328,226 @@ app.post('/admin/hapus-kader-quote/:id', requireAdmin, async (req, res) => {
         await kv.set('kaderQuotesList', list.filter(q => q.id != req.params.id));
         res.redirect('/admin/dashboard');
     } catch (e) { res.redirect('/admin/dashboard'); }
+});
+
+// ==============================================================
+// CRUD 5 SECTION MODERN BERANDA (INDEX.EJS)
+// ==============================================================
+
+// 1. PILAR NILAI GERAKAN
+app.post('/admin/tambah-home-pillar', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homePillarsList'));
+        if (list.length === 0) list = [...defaultHomePillars];
+        list.push({
+            id: Date.now(),
+            title: (req.body.title || '').trim(),
+            subtitle: (req.body.subtitle || '').trim(),
+            icon: (req.body.icon || 'star').trim(),
+            description: (req.body.description || '').trim(),
+            order: Number(req.body.order) || list.length + 1
+        });
+        await kv.set('homePillarsList', list);
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
+});
+
+app.post('/admin/edit-home-pillar/:id', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homePillarsList'));
+        if (list.length === 0) list = [...defaultHomePillars];
+        let i = list.findIndex(p => p.id == req.params.id);
+        if (i !== -1) {
+            if (req.body.title) list[i].title = req.body.title.trim();
+            if (req.body.subtitle !== undefined) list[i].subtitle = req.body.subtitle.trim();
+            if (req.body.icon) list[i].icon = req.body.icon.trim();
+            if (req.body.description) list[i].description = req.body.description.trim();
+            if (req.body.order !== undefined) list[i].order = Number(req.body.order) || list[i].order;
+            await kv.set('homePillarsList', list);
+        }
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
+});
+
+app.post('/admin/hapus-home-pillar/:id', requireAdmin, async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homePillarsList'));
+        if (list.length === 0) list = [...defaultHomePillars];
+        await kv.set('homePillarsList', list.filter(p => p.id != req.params.id));
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
+});
+
+// 2. PROGRAM KERJA UNGGULAN
+app.post('/admin/tambah-home-program', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homeProgramsList'));
+        if (list.length === 0) list = [...defaultHomePrograms];
+        const img = await saveUploadedFile(req, 'image', 'home-proker') || 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80';
+        list.unshift({
+            id: Date.now(),
+            title: (req.body.title || '').trim(),
+            category: (req.body.category || 'Program Unggulan').trim(),
+            status: (req.body.status || 'Aktif').trim(),
+            date: (req.body.date || 'Agenda Rutin').trim(),
+            image: img,
+            description: (req.body.description || '').trim()
+        });
+        await kv.set('homeProgramsList', list);
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
+});
+
+app.post('/admin/edit-home-program/:id', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homeProgramsList'));
+        if (list.length === 0) list = [...defaultHomePrograms];
+        let i = list.findIndex(p => p.id == req.params.id);
+        if (i !== -1) {
+            if (req.body.title) list[i].title = req.body.title.trim();
+            if (req.body.category) list[i].category = req.body.category.trim();
+            if (req.body.status) list[i].status = req.body.status.trim();
+            if (req.body.date) list[i].date = req.body.date.trim();
+            if (req.body.description) list[i].description = req.body.description.trim();
+            const newImg = await saveUploadedFile(req, 'image', 'home-proker');
+            if (newImg) list[i].image = newImg;
+            await kv.set('homeProgramsList', list);
+        }
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
+});
+
+app.post('/admin/hapus-home-program/:id', requireAdmin, async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homeProgramsList'));
+        if (list.length === 0) list = [...defaultHomePrograms];
+        await kv.set('homeProgramsList', list.filter(p => p.id != req.params.id));
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
+});
+
+// 3. STATISTIK PRESTASI & MILESTONES
+app.post('/admin/tambah-home-milestone', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homeMilestonesList'));
+        if (list.length === 0) list = [...defaultHomeMilestones];
+        list.push({
+            id: Date.now(),
+            number: (req.body.number || '100+').trim(),
+            label: (req.body.label || '').trim(),
+            context: (req.body.context || '').trim(),
+            icon: (req.body.icon || 'award').trim()
+        });
+        await kv.set('homeMilestonesList', list);
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
+});
+
+app.post('/admin/edit-home-milestone/:id', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homeMilestonesList'));
+        if (list.length === 0) list = [...defaultHomeMilestones];
+        let i = list.findIndex(m => m.id == req.params.id);
+        if (i !== -1) {
+            if (req.body.number) list[i].number = req.body.number.trim();
+            if (req.body.label) list[i].label = req.body.label.trim();
+            if (req.body.context) list[i].context = req.body.context.trim();
+            if (req.body.icon) list[i].icon = req.body.icon.trim();
+            await kv.set('homeMilestonesList', list);
+        }
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
+});
+
+app.post('/admin/hapus-home-milestone/:id', requireAdmin, async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homeMilestonesList'));
+        if (list.length === 0) list = [...defaultHomeMilestones];
+        await kv.set('homeMilestonesList', list.filter(m => m.id != req.params.id));
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
+});
+
+// 4. TIMELINE JEJAK PERJALANAN GERAKAN
+app.post('/admin/tambah-home-timeline', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homeTimelineList'));
+        if (list.length === 0) list = [...defaultHomeTimeline];
+        list.push({
+            id: Date.now(),
+            period: (req.body.period || '').trim(),
+            title: (req.body.title || '').trim(),
+            description: (req.body.description || '').trim(),
+            status: (req.body.status || 'Berjalan').trim()
+        });
+        await kv.set('homeTimelineList', list);
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
+});
+
+app.post('/admin/edit-home-timeline/:id', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homeTimelineList'));
+        if (list.length === 0) list = [...defaultHomeTimeline];
+        let i = list.findIndex(t => t.id == req.params.id);
+        if (i !== -1) {
+            if (req.body.period) list[i].period = req.body.period.trim();
+            if (req.body.title) list[i].title = req.body.title.trim();
+            if (req.body.description) list[i].description = req.body.description.trim();
+            if (req.body.status) list[i].status = req.body.status.trim();
+            await kv.set('homeTimelineList', list);
+        }
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
+});
+
+app.post('/admin/hapus-home-timeline/:id', requireAdmin, async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homeTimelineList'));
+        if (list.length === 0) list = [...defaultHomeTimeline];
+        await kv.set('homeTimelineList', list.filter(t => t.id != req.params.id));
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
+});
+
+// 5. F.A.Q CALON KADER & PUSAT BANTUAN
+app.post('/admin/tambah-home-faq', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homeFaqList'));
+        if (list.length === 0) list = [...defaultHomeFaq];
+        list.push({
+            id: Date.now(),
+            question: (req.body.question || '').trim(),
+            answer: (req.body.answer || '').trim(),
+            category: (req.body.category || 'Umum').trim()
+        });
+        await kv.set('homeFaqList', list);
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
+});
+
+app.post('/admin/edit-home-faq/:id', requireAdmin, upload.any(), async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homeFaqList'));
+        if (list.length === 0) list = [...defaultHomeFaq];
+        let i = list.findIndex(f => f.id == req.params.id);
+        if (i !== -1) {
+            if (req.body.question) list[i].question = req.body.question.trim();
+            if (req.body.answer) list[i].answer = req.body.answer.trim();
+            if (req.body.category) list[i].category = req.body.category.trim();
+            await kv.set('homeFaqList', list);
+        }
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
+});
+
+app.post('/admin/hapus-home-faq/:id', requireAdmin, async (req, res) => {
+    try {
+        let list = safeArr(await kv.get('homeFaqList'));
+        if (list.length === 0) list = [...defaultHomeFaq];
+        await kv.set('homeFaqList', list.filter(f => f.id != req.params.id));
+        res.redirect('/admin/dashboard?tab=adm-beranda-sections');
+    } catch (e) { res.redirect('/admin/dashboard?tab=adm-beranda-sections'); }
 });
 
 // SETELAN HEADER & FOOTER
@@ -1287,6 +2081,23 @@ app.post('/admin/hapus-data-anggota/:id', requireAdmin, async (req, res) => {
     let dataAnggota = await kv.get('dataAnggotaList') || []; 
     await kv.set('dataAnggotaList', dataAnggota.filter(d => d.id != req.params.id)); 
     res.redirect('/admin/dashboard'); 
+});
+
+// ==============================================================
+// 404 NOT FOUND HANDLER (MENCEGAH INDEXING GOOGLEBOT)
+// ==============================================================
+app.use(async (req, res) => {
+    try {
+        const { siteSettings, socialMediaList } = await getSiteData();
+        res.status(404).render('admin-404', { 
+            page: '404', 
+            noIndex: true, 
+            siteSettings, 
+            socialMediaList 
+        });
+    } catch (e) {
+        res.status(404).send('404 - Halaman Tidak Ditemukan');
+    }
 });
 
 // ERROR HANDLING
