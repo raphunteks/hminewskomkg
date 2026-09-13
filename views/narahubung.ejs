@@ -1,12 +1,11 @@
 <% 
     // ==============================================================
-    // FIX ERROR 500 & SEO BREADCRUMB: 
-    // Injeksi variabel SEO secara eksplisit untuk Halaman Narahubung
+    // 100% DYNAMIC SSR SEO: Halaman Narahubung Resmi
     // ==============================================================
     let page = 'narahubung';
     let pageTitle = 'Narahubung & Kontak Resmi';
     let pageDescription = 'Hubungi HMI Komisariat Kedokteran Gigi UMI. Layanan informasi kegiatan, pengajuan kerjasama, surat undangan resmi, dan alamat sekretariat.';
-    const seoBaseUrl = 'https://hmikomkgumi.xyz';
+    const seoBaseUrl = 'https://www.hmikomkgumi.xyz';
 
     const safeSettings = (typeof siteSettings !== 'undefined' && siteSettings) ? siteSettings : {};
     const contactAddress = safeSettings.contactAddress || "Jl. Pajonga Dg. Ngalle No. 27 A, Pa'batong, Kec. Mamajang, Kota Makassar, Sulawesi Selatan";
@@ -18,7 +17,7 @@
 <%- include('partials/header', { page: page, pageTitle: pageTitle, pageDescription: pageDescription }) %>
 
 <!-- ==============================================================
-     ADVANCED JSON-LD SCHEMA.ORG (CONTACTPAGE & ORGANIZATION)
+     GOLD STANDARD GSC: CONTACTPAGE SCHEMA.ORG
 ============================================================== -->
 <script type="application/ld+json">
 {
@@ -32,40 +31,6 @@
       "description": "<%= pageDescription %>",
       "inLanguage": "id-ID",
       "isPartOf": { "@id": "<%= seoBaseUrl %>/#website" }
-    },
-    {
-      "@type": "Organization",
-      "@id": "<%= seoBaseUrl %>/#organization",
-      "name": "HMI KomKG UMI",
-      "url": "<%= seoBaseUrl %>/",
-      "email": "<%= contactEmail %>",
-      "telephone": "<%= contactWa.replace(/[^0-9+]/g, '') %>",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "<%= contactAddress %>",
-        "addressLocality": "Makassar",
-        "addressRegion": "Sulawesi Selatan",
-        "postalCode": "90131",
-        "addressCountry": "ID"
-      }
-    },
-    {
-      "@type": "BreadcrumbList",
-      "@id": "<%= seoBaseUrl %>/narahubung/#breadcrumb",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Beranda",
-          "item": "<%= seoBaseUrl %>/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Narahubung",
-          "item": "<%= seoBaseUrl %>/narahubung"
-        }
-      ]
     }
   ]
 }
